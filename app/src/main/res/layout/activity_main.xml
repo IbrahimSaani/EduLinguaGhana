@@ -1,60 +1,87 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:gravity="center"
-    android:padding="24dp">
+    android:background="#FFF8E1">
 
-    <TextView
-        android:id="@+id/tvTitle"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="EduLingua Ghana"
-        android:textSize="26sp"
-        android:textStyle="bold"
-        android:paddingBottom="16dp" />
-
-    <TextView
-        android:id="@+id/tvSubtitle"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Choose a language"
-        android:textSize="18sp"
-        android:paddingBottom="24dp" />
-
-    <Button
-        android:id="@+id/btnEnglish"
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="English" />
+        android:orientation="vertical"
+        android:gravity="center_horizontal"
+        android:padding="24dp">
 
-    <Button
-        android:id="@+id/btnFrench"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="French"
-        android:layout_marginTop="8dp" />
+        <TextView
+            android:id="@+id/tvTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="EduLingua Ghana"
+            android:textSize="28sp"
+            android:textStyle="bold"
+            android:textColor="#E65100"
+            android:paddingBottom="8dp" />
 
-    <Button
-        android:id="@+id/btnTwi"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Twi"
-        android:layout_marginTop="8dp" />
+        <TextView
+            android:id="@+id/tvSubtitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Learn Alphabets &amp; Numbers"
+            android:textSize="18sp"
+            android:textColor="#5D4037"
+            android:paddingBottom="8dp" />
 
-    <Button
-        android:id="@+id/btnEwe"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Ewe"
-        android:layout_marginTop="8dp" />
+        <TextView
+            android:id="@+id/tvBestScoreMain"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Best quiz score: 0 / 10"
+            android:textSize="16sp"
+            android:textColor="#6D4C41"
+            android:paddingBottom="24dp" />
 
-    <Button
-        android:id="@+id/btnGa"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Ga"
-        android:layout_marginTop="8dp" />
+        <Button
+            android:id="@+id/btnEnglish"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="English"
+            android:textAllCaps="false"
+            android:textSize="18sp" />
 
-</LinearLayout>
+        <Button
+            android:id="@+id/btnFrench"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="French"
+            android:textAllCaps="false"
+            android:textSize="18sp"
+            android:layout_marginTop="8dp" />
+
+        <Button
+            android:id="@+id/btnTwi"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Twi"
+            android:textAllCaps="false"
+            android:textSize="18sp"
+            android:layout_marginTop="8dp" />
+
+        <Button
+            android:id="@+id/btnEwe"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Ewe"
+            android:textAllCaps="false"
+            android:textSize="18sp"
+            android:layout_marginTop="8dp" />
+
+        <Button
+            android:id="@+id/btnGa"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Ga"
+            android:textAllCaps="false"
+            android:textSize="18sp"
+            android:layout_marginTop="8dp" />
+
+    </LinearLayout>
+</ScrollView>
