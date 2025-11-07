@@ -2,68 +2,121 @@
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#E3F2FD">
+    android:background="#F3F5FF">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:gravity="center_horizontal"
-        android:padding="24dp">
+        android:padding="16dp">
 
-        <!-- Header: Question progress + score -->
-        <TextView
-            android:id="@+id/tvQuestionInfo"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Question 1 / 10"
-            android:textSize="18sp"
-            android:textStyle="bold"
-            android:textColor="#0D47A1"
-            android:paddingBottom="4dp" />
-
-        <TextView
-            android:id="@+id/tvScore"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Score: 0"
-            android:textSize="18sp"
-            android:textColor="#1B5E20"
-            android:paddingBottom="4dp" />
-
-        <TextView
-            android:id="@+id/tvBestScore"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Best: 0 / 10"
-            android:textSize="16sp"
-            android:textColor="#4E342E"
-            android:paddingBottom="16dp" />
-
-        <TextView
-            android:id="@+id/tvQuestionTitle"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Which letter or number did you hear?"
-            android:textSize="20sp"
-            android:textStyle="bold"
-            android:textColor="#263238"
-            android:paddingBottom="24dp" />
-
-        <Button
-            android:id="@+id/btnPlayAudio"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Play Audio"
-            android:backgroundTint="#64B5F6"
-            android:textAllCaps="false" />
-
-        <!-- Options -->
+        <!-- Top stats panel -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:background="@drawable/bg_quiz_stats"
             android:orientation="vertical"
-            android:paddingTop="32dp">
+            android:padding="16dp"
+            android:layout_marginBottom="16dp">
+
+            <TextView
+                android:id="@+id/tvQuestionInfo"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Question 1 / 10"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                android:textColor="#0D47A1" />
+
+            <TextView
+                android:id="@+id/tvScore"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Score: 0"
+                android:textSize="16sp"
+                android:textColor="#1B5E20"
+                android:layout_marginTop="4dp" />
+
+            <TextView
+                android:id="@+id/tvBestScore"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Best: 0 / 10"
+                android:textSize="14sp"
+                android:textColor="#4E342E"
+                android:layout_marginTop="4dp" />
+
+            <!-- Timer -->
+            <TextView
+                android:id="@+id/tvTimer"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Time: 15s"
+                android:textSize="14sp"
+                android:textColor="#B71C1C"
+                android:layout_marginTop="4dp" />
+
+            <!-- Music toggle button -->
+            <Button
+                android:id="@+id/btnToggleMusic"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Music: Off"
+                android:textAllCaps="false"
+                android:background="@drawable/bg_quiz_secondary_button"
+                android:textColor="#37474F"
+                android:paddingLeft="16dp"
+                android:paddingRight="16dp"
+                android:layout_marginTop="8dp" />
+        </LinearLayout>
+
+        <!-- Question card -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/bg_quiz_card"
+            android:orientation="vertical"
+            android:padding="16dp"
+            android:layout_marginBottom="16dp">
+
+            <TextView
+                android:id="@+id/tvQuestionTitle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Which letter or number did you hear?"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                android:textColor="#263238"
+                android:layout_marginBottom="12dp" />
+
+            <Button
+                android:id="@+id/btnPlayAudio"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Play Audio"
+                android:textAllCaps="false"
+                android:paddingLeft="24dp"
+                android:paddingRight="24dp"
+                android:background="@drawable/bg_quiz_primary_button"
+                android:textColor="#FFFFFF" />
+        </LinearLayout>
+
+        <!-- Options panel -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/bg_quiz_card"
+            android:orientation="vertical"
+            android:padding="16dp"
+            android:layout_marginBottom="16dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Choose the correct answer:"
+                android:textSize="16sp"
+                android:textColor="#37474F"
+                android:layout_marginBottom="12dp" />
 
             <Button
                 android:id="@+id/btnOption1"
@@ -71,8 +124,10 @@
                 android:layout_height="wrap_content"
                 android:text="Option 1"
                 android:textAllCaps="false"
-                android:backgroundTint="#BBDEFB"
-                android:layout_marginBottom="12dp"/>
+                android:background="@drawable/bg_quiz_option"
+                android:textColor="#212121"
+                android:layout_marginBottom="8dp"
+                android:padding="12dp" />
 
             <Button
                 android:id="@+id/btnOption2"
@@ -80,8 +135,10 @@
                 android:layout_height="wrap_content"
                 android:text="Option 2"
                 android:textAllCaps="false"
-                android:backgroundTint="#C5CAE9"
-                android:layout_marginBottom="12dp"/>
+                android:background="@drawable/bg_quiz_option"
+                android:textColor="#212121"
+                android:layout_marginBottom="8dp"
+                android:padding="12dp" />
 
             <Button
                 android:id="@+id/btnOption3"
@@ -89,37 +146,54 @@
                 android:layout_height="wrap_content"
                 android:text="Option 3"
                 android:textAllCaps="false"
-                android:backgroundTint="#D1C4E9" />
+                android:background="@drawable/bg_quiz_option"
+                android:textColor="#212121"
+                android:padding="12dp" />
         </LinearLayout>
 
-        <!-- Feedback -->
+        <!-- Feedback text -->
         <TextView
             android:id="@+id/tvFeedback"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text=""
             android:textSize="18sp"
             android:textStyle="bold"
             android:textColor="#37474F"
-            android:paddingTop="24dp" />
+            android:gravity="center_horizontal"
+            android:layout_marginBottom="16dp" />
 
-        <!-- Controls -->
-        <Button
-            android:id="@+id/btnNextQuestion"
-            android:layout_width="wrap_content"
+        <!-- Bottom buttons -->
+        <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Next Question"
-            android:textAllCaps="false"
-            android:backgroundTint="#81C784"
-            android:layout_marginTop="24dp" />
+            android:orientation="horizontal"
+            android:gravity="center"
+            android:layout_marginBottom="8dp">
 
-        <Button
-            android:id="@+id/btnBackQuiz"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Back"
-            android:textAllCaps="false"
-            android:backgroundTint="#FFAB91"
-            android:layout_marginTop="16dp" />
+            <Button
+                android:id="@+id/btnNextQuestion"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Next Question"
+                android:textAllCaps="false"
+                android:background="@drawable/bg_quiz_primary_button"
+                android:textColor="#FFFFFF"
+                android:paddingLeft="24dp"
+                android:paddingRight="24dp"
+                android:layout_marginEnd="16dp" />
+
+            <Button
+                android:id="@+id/btnBackQuiz"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Back"
+                android:textAllCaps="false"
+                android:background="@drawable/bg_quiz_secondary_button"
+                android:textColor="#37474F"
+                android:paddingLeft="24dp"
+                android:paddingRight="24dp" />
+        </LinearLayout>
+
     </LinearLayout>
 </ScrollView>

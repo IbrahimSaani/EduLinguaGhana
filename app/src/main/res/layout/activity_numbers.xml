@@ -2,72 +2,131 @@
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#FFF3E0">
+    android:background="#F3F5FF">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:gravity="center_horizontal"
-        android:padding="24dp">
+        android:padding="16dp"
+        android:gravity="center_horizontal">
 
-        <TextView
-            android:id="@+id/tvLanguageTitleNum"
-            android:layout_width="wrap_content"
+        <!-- Header card -->
+        <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Language: "
-            android:textSize="20sp"
-            android:textStyle="bold"
-            android:textColor="#E65100"
-            android:paddingBottom="16dp" />
+            android:background="@drawable/bg_quiz_card"
+            android:orientation="vertical"
+            android:padding="16dp"
+            android:layout_marginBottom="16dp">
 
-        <TextView
-            android:id="@+id/tvNumber"
-            android:layout_width="wrap_content"
+            <TextView
+                android:id="@+id/tvLanguageTitleNum"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Language: "
+                android:textSize="18sp"
+                android:textStyle="bold"
+                android:textColor="#E65100" />
+
+            <TextView
+                android:id="@+id/tvModeLabelNum"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Numbers - Recital / Practice"
+                android:textSize="14sp"
+                android:textColor="#455A64"
+                android:layout_marginTop="4dp" />
+        </LinearLayout>
+
+        <!-- Main number card -->
+        <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="1"
-            android:textSize="80sp"
-            android:textStyle="bold"
-            android:textColor="#F57C00"
-            android:paddingBottom="16dp" />
+            android:background="@drawable/bg_quiz_card"
+            android:orientation="vertical"
+            android:padding="24dp"
+            android:gravity="center_horizontal"
+            android:layout_marginBottom="16dp">
 
-        <Button
-            android:id="@+id/btnSpeakNumber"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Speak"
-            android:textAllCaps="false"
-            android:layout_marginBottom="24dp" />
+            <!-- Big number -->
+            <TextView
+                android:id="@+id/tvNumber"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="1"
+                android:textSize="80sp"
+                android:textStyle="bold"
+                android:textColor="#F57C00"
+                android:layout_marginBottom="8dp" />
 
+            <!-- Hint -->
+            <TextView
+                android:id="@+id/tvHintNumbers"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Swipe through numbers using Previous / Next. Tap Speak to hear or practice."
+                android:textSize="13sp"
+                android:textColor="#607D8B"
+                android:gravity="center"
+                android:layout_marginBottom="16dp" />
+
+            <!-- Speak / Practice button -->
+            <Button
+                android:id="@+id/btnSpeakNumber"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Speak"
+                android:textAllCaps="false"
+                android:background="@drawable/bg_quiz_primary_button"
+                android:textColor="#FFFFFF"
+                android:paddingLeft="36dp"
+                android:paddingRight="36dp" />
+        </LinearLayout>
+
+        <!-- Navigation buttons -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
-            android:gravity="center">
+            android:gravity="center"
+            android:layout_marginBottom="16dp">
 
             <Button
                 android:id="@+id/btnPrevNumber"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Previous"
-                android:textAllCaps="false" />
+                android:text="◀ Previous"
+                android:textAllCaps="false"
+                android:background="@drawable/bg_quiz_secondary_button"
+                android:textColor="#37474F"
+                android:paddingLeft="24dp"
+                android:paddingRight="24dp"
+                android:layout_marginEnd="16dp" />
 
             <Button
                 android:id="@+id/btnNextNumber"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Next"
+                android:text="Next ▶"
                 android:textAllCaps="false"
-                android:layout_marginStart="24dp" />
+                android:background="@drawable/bg_quiz_secondary_button"
+                android:textColor="#37474F"
+                android:paddingLeft="24dp"
+                android:paddingRight="24dp" />
         </LinearLayout>
 
+        <!-- Back button -->
         <Button
             android:id="@+id/btnBackNumber"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Back"
             android:textAllCaps="false"
-            android:layout_marginTop="32dp" />
+            android:background="@drawable/bg_quiz_secondary_button"
+            android:textColor="#37474F"
+            android:paddingLeft="24dp"
+            android:paddingRight="24dp" />
 
     </LinearLayout>
 </ScrollView>

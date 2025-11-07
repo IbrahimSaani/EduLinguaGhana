@@ -21,44 +21,94 @@
             android:textColor="#4527A0"
             android:paddingBottom="16dp" />
 
-        <TextView
-            android:id="@+id/tvStatHighScore"
-            android:layout_width="wrap_content"
+        <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Best quiz score: 0 / 10"
-            android:textSize="18sp"
-            android:paddingBottom="8dp" />
+            android:background="@drawable/bg_quiz_card"
+            android:orientation="vertical"
+            android:padding="16dp"
+            android:layout_marginBottom="16dp">
 
-        <TextView
-            android:id="@+id/tvStatTotalQuizzes"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Total quizzes taken: 0"
-            android:textSize="18sp"
-            android:paddingBottom="8dp" />
+            <TextView
+                android:id="@+id/tvStatHighScore"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Best quiz score: 0 / 10"
+                android:textSize="18sp"
+                android:paddingBottom="8dp" />
 
-        <TextView
-            android:id="@+id/tvStatTotalCorrect"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Total correct answers: 0"
-            android:textSize="18sp"
-            android:paddingBottom="8dp" />
+            <TextView
+                android:id="@+id/tvStatTotalQuizzes"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Total quizzes taken: 0"
+                android:textSize="18sp"
+                android:paddingBottom="8dp" />
 
-        <TextView
-            android:id="@+id/tvStatAccuracy"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Overall accuracy: 0%"
-            android:textSize="18sp"
-            android:paddingBottom="16dp" />
+            <TextView
+                android:id="@+id/tvStatTotalCorrect"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Total correct answers: 0"
+                android:textSize="18sp"
+                android:paddingBottom="8dp" />
 
-        <Button
-            android:id="@+id/btnCloseProgress"
-            android:layout_width="wrap_content"
+            <TextView
+                android:id="@+id/tvStatAccuracy"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Overall accuracy: 0%"
+                android:textSize="18sp"
+                android:paddingBottom="8dp" />
+
+            <ProgressBar
+                android:id="@+id/progressAccuracy"
+                style="?android:attr/progressBarStyleHorizontal"
+                android:layout_width="match_parent"
+                android:layout_height="12dp"
+                android:max="100"
+                android:progress="0"
+                android:progressDrawable="@android:drawable/progress_horizontal" />
+
+            <TextView
+                android:id="@+id/tvAchievements"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Achievements: -"
+                android:textSize="16sp"
+                android:textColor="#5D4037"
+                android:layout_marginTop="12dp" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Back"
-            android:textAllCaps="false" />
+            android:orientation="horizontal"
+            android:gravity="center">
+
+            <Button
+                android:id="@+id/btnShareProgress"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Share Progress"
+                android:textAllCaps="false"
+                android:background="@drawable/bg_quiz_primary_button"
+                android:textColor="#FFFFFF"
+                android:paddingLeft="24dp"
+                android:paddingRight="24dp"
+                android:layout_marginEnd="16dp" />
+
+            <Button
+                android:id="@+id/btnCloseProgress"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Back"
+                android:textAllCaps="false"
+                android:background="@drawable/bg_quiz_secondary_button"
+                android:textColor="#37474F"
+                android:paddingLeft="24dp"
+                android:paddingRight="24dp" />
+        </LinearLayout>
 
     </LinearLayout>
 </ScrollView>
