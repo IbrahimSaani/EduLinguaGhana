@@ -1,440 +1,288 @@
 package com.edulinguaghana;
 
-import androidx.appcompat.app.AlertDialog;
-import androidx.appcompat.app.AppCompatActivity;
-
 import android.content.SharedPreferences;
-import android.graphics.Color;
 import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.speech.tts.TextToSpeech;
-import android.view.animation.Animation;
-import android.view.animation.AnimationUtils;
+import android.util.Log;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.appcompat.app.AppCompatActivity;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.List;
 import java.util.Locale;
 import java.util.Random;
+import java.util.Set;
 
 public class QuizActivity extends AppCompatActivity {
 
-    private TextView tvQuestionTitle, tvFeedback, tvQuestionInfo, tvScore, tvBestScore, tvTimer;
-    private Button btnPlayAudio, btnOption1, btnOption2, btnOption3, btnNextQuestion, btnBackQuiz, btnToggleMusic;
+    // Views
+    private TextView tvGameTitle, tvGameTimer, tvGameScore, tvGameBest, tvGameFeedback, tvGamePrompt;
+    private Button btnPlayAudio, btnOption1, btnOption2, btnOption3, btnOption4, btnOption5, btnOption6, btnBackQuiz;
 
-    private final String[] letters = {"A","B","C","D","E","F","G","H","I","J","K","L","M",
-            "N","O","P","Q","R","S","T","U","V","W","X","Y","Z"};
-
-    private final String[] matchLetters = {"A","B","C","D"};
-    private final String[] matchWords   = {"Apple","Ball","Cat","Dog"};
-
-    private int maxNumber = 20;
-
-    private String correctAnswer;
-    private String quizType;
+    // Game variables
+    private int score = 0;
+    private int bestScore = 0;
+    private String currentCorrectAnswer;
+    private CountDownTimer countDownTimer;
     private String languageCode;
 
-    private TextToSpeech tts;
-    private MediaPlayer sfxPlayer;
-    private MediaPlayer musicPlayer;
-    private boolean isMusicOn = false;
-
-    private final Random random = new Random();
-
-    private int score = 0;
-    private int currentQuestion = 1;
-    private final int totalQuestions = 10;
-
-    private CountDownTimer countDownTimer;
-    private static final long TIME_PER_QUESTION_MS = 15000;
-    private boolean questionAnswered = false;
-
-    private SharedPreferences prefs;
     private static final String PREF_NAME = "EduLinguaPrefs";
     private static final String KEY_HIGH_SCORE = "HIGH_SCORE";
-    private static final String KEY_TOTAL_QUIZZES = "TOTAL_QUIZZES";
-    private static final String KEY_TOTAL_CORRECT = "TOTAL_CORRECT";
-    private static final String KEY_SFX_ENABLED = "SFX_ENABLED";
 
-    private int highScore = 0;
-    private int totalQuizzes = 0;
-    private int totalCorrectAnswers = 0;
-    private boolean isSfxOn = true;
+    // Timer settings
+    private static final long TIME_PER_QUESTION_MS = 30000; // 30 seconds for each question
+
+    // Game data (Example: English Alphabet)
+    private String[] questions = {"A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z"};
+
+    // TTS instance
+    private TextToSpeech textToSpeech;
+    private boolean isTtsInitialized = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_quiz);
+        setContentView(R.layout.activity_speed_game);
 
-        tvQuestionTitle = findViewById(R.id.tvQuestionTitle);
-        tvFeedback      = findViewById(R.id.tvFeedback);
-        tvQuestionInfo  = findViewById(R.id.tvQuestionInfo);
-        tvScore         = findViewById(R.id.tvScore);
-        tvBestScore     = findViewById(R.id.tvBestScore);
-        tvTimer         = findViewById(R.id.tvTimer);
+        // Initialize views
+        tvGameTitle = findViewById(R.id.tvGameTitle);
+        tvGameTimer = findViewById(R.id.tvGameTimer);
+        tvGameScore = findViewById(R.id.tvGameScore);
+        tvGameBest = findViewById(R.id.tvGameBest);
+        tvGameFeedback = findViewById(R.id.tvGameFeedback);
+        tvGamePrompt = findViewById(R.id.tvGamePrompt);
 
-        btnPlayAudio    = findViewById(R.id.btnPlayAudio);
-        btnOption1      = findViewById(R.id.btnOption1);
-        btnOption2      = findViewById(R.id.btnOption2);
-        btnOption3      = findViewById(R.id.btnOption3);
-        btnNextQuestion = findViewById(R.id.btnNextQuestion);
-        btnBackQuiz     = findViewById(R.id.btnBackQuiz);
-        btnToggleMusic  = findViewById(R.id.btnToggleMusic);
+        btnPlayAudio = findViewById(R.id.btnPlayAudio);
+        btnOption1 = findViewById(R.id.btnGameOpt1);
+        btnOption2 = findViewById(R.id.btnGameOpt2);
+        btnOption3 = findViewById(R.id.btnGameOpt3);
+        btnOption4 = findViewById(R.id.btnGameOpt4);
+        btnOption5 = findViewById(R.id.btnGameOpt5);
+        btnOption6 = findViewById(R.id.btnGameOpt6);
+        btnBackQuiz = findViewById(R.id.btnGameBack);
 
+        // Retrieve the language code passed from the previous activity
         languageCode = getIntent().getStringExtra("LANG_CODE");
-        quizType     = getIntent().getStringExtra("QUIZ_TYPE");
-        if (quizType == null) quizType = "basic";
 
-        tts = new TextToSpeech(this, status -> {
-            if (status == TextToSpeech.SUCCESS) {
-                tts.setLanguage(getLocale(languageCode));
-            }
+        // Initialize Text-to-Speech (TTS)
+        initializeTTS();
+
+        // Load the best score
+        SharedPreferences prefs = getSharedPreferences(PREF_NAME, MODE_PRIVATE);
+        bestScore = prefs.getInt(KEY_HIGH_SCORE, 0);
+        tvGameBest.setText("Best: " + bestScore);
+
+        // Start the game
+        startGame();
+
+        // Set up button listeners
+        btnOption1.setOnClickListener(v -> checkAnswer(btnOption1.getText().toString()));
+        btnOption2.setOnClickListener(v -> checkAnswer(btnOption2.getText().toString()));
+        btnOption3.setOnClickListener(v -> checkAnswer(btnOption3.getText().toString()));
+        btnOption4.setOnClickListener(v -> checkAnswer(btnOption4.getText().toString()));
+        btnOption5.setOnClickListener(v -> checkAnswer(btnOption5.getText().toString()));
+        btnOption6.setOnClickListener(v -> checkAnswer(btnOption6.getText().toString()));
+
+        btnBackQuiz.setOnClickListener(v -> {
+            cancelTimer();
+            finish(); // Go back to the previous screen
         });
 
-        prefs = getSharedPreferences(PREF_NAME, MODE_PRIVATE);
-        highScore          = prefs.getInt(KEY_HIGH_SCORE, 0);
-        totalQuizzes       = prefs.getInt(KEY_TOTAL_QUIZZES, 0);
-        totalCorrectAnswers= prefs.getInt(KEY_TOTAL_CORRECT, 0);
-        isSfxOn            = prefs.getBoolean(KEY_SFX_ENABLED, true);
-
-        initMusicPlayer();
-        updateHeader();
-        generateQuestion();
-
+        // Set up Play Audio button listener (for TTS)
         btnPlayAudio.setOnClickListener(v -> playAudio());
-        btnOption1.setOnClickListener(v -> checkAnswer(btnOption1));
-        btnOption2.setOnClickListener(v -> checkAnswer(btnOption2));
-        btnOption3.setOnClickListener(v -> checkAnswer(btnOption3));
+    }
 
-        btnNextQuestion.setOnClickListener(v -> {
-            currentQuestion++;
-            if (currentQuestion > totalQuestions) {
-                showResultDialog();
+    // Initialize Text-to-Speech (TTS)
+    private void initializeTTS() {
+        textToSpeech = new TextToSpeech(this, status -> {
+            if (status == TextToSpeech.SUCCESS) {
+                setTTSLanguage(languageCode);  // Set the language based on the languageCode
+                isTtsInitialized = true;
+                // Play audio for the first question now that TTS is ready
+                playAudio();
             } else {
-                generateQuestion();
+                Log.e("TTS", "Initialization failed with status: " + status);
+                Toast.makeText(this, "TTS Initialization Failed!", Toast.LENGTH_SHORT).show();
             }
         });
-
-        btnBackQuiz.setOnClickListener(v -> finish());
-
-        btnToggleMusic.setOnClickListener(v -> toggleMusic());
     }
 
-    @Override
-    protected void onResume() {
-        super.onResume();
-        if (prefs != null) {
-            isSfxOn = prefs.getBoolean(KEY_SFX_ENABLED, true);
-        }
-    }
+    // Set the appropriate language for TTS
+    private void setTTSLanguage(String langCode) {
+        Locale locale;
 
-    // ---------- MUSIC ----------
-
-    private void initMusicPlayer() {
-        try {
-            musicPlayer = MediaPlayer.create(this, R.raw.quiz_music);
-            if (musicPlayer != null) musicPlayer.setLooping(true);
-        } catch (Exception e) {
-            Toast.makeText(this, "Background music not available.", Toast.LENGTH_SHORT).show();
-        }
-    }
-
-    private void toggleMusic() {
-        if (musicPlayer == null) {
-            Toast.makeText(this, "No background music.", Toast.LENGTH_SHORT).show();
-            return;
-        }
-        if (isMusicOn) {
-            musicPlayer.pause();
-            isMusicOn = false;
-            btnToggleMusic.setText("Music: Off");
-        } else {
-            musicPlayer.start();
-            isMusicOn = true;
-            btnToggleMusic.setText("Music: On");
-        }
-    }
-
-    private void playAudio() {
-        if (tts != null && correctAnswer != null) {
-            tts.speak(correctAnswer, TextToSpeech.QUEUE_FLUSH, null, "quiz_audio");
-        }
-    }
-
-    // ---------- QUESTION FLOW ----------
-
-    private void generateQuestion() {
-        resetOptions();
-        cancelTimer();
-        questionAnswered = false;
-
-        switch (quizType) {
-            case "sequence":
-                generateSequenceQuestion();
+        // Check which language code was passed and set the appropriate locale for TTS
+        switch (langCode) {
+            case "fr":
+                locale = Locale.FRENCH;  // French TTS
                 break;
-            case "matching":
-                generateMatchingQuestion();
-                break;
-            case "mixed":
-                int choice = new Random().nextInt(3);
-                if (choice == 0) generateBasicQuestion();
-                else if (choice == 1) generateSequenceQuestion();
-                else generateMatchingQuestion();
-                break;
+            case "en":
             default:
-                generateBasicQuestion();
+                locale = Locale.ENGLISH;  // English TTS (default)
+                break;
         }
 
-        updateHeader();
+        // Set the language of the TextToSpeech engine
+        int result = textToSpeech.setLanguage(locale);
+
+        // ### START: CORRECTION ###
+        // The constant LANG_COUNTRY_NOT_SUPPORTED does not exist.
+        // The correct constants to check for errors are LANG_MISSING_DATA and LANG_NOT_SUPPORTED.
+        if (result == TextToSpeech.LANG_MISSING_DATA || result == TextToSpeech.LANG_NOT_SUPPORTED) {
+            // Handle the error if the language is not supported or data is missing
+            Log.e("TTS", "The Language is not supported!");
+            Toast.makeText(this, "The selected language is not supported.", Toast.LENGTH_SHORT).show();
+        }
+        // ### END: CORRECTION ###
+    }
+
+    // Start a new game
+    private void startGame() {
+        score = 0;
+        tvGameScore.setText("Score: " + score);
+        tvGameFeedback.setText("");
+
+        generateNewQuestion();
         startTimer();
     }
 
-    private void generateBasicQuestion() {
-        boolean isLetterQuestion = new Random().nextBoolean();
-        String[] options = new String[3];
+    // Generate a new question
+    private void generateNewQuestion() {
+        Random random = new Random();
+        // Pick a random correct answer from the questions array
+        currentCorrectAnswer = questions[random.nextInt(questions.length)];
 
-        if (isLetterQuestion) {
-            tvQuestionTitle.setText("Which letter did you hear?");
-            int correctIndex = new Random().nextInt(letters.length);
-            correctAnswer = letters[correctIndex];
+        // Generate 6 unique options, including the correct answer
+        List<String> options = new ArrayList<>();
+        options.add(currentCorrectAnswer);
 
-            int wrong1 = new Random().nextInt(letters.length);
-            int wrong2 = new Random().nextInt(letters.length);
-            while (wrong1 == correctIndex) wrong1 = new Random().nextInt(letters.length);
-            while (wrong2 == correctIndex || wrong2 == wrong1) wrong2 = new Random().nextInt(letters.length);
+        Set<String> usedOptions = new HashSet<>();
+        usedOptions.add(currentCorrectAnswer);
 
-            options[0] = letters[correctIndex];
-            options[1] = letters[wrong1];
-            options[2] = letters[wrong2];
-        } else {
-            tvQuestionTitle.setText("Which number did you hear?");
-            int correctNum = new Random().nextInt(maxNumber) + 1;
-            correctAnswer = String.valueOf(correctNum);
-
-            int wrong1 = new Random().nextInt(maxNumber) + 1;
-            int wrong2 = new Random().nextInt(maxNumber) + 1;
-            while (wrong1 == correctNum) wrong1 = new Random().nextInt(maxNumber) + 1;
-            while (wrong2 == correctNum || wrong2 == wrong1) wrong2 = new Random().nextInt(maxNumber) + 1;
-
-            options[0] = String.valueOf(correctNum);
-            options[1] = String.valueOf(wrong1);
-            options[2] = String.valueOf(wrong2);
+        while (options.size() < 6) {
+            String randomOption = questions[random.nextInt(questions.length)];
+            if (!usedOptions.contains(randomOption)) {
+                options.add(randomOption);
+                usedOptions.add(randomOption);
+            }
         }
 
-        shuffleArray(options);
-        btnOption1.setText(options[0]);
-        btnOption2.setText(options[1]);
-        btnOption3.setText(options[2]);
+        // Shuffle the options so the correct answer isn't always first
+        Collections.shuffle(options);
+
+        // Set options to buttons
+        btnOption1.setText(options.get(0));
+        btnOption2.setText(options.get(1));
+        btnOption3.setText(options.get(2));
+        btnOption4.setText(options.get(3));
+        btnOption5.setText(options.get(4));
+        btnOption6.setText(options.get(5));
+
+        tvGamePrompt.setText("Which letter did you hear?");
+        resetButtonStyles();
+
+        // Play the audio for the new question if TTS is ready
+        if (isTtsInitialized) {
+            playAudio();
+        }
     }
 
-    private void generateSequenceQuestion() {
-        int start = new Random().nextInt(10) + 1;
-        int[] seq = {start, start + 1, start + 2, start + 3};
-        int missing = new Random().nextInt(seq.length);
-        correctAnswer = String.valueOf(seq[missing]);
-        seq[missing] = -1;
+    // Check the selected answer
+    private void checkAnswer(String selectedAnswer) {
+        cancelTimer(); // Stop the timer once an answer is submitted
 
-        StringBuilder q = new StringBuilder("Complete the sequence: ");
-        for (int n : seq) q.append(n == -1 ? "? " : n + " ");
-        tvQuestionTitle.setText(q.toString());
-
-        String[] options = {
-                correctAnswer,
-                String.valueOf(new Random().nextInt(20) + 1),
-                String.valueOf(new Random().nextInt(20) + 1)
-        };
-        shuffleArray(options);
-        btnOption1.setText(options[0]);
-        btnOption2.setText(options[1]);
-        btnOption3.setText(options[2]);
-    }
-
-    private void generateMatchingQuestion() {
-        int idx = new Random().nextInt(matchLetters.length);
-        correctAnswer = matchWords[idx];
-        tvQuestionTitle.setText("Which word starts with " + matchLetters[idx] + "?");
-
-        String[] options = {
-                matchWords[idx],
-                matchWords[new Random().nextInt(matchWords.length)],
-                matchWords[new Random().nextInt(matchWords.length)]
-        };
-        shuffleArray(options);
-        btnOption1.setText(options[0]);
-        btnOption2.setText(options[1]);
-        btnOption3.setText(options[2]);
-    }
-
-    private void resetOptions() {
-        btnOption1.setEnabled(true);
-        btnOption2.setEnabled(true);
-        btnOption3.setEnabled(true);
-
-        btnOption1.setBackgroundResource(R.drawable.bg_quiz_option);
-        btnOption2.setBackgroundResource(R.drawable.bg_quiz_option);
-        btnOption3.setBackgroundResource(R.drawable.bg_quiz_option);
-
-        tvFeedback.setText("");
-        tvFeedback.setTextColor(Color.parseColor("#37474F"));
-
-        btnOption1.clearAnimation();
-        btnOption2.clearAnimation();
-        btnOption3.clearAnimation();
-    }
-
-    private void checkAnswer(Button selectedButton) {
-        questionAnswered = true;
-        cancelTimer();
-
-        btnOption1.setEnabled(false);
-        btnOption2.setEnabled(false);
-        btnOption3.setEnabled(false);
-
-        String choice = selectedButton.getText().toString();
-        boolean correct = choice.equals(correctAnswer);
-
-        if (correct) {
+        if (selectedAnswer.equals(currentCorrectAnswer)) {
             score++;
-            tvFeedback.setText("✅ Correct!");
-            tvFeedback.setTextColor(Color.parseColor("#1B5E20"));
+            tvGameFeedback.setText("✅ Correct!");
             playSfx(true);
-            animateButtonCorrect(selectedButton);
         } else {
-            tvFeedback.setText("❌ Wrong! Correct: " + correctAnswer);
-            tvFeedback.setTextColor(Color.parseColor("#B71C1C"));
+            tvGameFeedback.setText("❌ Incorrect! The correct answer was " + currentCorrectAnswer);
             playSfx(false);
-            animateButtonWrong(selectedButton);
+        }
+        tvGameScore.setText("Score: " + score);
+
+        // Update the best score if necessary
+        if (score > bestScore) {
+            bestScore = score;
+            tvGameBest.setText("Best: " + bestScore);
+            SharedPreferences prefs = getSharedPreferences(PREF_NAME, MODE_PRIVATE);
+            SharedPreferences.Editor editor = prefs.edit();
+            editor.putInt(KEY_HIGH_SCORE, bestScore);
+            editor.apply();
         }
 
-        updateHeader();
+        // Move to the next question after a short delay to show feedback
+        new android.os.Handler().postDelayed(() -> {
+            generateNewQuestion();
+            startTimer();
+        }, 1500); // 1.5-second delay
     }
 
-    private void animateButtonCorrect(Button b) {
-        b.setBackgroundResource(R.drawable.bg_quiz_option_correct);
-        Animation a = AnimationUtils.loadAnimation(this, R.anim.button_correct_pulse);
-        b.startAnimation(a);
-    }
-
-    private void animateButtonWrong(Button b) {
-        b.setBackgroundResource(R.drawable.bg_quiz_option_wrong);
-        Animation a = AnimationUtils.loadAnimation(this, R.anim.button_wrong_shake);
-        b.startAnimation(a);
-    }
-
-    private void playSfx(boolean correct) {
-        if (!isSfxOn) return;
-
-        int resId = correct ? R.raw.correct : R.raw.wrong;
-        if (sfxPlayer != null) {
-            sfxPlayer.release();
-            sfxPlayer = null;
-        }
-        sfxPlayer = MediaPlayer.create(this, resId);
-        if (sfxPlayer != null) sfxPlayer.start();
-    }
-
-    // ---------- TIMER & RESULTS ----------
-
+    // Start the countdown timer
     private void startTimer() {
-        tvTimer.setText("Time: 15s");
+        cancelTimer(); // Ensure no other timer is running
         countDownTimer = new CountDownTimer(TIME_PER_QUESTION_MS, 1000) {
             @Override
             public void onTick(long millisUntilFinished) {
-                long s = millisUntilFinished / 1000;
-                tvTimer.setText("Time: " + s + "s");
+                tvGameTimer.setText("Time: " + (millisUntilFinished / 1000) + "s");
             }
 
             @Override
             public void onFinish() {
-                if (!questionAnswered) {
-                    tvTimer.setText("Time: 0s");
-                    tvFeedback.setText("⏰ Time's up! Correct: " + correctAnswer);
-                    tvFeedback.setTextColor(Color.parseColor("#B71C1C"));
-                    playSfx(false);
-                    btnOption1.setEnabled(false);
-                    btnOption2.setEnabled(false);
-                    btnOption3.setEnabled(false);
-                }
+                tvGameTimer.setText("Time: 0s");
+                tvGameFeedback.setText("⏰ Time's up! The correct answer was " + currentCorrectAnswer);
+                playSfx(false);
+                // Move to the next question after a short delay
+                new android.os.Handler().postDelayed(() -> {
+                    generateNewQuestion();
+                    startTimer();
+                }, 1500);
             }
         }.start();
     }
 
+    // Cancel the timer
     private void cancelTimer() {
         if (countDownTimer != null) {
             countDownTimer.cancel();
-            countDownTimer = null;
         }
     }
 
-    private void showResultDialog() {
-        String message = "You scored " + score + " out of " + totalQuestions + ".";
-
-        totalQuizzes++;
-        totalCorrectAnswers += score;
-
-        if (score > highScore) {
-            highScore = score;
-            message += "\n\n🎉 New high score!";
-        }
-
-        SharedPreferences.Editor ed = prefs.edit();
-        ed.putInt(KEY_HIGH_SCORE, highScore);
-        ed.putInt(KEY_TOTAL_QUIZZES, totalQuizzes);
-        ed.putInt(KEY_TOTAL_CORRECT, totalCorrectAnswers);
-        ed.apply();
-
-        updateHeader();
-
-        new AlertDialog.Builder(this)
-                .setTitle("Quiz Finished")
-                .setMessage(message)
-                .setCancelable(false)
-                .setPositiveButton("Restart", (d, w) -> {
-                    score = 0;
-                    currentQuestion = 1;
-                    generateQuestion();
-                })
-                .setNegativeButton("Close", (d, w) -> finish())
-                .show();
-    }
-
-    private void updateHeader() {
-        tvQuestionInfo.setText("Question " + currentQuestion + " / " + totalQuestions);
-        tvScore.setText("Score: " + score);
-        tvBestScore.setText("Best: " + highScore + " / " + totalQuestions);
-    }
-
-    private Locale getLocale(String code) {
-        if (code == null) return Locale.ENGLISH;
-        switch (code) {
-            case "fr":  return Locale.FRENCH;
-            case "ak":  return new Locale("ak");
-            case "ee":  return new Locale("ee");
-            case "gaa": return new Locale("gaa");
-            default:    return Locale.ENGLISH;
+    // Play audio for the current question using TTS
+    private void playAudio() {
+        if (isTtsInitialized && currentCorrectAnswer != null) {
+            textToSpeech.speak(currentCorrectAnswer, TextToSpeech.QUEUE_FLUSH, null, null);
         }
     }
 
-    private void shuffleArray(String[] arr) {
-        for (int i = arr.length - 1; i > 0; i--) {
-            int j = new Random().nextInt(i + 1);
-            String tmp = arr[i];
-            arr[i] = arr[j];
-            arr[j] = tmp;
-        }
+    // Play sound effect (correct or wrong answer)
+    private void playSfx(boolean isCorrect) {
+        int resId = isCorrect ? R.raw.correct : R.raw.wrong;
+        MediaPlayer sfxPlayer = MediaPlayer.create(this, resId);
+        sfxPlayer.setOnCompletionListener(MediaPlayer::release); // Releases resources automatically
+        sfxPlayer.start();
+    }
+
+    // Reset button appearances (optional but good practice)
+    private void resetButtonStyles() {
+        tvGameFeedback.setText("");
+        // You can add code here to reset button colors if you change them on correct/incorrect answers
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        cancelTimer();
-        if (tts != null) { tts.stop(); tts.shutdown(); }
-        if (sfxPlayer != null) { sfxPlayer.release(); sfxPlayer = null; }
-        if (musicPlayer != null) {
-            if (musicPlayer.isPlaying()) musicPlayer.stop();
-            musicPlayer.release();
-            musicPlayer = null;
+        cancelTimer(); // Stop the timer to prevent leaks
+        if (textToSpeech != null) {
+            textToSpeech.stop();
+            textToSpeech.shutdown();
         }
     }
 }

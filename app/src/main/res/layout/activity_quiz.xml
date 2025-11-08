@@ -1,4 +1,3 @@
-<?xml version="1.0" encoding="utf-8"?>
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -10,7 +9,7 @@
         android:orientation="vertical"
         android:padding="16dp">
 
-        <!-- Top stats panel -->
+        <!-- Top stats card -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -20,57 +19,73 @@
             android:layout_marginBottom="16dp">
 
             <TextView
-                android:id="@+id/tvQuestionInfo"
+                android:id="@+id/tvGameTitle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Question 1 / 10"
-                android:textSize="16sp"
+                android:text="Speed Challenge"
+                android:textSize="18sp"
                 android:textStyle="bold"
                 android:textColor="#0D47A1" />
 
             <TextView
-                android:id="@+id/tvScore"
+                android:id="@+id/tvGameTimer"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Score: 0"
-                android:textSize="16sp"
-                android:textColor="#1B5E20"
-                android:layout_marginTop="4dp" />
-
-            <TextView
-                android:id="@+id/tvBestScore"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Best: 0 / 10"
-                android:textSize="14sp"
-                android:textColor="#4E342E"
-                android:layout_marginTop="4dp" />
-
-            <!-- Timer -->
-            <TextView
-                android:id="@+id/tvTimer"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Time: 15s"
+                android:text="Time: 30s"
                 android:textSize="14sp"
                 android:textColor="#B71C1C"
                 android:layout_marginTop="4dp" />
 
-            <!-- Music toggle button -->
-            <Button
-                android:id="@+id/btnToggleMusic"
+            <TextView
+                android:id="@+id/tvGameScore"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Music: Off"
-                android:textAllCaps="false"
-                android:background="@drawable/bg_quiz_secondary_button"
+                android:text="Score: 0"
+                android:textSize="14sp"
+                android:textColor="#1B5E20"
+                android:layout_marginTop="4dp" />
+
+            <TextView
+                android:id="@+id/tvGameBest"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Best: 0"
+                android:textSize="14sp"
+                android:textColor="#4E342E"
+                android:layout_marginTop="4dp" />
+        </LinearLayout>
+
+        <!-- Prompt card -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/bg_quiz_card"
+            android:orientation="vertical"
+            android:padding="16dp"
+            android:layout_marginBottom="16dp">
+
+            <TextView
+                android:id="@+id/tvGamePrompt"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Tap the correct letter or number"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                android:textColor="#263238" />
+
+            <!-- Feedback text -->
+            <TextView
+                android:id="@+id/tvGameFeedback"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text=""
+                android:textSize="16sp"
+                android:textStyle="bold"
                 android:textColor="#37474F"
-                android:paddingLeft="16dp"
-                android:paddingRight="16dp"
                 android:layout_marginTop="8dp" />
         </LinearLayout>
 
-        <!-- Question card -->
+        <!-- Options grid -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -79,121 +94,105 @@
             android:padding="16dp"
             android:layout_marginBottom="16dp">
 
-            <TextView
-                android:id="@+id/tvQuestionTitle"
+            <!-- Options layout -->
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Which letter or number did you hear?"
-                android:textSize="18sp"
-                android:textStyle="bold"
-                android:textColor="#263238"
-                android:layout_marginBottom="12dp" />
+                android:orientation="horizontal"
+                android:gravity="center_horizontal"
+                android:layout_marginBottom="8dp">
 
-            <Button
-                android:id="@+id/btnPlayAudio"
-                android:layout_width="wrap_content"
+                <Button
+                    android:id="@+id/btnGameOpt1"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="A"
+                    android:textAllCaps="false"
+                    android:background="@drawable/bg_quiz_option"
+                    android:textColor="#212121"
+                    android:padding="12dp"
+                    android:layout_marginEnd="8dp" />
+
+                <Button
+                    android:id="@+id/btnGameOpt2"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="B"
+                    android:textAllCaps="false"
+                    android:background="@drawable/bg_quiz_option"
+                    android:textColor="#212121"
+                    android:padding="12dp"
+                    android:layout_marginEnd="8dp" />
+
+                <Button
+                    android:id="@+id/btnGameOpt3"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="C"
+                    android:textAllCaps="false"
+                    android:background="@drawable/bg_quiz_option"
+                    android:textColor="#212121"
+                    android:padding="12dp" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Play Audio"
-                android:textAllCaps="false"
-                android:paddingLeft="24dp"
-                android:paddingRight="24dp"
-                android:background="@drawable/bg_quiz_primary_button"
-                android:textColor="#FFFFFF" />
+                android:orientation="horizontal"
+                android:gravity="center_horizontal">
+
+                <Button
+                    android:id="@+id/btnGameOpt4"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="D"
+                    android:textAllCaps="false"
+                    android:background="@drawable/bg_quiz_option"
+                    android:textColor="#212121"
+                    android:padding="12dp"
+                    android:layout_marginEnd="8dp" />
+
+                <Button
+                    android:id="@+id/btnGameOpt5"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="E"
+                    android:textAllCaps="false"
+                    android:background="@drawable/bg_quiz_option"
+                    android:textColor="#212121"
+                    android:padding="12dp"
+                    android:layout_marginEnd="8dp" />
+
+                <Button
+                    android:id="@+id/btnGameOpt6"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="F"
+                    android:textAllCaps="false"
+                    android:background="@drawable/bg_quiz_option"
+                    android:textColor="#212121"
+                    android:padding="12dp" />
+            </LinearLayout>
         </LinearLayout>
 
-        <!-- Options panel -->
-        <LinearLayout
-            android:layout_width="match_parent"
+        <!-- Back button -->
+        <Button
+            android:id="@+id/btnGameBack"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:background="@drawable/bg_quiz_card"
-            android:orientation="vertical"
-            android:padding="16dp"
-            android:layout_marginBottom="16dp">
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Choose the correct answer:"
-                android:textSize="16sp"
-                android:textColor="#37474F"
-                android:layout_marginBottom="12dp" />
-
-            <Button
-                android:id="@+id/btnOption1"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Option 1"
-                android:textAllCaps="false"
-                android:background="@drawable/bg_quiz_option"
-                android:textColor="#212121"
-                android:layout_marginBottom="8dp"
-                android:padding="12dp" />
-
-            <Button
-                android:id="@+id/btnOption2"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Option 2"
-                android:textAllCaps="false"
-                android:background="@drawable/bg_quiz_option"
-                android:textColor="#212121"
-                android:layout_marginBottom="8dp"
-                android:padding="12dp" />
-
-            <Button
-                android:id="@+id/btnOption3"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Option 3"
-                android:textAllCaps="false"
-                android:background="@drawable/bg_quiz_option"
-                android:textColor="#212121"
-                android:padding="12dp" />
-        </LinearLayout>
-
-        <!-- Feedback text -->
-        <TextView
-            android:id="@+id/tvFeedback"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text=""
-            android:textSize="18sp"
-            android:textStyle="bold"
+            android:text="Back"
+            android:textAllCaps="false"
+            android:background="@drawable/bg_quiz_secondary_button"
             android:textColor="#37474F"
-            android:gravity="center_horizontal"
-            android:layout_marginBottom="16dp" />
-
-        <!-- Bottom buttons -->
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:gravity="center"
-            android:layout_marginBottom="8dp">
-
-            <Button
-                android:id="@+id/btnNextQuestion"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Next Question"
-                android:textAllCaps="false"
-                android:background="@drawable/bg_quiz_primary_button"
-                android:textColor="#FFFFFF"
-                android:paddingLeft="24dp"
-                android:paddingRight="24dp"
-                android:layout_marginEnd="16dp" />
-
-            <Button
-                android:id="@+id/btnBackQuiz"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Back"
-                android:textAllCaps="false"
-                android:background="@drawable/bg_quiz_secondary_button"
-                android:textColor="#37474F"
-                android:paddingLeft="24dp"
-                android:paddingRight="24dp" />
-        </LinearLayout>
+            android:paddingLeft="24dp"
+            android:paddingRight="24dp"
+            android:layout_gravity="center_horizontal" />
 
     </LinearLayout>
 </ScrollView>

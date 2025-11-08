@@ -62,6 +62,7 @@
             android:layout_height="wrap_content"
             android:background="@drawable/bg_quiz_card"
             android:orientation="vertical"
+            android:gravity="center_horizontal"
             android:padding="16dp"
             android:layout_marginBottom="16dp">
 
@@ -73,6 +74,30 @@
                 android:textSize="16sp"
                 android:textStyle="bold"
                 android:textColor="#263238" />
+
+            <!-- ### START: Added Button ### -->
+            <Button
+                android:id="@+id/btnPlayAudio"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:background="@drawable/bg_quiz_secondary_button"
+                android:text="Play Audio"
+                android:textColor="#37474F"
+                android:paddingLeft="24dp"
+                android:paddingRight="24dp"
+                android:textAllCaps="false"/>
+            <!-- ### END: Added Button ### -->
+
+            <TextView
+                android:id="@+id/tvGameFeedback"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text=""
+                android:textSize="16sp"
+                android:textStyle="bold"
+                android:textColor="#37474F"
+                android:layout_marginTop="8dp" />
         </LinearLayout>
 
         <!-- Options grid -->
@@ -182,6 +207,5 @@
             android:paddingLeft="24dp"
             android:paddingRight="24dp"
             android:layout_gravity="center_horizontal" />
-
     </LinearLayout>
 </ScrollView>

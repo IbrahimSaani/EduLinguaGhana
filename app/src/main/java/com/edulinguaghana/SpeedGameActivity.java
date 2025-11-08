@@ -4,6 +4,7 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.SharedPreferences;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.widget.Button;
@@ -13,7 +14,7 @@ import java.util.Random;
 
 public class SpeedGameActivity extends AppCompatActivity {
 
-    private TextView tvGameTitle, tvGameTimer, tvGameScore, tvGameBest, tvGamePrompt;
+    private TextView tvGameTitle, tvGameTimer, tvGameScore, tvGameBest, tvGamePrompt, tvGameFeedback;
     private Button btnGameOpt1, btnGameOpt2, btnGameOpt3, btnGameOpt4, btnGameOpt5, btnGameOpt6, btnGameBack;
 
     private static final String PREF_NAME = "EduLinguaPrefs";
@@ -38,11 +39,12 @@ public class SpeedGameActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_speed_game);
 
-        tvGameTitle  = findViewById(R.id.tvGameTitle);
-        tvGameTimer  = findViewById(R.id.tvGameTimer);
-        tvGameScore  = findViewById(R.id.tvGameScore);
-        tvGameBest   = findViewById(R.id.tvGameBest);
-        tvGamePrompt = findViewById(R.id.tvGamePrompt);
+        tvGameTitle    = findViewById(R.id.tvGameTitle);
+        tvGameTimer    = findViewById(R.id.tvGameTimer);
+        tvGameScore    = findViewById(R.id.tvGameScore);
+        tvGameBest     = findViewById(R.id.tvGameBest);
+        tvGamePrompt   = findViewById(R.id.tvGamePrompt);
+        tvGameFeedback = findViewById(R.id.tvGameFeedback);
 
         btnGameOpt1 = findViewById(R.id.btnGameOpt1);
         btnGameOpt2 = findViewById(R.id.btnGameOpt2);
@@ -76,6 +78,7 @@ public class SpeedGameActivity extends AppCompatActivity {
         isGameOver = false;
         gameScore = 0;
         tvGameScore.setText("Score: " + gameScore);
+        tvGameFeedback.setText("");
         enableOptionButtons(true);
         startTimer();
         generateNewRound();
@@ -104,7 +107,11 @@ public class SpeedGameActivity extends AppCompatActivity {
     }
 
     private void generateNewRound() {
-        // Mix of letters and numbers for fun
+        if (isGameOver) return;
+
+        tvGameFeedback.setText("");
+        tvGameFeedback.setTextColor(Color.parseColor("#37474F"));
+
         boolean isLetterRound = random.nextBoolean();
         String[] options = new String[6];
 
@@ -163,12 +170,20 @@ public class SpeedGameActivity extends AppCompatActivity {
         if (isGameOver) return;
 
         String chosen = btn.getText().toString();
-        if (chosen.equals(currentCorrect)) {
+        boolean correct = chosen.equals(currentCorrect);
+
+        if (correct) {
             gameScore++;
             tvGameScore.setText("Score: " + gameScore);
+            tvGameFeedback.setText("✅ Correct!");
+            tvGameFeedback.setTextColor(Color.parseColor("#1B5E20"));
+        } else {
+            tvGameFeedback.setText("❌ Wrong! Correct: " + currentCorrect);
+            tvGameFeedback.setTextColor(Color.parseColor("#B71C1C"));
         }
-        // Immediately go to next round, whether right or wrong
-        generateNewRound();
+
+        // Brief pause so user sees feedback, then next round
+        tvGamePrompt.postDelayed(this::generateNewRound, 300);
     }
 
     private void endGame() {
