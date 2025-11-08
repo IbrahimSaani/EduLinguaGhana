@@ -1,43 +1,67 @@
-package com.edulinguaghana;  // <-- your package name
+package com.edulinguaghana;
 
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
+import android.media.MediaPlayer;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Looper;
-import android.view.animation.Animation;
-import android.view.animation.AnimationUtils;
-import android.widget.ImageView;
-import android.widget.TextView;
 
 public class SplashActivity extends AppCompatActivity {
 
-    private static final int SPLASH_DELAY = 1800; // 1.8 seconds
+    private MediaPlayer startPlayer;
+    private boolean hasNavigated = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_splash);
+        setContentView(R.layout.activity_splash);  // your splash layout
 
-        ImageView logo = findViewById(R.id.ivLogo);
-        TextView tvName = findViewById(R.id.tvAppNameSplash);
-        TextView tvTagline = findViewById(R.id.tvTaglineSplash);
+        playStartSoundAndThenOpenMain();
+    }
 
-        // Load animations
-        Animation bounceIn = AnimationUtils.loadAnimation(this, R.anim.bounce_in);
-        Animation slideUpFade = AnimationUtils.loadAnimation(this, R.anim.slide_up_fade_in);
+    private void playStartSoundAndThenOpenMain() {
+        try {
+            startPlayer = MediaPlayer.create(this, R.raw.app_start);
 
-        // Apply bounce to logo, slide+fade to text
-        logo.startAnimation(bounceIn);
-        tvName.startAnimation(slideUpFade);
-        tvTagline.startAnimation(slideUpFade);
+            if (startPlayer == null) {
+                // If something goes wrong, just open main
+                openMainScreen();
+                return;
+            }
 
-        // Go to main screen after animation
-        new Handler(Looper.getMainLooper()).postDelayed(() -> {
-            Intent intent = new Intent(SplashActivity.this, MainActivity.class);
-            startActivity(intent);
-            finish();
-        }, SPLASH_DELAY);
+            // When the sound finishes, go to MainActivity
+            startPlayer.setOnCompletionListener(mp -> {
+                mp.release();
+                startPlayer = null;
+                openMainScreen();
+            });
+
+            startPlayer.start();
+
+        } catch (Exception e) {
+            // If any error, just go to main
+            openMainScreen();
+        }
+    }
+
+    private void openMainScreen() {
+        if (hasNavigated) return;   // avoid double navigation
+        hasNavigated = true;
+
+        Intent intent = new Intent(SplashActivity.this, MainActivity.class);
+        startActivity(intent);
+        finish();
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if (startPlayer != null) {
+            if (startPlayer.isPlaying()) {
+                startPlayer.stop();
+            }
+            startPlayer.release();
+            startPlayer = null;
+        }
     }
 }

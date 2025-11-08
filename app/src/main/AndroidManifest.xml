@@ -45,6 +45,15 @@
             android:name=".ProgressActivity"
             android:exported="false" />
 
+        <!-- New Speed Challenge game screen -->
+        <activity
+            android:name=".SpeedGameActivity"
+            android:exported="false" />
+
+        <!-- SettingsActivity -->
+        <activity
+            android:name=".SettingsActivity"
+            android:exported="false" />
     </application>
 
 </manifest>

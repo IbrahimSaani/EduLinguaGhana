@@ -10,7 +10,7 @@
         android:orientation="vertical"
         android:padding="16dp">
 
-        <!-- App header card -->
+        <!-- Settings Title -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -20,34 +20,25 @@
             android:layout_marginBottom="16dp">
 
             <TextView
-                android:id="@+id/tvAppTitle"
+                android:id="@+id/tvSettingsTitle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="EduLingua Ghana"
-                android:textSize="22sp"
+                android:text="Settings"
+                android:textSize="20sp"
                 android:textStyle="bold"
                 android:textColor="#1A237E" />
 
             <TextView
-                android:id="@+id/tvAppSubtitle"
+                android:id="@+id/tvSettingsSubtitle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Multilingual Learning for Basic Schools"
+                android:text="Customize your EduLingua Ghana experience"
                 android:textSize="14sp"
                 android:textColor="#455A64"
                 android:layout_marginTop="4dp" />
-
-            <TextView
-                android:id="@+id/tvBestScoreMain"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Best quiz score: 0 / 10"
-                android:textSize="14sp"
-                android:textColor="#2E7D32"
-                android:layout_marginTop="8dp" />
         </LinearLayout>
 
-        <!-- Language selection card -->
+        <!-- Audio Settings -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -57,23 +48,60 @@
             android:layout_marginBottom="16dp">
 
             <TextView
-                android:id="@+id/tvLanguageLabel"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Choose language"
+                android:text="Audio Settings"
                 android:textSize="16sp"
                 android:textStyle="bold"
                 android:textColor="#263238"
-                android:layout_marginBottom="8dp" />
+                android:layout_marginBottom="12dp" />
 
-            <Spinner
-                android:id="@+id/spinnerLanguage"
+            <!-- Background Music Switch -->
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:spinnerMode="dropdown" />
+                android:orientation="horizontal"
+                android:layout_marginBottom="8dp">
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Background music"
+                    android:textSize="14sp"
+                    android:textColor="#37474F" />
+
+                <Switch
+                    android:id="@+id/switchMusic"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:padding="16dp" />  <!-- Increased padding for larger touch area -->
+            </LinearLayout>
+
+            <!-- Sound Effects Switch -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginBottom="8dp">
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Sound effects (SFX)"
+                    android:textSize="14sp"
+                    android:textColor="#37474F" />
+
+                <Switch
+                    android:id="@+id/switchSfx"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:padding="16dp" />  <!-- Increased padding for larger touch area -->
+            </LinearLayout>
         </LinearLayout>
 
-        <!-- Modes card -->
+        <!-- Reset Progress Section -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -84,66 +112,29 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Select mode"
+                android:text="Progress"
                 android:textSize="16sp"
                 android:textStyle="bold"
                 android:textColor="#263238"
                 android:layout_marginBottom="12dp" />
 
             <Button
-                android:id="@+id/btnRecitalMode"
+                android:id="@+id/btnResetProgress"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Recital Mode"
-                android:textAllCaps="false"
-                android:background="@drawable/bg_quiz_primary_button"
-                android:textColor="#FFFFFF"
-                android:padding="12dp"
-                android:layout_marginBottom="8dp" />
-
-            <Button
-                android:id="@+id/btnPracticeMode"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Practice Mode"
+                android:text="Reset quiz progress"
                 android:textAllCaps="false"
                 android:background="@drawable/bg_quiz_secondary_button"
                 android:textColor="#37474F"
                 android:padding="12dp"
                 android:layout_marginBottom="8dp" />
 
-            <Button
-                android:id="@+id/btnQuizMode"
-                android:layout_width="match_parent"
+            <TextView
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Quiz Mode"
-                android:textAllCaps="false"
-                android:background="@drawable/bg_quiz_secondary_button"
-                android:textColor="#37474F"
-                android:padding="12dp"
-                android:layout_marginBottom="8dp" />
-
-            <Button
-                android:id="@+id/btnProgressMode"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Progress Tracker"
-                android:textAllCaps="false"
-                android:background="@drawable/bg_quiz_secondary_button"
-                android:textColor="#37474F"
-                android:padding="12dp" />
-
-            <!-- Settings Button (New) -->
-            <Button
-                android:id="@+id/btnSettings"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Settings"
-                android:textAllCaps="false"
-                android:background="@drawable/bg_quiz_secondary_button"
-                android:textColor="#37474F"
-                android:padding="12dp"
-                android:layout_marginTop="16dp" />
+                android:text="(This will clear your best score and quiz statistics.)"
+                android:textSize="12sp"
+                android:textColor="#757575" />
         </LinearLayout>
 
     </LinearLayout>
