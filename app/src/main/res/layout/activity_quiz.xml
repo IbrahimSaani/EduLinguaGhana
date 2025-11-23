@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -18,17 +19,19 @@
             android:padding="16dp"
             android:layout_marginBottom="16dp">
 
+            <!-- Quiz title (e.g. "Quiz – French") -->
             <TextView
-                android:id="@+id/tvGameTitle"
+                android:id="@+id/tvQuestionTitle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Speed Challenge"
+                android:text="Quiz – English"
                 android:textSize="18sp"
                 android:textStyle="bold"
                 android:textColor="#0D47A1" />
 
+            <!-- Timer -->
             <TextView
-                android:id="@+id/tvGameTimer"
+                android:id="@+id/tvTimer"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Time: 30s"
@@ -36,8 +39,9 @@
                 android:textColor="#B71C1C"
                 android:layout_marginTop="4dp" />
 
+            <!-- Current score -->
             <TextView
-                android:id="@+id/tvGameScore"
+                android:id="@+id/tvScore"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Score: 0"
@@ -45,8 +49,9 @@
                 android:textColor="#1B5E20"
                 android:layout_marginTop="4dp" />
 
+            <!-- Best score -->
             <TextView
-                android:id="@+id/tvGameBest"
+                android:id="@+id/tvBest"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Best: 0"
@@ -55,7 +60,7 @@
                 android:layout_marginTop="4dp" />
         </LinearLayout>
 
-        <!-- Prompt card -->
+        <!-- Question + Play audio -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -65,24 +70,24 @@
             android:layout_marginBottom="16dp">
 
             <TextView
-                android:id="@+id/tvGamePrompt"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Tap the correct letter or number"
+                android:text="Listen and choose the correct letter:"
                 android:textSize="16sp"
                 android:textStyle="bold"
-                android:textColor="#263238" />
+                android:textColor="#263238"
+                android:layout_marginBottom="12dp" />
 
-            <!-- Feedback text -->
-            <TextView
-                android:id="@+id/tvGameFeedback"
-                android:layout_width="match_parent"
+            <Button
+                android:id="@+id/btnPlayAudio"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text=""
-                android:textSize="16sp"
-                android:textStyle="bold"
-                android:textColor="#37474F"
-                android:layout_marginTop="8dp" />
+                android:text="Play Sound"
+                android:textAllCaps="false"
+                android:background="@drawable/bg_quiz_primary_button"
+                android:textColor="#FFFFFF"
+                android:paddingLeft="24dp"
+                android:paddingRight="24dp" />
         </LinearLayout>
 
         <!-- Options grid -->
@@ -94,7 +99,7 @@
             android:padding="16dp"
             android:layout_marginBottom="16dp">
 
-            <!-- Options layout -->
+            <!-- Row 1 -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -103,7 +108,7 @@
                 android:layout_marginBottom="8dp">
 
                 <Button
-                    android:id="@+id/btnGameOpt1"
+                    android:id="@+id/btnOption1"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
@@ -115,7 +120,7 @@
                     android:layout_marginEnd="8dp" />
 
                 <Button
-                    android:id="@+id/btnGameOpt2"
+                    android:id="@+id/btnOption2"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
@@ -127,7 +132,7 @@
                     android:layout_marginEnd="8dp" />
 
                 <Button
-                    android:id="@+id/btnGameOpt3"
+                    android:id="@+id/btnOption3"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
@@ -138,6 +143,7 @@
                     android:padding="12dp" />
             </LinearLayout>
 
+            <!-- Row 2 -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -145,7 +151,7 @@
                 android:gravity="center_horizontal">
 
                 <Button
-                    android:id="@+id/btnGameOpt4"
+                    android:id="@+id/btnOption4"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
@@ -157,7 +163,7 @@
                     android:layout_marginEnd="8dp" />
 
                 <Button
-                    android:id="@+id/btnGameOpt5"
+                    android:id="@+id/btnOption5"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
@@ -169,7 +175,7 @@
                     android:layout_marginEnd="8dp" />
 
                 <Button
-                    android:id="@+id/btnGameOpt6"
+                    android:id="@+id/btnOption6"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
@@ -181,9 +187,21 @@
             </LinearLayout>
         </LinearLayout>
 
+        <!-- Feedback -->
+        <TextView
+            android:id="@+id/tvFeedback"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text=""
+            android:textSize="18sp"
+            android:textStyle="bold"
+            android:textColor="#37474F"
+            android:gravity="center_horizontal"
+            android:layout_marginBottom="16dp" />
+
         <!-- Back button -->
         <Button
-            android:id="@+id/btnGameBack"
+            android:id="@+id/btnBackQuiz"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Back"

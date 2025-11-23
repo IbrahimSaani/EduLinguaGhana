@@ -1,231 +1,368 @@
 package com.edulinguaghana;
 
-import androidx.appcompat.app.AlertDialog;
-import androidx.appcompat.app.AppCompatActivity;
-
 import android.content.SharedPreferences;
-import android.graphics.Color;
+import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.os.CountDownTimer;
+import android.speech.tts.TextToSpeech;
+import android.view.View;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.Button;
 import android.widget.TextView;
 
+import androidx.appcompat.app.AppCompatActivity;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Locale;
 import java.util.Random;
+import java.util.Set;
 
 public class SpeedGameActivity extends AppCompatActivity {
 
-    private TextView tvGameTitle, tvGameTimer, tvGameScore, tvGameBest, tvGamePrompt, tvGameFeedback;
-    private Button btnGameOpt1, btnGameOpt2, btnGameOpt3, btnGameOpt4, btnGameOpt5, btnGameOpt6, btnGameBack;
+    // Views
+    private TextView tvGameTitle, tvGameTimer, tvGameScore, tvGameBest, tvGameFeedback, tvGamePrompt;
+    private Button btnPlayAudio, btnOption1, btnOption2, btnOption3, btnOption4, btnOption5, btnOption6, btnBack;
+
+    // Game variables
+    private int score = 0;
+    private int bestScore = 0;
+    private String currentCorrectAnswer;
+    private CountDownTimer countDownTimer;
+    private long timeLeftMs;
 
     private static final String PREF_NAME = "EduLinguaPrefs";
-    private static final String KEY_SPEED_HIGH_SCORE = "SPEED_HIGH_SCORE";
+    private static final String KEY_HIGH_SCORE = "HIGH_SCORE";
+    private static final String KEY_SFX_ENABLED = "SFX_ENABLED";
 
-    private final String[] letters = {
+    // Timer settings (total round time)
+    private static final long TOTAL_TIME_MS = 30000;  // 30s round
+
+    // Letters to use in the game
+    private final String[] questions = {
             "A","B","C","D","E","F","G","H","I","J","K","L","M",
             "N","O","P","Q","R","S","T","U","V","W","X","Y","Z"
     };
 
-    private int gameScore = 0;
-    private int bestScore = 0;
-    private String currentCorrect;
-    private CountDownTimer gameTimer;
-    private static final long GAME_DURATION_MS = 30000; // 30s
-    private boolean isGameOver = false;
+    // TTS
+    private TextToSpeech tts;
+    private boolean isTtsReady = false;
+    private String languageCode;   // "en", "fr", etc.
 
-    private final Random random = new Random();
+    // SFX
+    private boolean isSfxOn = true;
+    private MediaPlayer sfxPlayer;
+
+    private SharedPreferences prefs;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_speed_game);
 
+        // --- Get language code from intent (same as other modes) ---
+        languageCode = getIntent().getStringExtra("LANG_CODE");
+        if (languageCode == null) {
+            languageCode = "en";
+        }
+
+        // --- Init views ---
         tvGameTitle    = findViewById(R.id.tvGameTitle);
         tvGameTimer    = findViewById(R.id.tvGameTimer);
         tvGameScore    = findViewById(R.id.tvGameScore);
         tvGameBest     = findViewById(R.id.tvGameBest);
-        tvGamePrompt   = findViewById(R.id.tvGamePrompt);
         tvGameFeedback = findViewById(R.id.tvGameFeedback);
+        tvGamePrompt   = findViewById(R.id.tvGamePrompt);
 
-        btnGameOpt1 = findViewById(R.id.btnGameOpt1);
-        btnGameOpt2 = findViewById(R.id.btnGameOpt2);
-        btnGameOpt3 = findViewById(R.id.btnGameOpt3);
-        btnGameOpt4 = findViewById(R.id.btnGameOpt4);
-        btnGameOpt5 = findViewById(R.id.btnGameOpt5);
-        btnGameOpt6 = findViewById(R.id.btnGameOpt6);
-        btnGameBack = findViewById(R.id.btnGameBack);
+        btnOption1 = findViewById(R.id.btnGameOpt1);
+        btnOption2 = findViewById(R.id.btnGameOpt2);
+        btnOption3 = findViewById(R.id.btnGameOpt3);
+        btnOption4 = findViewById(R.id.btnGameOpt4);
+        btnOption5 = findViewById(R.id.btnGameOpt5);
+        btnOption6 = findViewById(R.id.btnGameOpt6);
+        btnBack    = findViewById(R.id.btnGameBack);
 
-        String langName = getIntent().getStringExtra("LANG_NAME");
-        if (langName == null) langName = "Language";
-        tvGameTitle.setText("Speed Challenge - " + langName);
+        // OPTIONAL: if you added a Play Audio button in XML, otherwise comment out
+        btnPlayAudio = findViewById(R.id.btnPlayAudio);
 
-        SharedPreferences prefs = getSharedPreferences(PREF_NAME, MODE_PRIVATE);
-        bestScore = prefs.getInt(KEY_SPEED_HIGH_SCORE, 0);
+        // --- SharedPreferences ---
+        prefs = getSharedPreferences(PREF_NAME, MODE_PRIVATE);
+        bestScore = prefs.getInt(KEY_HIGH_SCORE, 0);
+        isSfxOn   = prefs.getBoolean(KEY_SFX_ENABLED, true);
+
         tvGameBest.setText("Best: " + bestScore);
-
-        btnGameOpt1.setOnClickListener(v -> handleAnswer(btnGameOpt1));
-        btnGameOpt2.setOnClickListener(v -> handleAnswer(btnGameOpt2));
-        btnGameOpt3.setOnClickListener(v -> handleAnswer(btnGameOpt3));
-        btnGameOpt4.setOnClickListener(v -> handleAnswer(btnGameOpt4));
-        btnGameOpt5.setOnClickListener(v -> handleAnswer(btnGameOpt5));
-        btnGameOpt6.setOnClickListener(v -> handleAnswer(btnGameOpt6));
-
-        btnGameBack.setOnClickListener(v -> finish());
-
-        startGame();
-    }
-
-    private void startGame() {
-        isGameOver = false;
-        gameScore = 0;
-        tvGameScore.setText("Score: " + gameScore);
+        tvGameScore.setText("Score: 0");
         tvGameFeedback.setText("");
-        enableOptionButtons(true);
-        startTimer();
-        generateNewRound();
-    }
 
-    private void startTimer() {
-        if (gameTimer != null) {
-            gameTimer.cancel();
+        // --- Init TTS ---
+        initTts();
+
+        // --- Button listeners ---
+        btnOption1.setOnClickListener(v -> handleAnswerClick((Button) v));
+        btnOption2.setOnClickListener(v -> handleAnswerClick((Button) v));
+        btnOption3.setOnClickListener(v -> handleAnswerClick((Button) v));
+        btnOption4.setOnClickListener(v -> handleAnswerClick((Button) v));
+        btnOption5.setOnClickListener(v -> handleAnswerClick((Button) v));
+        btnOption6.setOnClickListener(v -> handleAnswerClick((Button) v));
+
+        btnBack.setOnClickListener(v -> {
+            cancelTimer();
+            finish();
+        });
+
+        if (btnPlayAudio != null) {
+            btnPlayAudio.setOnClickListener(v -> playAudio());
         }
 
-        tvGameTimer.setText("Time: 30s");
+        // --- Start game ---
+        startNewRound();
+    }
 
-        gameTimer = new CountDownTimer(GAME_DURATION_MS, 1000) {
+    // -------------------------
+    // TTS
+    // -------------------------
+    private void initTts() {
+        tts = new TextToSpeech(this, status -> {
+            if (status == TextToSpeech.SUCCESS) {
+                Locale locale;
+                if ("fr".equalsIgnoreCase(languageCode)) {
+                    locale = Locale.FRENCH;
+                } else {
+                    locale = Locale.ENGLISH;
+                }
+                int result = tts.setLanguage(locale);
+                if (result != TextToSpeech.LANG_MISSING_DATA &&
+                        result != TextToSpeech.LANG_NOT_SUPPORTED) {
+                    isTtsReady = true;
+                }
+            }
+        });
+    }
+
+    private void playAudio() {
+        if (!isTtsReady || currentCorrectAnswer == null) return;
+        // Stop any current speech then speak
+        tts.stop();
+        tts.speak(currentCorrectAnswer, TextToSpeech.QUEUE_FLUSH, null, "speed_game_letter");
+    }
+
+    // -------------------------
+    // GAME FLOW
+    // -------------------------
+    private void startNewRound() {
+        score = 0;
+        tvGameScore.setText("Score: " + score);
+        tvGameFeedback.setText("");
+        timeLeftMs = TOTAL_TIME_MS;
+        tvGameTimer.setText("Time: " + (timeLeftMs / 1000) + "s");
+
+        generateNewQuestion();
+        startTimer();
+    }
+
+    private void generateNewQuestion() {
+        // pick correct letter
+        Random rnd = new Random();
+        currentCorrectAnswer = questions[rnd.nextInt(questions.length)];
+
+        // build 6 unique options including correct
+        List<String> options = new ArrayList<>();
+        options.add(currentCorrectAnswer);
+        Set<String> used = new HashSet<>();
+        used.add(currentCorrectAnswer);
+
+        while (options.size() < 6) {
+            String candidate = questions[rnd.nextInt(questions.length)];
+            if (!used.contains(candidate)) {
+                options.add(candidate);
+                used.add(candidate);
+            }
+        }
+
+        Collections.shuffle(options);
+
+        btnOption1.setText(options.get(0));
+        btnOption2.setText(options.get(1));
+        btnOption3.setText(options.get(2));
+        btnOption4.setText(options.get(3));
+        btnOption5.setText(options.get(4));
+        btnOption6.setText(options.get(5));
+
+        tvGamePrompt.setText("Which letter did you hear?");
+        tvGameFeedback.setText("");
+    }
+
+    private void handleAnswerClick(Button clickedButton) {
+        String chosen = clickedButton.getText().toString();
+        boolean correct = chosen.equals(currentCorrectAnswer);
+
+        if (correct) {
+            score++;
+            tvGameFeedback.setText("✅ Correct!");
+            tvGameScore.setText("Score: " + score);
+
+            playSfx(true);
+            playCorrectAnimation(clickedButton);
+
+            if (score > bestScore) {
+                bestScore = score;
+                tvGameBest.setText("Best: " + bestScore);
+                saveHighScore(bestScore);
+                playHighScoreCelebration();
+            }
+        } else {
+            tvGameFeedback.setText("❌ Wrong! Correct: " + currentCorrectAnswer);
+            playSfx(false);
+            playWrongAnimation(clickedButton);
+        }
+
+        // Next question immediately
+        generateNewQuestion();
+    }
+
+    // -------------------------
+    // TIMER
+    // -------------------------
+    private void startTimer() {
+        cancelTimer();
+        countDownTimer = new CountDownTimer(timeLeftMs, 1000) {
             @Override
             public void onTick(long millisUntilFinished) {
-                long s = millisUntilFinished / 1000;
-                tvGameTimer.setText("Time: " + s + "s");
+                timeLeftMs = millisUntilFinished;
+                tvGameTimer.setText("Time: " + (millisUntilFinished / 1000) + "s");
             }
 
             @Override
             public void onFinish() {
+                timeLeftMs = 0;
                 tvGameTimer.setText("Time: 0s");
-                endGame();
+                tvGameFeedback.setText("⏰ Time's up! Final score: " + score);
+
+                // Disable buttons
+                setOptionsEnabled(false);
             }
         }.start();
     }
 
-    private void generateNewRound() {
-        if (isGameOver) return;
+    private void cancelTimer() {
+        if (countDownTimer != null) {
+            countDownTimer.cancel();
+            countDownTimer = null;
+        }
+    }
 
-        tvGameFeedback.setText("");
-        tvGameFeedback.setTextColor(Color.parseColor("#37474F"));
+    private void setOptionsEnabled(boolean enabled) {
+        btnOption1.setEnabled(enabled);
+        btnOption2.setEnabled(enabled);
+        btnOption3.setEnabled(enabled);
+        btnOption4.setEnabled(enabled);
+        btnOption5.setEnabled(enabled);
+        btnOption6.setEnabled(enabled);
+    }
 
-        boolean isLetterRound = random.nextBoolean();
-        String[] options = new String[6];
+    // -------------------------
+    // SFX
+    // -------------------------
+    private void playSfx(boolean isCorrect) {
+        if (!isSfxOn) return;
 
-        if (isLetterRound) {
-            int correctIndex = random.nextInt(letters.length);
-            currentCorrect = letters[correctIndex];
-            tvGamePrompt.setText("Tap the letter: " + currentCorrect);
+        int resId = isCorrect ? R.raw.correct : R.raw.wrong;
 
-            options[0] = currentCorrect;
-            for (int i = 1; i < 6; i++) {
-                String candidate;
-                do {
-                    candidate = letters[random.nextInt(letters.length)];
-                } while (candidate.equals(currentCorrect) || contains(options, candidate, i));
-                options[i] = candidate;
+        try {
+            if (sfxPlayer != null) {
+                sfxPlayer.release();
+                sfxPlayer = null;
             }
-        } else {
-            int correctNum = random.nextInt(30) + 1;
-            currentCorrect = String.valueOf(correctNum);
-            tvGamePrompt.setText("Tap the number: " + currentCorrect);
-
-            options[0] = currentCorrect;
-            for (int i = 1; i < 6; i++) {
-                String candidate;
-                do {
-                    candidate = String.valueOf(random.nextInt(30) + 1);
-                } while (candidate.equals(currentCorrect) || contains(options, candidate, i));
-                options[i] = candidate;
+            sfxPlayer = MediaPlayer.create(this, resId);
+            if (sfxPlayer != null) {
+                sfxPlayer.setOnCompletionListener(mp -> {
+                    mp.release();
+                    sfxPlayer = null;
+                });
+                sfxPlayer.start();
             }
-        }
-
-        // Shuffle options
-        for (int i = options.length - 1; i > 0; i--) {
-            int j = random.nextInt(i + 1);
-            String tmp = options[i];
-            options[i] = options[j];
-            options[j] = tmp;
-        }
-
-        btnGameOpt1.setText(options[0]);
-        btnGameOpt2.setText(options[1]);
-        btnGameOpt3.setText(options[2]);
-        btnGameOpt4.setText(options[3]);
-        btnGameOpt5.setText(options[4]);
-        btnGameOpt6.setText(options[5]);
+        } catch (Exception ignored) {}
     }
 
-    private boolean contains(String[] arr, String value, int upToIndex) {
-        for (int i = 0; i < upToIndex; i++) {
-            if (value.equals(arr[i])) return true;
-        }
-        return false;
+    private void saveHighScore(int value) {
+        SharedPreferences.Editor ed = prefs.edit();
+        ed.putInt(KEY_HIGH_SCORE, value);
+        ed.apply();
     }
 
-    private void handleAnswer(Button btn) {
-        if (isGameOver) return;
+    // -------------------------
+    // ANIMATIONS
+    // -------------------------
+    private void playHighScoreCelebration() {
+        // Glow pulse on best score
+        try {
+            Animation glow = AnimationUtils.loadAnimation(this, R.anim.glow_pulse);
+            tvGameBest.startAnimation(glow);
+        } catch (Exception ignored) {}
 
-        String chosen = btn.getText().toString();
-        boolean correct = chosen.equals(currentCorrect);
+        // Bounce on score
+        try {
+            Animation bounce = AnimationUtils.loadAnimation(this, R.anim.bounce_pop);
+            tvGameScore.startAnimation(bounce);
+        } catch (Exception ignored) {}
 
-        if (correct) {
-            gameScore++;
-            tvGameScore.setText("Score: " + gameScore);
-            tvGameFeedback.setText("✅ Correct!");
-            tvGameFeedback.setTextColor(Color.parseColor("#1B5E20"));
-        } else {
-            tvGameFeedback.setText("❌ Wrong! Correct: " + currentCorrect);
-            tvGameFeedback.setTextColor(Color.parseColor("#B71C1C"));
-        }
+        // Rainbow shine on title
+        try {
+            Animation shine = AnimationUtils.loadAnimation(this, R.anim.rainbow_shine);
+            tvGameTitle.startAnimation(shine);
+        } catch (Exception ignored) {}
 
-        // Brief pause so user sees feedback, then next round
-        tvGamePrompt.postDelayed(this::generateNewRound, 300);
+        // Confetti on feedback
+        try {
+            Animation confetti = AnimationUtils.loadAnimation(this, R.anim.confetti_fall);
+            tvGameFeedback.startAnimation(confetti);
+        } catch (Exception ignored) {}
+
+        // Screen shake for entire screen
+        try {
+            View root = findViewById(android.R.id.content);
+            Animation shake = AnimationUtils.loadAnimation(this, R.anim.screen_shake);
+            root.startAnimation(shake);
+        } catch (Exception ignored) {}
     }
 
-    private void endGame() {
-        isGameOver = true;
-        enableOptionButtons(false);
+    private void playCorrectAnimation(View button) {
+        try {
+            Animation bounce = AnimationUtils.loadAnimation(this, R.anim.bounce_pop);
+            button.startAnimation(bounce);
 
-        if (gameTimer != null) {
-            gameTimer.cancel();
-            gameTimer = null;
-        }
-
-        SharedPreferences prefs = getSharedPreferences(PREF_NAME, MODE_PRIVATE);
-        if (gameScore > bestScore) {
-            bestScore = gameScore;
-            prefs.edit().putInt(KEY_SPEED_HIGH_SCORE, bestScore).apply();
-        }
-        tvGameBest.setText("Best: " + bestScore);
-
-        new AlertDialog.Builder(this)
-                .setTitle("Time's up!")
-                .setMessage("You scored " + gameScore + " in 30 seconds.")
-                .setCancelable(false)
-                .setPositiveButton("Play again", (d, w) -> startGame())
-                .setNegativeButton("Close", (d, w) -> finish())
-                .show();
+            Animation glow = AnimationUtils.loadAnimation(this, R.anim.glow_pulse);
+            tvGameFeedback.startAnimation(glow);
+        } catch (Exception ignored) {}
     }
 
-    private void enableOptionButtons(boolean enabled) {
-        btnGameOpt1.setEnabled(enabled);
-        btnGameOpt2.setEnabled(enabled);
-        btnGameOpt3.setEnabled(enabled);
-        btnGameOpt4.setEnabled(enabled);
-        btnGameOpt5.setEnabled(enabled);
-        btnGameOpt6.setEnabled(enabled);
+    private void playWrongAnimation(View button) {
+        try {
+            Animation shake = AnimationUtils.loadAnimation(this, R.anim.screen_shake);
+            button.startAnimation(shake);
+
+            Animation confetti = AnimationUtils.loadAnimation(this, R.anim.confetti_fall);
+            tvGameFeedback.startAnimation(confetti);
+        } catch (Exception ignored) {}
     }
 
+    // -------------------------
+    // LIFECYCLE
+    // -------------------------
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        if (gameTimer != null) {
-            gameTimer.cancel();
-            gameTimer = null;
+        cancelTimer();
+        if (tts != null) {
+            tts.stop();
+            tts.shutdown();
+        }
+        if (sfxPlayer != null) {
+            sfxPlayer.release();
+            sfxPlayer = null;
         }
     }
 }

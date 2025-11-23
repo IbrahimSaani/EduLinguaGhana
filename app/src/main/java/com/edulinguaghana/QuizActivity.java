@@ -4,11 +4,12 @@ import android.content.SharedPreferences;
 import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.os.CountDownTimer;
+import android.os.Handler;
 import android.speech.tts.TextToSpeech;
-import android.util.Log;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.Button;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -22,162 +23,263 @@ import java.util.Set;
 
 public class QuizActivity extends AppCompatActivity {
 
-    // Views
+    // Views (from activity_speed_game.xml / activity_quiz.xml with same IDs)
     private TextView tvGameTitle, tvGameTimer, tvGameScore, tvGameBest, tvGameFeedback, tvGamePrompt;
     private Button btnPlayAudio, btnOption1, btnOption2, btnOption3, btnOption4, btnOption5, btnOption6, btnBackQuiz;
 
-    // Game variables
+    // Game state
     private int score = 0;
     private int bestScore = 0;
     private String currentCorrectAnswer;
+    private String currentPromptTtsText;   // what TTS should actually say
+
     private CountDownTimer countDownTimer;
-    private String languageCode;
+    private long remainingTime = 30000L;             // total quiz time: 30s
+    private static final long PENALTY_TIME = 1000L;  // -1s penalty for wrong answer
 
-    private static final String PREF_NAME = "EduLinguaPrefs";
-    private static final String KEY_HIGH_SCORE = "HIGH_SCORE";
+    // SharedPreferences keys
+    private static final String PREF_NAME       = "EduLinguaPrefs";
+    private static final String KEY_HIGH_SCORE  = "QUIZ_HIGH_SCORE";
+    private static final String KEY_SFX_ENABLED = "SFX_ENABLED";
 
-    // Timer settings
-    private static final long TIME_PER_QUESTION_MS = 30000; // 30 seconds for each question
+    // Alphabet (letters-only)
+    private final String[] alphabet = {
+            "A","B","C","D","E","F","G","H","I","J","K","L","M",
+            "N","O","P","Q","R","S","T","U","V","W","X","Y","Z"
+    };
 
-    // Game data (Example: English Alphabet)
-    private String[] questions = {"A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z"};
+    // Matching data (letter → word so kids can relate)
+    private final String[] matchLetters = {"A","B","C","D","E","F"};
+    private final String[] matchWords   = {"Apple","Ball","Cat","Dog","Egg","Fish"};
 
-    // TTS instance
-    private TextToSpeech textToSpeech;
-    private boolean isTtsInitialized = false;
+    // Number settings
+    private static final int MAX_NUMBER = 30;
+
+    // TTS
+    private TextToSpeech tts;
+    private boolean ttsReady = false;
+    private String languageCode;   // "en", "fr", etc.
+    private String languageName;   // "English", "French", etc.
+
+    // SFX
+    private boolean isSfxOn = true;
+
+    // Quiz mode: "letters", "numbers", "sequence", "matching", "mixed"
+    private String quizType = "letters";
+
+    private final Random random = new Random();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        // Using the same layout you wired for the quiz/speed style
         setContentView(R.layout.activity_speed_game);
 
-        // Initialize views
-        tvGameTitle = findViewById(R.id.tvGameTitle);
-        tvGameTimer = findViewById(R.id.tvGameTimer);
-        tvGameScore = findViewById(R.id.tvGameScore);
-        tvGameBest = findViewById(R.id.tvGameBest);
-        tvGameFeedback = findViewById(R.id.tvGameFeedback);
-        tvGamePrompt = findViewById(R.id.tvGamePrompt);
-
-        btnPlayAudio = findViewById(R.id.btnPlayAudio);
-        btnOption1 = findViewById(R.id.btnGameOpt1);
-        btnOption2 = findViewById(R.id.btnGameOpt2);
-        btnOption3 = findViewById(R.id.btnGameOpt3);
-        btnOption4 = findViewById(R.id.btnGameOpt4);
-        btnOption5 = findViewById(R.id.btnGameOpt5);
-        btnOption6 = findViewById(R.id.btnGameOpt6);
-        btnBackQuiz = findViewById(R.id.btnGameBack);
-
-        // Retrieve the language code passed from the previous activity
+        // --- Get language & mode from intent ---
         languageCode = getIntent().getStringExtra("LANG_CODE");
+        languageName = getIntent().getStringExtra("LANG_NAME");
 
-        // Initialize Text-to-Speech (TTS)
-        initializeTTS();
+        // We support both old and new keys for safety
+        String rawType = getIntent().getStringExtra("QUIZ_TYPE");
+        if (rawType == null) rawType = getIntent().getStringExtra("QUIZ_MODE");
 
-        // Load the best score
+        if (languageCode == null) languageCode = "en";
+        if (languageName == null) languageName = "Unknown";
+        if (rawType == null) rawType = "letters";
+
+        // Normalize whatever string is coming from MainActivity
+        quizType = normalizeQuizType(rawType);
+
+        // --- Bind views ---
+        tvGameTitle    = findViewById(R.id.tvGameTitle);
+        tvGameTimer    = findViewById(R.id.tvGameTimer);
+        tvGameScore    = findViewById(R.id.tvGameScore);
+        tvGameBest     = findViewById(R.id.tvGameBest);
+        tvGameFeedback = findViewById(R.id.tvGameFeedback);
+        tvGamePrompt   = findViewById(R.id.tvGamePrompt);
+
+        // Make sure you have this button in the quiz layout if you want manual replay
+        btnPlayAudio   = findViewById(R.id.btnPlayAudio);
+
+        btnOption1     = findViewById(R.id.btnGameOpt1);
+        btnOption2     = findViewById(R.id.btnGameOpt2);
+        btnOption3     = findViewById(R.id.btnGameOpt3);
+        btnOption4     = findViewById(R.id.btnGameOpt4);
+        btnOption5     = findViewById(R.id.btnGameOpt5);
+        btnOption6     = findViewById(R.id.btnGameOpt6);
+        btnBackQuiz    = findViewById(R.id.btnGameBack);
+
+        // Title based on quiz type + language
+        String modeLabel;
+        switch (quizType) {
+            case "numbers":
+                modeLabel = "Numbers Quiz";
+                break;
+            case "sequence":
+                modeLabel = "Number Sequence Quiz";
+                break;
+            case "matching":
+                modeLabel = "Matching Quiz";
+                break;
+            case "mixed":
+                modeLabel = "Mixed Quiz";
+                break;
+            case "letters":
+            default:
+                modeLabel = "Letters Quiz";
+                break;
+        }
+        tvGameTitle.setText(modeLabel + " – " + languageName);
+
+        // Load prefs (high score & SFX setting)
         SharedPreferences prefs = getSharedPreferences(PREF_NAME, MODE_PRIVATE);
         bestScore = prefs.getInt(KEY_HIGH_SCORE, 0);
+        isSfxOn   = prefs.getBoolean(KEY_SFX_ENABLED, true);
         tvGameBest.setText("Best: " + bestScore);
 
-        // Start the game
+        initTTS();
+
+        // Start first round
         startGame();
 
-        // Set up button listeners
-        btnOption1.setOnClickListener(v -> checkAnswer(btnOption1.getText().toString()));
-        btnOption2.setOnClickListener(v -> checkAnswer(btnOption2.getText().toString()));
-        btnOption3.setOnClickListener(v -> checkAnswer(btnOption3.getText().toString()));
-        btnOption4.setOnClickListener(v -> checkAnswer(btnOption4.getText().toString()));
-        btnOption5.setOnClickListener(v -> checkAnswer(btnOption5.getText().toString()));
-        btnOption6.setOnClickListener(v -> checkAnswer(btnOption6.getText().toString()));
+        // Answer buttons
+        btnOption1.setOnClickListener(v -> checkAnswer(btnOption1));
+        btnOption2.setOnClickListener(v -> checkAnswer(btnOption2));
+        btnOption3.setOnClickListener(v -> checkAnswer(btnOption3));
+        btnOption4.setOnClickListener(v -> checkAnswer(btnOption4));
+        btnOption5.setOnClickListener(v -> checkAnswer(btnOption5));
+        btnOption6.setOnClickListener(v -> checkAnswer(btnOption6));
 
+        // Replay audio
+        if (btnPlayAudio != null) {
+            btnPlayAudio.setOnClickListener(v -> speakPrompt());
+        }
+
+        // Back button
         btnBackQuiz.setOnClickListener(v -> {
             cancelTimer();
-            finish(); // Go back to the previous screen
+            finish();
         });
-
-        // Set up Play Audio button listener (for TTS)
-        btnPlayAudio.setOnClickListener(v -> playAudio());
     }
 
-    // Initialize Text-to-Speech (TTS)
-    private void initializeTTS() {
-        textToSpeech = new TextToSpeech(this, status -> {
+    @Override
+    protected void onResume() {
+        super.onResume();
+        // Reload SFX setting in case user changed it in Settings
+        SharedPreferences prefs = getSharedPreferences(PREF_NAME, MODE_PRIVATE);
+        isSfxOn = prefs.getBoolean(KEY_SFX_ENABLED, true);
+    }
+
+    // ---------------- QUIZ TYPE NORMALIZATION ----------------
+
+    private String normalizeQuizType(String raw) {
+        String t = raw.toLowerCase(Locale.ROOT);
+
+        if (t.contains("letter")) return "letters";
+        if (t.contains("sequ"))   return "sequence";
+        if (t.contains("match"))  return "matching";
+        if (t.contains("mix"))    return "mixed";
+        if (t.contains("num"))    return "numbers";
+
+        // fallback
+        return t;
+    }
+
+    // ---------------- TTS ----------------
+
+    private void initTTS() {
+        tts = new TextToSpeech(this, status -> {
             if (status == TextToSpeech.SUCCESS) {
-                setTTSLanguage(languageCode);  // Set the language based on the languageCode
-                isTtsInitialized = true;
-                // Play audio for the first question now that TTS is ready
-                playAudio();
-            } else {
-                Log.e("TTS", "Initialization failed with status: " + status);
-                Toast.makeText(this, "TTS Initialization Failed!", Toast.LENGTH_SHORT).show();
+                // Language mapping
+                switch (languageCode.toLowerCase()) {
+                    case "fr":
+                        tts.setLanguage(Locale.FRENCH);
+                        break;
+                    case "en":
+                    default:
+                        tts.setLanguage(Locale.US);
+                        break;
+                }
+                ttsReady = true;
+
+                // If first question is already set, speak it
+                if (currentPromptTtsText != null) {
+                    speakPrompt();
+                }
             }
         });
     }
 
-    // Set the appropriate language for TTS
-    private void setTTSLanguage(String langCode) {
-        Locale locale;
+    private void speakPrompt() {
+        if (!ttsReady || currentPromptTtsText == null) return;
 
-        // Check which language code was passed and set the appropriate locale for TTS
-        switch (langCode) {
-            case "fr":
-                locale = Locale.FRENCH;  // French TTS
-                break;
-            case "en":
-            default:
-                locale = Locale.ENGLISH;  // English TTS (default)
-                break;
-        }
-
-        // Set the language of the TextToSpeech engine
-        int result = textToSpeech.setLanguage(locale);
-
-        // ### START: CORRECTION ###
-        // The constant LANG_COUNTRY_NOT_SUPPORTED does not exist.
-        // The correct constants to check for errors are LANG_MISSING_DATA and LANG_NOT_SUPPORTED.
-        if (result == TextToSpeech.LANG_MISSING_DATA || result == TextToSpeech.LANG_NOT_SUPPORTED) {
-            // Handle the error if the language is not supported or data is missing
-            Log.e("TTS", "The Language is not supported!");
-            Toast.makeText(this, "The selected language is not supported.", Toast.LENGTH_SHORT).show();
-        }
-        // ### END: CORRECTION ###
+        tts.stop();
+        tts.speak(currentPromptTtsText, TextToSpeech.QUEUE_FLUSH, null, "quiz_tts");
     }
 
-    // Start a new game
+    // ---------------- GAME FLOW ----------------
+
     private void startGame() {
         score = 0;
-        tvGameScore.setText("Score: " + score);
+        remainingTime = 30000L;    // 30 seconds total
+        tvGameScore.setText("Score: 0");
         tvGameFeedback.setText("");
-
         generateNewQuestion();
         startTimer();
     }
 
-    // Generate a new question
     private void generateNewQuestion() {
-        Random random = new Random();
-        // Pick a random correct answer from the questions array
-        currentCorrectAnswer = questions[random.nextInt(questions.length)];
+        // Reset buttons visuals & enabled state
+        resetButtons();
 
-        // Generate 6 unique options, including the correct answer
+        switch (quizType) {
+            case "numbers":
+                generateNumberQuestion();
+                break;
+            case "sequence":
+                generateSequenceQuestion();
+                break;
+            case "matching":
+                generateMatchingQuestion();
+                break;
+            case "mixed":
+                generateMixedQuestion();
+                break;
+            case "letters":
+            default:
+                generateLetterQuestion();
+                break;
+        }
+
+        // Auto-speak after setting question
+        speakPrompt();
+    }
+
+    /**
+     * Letters-only quiz:
+     * - TTS: speaks a letter (A–Z)
+     * - Options: letters only
+     */
+    private void generateLetterQuestion() {
+        currentCorrectAnswer = alphabet[random.nextInt(alphabet.length)];
+
+        // Build 6 unique letter options
         List<String> options = new ArrayList<>();
-        options.add(currentCorrectAnswer);
+        Set<String> used = new HashSet<>();
 
-        Set<String> usedOptions = new HashSet<>();
-        usedOptions.add(currentCorrectAnswer);
+        options.add(currentCorrectAnswer);
+        used.add(currentCorrectAnswer);
 
         while (options.size() < 6) {
-            String randomOption = questions[random.nextInt(questions.length)];
-            if (!usedOptions.contains(randomOption)) {
-                options.add(randomOption);
-                usedOptions.add(randomOption);
+            String pick = alphabet[random.nextInt(alphabet.length)];
+            if (!used.contains(pick)) {
+                options.add(pick);
+                used.add(pick);
             }
         }
 
-        // Shuffle the options so the correct answer isn't always first
         Collections.shuffle(options);
 
-        // Set options to buttons
         btnOption1.setText(options.get(0));
         btnOption2.setText(options.get(1));
         btnOption3.setText(options.get(2));
@@ -186,103 +288,328 @@ public class QuizActivity extends AppCompatActivity {
         btnOption6.setText(options.get(5));
 
         tvGamePrompt.setText("Which letter did you hear?");
-        resetButtonStyles();
-
-        // Play the audio for the new question if TTS is ready
-        if (isTtsInitialized) {
-            playAudio();
-        }
+        currentPromptTtsText = currentCorrectAnswer;  // TTS says the letter itself
     }
 
-    // Check the selected answer
-    private void checkAnswer(String selectedAnswer) {
-        cancelTimer(); // Stop the timer once an answer is submitted
+    /**
+     * Numbers-only quiz:
+     * - TTS: speaks a number (1..MAX_NUMBER)
+     * - Options: numbers only
+     */
+    private void generateNumberQuestion() {
+        int correctNumber = random.nextInt(MAX_NUMBER) + 1;
+        currentCorrectAnswer = String.valueOf(correctNumber);
 
-        if (selectedAnswer.equals(currentCorrectAnswer)) {
+        List<String> options = new ArrayList<>();
+        Set<Integer> used = new HashSet<>();
+
+        options.add(currentCorrectAnswer);
+        used.add(correctNumber);
+
+        while (options.size() < 6) {
+            int pick = random.nextInt(MAX_NUMBER) + 1;
+            if (!used.contains(pick)) {
+                options.add(String.valueOf(pick));
+                used.add(pick);
+            }
+        }
+
+        Collections.shuffle(options);
+
+        btnOption1.setText(options.get(0));
+        btnOption2.setText(options.get(1));
+        btnOption3.setText(options.get(2));
+        btnOption4.setText(options.get(3));
+        btnOption5.setText(options.get(4));
+        btnOption6.setText(options.get(5));
+
+        tvGamePrompt.setText("Which number did you hear?");
+        currentPromptTtsText = currentCorrectAnswer;  // TTS says the number
+    }
+
+    /**
+     * Number sequence quiz:
+     * - Shows a sequence like "3, 4, ?, 6"
+     * - Correct answer is the missing number
+     * - Options: numbers only
+     */
+    private void generateSequenceQuestion() {
+        int start = random.nextInt(20) + 1;  // keep small so sequence looks nice
+        int step = 1;                        // simple +1 sequence
+
+        // Build a 4-length sequence
+        int[] seq = new int[4];
+        for (int i = 0; i < 4; i++) {
+            seq[i] = start + i * step;
+        }
+
+        // Random missing position (not first or last)
+        int missingIndex = random.nextInt(2) + 1; // 1 or 2
+        int missingValue = seq[missingIndex];
+        currentCorrectAnswer = String.valueOf(missingValue);
+
+        // Build prompt text
+        StringBuilder sb = new StringBuilder("Complete the sequence: ");
+        for (int i = 0; i < seq.length; i++) {
+            if (i == missingIndex) {
+                sb.append("?, ");
+            } else {
+                sb.append(seq[i]).append(", ");
+            }
+        }
+        String prompt = sb.toString();
+        if (prompt.endsWith(", ")) {
+            prompt = prompt.substring(0, prompt.length() - 2);
+        }
+        tvGamePrompt.setText(prompt);
+
+        // Build options (numbers only)
+        List<String> options = new ArrayList<>();
+        Set<Integer> used = new HashSet<>();
+
+        options.add(currentCorrectAnswer);
+        used.add(missingValue);
+
+        while (options.size() < 6) {
+            int delta = random.nextInt(3) + 1;
+            int candidate = random.nextBoolean()
+                    ? missingValue + delta
+                    : missingValue - delta;
+            if (candidate < 1) candidate = missingValue + delta + 1;
+            if (!used.contains(candidate)) {
+                options.add(String.valueOf(candidate));
+                used.add(candidate);
+            }
+        }
+
+        Collections.shuffle(options);
+
+        btnOption1.setText(options.get(0));
+        btnOption2.setText(options.get(1));
+        btnOption3.setText(options.get(2));
+        btnOption4.setText(options.get(3));
+        btnOption5.setText(options.get(4));
+        btnOption6.setText(options.get(5));
+
+        // For sequence, we can speak just the missing number or a hint
+        currentPromptTtsText = "Find the missing number";
+    }
+
+    /**
+     * Matching quiz:
+     * - Prompt: "Which word starts with letter X?"
+     * - Options: words (Apple, Ball, Cat, etc.)
+     * - Correct answer: the word
+     */
+    private void generateMatchingQuestion() {
+        int idx = random.nextInt(matchLetters.length);
+        String letter = matchLetters[idx];
+        String correctWord = matchWords[idx];
+
+        currentCorrectAnswer = correctWord;
+
+        tvGamePrompt.setText("Which word starts with letter " + letter + "?");
+
+        // Build 6 word options
+        List<String> options = new ArrayList<>();
+        Set<Integer> used = new HashSet<>();
+
+        options.add(correctWord);
+        used.add(idx);
+
+        while (options.size() < 6 && used.size() < matchWords.length) {
+            int pick = random.nextInt(matchWords.length);
+            if (!used.contains(pick)) {
+                options.add(matchWords[pick]);
+                used.add(pick);
+            }
+        }
+
+        // If we still don't have 6 (e.g., only 6 words total), just duplicate some
+        while (options.size() < 6) {
+            options.add(matchWords[random.nextInt(matchWords.length)]);
+        }
+
+        Collections.shuffle(options);
+
+        btnOption1.setText(options.get(0));
+        btnOption2.setText(options.get(1));
+        btnOption3.setText(options.get(2));
+        btnOption4.setText(options.get(3));
+        btnOption5.setText(options.get(4));
+        btnOption6.setText(options.get(5));
+
+        // TTS: speak the letter (so kids hear the sound)
+        currentPromptTtsText = letter;
+    }
+
+    /**
+     * Mixed quiz:
+     * - Randomly chooses between letters-only and numbers-only
+     * - So kids see BOTH letters and numbers across the round
+     */
+    private void generateMixedQuestion() {
+        boolean useLetters = random.nextBoolean();
+        if (useLetters) {
+            generateLetterQuestion();
+        } else {
+            generateNumberQuestion();
+        }
+        // generateLetterQuestion / generateNumberQuestion already set currentPromptTtsText
+    }
+
+    private void checkAnswer(Button clickedButton) {
+        cancelTimer(); // stop ticking while we evaluate
+
+        String answer = clickedButton.getText().toString();
+        boolean isCorrect = answer.equals(currentCorrectAnswer);
+
+        if (isCorrect) {
             score++;
             tvGameFeedback.setText("✅ Correct!");
+            clickedButton.setBackgroundResource(R.drawable.bg_quiz_option_correct);
             playSfx(true);
+
+            // High score update + animation
+            if (score > bestScore) {
+                bestScore = score;
+                saveHighScore();
+                animateHighScore();
+            }
+
         } else {
-            tvGameFeedback.setText("❌ Incorrect! The correct answer was " + currentCorrectAnswer);
+            tvGameFeedback.setText("❌ Wrong! Correct: " + currentCorrectAnswer);
+            clickedButton.setBackgroundResource(R.drawable.bg_quiz_option_wrong);
             playSfx(false);
+
+            // Penalty time
+            remainingTime -= PENALTY_TIME;
+            if (remainingTime < 0) remainingTime = 0;
         }
+
         tvGameScore.setText("Score: " + score);
 
-        // Update the best score if necessary
-        if (score > bestScore) {
-            bestScore = score;
-            tvGameBest.setText("Best: " + bestScore);
-            SharedPreferences prefs = getSharedPreferences(PREF_NAME, MODE_PRIVATE);
-            SharedPreferences.Editor editor = prefs.edit();
-            editor.putInt(KEY_HIGH_SCORE, bestScore);
-            editor.apply();
-        }
+        // Disable all buttons until next question
+        setButtonsEnabled(false);
 
-        // Move to the next question after a short delay to show feedback
-        new android.os.Handler().postDelayed(() -> {
-            generateNewQuestion();
-            startTimer();
-        }, 1500); // 1.5-second delay
+        // Move to next question after a short delay
+        new Handler().postDelayed(() -> {
+            if (remainingTime <= 0) {
+                endQuiz();
+            } else {
+                generateNewQuestion();
+                startTimer();
+            }
+        }, 1000);
     }
 
-    // Start the countdown timer
+    // ---------------- TIMER ----------------
+
     private void startTimer() {
-        cancelTimer(); // Ensure no other timer is running
-        countDownTimer = new CountDownTimer(TIME_PER_QUESTION_MS, 1000) {
+        cancelTimer();
+
+        countDownTimer = new CountDownTimer(remainingTime, 1000) {
             @Override
             public void onTick(long millisUntilFinished) {
-                tvGameTimer.setText("Time: " + (millisUntilFinished / 1000) + "s");
+                remainingTime = millisUntilFinished;
+                long s = millisUntilFinished / 1000;
+                tvGameTimer.setText("Time: " + s + "s");
             }
 
             @Override
             public void onFinish() {
+                remainingTime = 0;
                 tvGameTimer.setText("Time: 0s");
-                tvGameFeedback.setText("⏰ Time's up! The correct answer was " + currentCorrectAnswer);
-                playSfx(false);
-                // Move to the next question after a short delay
-                new android.os.Handler().postDelayed(() -> {
-                    generateNewQuestion();
-                    startTimer();
-                }, 1500);
+                endQuiz();
             }
         }.start();
     }
 
-    // Cancel the timer
+    private void endQuiz() {
+        tvGameFeedback.setText("⏰ Time up! Final score: " + score);
+        playSfx(false);
+        setButtonsEnabled(false);
+    }
+
     private void cancelTimer() {
         if (countDownTimer != null) {
             countDownTimer.cancel();
+            countDownTimer = null;
         }
     }
 
-    // Play audio for the current question using TTS
-    private void playAudio() {
-        if (isTtsInitialized && currentCorrectAnswer != null) {
-            textToSpeech.speak(currentCorrectAnswer, TextToSpeech.QUEUE_FLUSH, null, null);
-        }
-    }
+    // ---------------- UI HELPERS ----------------
 
-    // Play sound effect (correct or wrong answer)
-    private void playSfx(boolean isCorrect) {
-        int resId = isCorrect ? R.raw.correct : R.raw.wrong;
-        MediaPlayer sfxPlayer = MediaPlayer.create(this, resId);
-        sfxPlayer.setOnCompletionListener(MediaPlayer::release); // Releases resources automatically
-        sfxPlayer.start();
-    }
-
-    // Reset button appearances (optional but good practice)
-    private void resetButtonStyles() {
+    private void resetButtons() {
         tvGameFeedback.setText("");
-        // You can add code here to reset button colors if you change them on correct/incorrect answers
+
+        setButtonsEnabled(true);
+
+        btnOption1.setBackgroundResource(R.drawable.bg_quiz_option);
+        btnOption2.setBackgroundResource(R.drawable.bg_quiz_option);
+        btnOption3.setBackgroundResource(R.drawable.bg_quiz_option);
+        btnOption4.setBackgroundResource(R.drawable.bg_quiz_option);
+        btnOption5.setBackgroundResource(R.drawable.bg_quiz_option);
+        btnOption6.setBackgroundResource(R.drawable.bg_quiz_option);
+
+        btnOption1.clearAnimation();
+        btnOption2.clearAnimation();
+        btnOption3.clearAnimation();
+        btnOption4.clearAnimation();
+        btnOption5.clearAnimation();
+        btnOption6.clearAnimation();
     }
+
+    private void setButtonsEnabled(boolean enabled) {
+        btnOption1.setEnabled(enabled);
+        btnOption2.setEnabled(enabled);
+        btnOption3.setEnabled(enabled);
+        btnOption4.setEnabled(enabled);
+        btnOption5.setEnabled(enabled);
+        btnOption6.setEnabled(enabled);
+    }
+
+    private void saveHighScore() {
+        SharedPreferences prefs = getSharedPreferences(PREF_NAME, MODE_PRIVATE);
+        prefs.edit().putInt(KEY_HIGH_SCORE, bestScore).apply();
+        tvGameBest.setText("Best: " + bestScore);
+    }
+
+    private void animateHighScore() {
+        // Uses your XML animations: glow_pulse, bounce_pop, rainbow_shine, screen_shake
+        Animation pulse  = AnimationUtils.loadAnimation(this, R.anim.glow_pulse);
+        Animation bounce = AnimationUtils.loadAnimation(this, R.anim.bounce_pop);
+        Animation shine  = AnimationUtils.loadAnimation(this, R.anim.rainbow_shine);
+        Animation shake  = AnimationUtils.loadAnimation(this, R.anim.screen_shake);
+
+        tvGameBest.startAnimation(pulse);
+        tvGameBest.startAnimation(bounce);
+        tvGameBest.startAnimation(shine);
+        tvGameBest.startAnimation(shake);
+    }
+
+    // ---------------- SFX ----------------
+
+    private void playSfx(boolean correct) {
+        if (!isSfxOn) return;
+
+        int res = correct ? R.raw.correct : R.raw.wrong;
+        MediaPlayer mp = MediaPlayer.create(this, res);
+        if (mp != null) {
+            mp.setOnCompletionListener(MediaPlayer::release);
+            mp.start();
+        }
+    }
+
+    // ---------------- LIFECYCLE ----------------
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        cancelTimer(); // Stop the timer to prevent leaks
-        if (textToSpeech != null) {
-            textToSpeech.stop();
-            textToSpeech.shutdown();
+        cancelTimer();
+        if (tts != null) {
+            tts.stop();
+            tts.shutdown();
         }
     }
 }
