@@ -19,17 +19,19 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="EduLingua Ghana"
-        android:textSize="24sp"
+        android:textSize="26sp"
         android:textStyle="bold"
+        android:fontFamily="sans-serif-medium"
         android:textColor="#FFFFFF"
-        android:layout_marginTop="16dp" />
+        android:layout_marginTop="18dp" />
 
     <TextView
         android:id="@+id/tvTaglineSplash"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Interactive Language Learning for Basic Schools"
-        android:textSize="14sp"
+        android:textSize="15sp"
+        android:fontFamily="sans-serif"
         android:textColor="#E3F2FD"
         android:layout_marginTop="8dp"
         android:gravity="center" />
