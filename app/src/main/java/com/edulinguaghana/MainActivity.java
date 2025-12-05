@@ -189,6 +189,7 @@ public class MainActivity extends AppCompatActivity {
             chip.setTag(langCodes[i]);
             chip.setCheckable(true);
             chip.setClickable(true);
+            chip.setChipIcon(getDrawable(android.R.drawable.ic_btn_speak_now));
 
             chip.setOnCheckedChangeListener((buttonView, isChecked) -> {
                 if (isChecked) {

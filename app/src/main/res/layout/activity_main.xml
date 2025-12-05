@@ -112,6 +112,8 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
+                android:fadingEdgeLength="32dp"
+                android:requiresFadingEdge="horizontal"
                 android:scrollbars="none"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
@@ -121,8 +123,9 @@
                     android:id="@+id/languageChipGroup"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    app:singleSelection="true"
-                    app:selectionRequired="true" />
+                    app:chipSpacingHorizontal="8dp"
+                    app:selectionRequired="true"
+                    app:singleSelection="true" />
 
             </HorizontalScrollView>
 
@@ -165,15 +168,28 @@
                         android:src="@android:drawable/ic_media_play"
                         app:tint="@color/colorPrimary" />
 
-                    <TextView
+                    <LinearLayout
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_marginStart="16dp"
                         android:layout_weight="1"
-                        android:fontFamily="@font/agbalumo"
-                        android:text="Recital Mode"
-                        android:textColor="@color/textColorPrimary"
-                        android:textSize="18sp" />
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:fontFamily="@font/agbalumo"
+                            android:text="Recital Mode"
+                            android:textColor="@color/textColorPrimary"
+                            android:textSize="18sp" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Listen to letters and numbers"
+                            android:textColor="@color/textColorSecondary"
+                            android:textSize="14sp" />
+                    </LinearLayout>
 
                     <ImageView
                         android:layout_width="24dp"
@@ -210,15 +226,28 @@
                         android:src="@android:drawable/ic_btn_speak_now"
                         app:tint="@color/colorPrimary" />
 
-                    <TextView
+                    <LinearLayout
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_marginStart="16dp"
                         android:layout_weight="1"
-                        android:fontFamily="@font/agbalumo"
-                        android:text="Practice Mode"
-                        android:textColor="@color/textColorPrimary"
-                        android:textSize="18sp" />
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:fontFamily="@font/agbalumo"
+                            android:text="Practice Mode"
+                            android:textColor="@color/textColorPrimary"
+                            android:textSize="18sp" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Repeat and practice pronunciation"
+                            android:textColor="@color/textColorSecondary"
+                            android:textSize="14sp" />
+                    </LinearLayout>
 
                     <ImageView
                         android:layout_width="24dp"
@@ -255,15 +284,28 @@
                         android:src="@android:drawable/ic_menu_help"
                         app:tint="@color/colorPrimary" />
 
-                    <TextView
+                    <LinearLayout
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_marginStart="16dp"
                         android:layout_weight="1"
-                        android:fontFamily="@font/agbalumo"
-                        android:text="Quiz Mode"
-                        android:textColor="@color/textColorPrimary"
-                        android:textSize="18sp" />
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:fontFamily="@font/agbalumo"
+                            android:text="Quiz Mode"
+                            android:textColor="@color/textColorPrimary"
+                            android:textSize="18sp" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Test your knowledge and play games"
+                            android:textColor="@color/textColorSecondary"
+                            android:textSize="14sp" />
+                    </LinearLayout>
 
                     <ImageView
                         android:layout_width="24dp"
@@ -300,15 +342,29 @@
                         android:src="@android:drawable/ic_menu_sort_by_size"
                         app:tint="@color/colorPrimary" />
 
-                    <TextView
+                    <LinearLayout
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_marginStart="16dp"
                         android:layout_weight="1"
-                        android:fontFamily="@font/agbalumo"
-                        android:text="Progress Tracker"
-                        android:textColor="@color/textColorPrimary"
-                        android:textSize="18sp" />
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:fontFamily="@font/agbalumo"
+                            android:text="Progress Tracker"
+                            android:textColor="@color/textColorPrimary"
+                            android:textSize="18sp" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="View your scores and stats"
+                            android:textColor="@color/textColorSecondary"
+                            android:textSize="14sp" />
+
+                    </LinearLayout>
 
                     <ImageView
                         android:layout_width="24dp"
