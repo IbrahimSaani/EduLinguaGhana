@@ -70,6 +70,7 @@
             android:layout_marginBottom="16dp">
 
             <TextView
+                android:id="@+id/tvGamePrompt"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="Listen and choose the correct letter:"

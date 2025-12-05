@@ -73,7 +73,7 @@ public class QuizActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         // Using the same layout you wired for the quiz/speed style
-        setContentView(R.layout.activity_speed_game);
+        setContentView(R.layout.activity_quiz);
 
         // --- Get language & mode from intent ---
         languageCode = getIntent().getStringExtra("LANG_CODE");
@@ -91,23 +91,23 @@ public class QuizActivity extends AppCompatActivity {
         quizType = normalizeQuizType(rawType);
 
         // --- Bind views ---
-        tvGameTitle    = findViewById(R.id.tvGameTitle);
-        tvGameTimer    = findViewById(R.id.tvGameTimer);
-        tvGameScore    = findViewById(R.id.tvGameScore);
-        tvGameBest     = findViewById(R.id.tvGameBest);
-        tvGameFeedback = findViewById(R.id.tvGameFeedback);
+        tvGameTitle    = findViewById(R.id.tvQuestionTitle);
+        tvGameTimer    = findViewById(R.id.tvTimer);
+        tvGameScore    = findViewById(R.id.tvScore);
+        tvGameBest     = findViewById(R.id.tvBest);
+        tvGameFeedback = findViewById(R.id.tvFeedback);
         tvGamePrompt   = findViewById(R.id.tvGamePrompt);
 
         // Make sure you have this button in the quiz layout if you want manual replay
         btnPlayAudio   = findViewById(R.id.btnPlayAudio);
 
-        btnOption1     = findViewById(R.id.btnGameOpt1);
-        btnOption2     = findViewById(R.id.btnGameOpt2);
-        btnOption3     = findViewById(R.id.btnGameOpt3);
-        btnOption4     = findViewById(R.id.btnGameOpt4);
-        btnOption5     = findViewById(R.id.btnGameOpt5);
-        btnOption6     = findViewById(R.id.btnGameOpt6);
-        btnBackQuiz    = findViewById(R.id.btnGameBack);
+        btnOption1     = findViewById(R.id.btnOption1);
+        btnOption2     = findViewById(R.id.btnOption2);
+        btnOption3     = findViewById(R.id.btnOption3);
+        btnOption4     = findViewById(R.id.btnOption4);
+        btnOption5     = findViewById(R.id.btnOption5);
+        btnOption6     = findViewById(R.id.btnOption6);
+        btnBackQuiz    = findViewById(R.id.btnBackQuiz);
 
         // Title based on quiz type + language
         String modeLabel;
