@@ -240,25 +240,35 @@ public class MainActivity extends AppCompatActivity {
     // ---------------- BUTTON ACTIONS ----------------
 
     private void setupButtons() {
+        AnimatorSet cardClickAnimation = (AnimatorSet) AnimatorInflater.loadAnimator(this, R.anim.card_click_animation);
+
         btnRecitalMode.setOnClickListener(v -> {
+            cardClickAnimation.setTarget(v);
+            cardClickAnimation.start();
             vibrate();
             if (!ensureLanguageSelected()) return;
             showContentTypeDialog(selectedLangCode, selectedLangName, "recital");
         });
 
         btnPracticeMode.setOnClickListener(v -> {
+            cardClickAnimation.setTarget(v);
+            cardClickAnimation.start();
             vibrate();
             if (!ensureLanguageSelected()) return;
             showContentTypeDialog(selectedLangCode, selectedLangName, "practice");
         });
 
         btnQuizMode.setOnClickListener(v -> {
+            cardClickAnimation.setTarget(v);
+            cardClickAnimation.start();
             vibrate();
             if (!ensureLanguageSelected()) return;
             showQuizTypeDialog(selectedLangCode, selectedLangName);
         });
 
         btnProgressMode.setOnClickListener(v -> {
+            cardClickAnimation.setTarget(v);
+            cardClickAnimation.start();
             vibrate();
             openProgressScreen();
         });
