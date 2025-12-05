@@ -2,4 +2,25 @@
 <resources>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
+
+    <!-- App-specific branding -->
+    <color name="colorPrimary">#1A237E</color>
+    <color name="colorPrimaryDark">#0D47A1</color>
+    <color name="colorAccent">#FFAB40</color>
+
+    <!-- UI elements -->
+    <color name="appBackground">#F3F5FF</color>
+    <color name="cardBackground">#FFFFFF</color>
+    <color name="textColorPrimary">#263238</color>
+    <color name="textColorSecondary">#455A64</color>
+
+    <!-- Buttons -->
+    <color name="buttonPrimary">#1A237E</color>
+    <color name="buttonSecondary">#E8EAF6</color>
+    <color name="buttonTextPrimary">#FFFFFF</color>
+    <color name="buttonTextSecondary">#37474F</color>
+
+    <!-- Quiz-specific -->
+    <color name="correctAnswer">#2E7D32</color>
+    <color name="wrongAnswer">#B71C1C</color>
 </resources>
