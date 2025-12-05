@@ -2,13 +2,18 @@ package com.edulinguaghana;
 
 import android.animation.AnimatorInflater;
 import android.animation.AnimatorSet;
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.media.MediaPlayer;
+import android.os.Build;
 import android.os.Bundle;
+import android.os.VibrationEffect;
+import android.os.Vibrator;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.animation.AnimationUtils;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.TextView;
@@ -18,6 +23,7 @@ import androidx.activity.OnBackPressedCallback;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+import androidx.core.widget.NestedScrollView;
 
 import com.airbnb.lottie.LottieAnimationView;
 import com.google.android.material.card.MaterialCardView;
@@ -28,6 +34,7 @@ public class MainActivity extends AppCompatActivity {
     private MaterialCardView btnRecitalMode, btnPracticeMode, btnQuizMode, btnProgressMode;
     private TextView tvBestScoreMain;
     private LottieAnimationView lottieAnimationView;
+    private NestedScrollView nestedScrollView;
 
     private static final String PREF_NAME = "EduLinguaPrefs";
     private static final String KEY_HIGH_SCORE = "HIGH_SCORE";
@@ -58,11 +65,13 @@ public class MainActivity extends AppCompatActivity {
         btnProgressMode = findViewById(R.id.btnProgressMode);
         tvBestScoreMain = findViewById(R.id.tvBestScoreMain);
         lottieAnimationView = findViewById(R.id.lottieAnimationView);
+        nestedScrollView = findViewById(R.id.nestedScrollView);
 
         setupAnimation();
         setupLanguageSpinner();
         restoreLastLanguageSelection();
         setupButtons();
+        setupScrollAnimations();
         setupBackHandler();
         showIntroIfFirstTime();
     }
@@ -73,6 +82,7 @@ public class MainActivity extends AppCompatActivity {
         pulse.start();
 
         lottieAnimationView.setOnClickListener(v -> {
+            vibrate();
             if (lottieAnimationView.isAnimating()) {
                 lottieAnimationView.pauseAnimation();
             } else {
@@ -233,21 +243,27 @@ public class MainActivity extends AppCompatActivity {
 
     private void setupButtons() {
         btnRecitalMode.setOnClickListener(v -> {
+            vibrate();
             if (!ensureLanguageSelected()) return;
             showContentTypeDialog(selectedLangCode, selectedLangName, "recital");
         });
 
         btnPracticeMode.setOnClickListener(v -> {
+            vibrate();
             if (!ensureLanguageSelected()) return;
             showContentTypeDialog(selectedLangCode, selectedLangName, "practice");
         });
 
         btnQuizMode.setOnClickListener(v -> {
+            vibrate();
             if (!ensureLanguageSelected()) return;
             showQuizTypeDialog(selectedLangCode, selectedLangName);
         });
 
-        btnProgressMode.setOnClickListener(v -> openProgressScreen());
+        btnProgressMode.setOnClickListener(v -> {
+            vibrate();
+            openProgressScreen();
+        });
     }
 
     private void showContentTypeDialog(String langCode, String langName, String mode) {
@@ -332,5 +348,32 @@ public class MainActivity extends AppCompatActivity {
     private void openProgressScreen() {
         Intent intent = new Intent(MainActivity.this, ProgressActivity.class);
         startActivity(intent);
+    }
+
+    private void vibrate() {
+        Vibrator v = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            v.vibrate(VibrationEffect.createOneShot(50, VibrationEffect.DEFAULT_AMPLITUDE));
+        } else {
+            //deprecated in API 26 
+            v.vibrate(50);
+        }
+    }
+
+    private void setupScrollAnimations() {
+        nestedScrollView.setOnScrollChangeListener((NestedScrollView.OnScrollChangeListener) (v, scrollX, scrollY, oldScrollX, oldScrollY) -> {
+            if (scrollY > oldScrollY) {
+                animateCard(btnRecitalMode, true);
+                animateCard(btnPracticeMode, true);
+                animateCard(btnQuizMode, true);
+                animateCard(btnProgressMode, true);
+            }
+        });
+    }
+
+    private void animateCard(View view, boolean scrollingDown) {
+        if (scrollingDown) {
+            view.startAnimation(AnimationUtils.loadAnimation(this, R.anim.slide_up));
+        }
     }
 }
