@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- App-specific branding -->
+    <color name="colorPrimary">#7E57C2</color> <!-- A lighter, more vibrant purple for dark mode -->
+    <color name="colorPrimaryDark">#5E35B1</color>
+    <color name="colorAccent">#FFD54F</color> <!-- A brighter, more visible accent for dark mode -->
+
+    <!-- UI elements -->
+    <color name="appBackground">#121212</color> <!-- A standard dark theme background -->
+    <color name="cardBackground">#1E1E1E</color> <!-- A slightly lighter card background -->
+    <color name="textColorPrimary">#FFFFFF</color>
+    <color name="textColorSecondary">#B0BEC5</color>
+
+    <!-- Buttons -->
+    <color name="buttonPrimary">#7E57C2</color>
+    <color name="buttonSecondary">#373737</color>
+    <color name="buttonTextPrimary">#FFFFFF</color>
+    <color name="buttonTextSecondary">#ECEFF1</color>
+
+    <!-- Quiz-specific -->
+    <color name="correctAnswer">#81C784</color>
+    <color name="wrongAnswer">#E57373</color>
+</resources>
