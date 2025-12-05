@@ -1,5 +1,7 @@
 package com.edulinguaghana;
 
+import android.animation.AnimatorInflater;
+import android.animation.AnimatorSet;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.media.MediaPlayer;
@@ -9,7 +11,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
-import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -18,11 +19,15 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
+import com.airbnb.lottie.LottieAnimationView;
+import com.google.android.material.card.MaterialCardView;
+
 public class MainActivity extends AppCompatActivity {
 
     private AutoCompleteTextView spinnerLanguage;
-    private Button btnRecitalMode, btnPracticeMode, btnQuizMode, btnProgressMode;
+    private MaterialCardView btnRecitalMode, btnPracticeMode, btnQuizMode, btnProgressMode;
     private TextView tvBestScoreMain;
+    private LottieAnimationView lottieAnimationView;
 
     private static final String PREF_NAME = "EduLinguaPrefs";
     private static final String KEY_HIGH_SCORE = "HIGH_SCORE";
@@ -52,13 +57,28 @@ public class MainActivity extends AppCompatActivity {
         btnQuizMode = findViewById(R.id.btnQuizMode);
         btnProgressMode = findViewById(R.id.btnProgressMode);
         tvBestScoreMain = findViewById(R.id.tvBestScoreMain);
+        lottieAnimationView = findViewById(R.id.lottieAnimationView);
 
+        setupAnimation();
         setupLanguageSpinner();
         restoreLastLanguageSelection();
         setupButtons();
-        setupLongPressHints();
         setupBackHandler();
         showIntroIfFirstTime();
+    }
+
+    private void setupAnimation() {
+        AnimatorSet pulse = (AnimatorSet) AnimatorInflater.loadAnimator(this, R.anim.pulse);
+        pulse.setTarget(lottieAnimationView);
+        pulse.start();
+
+        lottieAnimationView.setOnClickListener(v -> {
+            if (lottieAnimationView.isAnimating()) {
+                lottieAnimationView.pauseAnimation();
+            } else {
+                lottieAnimationView.resumeAnimation();
+            }
+        });
     }
 
     @Override
@@ -228,29 +248,6 @@ public class MainActivity extends AppCompatActivity {
         });
 
         btnProgressMode.setOnClickListener(v -> openProgressScreen());
-    }
-
-    // Long press explanations
-    private void setupLongPressHints() {
-        btnRecitalMode.setOnLongClickListener(v -> {
-            Toast.makeText(this, "Recital: listen to alphabet and numbers in " + (selectedLangName != null ? selectedLangName : "your language"), Toast.LENGTH_LONG).show();
-            return true;
-        });
-
-        btnPracticeMode.setOnLongClickListener(v -> {
-            Toast.makeText(this, "Practice: repeat after the app and improve pronunciation.", Toast.LENGTH_LONG).show();
-            return true;
-        });
-
-        btnQuizMode.setOnLongClickListener(v -> {
-            Toast.makeText(this, "Quiz: answer questions or play Speed Challenge.", Toast.LENGTH_LONG).show();
-            return true;
-        });
-
-        btnProgressMode.setOnLongClickListener(v -> {
-            Toast.makeText(this, "Progress: view your best scores and learning stats.", Toast.LENGTH_LONG).show();
-            return true;
-        });
     }
 
     private void showContentTypeDialog(String langCode, String langName, String mode) {
