@@ -14,8 +14,6 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.animation.AnimationUtils;
-import android.widget.ArrayAdapter;
-import android.widget.AutoCompleteTextView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -27,10 +25,12 @@ import androidx.core.widget.NestedScrollView;
 
 import com.airbnb.lottie.LottieAnimationView;
 import com.google.android.material.card.MaterialCardView;
+import com.google.android.material.chip.Chip;
+import com.google.android.material.chip.ChipGroup;
 
 public class MainActivity extends AppCompatActivity {
 
-    private AutoCompleteTextView spinnerLanguage;
+    private ChipGroup languageChipGroup;
     private MaterialCardView btnRecitalMode, btnPracticeMode, btnQuizMode, btnProgressMode;
     private TextView tvBestScoreMain;
     private LottieAnimationView lottieAnimationView;
@@ -47,8 +47,8 @@ public class MainActivity extends AppCompatActivity {
     private String selectedLangCode = null;
     private String selectedLangName = null;
 
-    private String[] langNames = {"Select language", "English", "French", "Twi", "Ewe", "Ga"};
-    private String[] langCodes = {"", "en", "fr", "ak", "ee", "gaa"};
+    private String[] langNames = {"English", "French", "Twi", "Ewe", "Ga"};
+    private String[] langCodes = {"en", "fr", "ak", "ee", "gaa"};
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -58,7 +58,7 @@ public class MainActivity extends AppCompatActivity {
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        spinnerLanguage = findViewById(R.id.spinnerLanguage);
+        languageChipGroup = findViewById(R.id.languageChipGroup);
         btnRecitalMode = findViewById(R.id.btnRecitalMode);
         btnPracticeMode = findViewById(R.id.btnPracticeMode);
         btnQuizMode = findViewById(R.id.btnQuizMode);
@@ -68,7 +68,7 @@ public class MainActivity extends AppCompatActivity {
         nestedScrollView = findViewById(R.id.nestedScrollView);
 
         setupAnimation();
-        setupLanguageSpinner();
+        setupLanguageChips();
         restoreLastLanguageSelection();
         setupButtons();
         setupScrollAnimations();
@@ -182,24 +182,23 @@ public class MainActivity extends AppCompatActivity {
 
     // ---------------- LANGUAGE ----------------
 
-    private void setupLanguageSpinner() {
-        ArrayAdapter<String> adapter = new ArrayAdapter<>(
-                this,
-                android.R.layout.simple_dropdown_item_1line,
-                langNames
-        );
-        spinnerLanguage.setAdapter(adapter);
+    private void setupLanguageChips() {
+        for (int i = 0; i < langNames.length; i++) {
+            Chip chip = new Chip(this);
+            chip.setText(langNames[i]);
+            chip.setTag(langCodes[i]);
+            chip.setCheckable(true);
+            chip.setClickable(true);
 
-        spinnerLanguage.setOnItemClickListener((parent, view, position, id) -> {
-            if (position == 0) {
-                selectedLangCode = null;
-                selectedLangName = null;
-            } else {
-                selectedLangCode = langCodes[position];
-                selectedLangName = langNames[position];
-                saveLastLanguageSelection(selectedLangCode, selectedLangName);
-            }
-        });
+            chip.setOnCheckedChangeListener((buttonView, isChecked) -> {
+                if (isChecked) {
+                    selectedLangCode = (String) buttonView.getTag();
+                    selectedLangName = buttonView.getText().toString();
+                    saveLastLanguageSelection(selectedLangCode, selectedLangName);
+                }
+            });
+            languageChipGroup.addView(chip);
+        }
     }
 
     private void saveLastLanguageSelection(String code, String name) {
@@ -212,23 +211,21 @@ public class MainActivity extends AppCompatActivity {
 
     private void restoreLastLanguageSelection() {
         SharedPreferences prefs = getSharedPreferences(PREF_NAME, MODE_PRIVATE);
-        String lastCode = prefs.getString(KEY_LAST_LANG_CODE, null);
+        String lastCode = prefs.getString(KEY_LAST_LANG_CODE, "en"); // Default to English
 
-        if (lastCode == null || lastCode.isEmpty()) {
-            return; // keep default "Select language"
-        }
-
-        int indexToSelect = 0;
-        for (int i = 0; i < langCodes.length; i++) {
-            if (lastCode.equals(langCodes[i])) {
-                indexToSelect = i;
-                break;
+        for (int i = 0; i < languageChipGroup.getChildCount(); i++) {
+            Chip chip = (Chip) languageChipGroup.getChildAt(i);
+            if (chip.getTag().equals(lastCode)) {
+                chip.setChecked(true);
+                return; // Found and set the chip
             }
         }
 
-        spinnerLanguage.setText(langNames[indexToSelect], false);
-        selectedLangCode = langCodes[indexToSelect];
-        selectedLangName = langNames[indexToSelect];
+        // If no chip was found, default to the first one
+        if (languageChipGroup.getChildCount() > 0) {
+            Chip firstChip = (Chip) languageChipGroup.getChildAt(0);
+            firstChip.setChecked(true);
+        }
     }
 
     private boolean ensureLanguageSelected() {

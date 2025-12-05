@@ -95,26 +95,36 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/tvAppSubtitle" />
 
-            <com.google.android.material.textfield.TextInputLayout
-                android:id="@+id/languageSelectorLayout"
-                style="@style/Widget.Material3.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
-                android:layout_width="0dp"
+            <TextView
+                android:id="@+id/tvLanguageLabel"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="24dp"
-                android:hint="Choose language"
-                app:startIconDrawable="@android:drawable/ic_menu_mapmode"
+                android:fontFamily="@font/agbalumo"
+                android:text="Choose language"
+                android:textColor="@color/textColorPrimary"
+                android:textSize="18sp"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/tvBestScoreMain" />
+
+            <HorizontalScrollView
+                android:id="@+id/languageSelectorScrollView"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:scrollbars="none"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/tvBestScoreMain">
+                app:layout_constraintTop_toBottomOf="@id/tvLanguageLabel">
 
-                <AutoCompleteTextView
-                    android:id="@+id/spinnerLanguage"
-                    android:layout_width="match_parent"
+                <com.google.android.material.chip.ChipGroup
+                    android:id="@+id/languageChipGroup"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:fontFamily="@font/agbalumo"
-                    android:inputType="none" />
+                    app:singleSelection="true"
+                    app:selectionRequired="true" />
 
-            </com.google.android.material.textfield.TextInputLayout>
+            </HorizontalScrollView>
 
             <TextView
                 android:id="@+id/tvSelectModeLabel"
@@ -126,7 +136,7 @@
                 android:textColor="@color/textColorPrimary"
                 android:textSize="18sp"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/languageSelectorLayout" />
+                app:layout_constraintTop_toBottomOf="@id/languageSelectorScrollView" />
 
             <!-- Recital Mode Card -->
             <com.google.android.material.card.MaterialCardView
