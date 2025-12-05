@@ -8,8 +8,8 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ArrayAdapter;
+import android.widget.AutoCompleteTextView;
 import android.widget.Button;
-import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -20,7 +20,7 @@ import androidx.appcompat.widget.Toolbar;
 
 public class MainActivity extends AppCompatActivity {
 
-    private Spinner spinnerLanguage;
+    private AutoCompleteTextView spinnerLanguage;
     private Button btnRecitalMode, btnPracticeMode, btnQuizMode, btnProgressMode;
     private TextView tvBestScoreMain;
 
@@ -155,29 +155,19 @@ public class MainActivity extends AppCompatActivity {
     private void setupLanguageSpinner() {
         ArrayAdapter<String> adapter = new ArrayAdapter<>(
                 this,
-                android.R.layout.simple_spinner_item,
+                android.R.layout.simple_dropdown_item_1line,
                 langNames
         );
-        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinnerLanguage.setAdapter(adapter);
 
-        spinnerLanguage.setOnItemSelectedListener(new android.widget.AdapterView.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(android.widget.AdapterView<?> parent, View view,
-                                       int position, long id) {
-                if (position == 0) {
-                    selectedLangCode = null;
-                    selectedLangName = null;
-                } else {
-                    selectedLangCode = langCodes[position];
-                    selectedLangName = langNames[position];
-                    saveLastLanguageSelection(selectedLangCode, selectedLangName);
-                }
-            }
-
-            @Override
-            public void onNothingSelected(android.widget.AdapterView<?> parent) {
-                // nothing
+        spinnerLanguage.setOnItemClickListener((parent, view, position, id) -> {
+            if (position == 0) {
+                selectedLangCode = null;
+                selectedLangName = null;
+            } else {
+                selectedLangCode = langCodes[position];
+                selectedLangName = langNames[position];
+                saveLastLanguageSelection(selectedLangCode, selectedLangName);
             }
         });
     }
@@ -206,7 +196,7 @@ public class MainActivity extends AppCompatActivity {
             }
         }
 
-        spinnerLanguage.setSelection(indexToSelect);
+        spinnerLanguage.setText(langNames[indexToSelect], false);
         selectedLangCode = langCodes[indexToSelect];
         selectedLangName = langNames[indexToSelect];
     }
