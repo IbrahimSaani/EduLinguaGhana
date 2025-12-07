@@ -1,17 +1,23 @@
 package com.edulinguaghana;
 
 import android.content.SharedPreferences;
+import android.content.res.ColorStateList;
 import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.os.Handler;
 import android.speech.tts.TextToSpeech;
+import android.view.MenuItem;
+import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
-import android.widget.Button;
 import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
+import androidx.core.content.ContextCompat;
+
+import com.google.android.material.button.MaterialButton;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -23,9 +29,11 @@ import java.util.Set;
 
 public class QuizActivity extends AppCompatActivity {
 
-    // Views (from activity_speed_game.xml / activity_quiz.xml with same IDs)
-    private TextView tvGameTitle, tvGameTimer, tvGameScore, tvGameBest, tvGameFeedback, tvGamePrompt;
-    private Button btnPlayAudio, btnOption1, btnOption2, btnOption3, btnOption4, btnOption5, btnOption6, btnBackQuiz;
+    // Views
+    private TextView tvGameTimer, tvGameScore, tvGameBest, tvGameFeedback, tvGamePrompt;
+    private MaterialButton btnOption1, btnOption2, btnOption3, btnOption4, btnOption5, btnOption6;
+    private View btnPlayAudio, btnBackQuiz;
+    private Toolbar toolbar;
 
     // Game state
     private int score = 0;
@@ -72,14 +80,12 @@ public class QuizActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        // Using the same layout you wired for the quiz/speed style
         setContentView(R.layout.activity_quiz);
 
         // --- Get language & mode from intent ---
         languageCode = getIntent().getStringExtra("LANG_CODE");
         languageName = getIntent().getStringExtra("LANG_NAME");
 
-        // We support both old and new keys for safety
         String rawType = getIntent().getStringExtra("QUIZ_TYPE");
         if (rawType == null) rawType = getIntent().getStringExtra("QUIZ_MODE");
 
@@ -87,18 +93,16 @@ public class QuizActivity extends AppCompatActivity {
         if (languageName == null) languageName = "Unknown";
         if (rawType == null) rawType = "letters";
 
-        // Normalize whatever string is coming from MainActivity
         quizType = normalizeQuizType(rawType);
 
         // --- Bind views ---
-        tvGameTitle    = findViewById(R.id.tvQuestionTitle);
+        toolbar = findViewById(R.id.toolbar);
         tvGameTimer    = findViewById(R.id.tvTimer);
         tvGameScore    = findViewById(R.id.tvScore);
         tvGameBest     = findViewById(R.id.tvBest);
         tvGameFeedback = findViewById(R.id.tvFeedback);
         tvGamePrompt   = findViewById(R.id.tvGamePrompt);
 
-        // Make sure you have this button in the quiz layout if you want manual replay
         btnPlayAudio   = findViewById(R.id.btnPlayAudio);
 
         btnOption1     = findViewById(R.id.btnOption1);
@@ -108,6 +112,10 @@ public class QuizActivity extends AppCompatActivity {
         btnOption5     = findViewById(R.id.btnOption5);
         btnOption6     = findViewById(R.id.btnOption6);
         btnBackQuiz    = findViewById(R.id.btnBackQuiz);
+
+        setSupportActionBar(toolbar);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setDisplayShowHomeEnabled(true);
 
         // Title based on quiz type + language
         String modeLabel;
@@ -129,7 +137,7 @@ public class QuizActivity extends AppCompatActivity {
                 modeLabel = "Letters Quiz";
                 break;
         }
-        tvGameTitle.setText(modeLabel + " – " + languageName);
+        getSupportActionBar().setTitle(modeLabel + " – " + languageName);
 
         // Load prefs (high score & SFX setting)
         SharedPreferences prefs = getSharedPreferences(PREF_NAME, MODE_PRIVATE);
@@ -458,16 +466,21 @@ public class QuizActivity extends AppCompatActivity {
         // generateLetterQuestion / generateNumberQuestion already set currentPromptTtsText
     }
 
-    private void checkAnswer(Button clickedButton) {
+    private void checkAnswer(MaterialButton clickedButton) {
         cancelTimer(); // stop ticking while we evaluate
 
         String answer = clickedButton.getText().toString();
         boolean isCorrect = answer.equals(currentCorrectAnswer);
 
+        Animation correctAnim = AnimationUtils.loadAnimation(this, R.anim.correct_answer);
+        Animation wrongAnim = AnimationUtils.loadAnimation(this, R.anim.wrong_answer);
+
         if (isCorrect) {
             score++;
             tvGameFeedback.setText("✅ Correct!");
-            clickedButton.setBackgroundResource(R.drawable.bg_quiz_option_correct);
+            tvGameFeedback.setTextColor(ContextCompat.getColor(this, R.color.correctAnswer));
+            clickedButton.setStrokeColor(ColorStateList.valueOf(ContextCompat.getColor(this, R.color.correctAnswer)));
+            clickedButton.startAnimation(correctAnim);
             playSfx(true);
 
             // High score update + animation
@@ -479,7 +492,9 @@ public class QuizActivity extends AppCompatActivity {
 
         } else {
             tvGameFeedback.setText("❌ Wrong! Correct: " + currentCorrectAnswer);
-            clickedButton.setBackgroundResource(R.drawable.bg_quiz_option_wrong);
+            tvGameFeedback.setTextColor(ContextCompat.getColor(this, R.color.wrongAnswer));
+            clickedButton.setStrokeColor(ColorStateList.valueOf(ContextCompat.getColor(this, R.color.wrongAnswer)));
+            clickedButton.startAnimation(wrongAnim);
             playSfx(false);
 
             // Penalty time
@@ -500,7 +515,7 @@ public class QuizActivity extends AppCompatActivity {
                 generateNewQuestion();
                 startTimer();
             }
-        }, 1000);
+        }, 1200);
     }
 
     // ---------------- TIMER ----------------
@@ -545,19 +560,11 @@ public class QuizActivity extends AppCompatActivity {
 
         setButtonsEnabled(true);
 
-        btnOption1.setBackgroundResource(R.drawable.bg_quiz_option);
-        btnOption2.setBackgroundResource(R.drawable.bg_quiz_option);
-        btnOption3.setBackgroundResource(R.drawable.bg_quiz_option);
-        btnOption4.setBackgroundResource(R.drawable.bg_quiz_option);
-        btnOption5.setBackgroundResource(R.drawable.bg_quiz_option);
-        btnOption6.setBackgroundResource(R.drawable.bg_quiz_option);
-
-        btnOption1.clearAnimation();
-        btnOption2.clearAnimation();
-        btnOption3.clearAnimation();
-        btnOption4.clearAnimation();
-        btnOption5.clearAnimation();
-        btnOption6.clearAnimation();
+        MaterialButton[] buttons = {btnOption1, btnOption2, btnOption3, btnOption4, btnOption5, btnOption6};
+        for (MaterialButton button : buttons) {
+            button.setStrokeColor(ColorStateList.valueOf(ContextCompat.getColor(this, R.color.buttonSecondary)));
+            button.clearAnimation();
+        }
     }
 
     private void setButtonsEnabled(boolean enabled) {
@@ -576,16 +583,8 @@ public class QuizActivity extends AppCompatActivity {
     }
 
     private void animateHighScore() {
-        // Uses your XML animations: glow_pulse, bounce_pop, rainbow_shine, screen_shake
-        Animation pulse  = AnimationUtils.loadAnimation(this, R.anim.glow_pulse);
-        Animation bounce = AnimationUtils.loadAnimation(this, R.anim.bounce_pop);
-        Animation shine  = AnimationUtils.loadAnimation(this, R.anim.rainbow_shine);
-        Animation shake  = AnimationUtils.loadAnimation(this, R.anim.screen_shake);
-
+        Animation pulse = AnimationUtils.loadAnimation(this, R.anim.glow_pulse);
         tvGameBest.startAnimation(pulse);
-        tvGameBest.startAnimation(bounce);
-        tvGameBest.startAnimation(shine);
-        tvGameBest.startAnimation(shake);
     }
 
     // ---------------- SFX ----------------
@@ -602,6 +601,15 @@ public class QuizActivity extends AppCompatActivity {
     }
 
     // ---------------- LIFECYCLE ----------------
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if (item.getItemId() == android.R.id.home) {
+            finish();
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
+    }
 
     @Override
     protected void onDestroy() {
