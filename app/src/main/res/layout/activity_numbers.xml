@@ -121,20 +121,21 @@
                             android:textStyle="bold" />
 
                         <TextView
-                            android:id="@+id/tvHintNumbers"
+                            android:id="@+id/tvNumberSpelling"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_marginBottom="16dp"
-                            android:gravity="center"
-                            android:text="@string/numbers_hint"
+                            android:layout_marginTop="8dp"
                             android:textColor="@color/textColorSecondary"
-                            android:textSize="14sp" />
+                            android:textSize="24sp"
+                            android:textStyle="italic"
+                            tools:text="One" />
 
                         <com.google.android.material.button.MaterialButton
                             android:id="@+id/btnSpeakNumber"
                             style="@style/Widget.Material3.Button"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
+                            android:layout_marginTop="16dp"
                             android:text="@string/speak_button"
                             app:icon="@drawable/ic_speak" />
                     </LinearLayout>

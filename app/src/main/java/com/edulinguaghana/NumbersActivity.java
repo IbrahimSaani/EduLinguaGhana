@@ -27,7 +27,7 @@ import java.util.Locale;
 
 public class NumbersActivity extends AppCompatActivity {
 
-    private TextView tvLanguageTitleNum, tvNumber;
+    private TextView tvLanguageTitleNum, tvNumber, tvNumberSpelling;
     private ImageButton btnPrevNumber, btnNextNumber;
     private FloatingActionButton btnBackNumber;
     private Button btnSpeakNumber;
@@ -52,6 +52,7 @@ public class NumbersActivity extends AppCompatActivity {
 
         tvLanguageTitleNum = findViewById(R.id.tvLanguageTitleNum);
         tvNumber = findViewById(R.id.tvNumber);
+        tvNumberSpelling = findViewById(R.id.tvNumberSpelling);
         btnPrevNumber = findViewById(R.id.btnPrevNumber);
         btnNextNumber = findViewById(R.id.btnNextNumber);
         btnBackNumber = findViewById(R.id.btnBackNumber);
@@ -112,6 +113,11 @@ public class NumbersActivity extends AppCompatActivity {
 
     private void updateNumber() {
         tvNumber.setText(String.valueOf(currentNumber));
+        if ("fr".equals(languageCode)) {
+            tvNumberSpelling.setText(convertNumberToWordFrench(currentNumber));
+        } else {
+            tvNumberSpelling.setText(convertNumberToWord(currentNumber));
+        }
         progressBar.setProgress(currentNumber);
     }
 
@@ -248,6 +254,74 @@ public class NumbersActivity extends AppCompatActivity {
                 promptSpeechInput();
             } else {
                 Toast.makeText(this, "Microphone permission is needed for pronunciation practice.", Toast.LENGTH_LONG).show();
+            }
+        }
+    }
+
+    private String convertNumberToWord(int num) {
+        if (num < 1 || num > 100) {
+            return "";
+        }
+
+        String[] units = {
+                "", "One", "Two", "Three", "Four", "Five", "Six", "Seven", "Eight", "Nine", "Ten",
+                "Eleven", "Twelve", "Thirteen", "Fourteen", "Fifteen", "Sixteen", "Seventeen", "Eighteen", "Nineteen"
+        };
+
+        String[] tens = {
+                "", "", "Twenty", "Thirty", "Forty", "Fifty", "Sixty", "Seventy", "Eighty", "Ninety"
+        };
+
+        if (num < 20) {
+            return units[num];
+        } else if (num == 100) {
+            return "One Hundred";
+        } else {
+            int unit = num % 10;
+            int ten = num / 10;
+            if (unit == 0) {
+                return tens[ten];
+            } else {
+                return tens[ten] + "-" + units[unit];
+            }
+        }
+    }
+
+    private String convertNumberToWordFrench(int num) {
+        if (num < 1 || num > 100) {
+            return "";
+        }
+
+        String[] units = {
+                "", "Un", "Deux", "Trois", "Quatre", "Cinq", "Six", "Sept", "Huit", "Neuf", "Dix",
+                "Onze", "Douze", "Treize", "Quatorze", "Quinze", "Seize", "Dix-sept", "Dix-huit", "Dix-neuf"
+        };
+
+        String[] tens = {
+                "", "Dix", "Vingt", "Trente", "Quarante", "Cinquante", "Soixante", "Soixante-dix", "Quatre-vingts", "Quatre-vingt-dix"
+        };
+
+        if (num < 20) {
+            return units[num];
+        } else if (num == 100) {
+            return "Cent";
+        } else {
+            int unit = num % 10;
+            int ten = num / 10;
+            if (unit == 0) {
+                if (ten == 8) { // 80
+                    return "Quatre-vingts";
+                } else {
+                    return tens[ten];
+                }
+            } else {
+                if (ten == 7 || ten == 9) { // 70s, 90s
+                    return tens[ten-1] + "-" + units[10+unit];
+                } else if (ten == 8) { // 80s
+                    return tens[ten] + "-" + units[unit];
+                } else {
+                    return tens[ten] + (unit == 1 ? " et " : "-") + units[unit];
+                }
             }
         }
     }

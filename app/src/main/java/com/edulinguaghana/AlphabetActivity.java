@@ -27,7 +27,7 @@ import java.util.Locale;
 
 public class AlphabetActivity extends AppCompatActivity {
 
-    private TextView tvLanguageTitle, tvLetter;
+    private TextView tvLanguageTitle, tvLetter, tvLetterWord;
     private ImageButton btnPrev, btnNext;
     private FloatingActionButton btnBack;
     private Button btnSpeak;
@@ -39,6 +39,14 @@ public class AlphabetActivity extends AppCompatActivity {
     private boolean isRecitalMode;
 
     private String[] letters;
+    private String[] wordsEn = {
+            "Apple", "Ball", "Cat", "Dog", "Elephant", "Fish", "Goat", "Hat", "Ice Cream", "Jug", "Kite", "Lion", "Monkey",
+            "Nose", "Orange", "Pen", "Queen", "Rainbow", "Sun", "Tiger", "Umbrella", "Violin", "Watch", "Xylophone", "Yoyo", "Zebra"
+    };
+    private String[] wordsFr = {
+            "Avion", "Bateau", "Chien", "Dauphin", "Éléphant", "Fleur", "Girafe", "Hibou", "Île", "Jardin", "Kangourou", "Lune", "Maison",
+            "Nuage", "Oiseau", "Poisson", "Quatre", "Robot", "Soleil", "Train", "Uniforme", "Vache", "Wagon", "Xylophone", "Yaourt", "Zèbre"
+    };
     private int currentIndex = 0;
 
     private TextToSpeech tts;
@@ -54,6 +62,7 @@ public class AlphabetActivity extends AppCompatActivity {
 
         tvLanguageTitle = findViewById(R.id.tvLanguageTitle);
         tvLetter = findViewById(R.id.tvLetter);
+        tvLetterWord = findViewById(R.id.tvLetterWord);
         btnPrev = findViewById(R.id.btnPrev);
         btnNext = findViewById(R.id.btnNext);
         btnBack = findViewById(R.id.btnBack);
@@ -119,6 +128,11 @@ public class AlphabetActivity extends AppCompatActivity {
 
     private void updateLetter() {
         tvLetter.setText(letters[currentIndex]);
+        if ("fr".equals(languageCode)) {
+            tvLetterWord.setText(wordsFr[currentIndex]);
+        } else {
+            tvLetterWord.setText(wordsEn[currentIndex]);
+        }
         progressBar.setProgress(currentIndex + 1);
     }
 
