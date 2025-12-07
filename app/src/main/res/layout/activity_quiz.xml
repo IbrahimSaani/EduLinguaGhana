@@ -8,8 +8,11 @@
     tools:context=".QuizActivity">
 
     <com.google.android.material.appbar.AppBarLayout
+        android:id="@+id/appBarLayout"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:visibility="gone"
+        tools:visibility="visible">
 
         <com.google.android.material.appbar.MaterialToolbar
             android:id="@+id/toolbar"
@@ -19,41 +22,72 @@
 
     </com.google.android.material.appbar.AppBarLayout>
 
-    <androidx.core.widget.NestedScrollView
+    <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
+        <!-- Start Screen -->
         <LinearLayout
+            android:id="@+id/startQuizContainer"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
+            android:gravity="center"
             android:orientation="vertical"
-            android:padding="16dp">
+            android:padding="16dp"
+            android:visibility="visible">
 
-            <!-- Stats Card -->
-            <com.google.android.material.card.MaterialCardView
+            <TextView
+                android:id="@+id/tvStartTitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/agbalumo"
+                android:gravity="center"
+                android:text="You are about to start the quiz!"
+                android:textAppearance="?attr/textAppearanceHeadline5" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:gravity="center"
+                android:text="Answer as many questions as you can in 30 seconds."
+                android:textAppearance="?attr/textAppearanceBody1" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnStartQuiz"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="24dp"
+                android:text="Start Quiz" />
+
+        </LinearLayout>
+
+        <!-- Quiz Content -->
+        <androidx.core.widget.NestedScrollView
+            android:id="@+id/quizContentContainer"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:visibility="gone"
+            tools:visibility="visible">
+
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="16dp">
+                android:orientation="vertical"
+                android:padding="16dp">
 
-                <LinearLayout
+                <!-- Stats Card -->
+                <com.google.android.material.card.MaterialCardView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:padding="16dp">
-
-                    <TextView
-                        android:id="@+id/tvQuestionTitle"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:textAppearance="?attr/textAppearanceHeadline6"
-                        tools:text="Letters Quiz – English" />
+                    android:layout_marginBottom="16dp">
 
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="8dp"
-                        android:orientation="horizontal">
+                        android:orientation="horizontal"
+                        android:padding="16dp">
 
                         <TextView
                             android:id="@+id/tvTimer"
@@ -85,112 +119,113 @@
                             app:drawableStartCompat="@drawable/ic_best_score"
                             tools:text="Best: 0" />
                     </LinearLayout>
-                </LinearLayout>
-            </com.google.android.material.card.MaterialCardView>
+                </com.google.android.material.card.MaterialCardView>
 
-            <!-- Prompt Card -->
-            <com.google.android.material.card.MaterialCardView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="16dp">
-
-                <RelativeLayout
+                <!-- Prompt Card -->
+                <com.google.android.material.card.MaterialCardView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:padding="16dp">
+                    android:layout_marginBottom="16dp">
 
-                    <TextView
-                        android:id="@+id/tvGamePrompt"
-                        android:layout_width="wrap_content"
+                    <RelativeLayout
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_centerVertical="true"
-                        android:layout_toStartOf="@+id/btnPlayAudio"
-                        android:layout_alignParentStart="true"
-                        android:textAppearance="?attr/textAppearanceHeadline5"
-                        tools:text="Which letter did you hear?" />
+                        android:padding="16dp">
 
-                    <com.google.android.material.floatingactionbutton.FloatingActionButton
-                        android:id="@+id/btnPlayAudio"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_alignParentEnd="true"
-                        android:layout_centerVertical="true"
-                        android:layout_marginStart="16dp"
-                        android:contentDescription="Play Audio Prompt"
-                        app:srcCompat="@drawable/ic_play_audio" />
+                        <TextView
+                            android:id="@+id/tvGamePrompt"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_centerVertical="true"
+                            android:layout_toStartOf="@+id/btnPlayAudio"
+                            android:layout_alignParentStart="true"
+                            android:textAppearance="?attr/textAppearanceHeadline5"
+                            tools:text="Which letter did you hear?" />
 
-                </RelativeLayout>
-            </com.google.android.material.card.MaterialCardView>
+                        <com.google.android.material.floatingactionbutton.FloatingActionButton
+                            android:id="@+id/btnPlayAudio"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_alignParentEnd="true"
+                            android:layout_centerVertical="true"
+                            android:layout_marginStart="16dp"
+                            android:contentDescription="Play Audio Prompt"
+                            app:srcCompat="@drawable/ic_play_audio" />
 
-            <!-- Options -->
-            <GridLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:columnCount="2">
+                    </RelativeLayout>
+                </com.google.android.material.card.MaterialCardView>
+
+                <!-- Options -->
+                <GridLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:columnCount="2">
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btnOption1"
+                        android:layout_width="0dp"
+                        android:layout_columnWeight="1"
+                        android:layout_margin="8dp"
+                        tools:text="A" />
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btnOption2"
+                        android:layout_width="0dp"
+                        android:layout_columnWeight="1"
+                        android:layout_margin="8dp"
+                        tools:text="B" />
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btnOption3"
+                        android:layout_width="0dp"
+                        android:layout_columnWeight="1"
+                        android:layout_margin="8dp"
+                        tools:text="C" />
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btnOption4"
+                        android:layout_width="0dp"
+                        android:layout_columnWeight="1"
+                        android:layout_margin="8dp"
+                        tools:text="D" />
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btnOption5"
+                        android:layout_width="0dp"
+                        android:layout_columnWeight="1"
+                        android:layout_margin="8dp"
+                        tools:text="E" />
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btnOption6"
+                        android:layout_width="0dp"
+                        android:layout_columnWeight="1"
+                        android:layout_margin="8dp"
+                        tools:text="F" />
+
+                </GridLayout>
+
+                <TextView
+                    android:id="@+id/tvFeedback"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:layout_marginTop="16dp"
+                    android:textAppearance="?attr/textAppearanceHeadline6"
+                    tools:text="✅ Correct!" />
 
                 <com.google.android.material.button.MaterialButton
-                    android:id="@+id/btnOption1"
-                    android:layout_width="0dp"
-                    android:layout_columnWeight="1"
-                    android:layout_margin="8dp"
-                    tools:text="A" />
+                    android:id="@+id/btnBackQuiz"
+                    style="@style/Widget.Material3.Button.OutlinedButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_horizontal"
+                    android:layout_marginTop="16dp"
+                    android:text="End Quiz" />
 
-                <com.google.android.material.button.MaterialButton
-                    android:id="@+id/btnOption2"
-                    android:layout_width="0dp"
-                    android:layout_columnWeight="1"
-                    android:layout_margin="8dp"
-                    tools:text="B" />
+            </LinearLayout>
+        </androidx.core.widget.NestedScrollView>
 
-                <com.google.android.material.button.MaterialButton
-                    android:id="@+id/btnOption3"
-                    android:layout_width="0dp"
-                    android:layout_columnWeight="1"
-                    android:layout_margin="8dp"
-                    tools:text="C" />
-
-                <com.google.android.material.button.MaterialButton
-                    android:id="@+id/btnOption4"
-                    android:layout_width="0dp"
-                    android:layout_columnWeight="1"
-                    android:layout_margin="8dp"
-                    tools:text="D" />
-
-                <com.google.android.material.button.MaterialButton
-                    android:id="@+id/btnOption5"
-                    android:layout_width="0dp"
-                    android:layout_columnWeight="1"
-                    android:layout_margin="8dp"
-                    tools:text="E" />
-
-                <com.google.android.material.button.MaterialButton
-                    android:id="@+id/btnOption6"
-                    android:layout_width="0dp"
-                    android:layout_columnWeight="1"
-                    android:layout_margin="8dp"
-                    tools:text="F" />
-
-            </GridLayout>
-
-            <TextView
-                android:id="@+id/tvFeedback"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:gravity="center"
-                android:layout_marginTop="16dp"
-                android:textAppearance="?attr/textAppearanceHeadline6"
-                tools:text="✅ Correct!" />
-
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/btnBackQuiz"
-                style="@style/Widget.Material3.Button.OutlinedButton"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center_horizontal"
-                android:layout_marginTop="16dp"
-                android:text="End Quiz" />
-
-        </LinearLayout>
-    </androidx.core.widget.NestedScrollView>
+    </FrameLayout>
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

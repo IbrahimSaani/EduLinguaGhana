@@ -11,12 +11,14 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
+import android.widget.Button;
 import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.content.ContextCompat;
 
+import com.google.android.material.appbar.AppBarLayout;
 import com.google.android.material.button.MaterialButton;
 
 import java.util.ArrayList;
@@ -30,10 +32,12 @@ import java.util.Set;
 public class QuizActivity extends AppCompatActivity {
 
     // Views
-    private TextView tvGameTimer, tvGameScore, tvGameBest, tvGameFeedback, tvGamePrompt;
-    private MaterialButton btnOption1, btnOption2, btnOption3, btnOption4, btnOption5, btnOption6;
+    private TextView tvGameTimer, tvGameScore, tvGameBest, tvGameFeedback, tvGamePrompt, tvStartTitle;
+    private MaterialButton btnOption1, btnOption2, btnOption3, btnOption4, btnOption5, btnOption6, btnStartQuiz;
     private View btnPlayAudio, btnBackQuiz;
     private Toolbar toolbar;
+    private AppBarLayout appBarLayout;
+    private View startQuizContainer, quizContentContainer;
 
     // Game state
     private int score = 0;
@@ -97,6 +101,12 @@ public class QuizActivity extends AppCompatActivity {
 
         // --- Bind views ---
         toolbar = findViewById(R.id.toolbar);
+        appBarLayout = findViewById(R.id.appBarLayout);
+        startQuizContainer = findViewById(R.id.startQuizContainer);
+        quizContentContainer = findViewById(R.id.quizContentContainer);
+        tvStartTitle = findViewById(R.id.tvStartTitle);
+        btnStartQuiz = findViewById(R.id.btnStartQuiz);
+
         tvGameTimer    = findViewById(R.id.tvTimer);
         tvGameScore    = findViewById(R.id.tvScore);
         tvGameBest     = findViewById(R.id.tvBest);
@@ -138,6 +148,7 @@ public class QuizActivity extends AppCompatActivity {
                 break;
         }
         getSupportActionBar().setTitle(modeLabel + " – " + languageName);
+        tvStartTitle.setText(modeLabel);
 
         // Load prefs (high score & SFX setting)
         SharedPreferences prefs = getSharedPreferences(PREF_NAME, MODE_PRIVATE);
@@ -147,8 +158,7 @@ public class QuizActivity extends AppCompatActivity {
 
         initTTS();
 
-        // Start first round
-        startGame();
+        btnStartQuiz.setOnClickListener(v -> showQuizContent());
 
         // Answer buttons
         btnOption1.setOnClickListener(v -> checkAnswer(btnOption1));
@@ -168,6 +178,16 @@ public class QuizActivity extends AppCompatActivity {
             cancelTimer();
             finish();
         });
+    }
+
+    private void showQuizContent() {
+        Animation fadeIn = AnimationUtils.loadAnimation(this, R.anim.fade_in);
+        startQuizContainer.setVisibility(View.GONE);
+        quizContentContainer.setVisibility(View.VISIBLE);
+        appBarLayout.setVisibility(View.VISIBLE);
+        quizContentContainer.startAnimation(fadeIn);
+        appBarLayout.startAnimation(fadeIn);
+        startGame();
     }
 
     @Override
