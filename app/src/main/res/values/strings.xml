@@ -1,3 +1,12 @@
 <resources>
     <string name="app_name">EduLinguaGhana</string>
+    <string name="language_prefix">Language:</string>
+    <string name="alphabet_mode">Alphabet - Recital / Practice</string>
+    <string name="alphabet_hint">Use Previous / Next to move. Tap Speak to hear or practice.</string>
+    <string name="speak_button">Speak</string>
+    <string name="previous_button">◀ Previous</string>
+    <string name="next_button">Next ▶</string>
+    <string name="back_button">Back</string>
+    <string name="numbers_mode">Numbers - Recital / Practice</string>
+    <string name="numbers_hint">Swipe through numbers using Previous / Next. Tap Speak to hear or practice.</string>
 </resources>
