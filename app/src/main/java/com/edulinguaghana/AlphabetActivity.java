@@ -15,6 +15,7 @@ import android.speech.tts.TextToSpeech;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -24,7 +25,8 @@ import java.util.Locale;
 public class AlphabetActivity extends AppCompatActivity {
 
     private TextView tvLanguageTitle, tvLetter;
-    private Button btnPrev, btnNext, btnBack, btnSpeak;
+    private ImageButton btnPrev, btnNext;
+    private Button btnBack, btnSpeak;
 
     private String languageCode;
     private String languageName;

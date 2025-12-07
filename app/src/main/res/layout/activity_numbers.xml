@@ -67,71 +67,77 @@
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
 
-            <com.google.android.material.card.MaterialCardView
+            <RelativeLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="16dp"
-                app:cardCornerRadius="16dp"
-                app:cardElevation="8dp">
+                android:layout_marginBottom="16dp">
 
-                <LinearLayout
+                <ImageButton
+                    android:id="@+id/btnPrevNumber"
+                    android:layout_width="56dp"
+                    android:layout_height="56dp"
+                    android:layout_alignParentStart="true"
+                    android:layout_centerVertical="true"
+                    android:background="?attr/selectableItemBackgroundBorderless"
+                    android:contentDescription="@string/content_description_previous"
+                    android:src="@drawable/ic_arrow_back" />
+
+                <com.google.android.material.card.MaterialCardView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:gravity="center_horizontal"
-                    android:orientation="vertical"
-                    android:padding="24dp">
+                    android:layout_toStartOf="@id/btnNextNumber"
+                    android:layout_toEndOf="@id/btnPrevNumber"
+                    app:cardCornerRadius="16dp"
+                    app:cardElevation="8dp">
 
-                    <TextView
-                        android:id="@+id/tvNumber"
-                        android:layout_width="wrap_content"
+                    <LinearLayout
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginBottom="8dp"
-                        android:fontFamily="@font/agbalumo"
-                        android:text="1"
-                        android:textColor="@color/colorAccent"
-                        android:textSize="120sp"
-                        android:textStyle="bold" />
+                        android:gravity="center_horizontal"
+                        android:orientation="vertical"
+                        android:padding="24dp">
 
-                    <TextView
-                        android:id="@+id/tvHintNumbers"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginBottom="16dp"
-                        android:gravity="center"
-                        android:text="@string/numbers_hint"
-                        android:textColor="@color/textColorSecondary"
-                        android:textSize="14sp" />
+                        <TextView
+                            android:id="@+id/tvNumber"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginBottom="8dp"
+                            android:fontFamily="@font/agbalumo"
+                            android:text="1"
+                            android:textColor="@color/colorAccent"
+                            android:textSize="120sp"
+                            android:textStyle="bold" />
 
-                    <com.google.android.material.button.MaterialButton
-                        android:id="@+id/btnSpeakNumber"
-                        style="@style/Widget.Material3.Button"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="@string/speak_button" />
-                </LinearLayout>
-            </com.google.android.material.card.MaterialCardView>
+                        <TextView
+                            android:id="@+id/tvHintNumbers"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginBottom="16dp"
+                            android:gravity="center"
+                            android:text="@string/numbers_hint"
+                            android:textColor="@color/textColorSecondary"
+                            android:textSize="14sp" />
 
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:gravity="center"
-                android:orientation="horizontal">
+                        <com.google.android.material.button.MaterialButton
+                            android:id="@+id/btnSpeakNumber"
+                            style="@style/Widget.Material3.Button"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/speak_button" />
+                    </LinearLayout>
+                </com.google.android.material.card.MaterialCardView>
 
-                <com.google.android.material.button.MaterialButton
-                    android:id="@+id/btnPrevNumber"
-                    style="@style/Widget.Material3.Button.OutlinedButton"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginEnd="16dp"
-                    android:text="@string/previous_button" />
-
-                <com.google.android.material.button.MaterialButton
+                <ImageButton
                     android:id="@+id/btnNextNumber"
-                    style="@style/Widget.Material3.Button.OutlinedButton"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/next_button" />
-            </LinearLayout>
+                    android:layout_width="56dp"
+                    android:layout_height="56dp"
+                    android:layout_alignParentEnd="true"
+                    android:layout_centerVertical="true"
+                    android:background="?attr/selectableItemBackgroundBorderless"
+                    android:contentDescription="@string/content_description_next"
+                    android:src="@drawable/ic_arrow_forward" />
+
+            </RelativeLayout>
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/btnBackNumber"

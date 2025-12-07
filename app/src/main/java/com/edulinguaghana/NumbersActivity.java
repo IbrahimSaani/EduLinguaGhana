@@ -15,6 +15,7 @@ import android.speech.tts.TextToSpeech;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -24,7 +25,8 @@ import java.util.Locale;
 public class NumbersActivity extends AppCompatActivity {
 
     private TextView tvLanguageTitleNum, tvNumber;
-    private Button btnPrevNumber, btnNextNumber, btnBackNumber, btnSpeakNumber;
+    private ImageButton btnPrevNumber, btnNextNumber;
+    private Button btnBackNumber, btnSpeakNumber;
 
     private String languageCode;
     private String languageName;

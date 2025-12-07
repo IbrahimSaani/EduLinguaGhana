@@ -29,4 +29,8 @@
     <string name="settings_reset_dialog_positive">Yes, reset</string>
     <string name="settings_reset_dialog_negative">Cancel</string>
     <string name="settings_reset_toast">Progress has been reset.</string>
+
+    <!-- Accessibility -->
+    <string name="content_description_previous">Previous</string>
+    <string name="content_description_next">Next</string>
 </resources>
