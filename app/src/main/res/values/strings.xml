@@ -1,25 +1,32 @@
-    <resources>
-        <string name="app_name">EduLinguaGhana</string>
-        <string name="language_prefix">Language:</string>
-        <string name="alphabet_mode">Alphabet - Recital / Practice</string>
-        <string name="alphabet_hint">Use Previous / Next to move. Tap Speak to hear or practice.</string>
-        <string name="speak_button">Speak</string>
-        <string name="previous_button">◀ Previous</string>
-        <string name="next_button">Next ▶</string>
-        <string name="back_button">Back</string>
-        <string name="numbers_mode">Numbers - Recital / Practice</string>
-        <string name="numbers_hint">Swipe through numbers using Previous / Next. Tap Speak to hear or practice.</string>
-    
-        <!-- Settings Screen -->
-        <string name="settings_title">Settings</string>
-        <string name="settings_audio_title">Audio Settings</string>
-        <string name="settings_background_music">Background music</string>
-        <string name="settings_sound_effects">Sound effects (SFX)</string>
-        <string name="settings_theme_title">Theme</string>
-        <string name="settings_theme_light">Light</string>
-        <string name="settings_theme_dark">Dark</string>
-        <string name="settings_theme_system">System Default</string>
-        <string name="settings_progress_title">Progress</string>
-        <string name="settings_reset_progress">Reset quiz progress</string>
-        <string name="settings_reset_warning">(This will clear your best score and quiz statistics.)</string>
-    </resources>
+<resources>
+    <string name="app_name">EduLinguaGhana</string>
+    <string name="language_prefix">Language:</string>
+    <string name="alphabet_mode">Alphabet - Recital / Practice</string>
+    <string name="alphabet_hint">Use Previous / Next to move. Tap Speak to hear or practice.</string>
+    <string name="speak_button">Speak</string>
+    <string name="previous_button">◀ Previous</string>
+    <string name="next_button">Next ▶</string>
+    <string name="back_button">Back</string>
+    <string name="numbers_mode">Numbers - Recital / Practice</string>
+    <string name="numbers_hint">Swipe through numbers using Previous / Next. Tap Speak to hear or practice.</string>
+
+    <!-- Settings Screen -->
+    <string name="settings_title">Settings</string>
+    <string name="settings_audio_title">Audio Settings</string>
+    <string name="settings_background_music">Background music</string>
+    <string name="settings_sound_effects">Sound effects (SFX)</string>
+    <string name="settings_theme_title">Theme</string>
+    <string name="settings_theme_light">Light</string>
+    <string name="settings_theme_dark">Dark</string>
+    <string name="settings_theme_system">System Default</string>
+    <string name="settings_progress_title">Progress</string>
+    <string name="settings_reset_progress">Reset quiz progress</string>
+    <string name="settings_reset_warning">(This will clear your best score and quiz statistics.)</string>
+
+    <!-- Reset Progress Dialog -->
+    <string name="settings_reset_dialog_title">Reset Progress</string>
+    <string name="settings_reset_dialog_message">Are you sure you want to reset quiz progress? This will clear your best score and quiz statistics.</string>
+    <string name="settings_reset_dialog_positive">Yes, reset</string>
+    <string name="settings_reset_dialog_negative">Cancel</string>
+    <string name="settings_reset_toast">Progress has been reset.</string>
+</resources>

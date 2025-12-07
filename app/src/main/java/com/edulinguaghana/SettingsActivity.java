@@ -88,17 +88,17 @@ public class SettingsActivity extends AppCompatActivity {
         // Reset quiz progress when clicked
         btnResetProgress.setOnClickListener(v -> {
             new AlertDialog.Builder(this)
-                    .setTitle("Reset Progress")
-                    .setMessage("Are you sure you want to reset quiz progress? This will clear your best score and quiz statistics.")
-                    .setPositiveButton("Yes, reset", (dialog, which) -> {
+                    .setTitle(R.string.settings_reset_dialog_title)
+                    .setMessage(R.string.settings_reset_dialog_message)
+                    .setPositiveButton(R.string.settings_reset_dialog_positive, (dialog, which) -> {
                         SharedPreferences.Editor editor = prefs.edit();
                         editor.putInt(KEY_HIGH_SCORE, 0);
                         editor.putInt(KEY_TOTAL_QUIZZES, 0);
                         editor.putInt(KEY_TOTAL_CORRECT, 0);
                         editor.apply();
-                        Toast.makeText(this, "Progress has been reset.", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(this, getString(R.string.settings_reset_toast), Toast.LENGTH_SHORT).show();
                     })
-                    .setNegativeButton("Cancel", null)
+                    .setNegativeButton(R.string.settings_reset_dialog_negative, null)
                     .show();
         });
     }
