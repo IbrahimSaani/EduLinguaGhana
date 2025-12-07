@@ -78,7 +78,8 @@
                         <Switch
                             android:id="@+id/switchMusic"
                             android:layout_width="wrap_content"
-                            android:layout_height="wrap_content" />
+                            android:layout_height="wrap_content"
+                            android:minHeight="48dp" />
                     </LinearLayout>
 
                     <LinearLayout
@@ -98,7 +99,8 @@
                         <Switch
                             android:id="@+id/switchSfx"
                             android:layout_width="wrap_content"
-                            android:layout_height="wrap_content" />
+                            android:layout_height="wrap_content"
+                            android:minHeight="48dp" />
                     </LinearLayout>
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
@@ -140,6 +142,7 @@
                             android:id="@+id/rbLight"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
+                            android:minHeight="48dp"
                             android:text="Light"
                             android:textColor="@color/textColorSecondary" />
 
@@ -147,6 +150,7 @@
                             android:id="@+id/rbDark"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
+                            android:minHeight="48dp"
                             android:text="Dark"
                             android:textColor="@color/textColorSecondary" />
 
@@ -155,6 +159,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:checked="true"
+                            android:minHeight="48dp"
                             android:text="System Default"
                             android:textColor="@color/textColorSecondary" />
                     </RadioGroup>
