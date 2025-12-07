@@ -28,40 +28,69 @@
         app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
         <!-- Start Screen -->
-        <LinearLayout
+        <ScrollView
             android:id="@+id/startQuizContainer"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:gravity="center"
-            android:orientation="vertical"
-            android:padding="16dp"
-            android:visibility="visible">
+            android:layout_height="match_parent">
 
-            <TextView
-                android:id="@+id/tvStartTitle"
-                android:layout_width="wrap_content"
+            <LinearLayout
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:fontFamily="@font/agbalumo"
-                android:gravity="center"
-                android:text="You are about to start the quiz!"
-                android:textAppearance="?attr/textAppearanceHeadline5" />
+                android:gravity="center_horizontal"
+                android:orientation="vertical"
+                android:padding="16dp">
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
-                android:gravity="center"
-                android:text="Answer as many questions as you can in 30 seconds."
-                android:textAppearance="?attr/textAppearanceBody1" />
 
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/btnStartQuiz"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="24dp"
-                android:text="Start Quiz" />
+                <com.google.android.material.card.MaterialCardView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
 
-        </LinearLayout>
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:padding="16dp">
+
+                        <ImageView
+                            android:id="@+id/ivQuizIcon"
+                            android:layout_width="64dp"
+                            android:layout_height="64dp"
+                            android:layout_gravity="center_horizontal"
+                            android:layout_marginBottom="16dp"
+                            tools:src="@drawable/ic_quiz_letters" />
+
+                        <TextView
+                            android:id="@+id/tvStartTitle"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center_horizontal"
+                            android:fontFamily="@font/agbalumo"
+                            android:gravity="center"
+                            android:textAppearance="?attr/textAppearanceHeadline5"
+                            tools:text="Letters Quiz" />
+
+                        <TextView
+                            android:id="@+id/tvStartDescription"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center_horizontal"
+                            android:layout_marginTop="8dp"
+                            android:gravity="center"
+                            android:textAppearance="?attr/textAppearanceBody1"
+                            tools:text="Listen to the letter and choose the correct option."
+                            />
+                    </LinearLayout>
+                </com.google.android.material.card.MaterialCardView>
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnStartQuiz"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="24dp"
+                    android:text="Start Quiz" />
+
+            </LinearLayout>
+        </ScrollView>
 
         <!-- Quiz Content -->
         <androidx.core.widget.NestedScrollView

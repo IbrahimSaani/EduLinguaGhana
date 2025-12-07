@@ -11,7 +11,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
-import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -32,12 +32,13 @@ import java.util.Set;
 public class QuizActivity extends AppCompatActivity {
 
     // Views
-    private TextView tvGameTimer, tvGameScore, tvGameBest, tvGameFeedback, tvGamePrompt, tvStartTitle;
+    private TextView tvGameTimer, tvGameScore, tvGameBest, tvGameFeedback, tvGamePrompt, tvStartTitle, tvStartDescription;
     private MaterialButton btnOption1, btnOption2, btnOption3, btnOption4, btnOption5, btnOption6, btnStartQuiz;
     private View btnPlayAudio, btnBackQuiz;
     private Toolbar toolbar;
     private AppBarLayout appBarLayout;
     private View startQuizContainer, quizContentContainer;
+    private ImageView ivQuizIcon;
 
     // Game state
     private int score = 0;
@@ -105,6 +106,8 @@ public class QuizActivity extends AppCompatActivity {
         startQuizContainer = findViewById(R.id.startQuizContainer);
         quizContentContainer = findViewById(R.id.quizContentContainer);
         tvStartTitle = findViewById(R.id.tvStartTitle);
+        tvStartDescription = findViewById(R.id.tvStartDescription);
+        ivQuizIcon = findViewById(R.id.ivQuizIcon);
         btnStartQuiz = findViewById(R.id.btnStartQuiz);
 
         tvGameTimer    = findViewById(R.id.tvTimer);
@@ -127,28 +130,7 @@ public class QuizActivity extends AppCompatActivity {
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setDisplayShowHomeEnabled(true);
 
-        // Title based on quiz type + language
-        String modeLabel;
-        switch (quizType) {
-            case "numbers":
-                modeLabel = "Numbers Quiz";
-                break;
-            case "sequence":
-                modeLabel = "Number Sequence Quiz";
-                break;
-            case "matching":
-                modeLabel = "Matching Quiz";
-                break;
-            case "mixed":
-                modeLabel = "Mixed Quiz";
-                break;
-            case "letters":
-            default:
-                modeLabel = "Letters Quiz";
-                break;
-        }
-        getSupportActionBar().setTitle(modeLabel + " – " + languageName);
-        tvStartTitle.setText(modeLabel);
+        setupStartScreen();
 
         // Load prefs (high score & SFX setting)
         SharedPreferences prefs = getSharedPreferences(PREF_NAME, MODE_PRIVATE);
@@ -178,6 +160,47 @@ public class QuizActivity extends AppCompatActivity {
             cancelTimer();
             finish();
         });
+    }
+
+    private void setupStartScreen() {
+        String modeLabel, description;
+        int iconRes;
+
+        switch (quizType) {
+            case "numbers":
+                modeLabel = "Numbers Quiz";
+                description = "Listen to the number and choose the correct option.";
+                iconRes = R.drawable.ic_quiz_numbers;
+                break;
+            case "sequence":
+                modeLabel = "Number Sequence Quiz";
+                description = "Complete the sequence by finding the missing number.";
+                iconRes = R.drawable.ic_quiz_sequence;
+                break;
+            case "matching":
+                modeLabel = "Matching Quiz";
+                description = "Match the letter to the word that starts with it.";
+                iconRes = R.drawable.ic_quiz_matching;
+                break;
+            case "mixed":
+                modeLabel = "Mixed Quiz";
+                description = "A mix of letter and number questions.";
+                iconRes = R.drawable.ic_quiz_mixed;
+                break;
+            case "letters":
+            default:
+                modeLabel = "Letters Quiz";
+                description = "Listen to the letter and choose the correct option.";
+                iconRes = R.drawable.ic_quiz_letters;
+                break;
+        }
+        getSupportActionBar().setTitle(modeLabel + " – " + languageName);
+        tvStartTitle.setText(modeLabel);
+        tvStartDescription.setText(description);
+        ivQuizIcon.setImageResource(iconRes);
+
+        Animation startButtonAnim = AnimationUtils.loadAnimation(this, R.anim.bounce_pop);
+        btnStartQuiz.startAnimation(startButtonAnim);
     }
 
     private void showQuizContent() {
