@@ -23,4 +23,9 @@
     <!-- Quiz-specific -->
     <color name="correctAnswer">#2E7D32</color>
     <color name="wrongAnswer">#B71C1C</color>
+
+    <!-- Progress Screen -->
+    <color name="progressScreenBackground">#EDE7F6</color>
+    <color name="progressTitleColor">#4527A0</color>
+    <color name="achievementsTextColor">#5D4037</color>
 </resources>
