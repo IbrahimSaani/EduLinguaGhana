@@ -10,12 +10,12 @@ import android.os.Bundle;
 import android.widget.Button;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
-import android.widget.Switch;
+import com.google.android.material.switchmaterial.SwitchMaterial;
 import android.widget.Toast;
 
 public class SettingsActivity extends AppCompatActivity {
 
-    private Switch switchMusic, switchSfx;
+    private SwitchMaterial switchMusic, switchSfx;
     private Button btnResetProgress;
     private RadioGroup rgTheme;
     private RadioButton rbLight, rbDark, rbSystem;

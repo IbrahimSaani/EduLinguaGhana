@@ -18,7 +18,7 @@
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
             app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
-            app:title="Settings" />
+            app:title="@string/settings_title" />
 
     </com.google.android.material.appbar.AppBarLayout>
 
@@ -51,57 +51,32 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginBottom="12dp"
-                        android:drawableStart="@android:drawable/ic_menu_preferences"
+                        android:drawableStart="@android:drawable/ic_lock_silent_mode_off" 
                         android:drawablePadding="12dp"
-                        android:fontFamily="@font/agbalumo"
                         android:gravity="center_vertical"
-                        android:text="Audio Settings"
+                        android:text="@string/settings_audio_title"
                         android:textColor="@color/textColorPrimary"
                         android:textSize="16sp"
                         android:textStyle="bold" />
 
-                    <LinearLayout
+                    <com.google.android.material.switchmaterial.SwitchMaterial
+                        android:id="@+id/switchMusic"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginBottom="8dp"
-                        android:gravity="center_vertical"
-                        android:orientation="horizontal">
+                        android:minHeight="48dp"
+                        android:text="@string/settings_background_music"
+                        android:textColor="@color/textColorSecondary"
+                        android:textSize="14sp" />
 
-                        <TextView
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:text="Background music"
-                            android:textColor="@color/textColorSecondary"
-                            android:textSize="14sp" />
-
-                        <Switch
-                            android:id="@+id/switchMusic"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:minHeight="48dp" />
-                    </LinearLayout>
-
-                    <LinearLayout
+                    <com.google.android.material.switchmaterial.SwitchMaterial
+                        android:id="@+id/switchSfx"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:gravity="center_vertical"
-                        android:orientation="horizontal">
+                        android:minHeight="48dp"
+                        android:text="@string/settings_sound_effects"
+                        android:textColor="@color/textColorSecondary"
+                        android:textSize="14sp" />
 
-                        <TextView
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:text="Sound effects (SFX)"
-                            android:textColor="@color/textColorSecondary"
-                            android:textSize="14sp" />
-
-                        <Switch
-                            android:id="@+id/switchSfx"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:minHeight="48dp" />
-                    </LinearLayout>
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
 
@@ -123,11 +98,10 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginBottom="12dp"
-                        android:drawableStart="@android:drawable/ic_menu_view"
+                        android:drawableStart="@android:drawable/ic_menu_gallery"
                         android:drawablePadding="12dp"
-                        android:fontFamily="@font/agbalumo"
                         android:gravity="center_vertical"
-                        android:text="Theme"
+                        android:text="@string/settings_theme_title"
                         android:textColor="@color/textColorPrimary"
                         android:textSize="16sp"
                         android:textStyle="bold" />
@@ -143,7 +117,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:minHeight="48dp"
-                            android:text="Light"
+                            android:text="@string/settings_theme_light"
                             android:textColor="@color/textColorSecondary" />
 
                         <RadioButton
@@ -151,7 +125,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:minHeight="48dp"
-                            android:text="Dark"
+                            android:text="@string/settings_theme_dark"
                             android:textColor="@color/textColorSecondary" />
 
                         <RadioButton
@@ -160,7 +134,7 @@
                             android:layout_height="wrap_content"
                             android:checked="true"
                             android:minHeight="48dp"
-                            android:text="System Default"
+                            android:text="@string/settings_theme_system"
                             android:textColor="@color/textColorSecondary" />
                     </RadioGroup>
                 </LinearLayout>
@@ -183,31 +157,29 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginBottom="12dp"
-                        android:drawableStart="@android:drawable/ic_menu_revert"
+                        android:drawableStart="@android:drawable/ic_menu_delete"
                         android:drawablePadding="12dp"
-                        android:fontFamily="@font/agbalumo"
                         android:gravity="center_vertical"
-                        android:text="Progress"
+                        android:text="@string/settings_progress_title"
                         android:textColor="@color/textColorPrimary"
                         android:textSize="16sp"
                         android:textStyle="bold" />
 
-                    <Button
+                    <com.google.android.material.button.MaterialButton
                         android:id="@+id/btnResetProgress"
-                        style="@style/Widget.Material3.Button.OutlinedButton"
+                        style="@style/Widget.Material3.Button"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginBottom="8dp"
                         android:padding="12dp"
-                        android:text="Reset quiz progress"
-                        android:textAllCaps="false"
-                        android:textColor="@color/wrongAnswer" />
+                        android:text="@string/settings_reset_progress"
+                        app:backgroundTint="@color/wrongAnswer" />
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="(This will clear your best score and quiz statistics.)"
-                        android:textColor="#757575"
+                        android:text="@string/settings_reset_warning"
+                        android:textColor="@color/textColorSecondary"
                         android:textSize="12sp" />
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
