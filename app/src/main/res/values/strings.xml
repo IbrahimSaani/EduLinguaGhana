@@ -33,4 +33,5 @@
     <!-- Accessibility -->
     <string name="content_description_previous">Previous</string>
     <string name="content_description_next">Next</string>
+    <string name="content_description_back">Back</string>
 </resources>

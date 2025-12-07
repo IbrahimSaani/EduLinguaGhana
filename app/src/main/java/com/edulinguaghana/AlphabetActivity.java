@@ -19,6 +19,9 @@ import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.android.material.progressindicator.LinearProgressIndicator;
+
 import java.util.ArrayList;
 import java.util.Locale;
 
@@ -26,7 +29,9 @@ public class AlphabetActivity extends AppCompatActivity {
 
     private TextView tvLanguageTitle, tvLetter;
     private ImageButton btnPrev, btnNext;
-    private Button btnBack, btnSpeak;
+    private FloatingActionButton btnBack;
+    private Button btnSpeak;
+    private LinearProgressIndicator progressBar;
 
     private String languageCode;
     private String languageName;
@@ -53,6 +58,7 @@ public class AlphabetActivity extends AppCompatActivity {
         btnNext = findViewById(R.id.btnNext);
         btnBack = findViewById(R.id.btnBack);
         btnSpeak = findViewById(R.id.btnSpeak);
+        progressBar = findViewById(R.id.progressBar);
 
         languageCode = getIntent().getStringExtra("LANG_CODE");
         languageName = getIntent().getStringExtra("LANG_NAME");
@@ -70,6 +76,8 @@ public class AlphabetActivity extends AppCompatActivity {
                 "A","B","C","D","E","F","G","H","I","J","K","L","M",
                 "N","O","P","Q","R","S","T","U","V","W","X","Y","Z"
         };
+
+        progressBar.setMax(letters.length);
 
         tts = new TextToSpeech(this, status -> {
             if (status == TextToSpeech.SUCCESS) {
@@ -111,6 +119,7 @@ public class AlphabetActivity extends AppCompatActivity {
 
     private void updateLetter() {
         tvLetter.setText(letters[currentIndex]);
+        progressBar.setProgress(currentIndex + 1);
     }
 
     private void animateLetter() {

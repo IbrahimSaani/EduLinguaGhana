@@ -19,6 +19,9 @@ import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.android.material.progressindicator.LinearProgressIndicator;
+
 import java.util.ArrayList;
 import java.util.Locale;
 
@@ -26,7 +29,9 @@ public class NumbersActivity extends AppCompatActivity {
 
     private TextView tvLanguageTitleNum, tvNumber;
     private ImageButton btnPrevNumber, btnNextNumber;
-    private Button btnBackNumber, btnSpeakNumber;
+    private FloatingActionButton btnBackNumber;
+    private Button btnSpeakNumber;
+    private LinearProgressIndicator progressBar;
 
     private String languageCode;
     private String languageName;
@@ -51,6 +56,7 @@ public class NumbersActivity extends AppCompatActivity {
         btnNextNumber = findViewById(R.id.btnNextNumber);
         btnBackNumber = findViewById(R.id.btnBackNumber);
         btnSpeakNumber = findViewById(R.id.btnSpeakNumber);
+        progressBar = findViewById(R.id.progressBar);
 
         languageCode = getIntent().getStringExtra("LANG_CODE");
         languageName = getIntent().getStringExtra("LANG_NAME");
@@ -63,6 +69,8 @@ public class NumbersActivity extends AppCompatActivity {
 
         tvLanguageTitleNum.setText("Language: " + languageName);
         btnSpeakNumber.setText(isRecitalMode ? "Repeat" : "Practice");
+
+        progressBar.setMax(100);
 
         tts = new TextToSpeech(this, status -> {
             if (status == TextToSpeech.SUCCESS) {
@@ -104,6 +112,7 @@ public class NumbersActivity extends AppCompatActivity {
 
     private void updateNumber() {
         tvNumber.setText(String.valueOf(currentNumber));
+        progressBar.setProgress(currentNumber);
     }
 
     private void animateNumber() {

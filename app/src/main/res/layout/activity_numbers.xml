@@ -8,6 +8,7 @@
     tools:context=".NumbersActivity">
 
     <com.google.android.material.appbar.AppBarLayout
+        android:id="@+id/appBarLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@color/colorPrimary"
@@ -33,6 +34,15 @@
             android:gravity="center_horizontal"
             android:orientation="vertical"
             android:padding="16dp">
+
+            <com.google.android.material.progressindicator.LinearProgressIndicator
+                android:id="@+id/progressBar"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp"
+                android:progress="0"
+                app:indicatorColor="@color/colorAccent"
+                app:trackColor="@color/buttonSecondary" />
 
             <com.google.android.material.card.MaterialCardView
                 android:layout_width="match_parent"
@@ -141,14 +151,16 @@
                     android:src="@drawable/ic_arrow_forward" />
 
             </RelativeLayout>
-
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/btnBackNumber"
-                style="@style/Widget.Material3.Button.TextButton"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="16dp"
-                android:text="@string/back_button" />
         </LinearLayout>
     </ScrollView>
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/btnBackNumber"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|end"
+        android:layout_margin="16dp"
+        android:contentDescription="@string/content_description_back"
+        app:srcCompat="@drawable/ic_back_fab" />
+
 </androidx.coordinatorlayout.widget.CoordinatorLayout>
