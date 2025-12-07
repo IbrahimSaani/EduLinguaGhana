@@ -76,8 +76,8 @@
                     android:id="@+id/btnPrev"
                     android:layout_width="56dp"
                     android:layout_height="56dp"
-                    android:layout_centerVertical="true"
                     android:layout_alignParentStart="true"
+                    android:layout_centerVertical="true"
                     android:background="?attr/selectableItemBackgroundBorderless"
                     android:contentDescription="@string/content_description_previous"
                     android:src="@drawable/ic_arrow_back" />
@@ -85,10 +85,12 @@
                 <com.google.android.material.card.MaterialCardView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_toEndOf="@id/btnPrev"
                     android:layout_toStartOf="@id/btnNext"
+                    android:layout_toEndOf="@id/btnPrev"
                     app:cardCornerRadius="16dp"
-                    app:cardElevation="8dp">
+                    app:cardElevation="8dp"
+                    app:strokeColor="@color/colorPrimary"
+                    app:strokeWidth="2dp">
 
                     <LinearLayout
                         android:layout_width="match_parent"
@@ -123,7 +125,8 @@
                             style="@style/Widget.Material3.Button"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="@string/speak_button" />
+                            android:text="@string/speak_button"
+                            app:icon="@drawable/ic_speak" />
                     </LinearLayout>
                 </com.google.android.material.card.MaterialCardView>
 
@@ -131,8 +134,8 @@
                     android:id="@+id/btnNext"
                     android:layout_width="56dp"
                     android:layout_height="56dp"
-                    android:layout_centerVertical="true"
                     android:layout_alignParentEnd="true"
+                    android:layout_centerVertical="true"
                     android:background="?attr/selectableItemBackgroundBorderless"
                     android:contentDescription="@string/content_description_next"
                     android:src="@drawable/ic_arrow_forward" />

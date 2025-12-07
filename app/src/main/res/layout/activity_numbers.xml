@@ -88,7 +88,9 @@
                     android:layout_toStartOf="@id/btnNextNumber"
                     android:layout_toEndOf="@id/btnPrevNumber"
                     app:cardCornerRadius="16dp"
-                    app:cardElevation="8dp">
+                    app:cardElevation="8dp"
+                    app:strokeColor="@color/colorPrimary"
+                    app:strokeWidth="2dp">
 
                     <LinearLayout
                         android:layout_width="match_parent"
@@ -123,7 +125,8 @@
                             style="@style/Widget.Material3.Button"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="@string/speak_button" />
+                            android:text="@string/speak_button"
+                            app:icon="@drawable/ic_speak" />
                     </LinearLayout>
                 </com.google.android.material.card.MaterialCardView>
 
