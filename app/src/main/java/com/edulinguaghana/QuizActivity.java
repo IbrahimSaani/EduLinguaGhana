@@ -32,12 +32,12 @@ import java.util.Set;
 public class QuizActivity extends AppCompatActivity {
 
     // Views
-    private TextView tvGameTimer, tvGameScore, tvGameBest, tvGameFeedback, tvGamePrompt, tvStartTitle, tvStartDescription;
-    private MaterialButton btnOption1, btnOption2, btnOption3, btnOption4, btnOption5, btnOption6, btnStartQuiz;
-    private View btnPlayAudio, btnBackQuiz;
+    private TextView tvGameTimer, tvGameScore, tvGameBest, tvGameFeedback, tvGamePrompt, tvStartTitle, tvStartDescription, tvEndTitle, tvFinalScore, tvEndBestScore;
+    private MaterialButton btnOption1, btnOption2, btnOption3, btnOption4, btnOption5, btnOption6, btnStartQuiz, btnPlayAgain, btnEndQuit;
+    private View btnPlayAudio;
     private Toolbar toolbar;
     private AppBarLayout appBarLayout;
-    private View startQuizContainer, quizContentContainer;
+    private View startQuizContainer, quizContentContainer, endQuizContainer;
     private ImageView ivQuizIcon;
 
     // Game state
@@ -51,8 +51,8 @@ public class QuizActivity extends AppCompatActivity {
     private static final long PENALTY_TIME = 1000L;  // -1s penalty for wrong answer
 
     // SharedPreferences keys
-    private static final String PREF_NAME       = "EduLinguaPrefs";
-    private static final String KEY_HIGH_SCORE  = "QUIZ_HIGH_SCORE";
+    private static final String PREF_NAME = "EduLinguaPrefs";
+    private static final String KEY_HIGH_SCORE_PREFIX = "QUIZ_HIGH_SCORE_";
     private static final String KEY_SFX_ENABLED = "SFX_ENABLED";
 
     // Alphabet (letters-only)
@@ -101,30 +101,7 @@ public class QuizActivity extends AppCompatActivity {
         quizType = normalizeQuizType(rawType);
 
         // --- Bind views ---
-        toolbar = findViewById(R.id.toolbar);
-        appBarLayout = findViewById(R.id.appBarLayout);
-        startQuizContainer = findViewById(R.id.startQuizContainer);
-        quizContentContainer = findViewById(R.id.quizContentContainer);
-        tvStartTitle = findViewById(R.id.tvStartTitle);
-        tvStartDescription = findViewById(R.id.tvStartDescription);
-        ivQuizIcon = findViewById(R.id.ivQuizIcon);
-        btnStartQuiz = findViewById(R.id.btnStartQuiz);
-
-        tvGameTimer    = findViewById(R.id.tvTimer);
-        tvGameScore    = findViewById(R.id.tvScore);
-        tvGameBest     = findViewById(R.id.tvBest);
-        tvGameFeedback = findViewById(R.id.tvFeedback);
-        tvGamePrompt   = findViewById(R.id.tvGamePrompt);
-
-        btnPlayAudio   = findViewById(R.id.btnPlayAudio);
-
-        btnOption1     = findViewById(R.id.btnOption1);
-        btnOption2     = findViewById(R.id.btnOption2);
-        btnOption3     = findViewById(R.id.btnOption3);
-        btnOption4     = findViewById(R.id.btnOption4);
-        btnOption5     = findViewById(R.id.btnOption5);
-        btnOption6     = findViewById(R.id.btnOption6);
-        btnBackQuiz    = findViewById(R.id.btnBackQuiz);
+        bindViews();
 
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
@@ -134,7 +111,7 @@ public class QuizActivity extends AppCompatActivity {
 
         // Load prefs (high score & SFX setting)
         SharedPreferences prefs = getSharedPreferences(PREF_NAME, MODE_PRIVATE);
-        bestScore = prefs.getInt(KEY_HIGH_SCORE, 0);
+        bestScore = prefs.getInt(getHighScoreKey(), 0);
         isSfxOn   = prefs.getBoolean(KEY_SFX_ENABLED, true);
         tvGameBest.setText("Best: " + bestScore);
 
@@ -155,11 +132,46 @@ public class QuizActivity extends AppCompatActivity {
             btnPlayAudio.setOnClickListener(v -> speakPrompt());
         }
 
-        // Back button
-        btnBackQuiz.setOnClickListener(v -> {
-            cancelTimer();
-            finish();
+        // End screen buttons
+        btnPlayAgain.setOnClickListener(v -> {
+            endQuizContainer.setVisibility(View.GONE);
+            showQuizContent();
         });
+        btnEndQuit.setOnClickListener(v -> finish());
+    }
+
+    private void bindViews() {
+        toolbar = findViewById(R.id.toolbar);
+        appBarLayout = findViewById(R.id.appBarLayout);
+        startQuizContainer = findViewById(R.id.startQuizContainer);
+        quizContentContainer = findViewById(R.id.quizContentContainer);
+        endQuizContainer = findViewById(R.id.endQuizContainer);
+
+        tvStartTitle = findViewById(R.id.tvStartTitle);
+        tvStartDescription = findViewById(R.id.tvStartDescription);
+        ivQuizIcon = findViewById(R.id.ivQuizIcon);
+        btnStartQuiz = findViewById(R.id.btnStartQuiz);
+
+        tvGameTimer    = findViewById(R.id.tvTimer);
+        tvGameScore    = findViewById(R.id.tvScore);
+        tvGameBest     = findViewById(R.id.tvBest);
+        tvGameFeedback = findViewById(R.id.tvFeedback);
+        tvGamePrompt   = findViewById(R.id.tvGamePrompt);
+
+        btnPlayAudio   = findViewById(R.id.btnPlayAudio);
+
+        btnOption1     = findViewById(R.id.btnOption1);
+        btnOption2     = findViewById(R.id.btnOption2);
+        btnOption3     = findViewById(R.id.btnOption3);
+        btnOption4     = findViewById(R.id.btnOption4);
+        btnOption5     = findViewById(R.id.btnOption5);
+        btnOption6     = findViewById(R.id.btnOption6);
+
+        tvEndTitle = findViewById(R.id.tvEndTitle);
+        tvFinalScore = findViewById(R.id.tvFinalScore);
+        tvEndBestScore = findViewById(R.id.tvEndBestScore);
+        btnPlayAgain = findViewById(R.id.btnPlayAgain);
+        btnEndQuit = findViewById(R.id.btnEndQuit);
     }
 
     private void setupStartScreen() {
@@ -216,32 +228,23 @@ public class QuizActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        // Reload SFX setting in case user changed it in Settings
         SharedPreferences prefs = getSharedPreferences(PREF_NAME, MODE_PRIVATE);
         isSfxOn = prefs.getBoolean(KEY_SFX_ENABLED, true);
     }
 
-    // ---------------- QUIZ TYPE NORMALIZATION ----------------
-
     private String normalizeQuizType(String raw) {
         String t = raw.toLowerCase(Locale.ROOT);
-
         if (t.contains("letter")) return "letters";
         if (t.contains("sequ"))   return "sequence";
         if (t.contains("match"))  return "matching";
         if (t.contains("mix"))    return "mixed";
         if (t.contains("num"))    return "numbers";
-
-        // fallback
         return t;
     }
-
-    // ---------------- TTS ----------------
 
     private void initTTS() {
         tts = new TextToSpeech(this, status -> {
             if (status == TextToSpeech.SUCCESS) {
-                // Language mapping
                 switch (languageCode.toLowerCase()) {
                     case "fr":
                         tts.setLanguage(Locale.FRENCH);
@@ -252,8 +255,6 @@ public class QuizActivity extends AppCompatActivity {
                         break;
                 }
                 ttsReady = true;
-
-                // If first question is already set, speak it
                 if (currentPromptTtsText != null) {
                     speakPrompt();
                 }
@@ -263,16 +264,13 @@ public class QuizActivity extends AppCompatActivity {
 
     private void speakPrompt() {
         if (!ttsReady || currentPromptTtsText == null) return;
-
         tts.stop();
         tts.speak(currentPromptTtsText, TextToSpeech.QUEUE_FLUSH, null, "quiz_tts");
     }
 
-    // ---------------- GAME FLOW ----------------
-
     private void startGame() {
         score = 0;
-        remainingTime = 30000L;    // 30 seconds total
+        remainingTime = 30000L;
         tvGameScore.setText("Score: 0");
         tvGameFeedback.setText("");
         generateNewQuestion();
@@ -280,47 +278,23 @@ public class QuizActivity extends AppCompatActivity {
     }
 
     private void generateNewQuestion() {
-        // Reset buttons visuals & enabled state
         resetButtons();
-
         switch (quizType) {
-            case "numbers":
-                generateNumberQuestion();
-                break;
-            case "sequence":
-                generateSequenceQuestion();
-                break;
-            case "matching":
-                generateMatchingQuestion();
-                break;
-            case "mixed":
-                generateMixedQuestion();
-                break;
-            case "letters":
-            default:
-                generateLetterQuestion();
-                break;
+            case "numbers": generateNumberQuestion(); break;
+            case "sequence": generateSequenceQuestion(); break;
+            case "matching": generateMatchingQuestion(); break;
+            case "mixed": generateMixedQuestion(); break;
+            default: generateLetterQuestion(); break;
         }
-
-        // Auto-speak after setting question
         speakPrompt();
     }
 
-    /**
-     * Letters-only quiz:
-     * - TTS: speaks a letter (A–Z)
-     * - Options: letters only
-     */
     private void generateLetterQuestion() {
         currentCorrectAnswer = alphabet[random.nextInt(alphabet.length)];
-
-        // Build 6 unique letter options
         List<String> options = new ArrayList<>();
         Set<String> used = new HashSet<>();
-
         options.add(currentCorrectAnswer);
         used.add(currentCorrectAnswer);
-
         while (options.size() < 6) {
             String pick = alphabet[random.nextInt(alphabet.length)];
             if (!used.contains(pick)) {
@@ -328,35 +302,24 @@ public class QuizActivity extends AppCompatActivity {
                 used.add(pick);
             }
         }
-
         Collections.shuffle(options);
-
         btnOption1.setText(options.get(0));
         btnOption2.setText(options.get(1));
         btnOption3.setText(options.get(2));
         btnOption4.setText(options.get(3));
         btnOption5.setText(options.get(4));
         btnOption6.setText(options.get(5));
-
         tvGamePrompt.setText("Which letter did you hear?");
-        currentPromptTtsText = currentCorrectAnswer;  // TTS says the letter itself
+        currentPromptTtsText = currentCorrectAnswer;
     }
 
-    /**
-     * Numbers-only quiz:
-     * - TTS: speaks a number (1..MAX_NUMBER)
-     * - Options: numbers only
-     */
     private void generateNumberQuestion() {
         int correctNumber = random.nextInt(MAX_NUMBER) + 1;
         currentCorrectAnswer = String.valueOf(correctNumber);
-
         List<String> options = new ArrayList<>();
         Set<Integer> used = new HashSet<>();
-
         options.add(currentCorrectAnswer);
         used.add(correctNumber);
-
         while (options.size() < 6) {
             int pick = random.nextInt(MAX_NUMBER) + 1;
             if (!used.contains(pick)) {
@@ -364,44 +327,29 @@ public class QuizActivity extends AppCompatActivity {
                 used.add(pick);
             }
         }
-
         Collections.shuffle(options);
-
         btnOption1.setText(options.get(0));
         btnOption2.setText(options.get(1));
         btnOption3.setText(options.get(2));
         btnOption4.setText(options.get(3));
         btnOption5.setText(options.get(4));
         btnOption6.setText(options.get(5));
-
         tvGamePrompt.setText("Which number did you hear?");
-        currentPromptTtsText = currentCorrectAnswer;  // TTS says the number
+        currentPromptTtsText = currentCorrectAnswer;
     }
 
-    /**
-     * Number sequence quiz:
-     * - Shows a sequence like "3, 4, ?, 6"
-     * - Correct answer is the missing number
-     * - Options: numbers only
-     */
     private void generateSequenceQuestion() {
-        int start = random.nextInt(20) + 1;  // keep small so sequence looks nice
-        int step = 1;                        // simple +1 sequence
-
-        // Build a 4-length sequence
+        int start = random.nextInt(20) + 1;
+        int step = 1;
         int[] seq = new int[4];
         for (int i = 0; i < 4; i++) {
             seq[i] = start + i * step;
         }
-
-        // Random missing position (not first or last)
-        int missingIndex = random.nextInt(2) + 1; // 1 or 2
+        int missingIndex = random.nextInt(2) + 1;
         int missingValue = seq[missingIndex];
         currentCorrectAnswer = String.valueOf(missingValue);
-
-        // Build prompt text
         StringBuilder sb = new StringBuilder("Complete the sequence: ");
-        for (int i = 0; i < seq.length; i++) {
+        for (int i = 0; i < 4; i++) {
             if (i == missingIndex) {
                 sb.append("?, ");
             } else {
@@ -413,61 +361,39 @@ public class QuizActivity extends AppCompatActivity {
             prompt = prompt.substring(0, prompt.length() - 2);
         }
         tvGamePrompt.setText(prompt);
-
-        // Build options (numbers only)
         List<String> options = new ArrayList<>();
         Set<Integer> used = new HashSet<>();
-
         options.add(currentCorrectAnswer);
         used.add(missingValue);
-
         while (options.size() < 6) {
             int delta = random.nextInt(3) + 1;
-            int candidate = random.nextBoolean()
-                    ? missingValue + delta
-                    : missingValue - delta;
+            int candidate = random.nextBoolean() ? missingValue + delta : missingValue - delta;
             if (candidate < 1) candidate = missingValue + delta + 1;
             if (!used.contains(candidate)) {
                 options.add(String.valueOf(candidate));
                 used.add(candidate);
             }
         }
-
         Collections.shuffle(options);
-
         btnOption1.setText(options.get(0));
         btnOption2.setText(options.get(1));
         btnOption3.setText(options.get(2));
         btnOption4.setText(options.get(3));
         btnOption5.setText(options.get(4));
         btnOption6.setText(options.get(5));
-
-        // For sequence, we can speak just the missing number or a hint
         currentPromptTtsText = "Find the missing number";
     }
 
-    /**
-     * Matching quiz:
-     * - Prompt: "Which word starts with letter X?"
-     * - Options: words (Apple, Ball, Cat, etc.)
-     * - Correct answer: the word
-     */
     private void generateMatchingQuestion() {
         int idx = random.nextInt(matchLetters.length);
         String letter = matchLetters[idx];
         String correctWord = matchWords[idx];
-
         currentCorrectAnswer = correctWord;
-
         tvGamePrompt.setText("Which word starts with letter " + letter + "?");
-
-        // Build 6 word options
         List<String> options = new ArrayList<>();
         Set<Integer> used = new HashSet<>();
-
         options.add(correctWord);
         used.add(idx);
-
         while (options.size() < 6 && used.size() < matchWords.length) {
             int pick = random.nextInt(matchWords.length);
             if (!used.contains(pick)) {
@@ -475,46 +401,31 @@ public class QuizActivity extends AppCompatActivity {
                 used.add(pick);
             }
         }
-
-        // If we still don't have 6 (e.g., only 6 words total), just duplicate some
         while (options.size() < 6) {
             options.add(matchWords[random.nextInt(matchWords.length)]);
         }
-
         Collections.shuffle(options);
-
         btnOption1.setText(options.get(0));
         btnOption2.setText(options.get(1));
         btnOption3.setText(options.get(2));
         btnOption4.setText(options.get(3));
         btnOption5.setText(options.get(4));
         btnOption6.setText(options.get(5));
-
-        // TTS: speak the letter (so kids hear the sound)
         currentPromptTtsText = letter;
     }
 
-    /**
-     * Mixed quiz:
-     * - Randomly chooses between letters-only and numbers-only
-     * - So kids see BOTH letters and numbers across the round
-     */
     private void generateMixedQuestion() {
-        boolean useLetters = random.nextBoolean();
-        if (useLetters) {
+        if (random.nextBoolean()) {
             generateLetterQuestion();
         } else {
             generateNumberQuestion();
         }
-        // generateLetterQuestion / generateNumberQuestion already set currentPromptTtsText
     }
 
     private void checkAnswer(MaterialButton clickedButton) {
-        cancelTimer(); // stop ticking while we evaluate
-
+        cancelTimer();
         String answer = clickedButton.getText().toString();
         boolean isCorrect = answer.equals(currentCorrectAnswer);
-
         Animation correctAnim = AnimationUtils.loadAnimation(this, R.anim.correct_answer);
         Animation wrongAnim = AnimationUtils.loadAnimation(this, R.anim.wrong_answer);
 
@@ -525,32 +436,24 @@ public class QuizActivity extends AppCompatActivity {
             clickedButton.setStrokeColor(ColorStateList.valueOf(ContextCompat.getColor(this, R.color.correctAnswer)));
             clickedButton.startAnimation(correctAnim);
             playSfx(true);
-
-            // High score update + animation
             if (score > bestScore) {
                 bestScore = score;
                 saveHighScore();
                 animateHighScore();
             }
-
         } else {
             tvGameFeedback.setText("❌ Wrong! Correct: " + currentCorrectAnswer);
             tvGameFeedback.setTextColor(ContextCompat.getColor(this, R.color.wrongAnswer));
             clickedButton.setStrokeColor(ColorStateList.valueOf(ContextCompat.getColor(this, R.color.wrongAnswer)));
             clickedButton.startAnimation(wrongAnim);
             playSfx(false);
-
-            // Penalty time
             remainingTime -= PENALTY_TIME;
             if (remainingTime < 0) remainingTime = 0;
         }
 
         tvGameScore.setText("Score: " + score);
-
-        // Disable all buttons until next question
         setButtonsEnabled(false);
 
-        // Move to next question after a short delay
         new Handler().postDelayed(() -> {
             if (remainingTime <= 0) {
                 endQuiz();
@@ -561,11 +464,8 @@ public class QuizActivity extends AppCompatActivity {
         }, 1200);
     }
 
-    // ---------------- TIMER ----------------
-
     private void startTimer() {
         cancelTimer();
-
         countDownTimer = new CountDownTimer(remainingTime, 1000) {
             @Override
             public void onTick(long millisUntilFinished) {
@@ -584,9 +484,21 @@ public class QuizActivity extends AppCompatActivity {
     }
 
     private void endQuiz() {
-        tvGameFeedback.setText("⏰ Time up! Final score: " + score);
-        playSfx(false);
+        cancelTimer();
         setButtonsEnabled(false);
+
+        // Update overall progress
+        ProgressManager.updateProgress(this, quizType, score, score);
+
+        // Show end screen
+        Animation fadeIn = AnimationUtils.loadAnimation(this, R.anim.fade_in);
+        quizContentContainer.setVisibility(View.GONE);
+        appBarLayout.setVisibility(View.GONE);
+        endQuizContainer.setVisibility(View.VISIBLE);
+        endQuizContainer.startAnimation(fadeIn);
+
+        tvFinalScore.setText("Your Score: " + score);
+        tvEndBestScore.setText("Best Score: " + bestScore);
     }
 
     private void cancelTimer() {
@@ -596,13 +508,9 @@ public class QuizActivity extends AppCompatActivity {
         }
     }
 
-    // ---------------- UI HELPERS ----------------
-
     private void resetButtons() {
         tvGameFeedback.setText("");
-
         setButtonsEnabled(true);
-
         MaterialButton[] buttons = {btnOption1, btnOption2, btnOption3, btnOption4, btnOption5, btnOption6};
         for (MaterialButton button : buttons) {
             button.setStrokeColor(ColorStateList.valueOf(ContextCompat.getColor(this, R.color.buttonSecondary)));
@@ -619,9 +527,13 @@ public class QuizActivity extends AppCompatActivity {
         btnOption6.setEnabled(enabled);
     }
 
+    private String getHighScoreKey() {
+        return KEY_HIGH_SCORE_PREFIX + quizType;
+    }
+
     private void saveHighScore() {
         SharedPreferences prefs = getSharedPreferences(PREF_NAME, MODE_PRIVATE);
-        prefs.edit().putInt(KEY_HIGH_SCORE, bestScore).apply();
+        prefs.edit().putInt(getHighScoreKey(), bestScore).apply();
         tvGameBest.setText("Best: " + bestScore);
     }
 
@@ -630,11 +542,8 @@ public class QuizActivity extends AppCompatActivity {
         tvGameBest.startAnimation(pulse);
     }
 
-    // ---------------- SFX ----------------
-
     private void playSfx(boolean correct) {
         if (!isSfxOn) return;
-
         int res = correct ? R.raw.correct : R.raw.wrong;
         MediaPlayer mp = MediaPlayer.create(this, res);
         if (mp != null) {
@@ -642,8 +551,6 @@ public class QuizActivity extends AppCompatActivity {
             mp.start();
         }
     }
-
-    // ---------------- LIFECYCLE ----------------
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
