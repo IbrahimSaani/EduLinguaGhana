@@ -1,4 +1,4 @@
-package com.edulinguaghana;  // <-- your package
+package com.edulinguaghana;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -113,10 +113,22 @@ public class NumbersActivity extends AppCompatActivity {
 
     private void updateNumber() {
         tvNumber.setText(String.valueOf(currentNumber));
-        if ("fr".equals(languageCode)) {
-            tvNumberSpelling.setText(convertNumberToWordFrench(currentNumber));
-        } else {
-            tvNumberSpelling.setText(convertNumberToWord(currentNumber));
+        switch (languageCode) {
+            case "fr":
+                tvNumberSpelling.setText(convertNumberToWordFrench(currentNumber));
+                break;
+            case "ak":
+                tvNumberSpelling.setText(convertNumberToWordTwi(currentNumber));
+                break;
+            case "ee":
+                tvNumberSpelling.setText(convertNumberToWordEwe(currentNumber));
+                break;
+            case "gaa":
+                tvNumberSpelling.setText(convertNumberToWordGa(currentNumber));
+                break;
+            default:
+                tvNumberSpelling.setText(convertNumberToWord(currentNumber));
+                break;
         }
         progressBar.setProgress(currentNumber);
     }
@@ -206,10 +218,11 @@ public class NumbersActivity extends AppCompatActivity {
     private Locale getLocaleForLanguage(String code) {
         if (code == null) return Locale.ENGLISH;
         switch (code) {
-            case "fr":
-                return Locale.FRENCH;
-            default:
-                return Locale.ENGLISH;
+            case "fr": return Locale.FRENCH;
+            case "ak": return new Locale("ak");
+            case "ee": return new Locale("ee");
+            case "gaa": return new Locale("gaa");
+            default: return Locale.ENGLISH;
         }
     }
 
@@ -325,6 +338,63 @@ public class NumbersActivity extends AppCompatActivity {
             }
         }
     }
+
+    private String convertNumberToWordTwi(int num) {
+        if (num < 1 || num > 100) return "";
+        String[] units = {"", "baako", "mienu", "miɛnsa", "nan", "num", "nsia", "nson", "nwɔtwe", "nkron"};
+        String[] tens = {"", "du", "aduonu", "aduasa", "aduanan", "aduonum", "aduosia", "aduɔson", "aduɔwɔtwe", "aduɔkron"};
+
+        if (num < 10) return units[num];
+        if (num == 10) return "du";
+        if (num < 20) return "du" + units[num-10];
+        if (num % 10 == 0) {
+            if(num == 100) return "ɔha";
+            return tens[num/10];
+        }
+        return tens[num/10] + " " + units[num%10];
+    }
+
+    private String convertNumberToWordEwe(int num) {
+        if (num < 1 || num > 100) return "";
+        String[] units = {"", "ɖeka", "eve", "etɔ̃", "ene", "atɔ̃", "adẽ", "adrẽ", "enyi", "asieke"};
+        if (num <= 10) return units[num-1];
+        if (num == 10) return "ewó";
+        if (num < 20) return "ewóí" + units[num-11];
+        if (num % 10 == 0) {
+            if (num == 20) return "blaeve";
+            if (num == 30) return "blaetɔ̃";
+            if (num == 40) return "blaene";
+            if (num == 50) return "blaatɔ̃";
+            if (num == 60) return "blaadẽ";
+            if (num == 70) return "blaadrẽ";
+            if (num == 80) return "blaenyi";
+            if (num == 90) return "blaasieke";
+            if (num == 100) return "alakpa ɖeka";
+        }
+        return convertNumberToWordEwe(num - (num%10)) + " kple " + units[(num%10)-1];
+    }
+
+    private String convertNumberToWordGa(int num) {
+        if (num < 1 || num > 100) return "";
+        String[] units = {"", "ekome", "enyɔ", "etɛ", "ejwɛ", "enumɔ", "ekpaa", "kpawo", "kpaanyɔ", "nɛɛhu"};
+        if (num < 10) return units[num];
+        if (num == 10) return "nyɔŋma";
+        if (num < 20) return "nyɔŋma kɛ " + units[num-10];
+        if (num % 10 == 0) {
+            if (num == 20) return "iwuo";
+            if (num == 30) return "iwuo kɛ nyɔŋma";
+            if (num == 40) return "iwuo enyɔ";
+            if (num == 50) return "iwuo enyɔ kɛ nyɔŋma";
+            if (num == 60) return "iwuo etɛ";
+            if (num == 70) return "iwuo etɛ kɛ nyɔŋma";
+            if (num == 80) return "iwuo ejwɛ";
+            if (num == 90) return "iwuo ejwɛ kɛ nyɔŋma";
+            if (num == 100) return "ohaa";
+        }
+        return convertNumberToWordGa(num - (num % 10)) + " kɛ " + units[num % 10];
+    }
+
+
 
     @Override
     protected void onDestroy() {

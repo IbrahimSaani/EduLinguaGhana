@@ -1,4 +1,4 @@
-package com.edulinguaghana;  // <-- make sure this matches your package
+package com.edulinguaghana;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -39,15 +39,19 @@ public class AlphabetActivity extends AppCompatActivity {
     private boolean isRecitalMode;
 
     private String[] letters;
-    private String[] wordsEn = {
-            "Apple", "Ball", "Cat", "Dog", "Elephant", "Fish", "Goat", "Hat", "Ice Cream", "Jug", "Kite", "Lion", "Monkey",
-            "Nose", "Orange", "Pen", "Queen", "Rainbow", "Sun", "Tiger", "Umbrella", "Violin", "Watch", "Xylophone", "Yoyo", "Zebra"
-    };
-    private String[] wordsFr = {
-            "Avion", "Bateau", "Chien", "Dauphin", "Éléphant", "Fleur", "Girafe", "Hibou", "Île", "Jardin", "Kangourou", "Lune", "Maison",
-            "Nuage", "Oiseau", "Poisson", "Quatre", "Robot", "Soleil", "Train", "Uniforme", "Vache", "Wagon", "Xylophone", "Yaourt", "Zèbre"
-    };
+    private String[] words;
     private int currentIndex = 0;
+
+    // --- ALPHABET & WORD DATA ---
+    private final String[] lettersEnFr = {"A","B","C","D","E","F","G","H","I","J","K","L","M","N","O","P","Q","R","S","T","U","V","W","X","Y","Z"};
+    private final String[] wordsEn = {"Apple", "Ball", "Cat", "Dog", "Elephant", "Fish", "Goat", "Hat", "Ice Cream", "Jug", "Kite", "Lion", "Monkey", "Nose", "Orange", "Pen", "Queen", "Rainbow", "Sun", "Tiger", "Umbrella", "Violin", "Watch", "Xylophone", "Yoyo", "Zebra"};
+    private final String[] wordsFr = {"Avion", "Bateau", "Chien", "Dauphin", "Éléphant", "Fleur", "Girafe", "Hibou", "Île", "Jardin", "Kangourou", "Lune", "Maison", "Nuage", "Oiseau", "Poisson", "Quatre", "Robot", "Soleil", "Train", "Uniforme", "Vache", "Wagon", "Xylophone", "Yaourt", "Zèbre"};
+    private final String[] lettersAk = {"A", "B", "D", "E", "Ɛ", "F", "G", "H", "I", "K", "L", "M", "N", "O", "Ɔ", "P", "R", "S", "T", "U", "W", "Y"};
+    private final String[] wordsAk = {"Akokɔ", "Borɔdeɛ", "Duku", "Etuo", "Ɛmo", "Forosie", "Gari", "Hweaa", "Isu", "Kube", "Lɔre", "Maame", "Nsuo", "Odwan", "Ɔkraman", "Pono", "Prako", "Sika", "Tɛkyerɛma", "Uniwesiti", "Wura", "Yareɛ"};
+    private final String[] lettersEe = {"A", "B", "D", "Ɖ", "E", "Ɛ", "F", "Ƒ", "G", "Ɣ", "H", "X", "I", "K", "L", "M", "N", "Ŋ", "O", "Ɔ", "P", "R", "S", "T", "U", "V", "Ʋ", "W", "Y", "Z"};
+    private final String[] wordsEe = {"Ati", "Baka", "Dadi", "Ɖevi", "Eku", "Ɛfu", "Fia", "Ƒo", "Gbe", "Ɣe", "Ha", "Xɔ", "Iŋk", "Kafu", "Lá", "Me", "Nɔ", "Ŋkɔ", "Oyi", "Ɔli", "Papa", "Rɛdio", "Sɔ", "Tɔ", "Unilɔ", "Vɔ", "Ʋu", "Wó", "Yevú", "Zã"};
+    private final String[] lettersGaa = {"A", "B", "D", "E", "Ɛ", "F", "G", "H", "I", "K", "L", "M", "N", "Ŋ", "O", "Ɔ", "P", "S", "T", "U", "V", "W", "Y", "Z"};
+    private final String[] wordsGaa = {"Akekā", "Blɔfo", "Dade", "Enɔ", "Ɛlɛ", "Fio", "Gbekɛ", "Hejɔ", "Iŋk", "Klala", "Lala", "Maŋ", "Nuu", "Ŋmã", "Okpɔtɔ", "Ɔɔso", "Papa", "Sohaa", "Tee", "Wala", "Vinɔ", "Wɔ", "Yoomo", "Zigidi"};
 
     private TextToSpeech tts;
     private MediaPlayer mediaPlayer;
@@ -81,10 +85,29 @@ public class AlphabetActivity extends AppCompatActivity {
         tvLanguageTitle.setText("Language: " + languageName);
         btnSpeak.setText(isRecitalMode ? "Repeat" : "Practice");
 
-        letters = new String[]{
-                "A","B","C","D","E","F","G","H","I","J","K","L","M",
-                "N","O","P","Q","R","S","T","U","V","W","X","Y","Z"
-        };
+        // --- DYNAMICALLY SET ALPHABET & WORDS ---
+        switch (languageCode) {
+            case "ak":
+                letters = lettersAk;
+                words = wordsAk;
+                break;
+            case "ee":
+                letters = lettersEe;
+                words = wordsEe;
+                break;
+            case "gaa":
+                letters = lettersGaa;
+                words = wordsGaa;
+                break;
+            case "fr":
+                letters = lettersEnFr;
+                words = wordsFr;
+                break;
+            default: // "en" and any other case
+                letters = lettersEnFr;
+                words = wordsEn;
+                break;
+        }
 
         progressBar.setMax(letters.length);
 
@@ -128,11 +151,7 @@ public class AlphabetActivity extends AppCompatActivity {
 
     private void updateLetter() {
         tvLetter.setText(letters[currentIndex]);
-        if ("fr".equals(languageCode)) {
-            tvLetterWord.setText(wordsFr[currentIndex]);
-        } else {
-            tvLetterWord.setText(wordsEn[currentIndex]);
-        }
+        tvLetterWord.setText(words[currentIndex]);
         progressBar.setProgress(currentIndex + 1);
     }
 
@@ -154,7 +173,10 @@ public class AlphabetActivity extends AppCompatActivity {
 
     private int getLetterAudioResId(String lang, String letter) {
         if (lang == null || letter == null) return 0;
-        String fileName = lang.toLowerCase(Locale.ROOT) + "_" + letter.toLowerCase(Locale.ROOT);
+        // Sanitize special characters for resource names
+        String sanitizedLetter = letter.replaceAll("[^a-zA-Z0-9]", "").toLowerCase(Locale.ROOT);
+        if (sanitizedLetter.isEmpty()) return 0;
+        String fileName = lang.toLowerCase(Locale.ROOT) + "_" + sanitizedLetter;
         return getResources().getIdentifier(fileName, "raw", getPackageName());
     }
 
@@ -173,7 +195,7 @@ public class AlphabetActivity extends AppCompatActivity {
     private void startPracticePronunciation() {
         // Only support grading for English & French
         if (!("en".equals(languageCode) || "fr".equals(languageCode))) {
-            Toast.makeText(this, "Pronunciation grading is only available for English and French for now.", Toast.LENGTH_LONG).show();
+            Toast.makeText(this, "Pronunciation grading is not yet available for " + languageName, Toast.LENGTH_LONG).show();
             speakCurrentLetter(); // still let them hear audio
             return;
         }
@@ -213,19 +235,19 @@ public class AlphabetActivity extends AppCompatActivity {
     }
 
     private String getSpeechLocaleCode() {
-        if ("fr".equals(languageCode)) {
-            return "fr-FR";
-        }
+        if ("fr".equals(languageCode)) return "fr-FR";
+        // Add other language speech codes here if supported
         return "en-US";
     }
 
     private Locale getLocaleForLanguage(String code) {
         if (code == null) return Locale.ENGLISH;
         switch (code) {
-            case "fr":
-                return Locale.FRENCH;
-            default:
-                return Locale.ENGLISH;
+            case "fr": return Locale.FRENCH;
+            case "ak": return new Locale("ak");
+            case "ee": return new Locale("ee");
+            case "gaa": return new Locale("gaa");
+            default: return Locale.ENGLISH;
         }
     }
 
@@ -248,10 +270,9 @@ public class AlphabetActivity extends AppCompatActivity {
         String expectedLetter = letters[currentIndex];
 
         if (recognized.length() > 0) {
-            char firstChar = Character.toUpperCase(recognized.charAt(0));
-            char expectedChar = expectedLetter.charAt(0);
+            String simplifiedRecognized = recognized.toUpperCase().substring(0, 1);
 
-            if (firstChar == expectedChar) {
+            if (simplifiedRecognized.equals(expectedLetter)) {
                 Toast.makeText(this, "Great! Pronunciation matched (" + recognized + ")", Toast.LENGTH_LONG).show();
             } else {
                 Toast.makeText(this, "It heard: \"" + recognized + "\". Expected: " + expectedLetter, Toast.LENGTH_LONG).show();
