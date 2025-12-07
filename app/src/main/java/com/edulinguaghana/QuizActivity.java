@@ -15,11 +15,13 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.Toolbar;
 import androidx.core.content.ContextCompat;
 
+import com.airbnb.lottie.LottieAnimationView;
 import com.google.android.material.appbar.AppBarLayout;
+import com.google.android.material.appbar.MaterialToolbar;
 import com.google.android.material.button.MaterialButton;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -30,69 +32,58 @@ import java.util.Random;
 import java.util.Set;
 
 public class QuizActivity extends AppCompatActivity {
+    public static final String PREF_NAME = "EduLinguaPrefs";
+    public static final String KEY_HIGH_SCORE_PREFIX = "high_score_";
+    public static final String KEY_SFX_ENABLED = "sfx_enabled";
 
-    // Views
-    private TextView tvGameTimer, tvGameScore, tvGameBest, tvGameFeedback, tvGamePrompt, tvStartTitle, tvStartDescription, tvEndTitle, tvFinalScore, tvEndBestScore;
-    private MaterialButton btnOption1, btnOption2, btnOption3, btnOption4, btnOption5, btnOption6, btnStartQuiz, btnPlayAgain, btnEndQuit;
-    private View btnPlayAudio;
-    private Toolbar toolbar;
-    private AppBarLayout appBarLayout;
-    private View startQuizContainer, quizContentContainer, endQuizContainer;
-    private ImageView ivQuizIcon;
-
-    // Game state
-    private int score = 0;
-    private int bestScore = 0;
-    private String currentCorrectAnswer;
-    private String currentPromptTtsText;   // what TTS should actually say
-
-    private CountDownTimer countDownTimer;
-    private long remainingTime = 30000L;             // total quiz time: 30s
-    private static final long PENALTY_TIME = 1000L;  // -1s penalty for wrong answer
-
-    // SharedPreferences keys
-    private static final String PREF_NAME = "EduLinguaPrefs";
-    private static final String KEY_HIGH_SCORE_PREFIX = "QUIZ_HIGH_SCORE_";
-    private static final String KEY_SFX_ENABLED = "SFX_ENABLED";
-
-    // Alphabet (letters-only)
-    private final String[] alphabet = {
-            "A","B","C","D","E","F","G","H","I","J","K","L","M",
-            "N","O","P","Q","R","S","T","U","V","W","X","Y","Z"
-    };
-
-    // Matching data (letter → word so kids can relate)
-    private final String[] matchLetters = {"A","B","C","D","E","F"};
-    private final String[] matchWords   = {"Apple","Ball","Cat","Dog","Egg","Fish"};
-
-    // Number settings
-    private static final int MAX_NUMBER = 30;
-
-    // TTS
-    private TextToSpeech tts;
-    private boolean ttsReady = false;
-    private String languageCode;   // "en", "fr", etc.
-    private String languageName;   // "English", "French", etc.
-
-    // SFX
-    private boolean isSfxOn = true;
-
-    // Quiz mode: "letters", "numbers", "sequence", "matching", "mixed"
-    private String quizType = "letters";
+    private static final long PENALTY_TIME = 5000L;
+    private static final int MAX_NUMBER = 50;
 
     private final Random random = new Random();
+
+    private MaterialToolbar toolbar;
+    private AppBarLayout appBarLayout;
+    private View startQuizContainer, quizContentContainer, endQuizContainer;
+
+    // Start screen
+    private TextView tvStartTitle, tvStartDescription;
+    private ImageView ivQuizIcon;
+    private MaterialButton btnStartQuiz;
+
+    // Game screen
+    private TextView tvGameTimer, tvGameScore, tvGameBest, tvGameFeedback, tvGamePrompt;
+    private FloatingActionButton btnPlayAudio;
+    private MaterialButton btnOption1, btnOption2, btnOption3, btnOption4, btnOption5, btnOption6;
+
+    // End screen
+    private TextView tvFinalScore, tvEndBestScore, tvNewHighScore;
+    private MaterialButton btnPlayAgain, btnEndQuit;
+    private LottieAnimationView lottieAnimationView;
+
+    private String quizType, languageCode, languageName;
+    private int score = 0;
+    private int bestScore = 0;
+    private CountDownTimer countDownTimer;
+    private long remainingTime;
+
+    private TextToSpeech tts;
+    private boolean ttsReady = false;
+    private String currentCorrectAnswer;
+    private String currentPromptTtsText;
+    private boolean isSfxOn = true;
+
+    private final String[] alphabet = {"A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z"};
+    private final String[] matchLetters = {"A", "B", "C"};
+    private final String[] matchWords = {"Apple", "Ball", "Cat"};
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_quiz);
 
-        // --- Get language & mode from intent ---
-        languageCode = getIntent().getStringExtra("LANG_CODE");
-        languageName = getIntent().getStringExtra("LANG_NAME");
-
+        languageName = getIntent().getStringExtra("LANGUAGE_NAME");
+        languageCode = getIntent().getStringExtra("LANGUAGE_CODE");
         String rawType = getIntent().getStringExtra("QUIZ_TYPE");
-        if (rawType == null) rawType = getIntent().getStringExtra("QUIZ_MODE");
 
         if (languageCode == null) languageCode = "en";
         if (languageName == null) languageName = "Unknown";
@@ -104,16 +95,18 @@ public class QuizActivity extends AppCompatActivity {
         bindViews();
 
         setSupportActionBar(toolbar);
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        getSupportActionBar().setDisplayShowHomeEnabled(true);
+        if (getSupportActionBar() != null) {
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+            getSupportActionBar().setDisplayShowHomeEnabled(true);
+        }
 
         setupStartScreen();
 
         // Load prefs (high score & SFX setting)
         SharedPreferences prefs = getSharedPreferences(PREF_NAME, MODE_PRIVATE);
         bestScore = prefs.getInt(getHighScoreKey(), 0);
-        isSfxOn   = prefs.getBoolean(KEY_SFX_ENABLED, true);
-        tvGameBest.setText("Best: " + bestScore);
+        isSfxOn = prefs.getBoolean(KEY_SFX_ENABLED, true);
+        tvGameBest.setText(String.format(Locale.getDefault(), getString(R.string.quiz_best_score), bestScore));
 
         initTTS();
 
@@ -134,6 +127,7 @@ public class QuizActivity extends AppCompatActivity {
 
         // End screen buttons
         btnPlayAgain.setOnClickListener(v -> {
+            lottieAnimationView.cancelAnimation();
             endQuizContainer.setVisibility(View.GONE);
             showQuizContent();
         });
@@ -152,26 +146,27 @@ public class QuizActivity extends AppCompatActivity {
         ivQuizIcon = findViewById(R.id.ivQuizIcon);
         btnStartQuiz = findViewById(R.id.btnStartQuiz);
 
-        tvGameTimer    = findViewById(R.id.tvTimer);
-        tvGameScore    = findViewById(R.id.tvScore);
-        tvGameBest     = findViewById(R.id.tvBest);
+        tvGameTimer = findViewById(R.id.tvTimer);
+        tvGameScore = findViewById(R.id.tvScore);
+        tvGameBest = findViewById(R.id.tvBest);
         tvGameFeedback = findViewById(R.id.tvFeedback);
-        tvGamePrompt   = findViewById(R.id.tvGamePrompt);
+        tvGamePrompt = findViewById(R.id.tvGamePrompt);
 
-        btnPlayAudio   = findViewById(R.id.btnPlayAudio);
+        btnPlayAudio = findViewById(R.id.btnPlayAudio);
 
-        btnOption1     = findViewById(R.id.btnOption1);
-        btnOption2     = findViewById(R.id.btnOption2);
-        btnOption3     = findViewById(R.id.btnOption3);
-        btnOption4     = findViewById(R.id.btnOption4);
-        btnOption5     = findViewById(R.id.btnOption5);
-        btnOption6     = findViewById(R.id.btnOption6);
+        btnOption1 = findViewById(R.id.btnOption1);
+        btnOption2 = findViewById(R.id.btnOption2);
+        btnOption3 = findViewById(R.id.btnOption3);
+        btnOption4 = findViewById(R.id.btnOption4);
+        btnOption5 = findViewById(R.id.btnOption5);
+        btnOption6 = findViewById(R.id.btnOption6);
 
-        tvEndTitle = findViewById(R.id.tvEndTitle);
         tvFinalScore = findViewById(R.id.tvFinalScore);
         tvEndBestScore = findViewById(R.id.tvEndBestScore);
         btnPlayAgain = findViewById(R.id.btnPlayAgain);
         btnEndQuit = findViewById(R.id.btnEndQuit);
+        tvNewHighScore = findViewById(R.id.tvNewHighScore);
+        lottieAnimationView = findViewById(R.id.lottieAnimationView);
     }
 
     private void setupStartScreen() {
@@ -206,7 +201,9 @@ public class QuizActivity extends AppCompatActivity {
                 iconRes = R.drawable.ic_quiz_letters;
                 break;
         }
-        getSupportActionBar().setTitle(modeLabel + " – " + languageName);
+        if (getSupportActionBar() != null) {
+            getSupportActionBar().setTitle(modeLabel + " – " + languageName);
+        }
         tvStartTitle.setText(modeLabel);
         tvStartDescription.setText(description);
         ivQuizIcon.setImageResource(iconRes);
@@ -235,10 +232,10 @@ public class QuizActivity extends AppCompatActivity {
     private String normalizeQuizType(String raw) {
         String t = raw.toLowerCase(Locale.ROOT);
         if (t.contains("letter")) return "letters";
-        if (t.contains("sequ"))   return "sequence";
-        if (t.contains("match"))  return "matching";
-        if (t.contains("mix"))    return "mixed";
-        if (t.contains("num"))    return "numbers";
+        if (t.contains("sequ")) return "sequence";
+        if (t.contains("match")) return "matching";
+        if (t.contains("mix")) return "mixed";
+        if (t.contains("num")) return "numbers";
         return t;
     }
 
@@ -271,7 +268,7 @@ public class QuizActivity extends AppCompatActivity {
     private void startGame() {
         score = 0;
         remainingTime = 30000L;
-        tvGameScore.setText("Score: 0");
+        tvGameScore.setText(String.format(Locale.getDefault(), getString(R.string.quiz_score), score));
         tvGameFeedback.setText("");
         generateNewQuestion();
         startTimer();
@@ -280,11 +277,21 @@ public class QuizActivity extends AppCompatActivity {
     private void generateNewQuestion() {
         resetButtons();
         switch (quizType) {
-            case "numbers": generateNumberQuestion(); break;
-            case "sequence": generateSequenceQuestion(); break;
-            case "matching": generateMatchingQuestion(); break;
-            case "mixed": generateMixedQuestion(); break;
-            default: generateLetterQuestion(); break;
+            case "numbers":
+                generateNumberQuestion();
+                break;
+            case "sequence":
+                generateSequenceQuestion();
+                break;
+            case "matching":
+                generateMatchingQuestion();
+                break;
+            case "mixed":
+                generateMixedQuestion();
+                break;
+            default:
+                generateLetterQuestion();
+                break;
         }
         speakPrompt();
     }
@@ -309,7 +316,7 @@ public class QuizActivity extends AppCompatActivity {
         btnOption4.setText(options.get(3));
         btnOption5.setText(options.get(4));
         btnOption6.setText(options.get(5));
-        tvGamePrompt.setText("Which letter did you hear?");
+        tvGamePrompt.setText(R.string.quiz_prompt_letter);
         currentPromptTtsText = currentCorrectAnswer;
     }
 
@@ -334,7 +341,7 @@ public class QuizActivity extends AppCompatActivity {
         btnOption4.setText(options.get(3));
         btnOption5.setText(options.get(4));
         btnOption6.setText(options.get(5));
-        tvGamePrompt.setText("Which number did you hear?");
+        tvGamePrompt.setText(R.string.quiz_prompt_number);
         currentPromptTtsText = currentCorrectAnswer;
     }
 
@@ -389,7 +396,7 @@ public class QuizActivity extends AppCompatActivity {
         String letter = matchLetters[idx];
         String correctWord = matchWords[idx];
         currentCorrectAnswer = correctWord;
-        tvGamePrompt.setText("Which word starts with letter " + letter + "?");
+        tvGamePrompt.setText(getString(R.string.quiz_prompt_matching, letter));
         List<String> options = new ArrayList<>();
         Set<Integer> used = new HashSet<>();
         options.add(correctWord);
@@ -431,7 +438,7 @@ public class QuizActivity extends AppCompatActivity {
 
         if (isCorrect) {
             score++;
-            tvGameFeedback.setText("✅ Correct!");
+            tvGameFeedback.setText(R.string.quiz_feedback_correct);
             tvGameFeedback.setTextColor(ContextCompat.getColor(this, R.color.correctAnswer));
             clickedButton.setStrokeColor(ColorStateList.valueOf(ContextCompat.getColor(this, R.color.correctAnswer)));
             clickedButton.startAnimation(correctAnim);
@@ -442,7 +449,7 @@ public class QuizActivity extends AppCompatActivity {
                 animateHighScore();
             }
         } else {
-            tvGameFeedback.setText("❌ Wrong! Correct: " + currentCorrectAnswer);
+            tvGameFeedback.setText(getString(R.string.quiz_feedback_wrong, currentCorrectAnswer));
             tvGameFeedback.setTextColor(ContextCompat.getColor(this, R.color.wrongAnswer));
             clickedButton.setStrokeColor(ColorStateList.valueOf(ContextCompat.getColor(this, R.color.wrongAnswer)));
             clickedButton.startAnimation(wrongAnim);
@@ -451,7 +458,7 @@ public class QuizActivity extends AppCompatActivity {
             if (remainingTime < 0) remainingTime = 0;
         }
 
-        tvGameScore.setText("Score: " + score);
+        tvGameScore.setText(String.format(Locale.getDefault(), getString(R.string.quiz_score), score));
         setButtonsEnabled(false);
 
         new Handler().postDelayed(() -> {
@@ -471,13 +478,13 @@ public class QuizActivity extends AppCompatActivity {
             public void onTick(long millisUntilFinished) {
                 remainingTime = millisUntilFinished;
                 long s = millisUntilFinished / 1000;
-                tvGameTimer.setText("Time: " + s + "s");
+                tvGameTimer.setText(String.format(Locale.getDefault(), getString(R.string.quiz_timer), s));
             }
 
             @Override
             public void onFinish() {
                 remainingTime = 0;
-                tvGameTimer.setText("Time: 0s");
+                tvGameTimer.setText(R.string.quiz_timer_done);
                 endQuiz();
             }
         }.start();
@@ -486,6 +493,8 @@ public class QuizActivity extends AppCompatActivity {
     private void endQuiz() {
         cancelTimer();
         setButtonsEnabled(false);
+
+        boolean newHighScore = score > 0 && score >= bestScore;
 
         // Update overall progress
         ProgressManager.updateProgress(this, quizType, score, score);
@@ -497,8 +506,19 @@ public class QuizActivity extends AppCompatActivity {
         endQuizContainer.setVisibility(View.VISIBLE);
         endQuizContainer.startAnimation(fadeIn);
 
-        tvFinalScore.setText("Your Score: " + score);
-        tvEndBestScore.setText("Best Score: " + bestScore);
+        tvFinalScore.setText(String.format(Locale.getDefault(), getString(R.string.quiz_final_score), score));
+        tvEndBestScore.setText(String.format(Locale.getDefault(), getString(R.string.quiz_best_score), bestScore));
+
+        if (newHighScore) {
+            tvNewHighScore.setVisibility(View.VISIBLE);
+            Animation bouncePop = AnimationUtils.loadAnimation(this, R.anim.bounce_pop);
+            tvNewHighScore.startAnimation(bouncePop);
+            lottieAnimationView.playAnimation();
+        } else {
+            tvNewHighScore.setVisibility(View.GONE);
+            lottieAnimationView.cancelAnimation();
+            lottieAnimationView.setProgress(0f);
+        }
     }
 
     private void cancelTimer() {
@@ -534,7 +554,7 @@ public class QuizActivity extends AppCompatActivity {
     private void saveHighScore() {
         SharedPreferences prefs = getSharedPreferences(PREF_NAME, MODE_PRIVATE);
         prefs.edit().putInt(getHighScoreKey(), bestScore).apply();
-        tvGameBest.setText("Best: " + bestScore);
+        tvGameBest.setText(String.format(Locale.getDefault(), getString(R.string.quiz_best_score), bestScore));
     }
 
     private void animateHighScore() {

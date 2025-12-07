@@ -34,4 +34,16 @@
     <string name="content_description_previous">Previous</string>
     <string name="content_description_next">Next</string>
     <string name="content_description_back">Back</string>
+
+    <!-- Quiz -->
+    <string name="quiz_prompt_letter">Which letter did you hear?</string>
+    <string name="quiz_prompt_number">Which number did you hear?</string>
+    <string name="quiz_prompt_matching">Which word starts with letter %s?</string>
+    <string name="quiz_feedback_correct">✅ Correct!</string>
+    <string name="quiz_feedback_wrong">❌ Wrong! Correct: %s</string>
+    <string name="quiz_timer">Time: %ds</string>
+    <string name="quiz_timer_done">Time: 0s</string>
+    <string name="quiz_score">Score: %d</string>
+    <string name="quiz_best_score">Best: %d</string>
+    <string name="quiz_final_score">Your Score: %d</string>
 </resources>
