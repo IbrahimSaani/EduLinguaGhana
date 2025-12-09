@@ -18,7 +18,7 @@
             android:id="@+id/toolbar"
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
-            app:title="Quiz Mode" />
+            app:title="@string/quiz_title" />
 
     </com.google.android.material.appbar.AppBarLayout>
 
@@ -87,7 +87,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="24dp"
-                    android:text="Start Quiz" />
+                    android:text="@string/quiz_start_button" />
 
             </LinearLayout>
         </ScrollView>
@@ -165,9 +165,9 @@
                             android:id="@+id/tvGamePrompt"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
+                            android:layout_alignParentStart="true"
                             android:layout_centerVertical="true"
                             android:layout_toStartOf="@+id/btnPlayAudio"
-                            android:layout_alignParentStart="true"
                             android:textAppearance="?attr/textAppearanceHeadline5"
                             tools:text="Which letter did you hear?" />
 
@@ -178,7 +178,7 @@
                             android:layout_alignParentEnd="true"
                             android:layout_centerVertical="true"
                             android:layout_marginStart="16dp"
-                            android:contentDescription="Play Audio Prompt"
+                            android:contentDescription="@string/quiz_play_audio_description"
                             app:srcCompat="@drawable/ic_play_audio" />
 
                     </RelativeLayout>
@@ -238,8 +238,8 @@
                     android:id="@+id/tvFeedback"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:gravity="center"
                     android:layout_marginTop="16dp"
+                    android:gravity="center"
                     android:textAppearance="?attr/textAppearanceHeadline6"
                     tools:text="✅ Correct!" />
 
@@ -261,9 +261,9 @@
                 android:id="@+id/lottieAnimationView"
                 android:layout_width="200dp"
                 android:layout_height="200dp"
-                app:lottie_rawRes="@raw/kids_animation"
                 app:lottie_autoPlay="true"
-                app:lottie_loop="true"/>
+                app:lottie_loop="true"
+                app:lottie_rawRes="@raw/kids_animation" />
 
             <TextView
                 android:id="@+id/tvEndTitle"
@@ -271,7 +271,7 @@
                 android:layout_height="wrap_content"
                 android:fontFamily="@font/agbalumo"
                 android:gravity="center"
-                android:text="Time's Up!"
+                android:text="@string/quiz_end_title"
                 android:textAppearance="?attr/textAppearanceHeadline4" />
 
             <TextView
@@ -281,7 +281,7 @@
                 android:layout_marginTop="16dp"
                 android:fontFamily="@font/agbalumo"
                 android:gravity="center"
-                android:text="New High Score! 🎉"
+                android:text="@string/quiz_end_new_high_score"
                 android:textAppearance="?attr/textAppearanceHeadline5"
                 android:textColor="?attr/colorPrimary"
                 android:visibility="gone"
@@ -316,14 +316,14 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginEnd="8dp"
-                    android:text="Play Again" />
+                    android:text="@string/quiz_play_again_button" />
 
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/btnEndQuit"
                     style="@style/Widget.Material3.Button.OutlinedButton"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Quit" />
+                    android:text="@string/quiz_quit_button" />
             </LinearLayout>
 
         </LinearLayout>

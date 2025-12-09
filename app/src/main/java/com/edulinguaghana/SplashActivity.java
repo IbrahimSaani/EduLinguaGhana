@@ -5,8 +5,10 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.content.Intent;
 import android.media.MediaPlayer;
 import android.os.Bundle;
+import android.os.CountDownTimer;
 import android.view.animation.OvershootInterpolator;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 public class SplashActivity extends AppCompatActivity {
@@ -17,6 +19,7 @@ public class SplashActivity extends AppCompatActivity {
     private ImageView ivLogo;
     private TextView tvAppNameSplash;
     private TextView tvTaglineSplash;
+    private ProgressBar progressBar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -27,10 +30,11 @@ public class SplashActivity extends AppCompatActivity {
         ivLogo = findViewById(R.id.ivLogo);
         tvAppNameSplash = findViewById(R.id.tvAppNameSplash);
         tvTaglineSplash = findViewById(R.id.tvTaglineSplash);
+        progressBar = findViewById(R.id.progressBar);
 
         setupInitialAnimationState();
         startIntroAnimations();
-        playStartSoundAndThenOpenMain();
+        startLoading();
     }
 
     private void setupInitialAnimationState() {
@@ -76,27 +80,70 @@ public class SplashActivity extends AppCompatActivity {
                 .start();
     }
 
-    private void playStartSoundAndThenOpenMain() {
+    private void startLoading() {
+        // Define a fallback mechanism for a standard 3-second splash
+        Runnable fallback = () -> {
+            new CountDownTimer(3000, 30) {
+                @Override
+                public void onTick(long millisUntilFinished) {
+                    progressBar.setProgress((int) (((3000 - millisUntilFinished) * 100) / 3000));
+                }
+                @Override
+                public void onFinish() {
+                    progressBar.setProgress(100);
+                    openMainScreen();
+                }
+            }.start();
+        };
+
         try {
             startPlayer = MediaPlayer.create(this, R.raw.app_start);
 
             if (startPlayer == null) {
-                openMainScreen();
+                fallback.run();
                 return;
             }
 
-            startPlayer.setOnCompletionListener(mp -> {
-                mp.release();
+            int soundDuration = startPlayer.getDuration();
+            if (soundDuration <= 0) { // Check for invalid duration
+                startPlayer.release();
                 startPlayer = null;
+                fallback.run();
+                return;
+            }
+
+            progressBar.setMax(100);
+
+            // Navigate when sound completes
+            startPlayer.setOnCompletionListener(mp -> {
+                if (startPlayer != null) {
+                    mp.release();
+                    startPlayer = null;
+                }
                 openMainScreen();
             });
+
+            // Update progress bar in sync with sound
+            new CountDownTimer(soundDuration, 30) {
+                @Override
+                public void onTick(long millisUntilFinished) {
+                    int progress = (int) ((((long)soundDuration - millisUntilFinished) * 100) / soundDuration);
+                    progressBar.setProgress(progress);
+                }
+                @Override
+                public void onFinish() {
+                    progressBar.setProgress(100);
+                }
+            }.start();
 
             startPlayer.start();
 
         } catch (Exception e) {
-            openMainScreen();
+            // If anything goes wrong, just use the fallback
+            fallback.run();
         }
     }
+
 
     private void openMainScreen() {
         if (hasNavigated) return;   // avoid double navigation

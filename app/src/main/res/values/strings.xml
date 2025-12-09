@@ -46,4 +46,11 @@
     <string name="quiz_score">Score: %d</string>
     <string name="quiz_best_score">Best: %d</string>
     <string name="quiz_final_score">Your Score: %d</string>
+    <string name="quiz_title">Quiz Mode</string>
+    <string name="quiz_start_button">Start Quiz</string>
+    <string name="quiz_play_audio_description">Play Audio Prompt</string>
+    <string name="quiz_end_title">Time Up</string>
+    <string name="quiz_end_new_high_score">New High Score! 🎉</string>
+    <string name="quiz_play_again_button">Play Again</string>
+    <string name="quiz_quit_button">Quit</string>
 </resources>
