@@ -2,16 +2,37 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#2196F3"
+    android:background="@drawable/bg_splash_gradient"
     android:gravity="center"
-    android:padding="24dp">
+    android:padding="24dp"
+    android:clipToPadding="false">
+
+    <ImageView
+        android:id="@+id/topWave"
+        android:layout_width="match_parent"
+        android:layout_height="140dp"
+        android:layout_alignParentTop="true"
+        android:scaleType="fitXY"
+        android:src="@drawable/ic_wave_top"
+        android:alpha="0.45" />
+
+    <ImageView
+        android:id="@+id/bottomWave"
+        android:layout_width="match_parent"
+        android:layout_height="160dp"
+        android:layout_alignParentBottom="true"
+        android:scaleType="fitXY"
+        android:src="@drawable/ic_wave_bottom"
+        android:alpha="0.5" />
 
     <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_centerInParent="true"
         android:gravity="center"
-        android:orientation="vertical">
+        android:orientation="vertical"
+        android:background="@drawable/bg_splash_center_card"
+        android:padding="24dp">
 
         <ImageView
             android:id="@+id/ivLogo"
