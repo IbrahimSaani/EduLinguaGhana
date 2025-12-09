@@ -53,4 +53,5 @@
     <string name="quiz_end_new_high_score">New High Score! 🎉</string>
     <string name="quiz_play_again_button">Play Again</string>
     <string name="quiz_quit_button">Quit</string>
+    <string name="splash_progress_label">Loading fun adventures...</string>
 </resources>
