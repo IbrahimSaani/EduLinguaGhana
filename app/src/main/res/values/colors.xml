@@ -28,4 +28,22 @@
     <color name="progressScreenBackground">#EDE7F6</color>
     <color name="progressTitleColor">#4527A0</color>
     <color name="achievementsTextColor">#5D4037</color>
+
+    <!-- Playful palette -->
+    <color name="playfulSkyStart">#FDF2FF</color>
+    <color name="playfulSkyEnd">#E3F2FD</color>
+    <color name="playfulHeroStart">#FFE7F7</color>
+    <color name="playfulHeroEnd">#FFF5E5</color>
+    <color name="languageCardStart">#E0F7FA</color>
+    <color name="languageCardEnd">#F1F8E9</color>
+    <color name="modeRecitalStart">#FFECB3</color>
+    <color name="modeRecitalEnd">#FFE0B2</color>
+    <color name="modePracticeStart">#EDE7F6</color>
+    <color name="modePracticeEnd">#D1C4E9</color>
+    <color name="modeQuizStart">#B2EBF2</color>
+    <color name="modeQuizEnd">#80DEEA</color>
+    <color name="modeProgressStart">#C8E6C9</color>
+    <color name="modeProgressEnd">#A5D6A7</color>
+    <color name="chipSurface">#FFFFFFFF</color>
+    <color name="chipStroke">#DFE7FF</color>
 </resources>

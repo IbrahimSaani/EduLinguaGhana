@@ -54,4 +54,24 @@
     <string name="quiz_play_again_button">Play Again</string>
     <string name="quiz_quit_button">Quit</string>
     <string name="splash_progress_label">Loading fun adventures...</string>
+
+    <!-- Main screen refresh -->
+    <string name="main_tap_hint">Tap the glowing bubble to play or pause.</string>
+    <string name="main_subtitle">Learning adventures for curious kids</string>
+    <string name="main_language_label">Choose your language buddy</string>
+    <string name="main_language_hint">Swipe to pick the language you want to explore.</string>
+    <string name="main_mode_label">Pick a fun mode</string>
+    <string name="main_best_score_placeholder">Best quiz score: 0 / 10</string>
+    <string name="mode_recital_title">Recital Mode</string>
+    <string name="mode_recital_desc">Listen to letters, sounds, and numbers.</string>
+    <string name="mode_practice_title">Practice Mode</string>
+    <string name="mode_practice_desc">Repeat words and polish pronunciation.</string>
+    <string name="mode_quiz_title">Quiz Mode</string>
+    <string name="mode_quiz_desc">Play mini-games to test your memory.</string>
+    <string name="mode_progress_title">Progress Tracker</string>
+    <string name="mode_progress_desc">See your badges, stars, and scores.</string>
+    <string name="mode_cta_play">Let\'s go!</string>
+    <string name="mode_cta_ready">I\'m ready!</string>
+    <string name="mode_cta_game_on">Game on!</string>
+    <string name="mode_cta_view">View stats</string>
 </resources>
