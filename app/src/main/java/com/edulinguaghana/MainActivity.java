@@ -80,7 +80,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void setupAnimation() {
-        AnimatorSet pulse = (AnimatorSet) AnimatorInflater.loadAnimator(this, R.anim.pulse);
+        AnimatorSet pulse = (AnimatorSet) AnimatorInflater.loadAnimator(this, R.animator.pulse);
         pulse.setTarget(lottieAnimationView);
         pulse.start();
 
@@ -243,7 +243,7 @@ public class MainActivity extends AppCompatActivity {
     // ---------------- BUTTON ACTIONS ----------------
 
     private void setupButtons() {
-        AnimatorSet cardClickAnimation = (AnimatorSet) AnimatorInflater.loadAnimator(this, R.anim.card_click_animation);
+        AnimatorSet cardClickAnimation = (AnimatorSet) AnimatorInflater.loadAnimator(this, R.animator.card_click_animation);
 
         btnRecitalMode.setOnClickListener(v -> {
             cardClickAnimation.setTarget(v);
