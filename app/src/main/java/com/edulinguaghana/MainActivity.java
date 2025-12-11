@@ -28,6 +28,10 @@ import com.google.android.material.card.MaterialCardView;
 import com.google.android.material.chip.Chip;
 import com.google.android.material.chip.ChipGroup;
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+
 public class MainActivity extends AppCompatActivity {
 
     private ChipGroup languageChipGroup;
@@ -106,6 +110,9 @@ public class MainActivity extends AppCompatActivity {
             Intent intent = new Intent(MainActivity.this, SettingsActivity.class);
             startActivity(intent);
             return true;
+        } else if (item.getItemId() == R.id.action_license) {
+            showLicenseDialog();
+            return true;
         }
         return super.onOptionsItemSelected(item);
     }
@@ -158,6 +165,24 @@ public class MainActivity extends AppCompatActivity {
 
         // Close immediately
         finish();
+    }
+    
+    private void showLicenseDialog() {
+        try (InputStream inputStream = getResources().openRawResource(R.raw.license);
+             ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream()) {
+            byte[] buffer = new byte[1024];
+            int length;
+            while ((length = inputStream.read(buffer)) != -1) {
+                byteArrayOutputStream.write(buffer, 0, length);
+            }
+            new AlertDialog.Builder(this)
+                    .setTitle("License")
+                    .setMessage(byteArrayOutputStream.toString())
+                    .setPositiveButton("Close", null)
+                    .show();
+        } catch (IOException e) {
+             Toast.makeText(this, "Could not load license.", Toast.LENGTH_SHORT).show();
+        }
     }
 
     // ---------------- INTRO DIALOG ----------------
