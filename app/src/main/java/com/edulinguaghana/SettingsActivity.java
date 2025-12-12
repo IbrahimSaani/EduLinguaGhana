@@ -49,19 +49,9 @@ public class SettingsActivity extends AppCompatActivity {
         // Find views
         switchMusic = findViewById(R.id.switchMusic);
         switchSfx = findViewById(R.id.switchSfx);
-        // Guarded lookup: layout may differ across variants; use identifier lookup and null check
-        int animSwitchId = getResources().getIdentifier("switchAnimations", "id", getPackageName());
-        if (animSwitchId != 0) {
-            switchAnimations = findViewById(animSwitchId);
-        } else {
-            switchAnimations = null;
-        }
-        int lowPowerSwitchId = getResources().getIdentifier("switchLowPowerAnimations", "id", getPackageName());
-        if (lowPowerSwitchId != 0) {
-            switchLowPowerAnimations = findViewById(lowPowerSwitchId);
-        } else {
-            switchLowPowerAnimations = null;
-        }
+        // Direct lookups (layout contains these ids)
+        switchAnimations = findViewById(R.id.switchAnimations);
+        switchLowPowerAnimations = findViewById(R.id.switchLowPowerAnimations);
         btnResetProgress = findViewById(R.id.btnResetProgress);
         rgTheme = findViewById(R.id.rgTheme);
         rbLight = findViewById(R.id.rbLight);
@@ -79,12 +69,8 @@ public class SettingsActivity extends AppCompatActivity {
         // Set UI states
         switchMusic.setChecked(musicEnabled);
         switchSfx.setChecked(sfxEnabled);
-        if (switchAnimations != null) {
-            switchAnimations.setChecked(animationsEnabled);
-        }
-        if (switchLowPowerAnimations != null) {
-            switchLowPowerAnimations.setChecked(lowPowerEnabled);
-        }
+        switchAnimations.setChecked(animationsEnabled);
+        switchLowPowerAnimations.setChecked(lowPowerEnabled);
         updateThemeRadioButtons(currentTheme);
 
         // Save preferences when toggles change
@@ -96,17 +82,13 @@ public class SettingsActivity extends AppCompatActivity {
             prefs.edit().putBoolean(KEY_SFX_ENABLED, isChecked).apply();
         });
 
-        if (switchAnimations != null) {
-            switchAnimations.setOnCheckedChangeListener((buttonView, isChecked) -> {
-                prefs.edit().putBoolean(KEY_ANIMATIONS_ENABLED, isChecked).apply();
-            });
-        }
+        switchAnimations.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            prefs.edit().putBoolean(KEY_ANIMATIONS_ENABLED, isChecked).apply();
+        });
 
-        if (switchLowPowerAnimations != null) {
-            switchLowPowerAnimations.setOnCheckedChangeListener((buttonView, isChecked) -> {
-                prefs.edit().putBoolean(KEY_LOW_POWER_ANIMATIONS, isChecked).apply();
-            });
-        }
+        switchLowPowerAnimations.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            prefs.edit().putBoolean(KEY_LOW_POWER_ANIMATIONS, isChecked).apply();
+        });
 
         // Change theme when radio button is selected
         rgTheme.setOnCheckedChangeListener((group, checkedId) -> {
