@@ -25,75 +25,120 @@
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:fillViewport="true"
         app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:padding="16dp">
+            android:padding="20dp"
+            android:clipToPadding="false"
+            android:clipChildren="false">
 
             <!-- Audio Settings -->
             <com.google.android.material.card.MaterialCardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="16dp"
-                app:cardCornerRadius="12dp"
-                app:cardElevation="4dp">
+                android:layout_marginBottom="20dp"
+                app:cardCornerRadius="16dp"
+                app:cardElevation="2dp"
+                app:strokeWidth="0dp">
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="vertical"
-                    android:padding="16dp">
+                    android:padding="20dp">
 
-                    <TextView
-                        android:layout_width="wrap_content"
+                    <LinearLayout
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginBottom="12dp"
-                        app:drawableStartCompat="@drawable/ic_audio_settings"
-                        android:drawablePadding="12dp"
                         android:gravity="center_vertical"
-                        android:text="@string/settings_audio_title"
-                        android:textColor="@color/textColorPrimary"
-                        android:textSize="16sp"
-                        android:textStyle="bold" />
+                        android:layout_marginBottom="16dp"
+                        android:orientation="horizontal">
+
+                        <ImageView
+                            android:layout_width="28dp"
+                            android:layout_height="28dp"
+                            android:src="@drawable/ic_audio_settings"
+                            app:tint="@color/colorPrimary"
+                            android:contentDescription="@string/settings_audio_title" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="12dp"
+                            android:text="@string/settings_audio_title"
+                            android:textColor="@color/textColorPrimary"
+                            android:textSize="18sp"
+                            android:textStyle="bold" />
+                    </LinearLayout>
 
                     <com.google.android.material.switchmaterial.SwitchMaterial
                         android:id="@+id/switchMusic"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:minHeight="48dp"
+                        android:minHeight="56dp"
+                        android:paddingStart="4dp"
+                        android:paddingEnd="4dp"
                         android:text="@string/settings_background_music"
-                        android:textColor="@color/textColorSecondary"
-                        android:textSize="14sp" />
+                        android:textColor="@color/textColorPrimary"
+                        android:textSize="15sp" />
+
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="1dp"
+                        android:layout_marginStart="4dp"
+                        android:layout_marginEnd="4dp"
+                        android:background="@color/chipStroke" />
 
                     <com.google.android.material.switchmaterial.SwitchMaterial
                         android:id="@+id/switchSfx"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:minHeight="48dp"
+                        android:minHeight="56dp"
+                        android:paddingStart="4dp"
+                        android:paddingEnd="4dp"
                         android:text="@string/settings_sound_effects"
-                        android:textColor="@color/textColorSecondary"
-                        android:textSize="14sp" />
+                        android:textColor="@color/textColorPrimary"
+                        android:textSize="15sp" />
+
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="1dp"
+                        android:layout_marginStart="4dp"
+                        android:layout_marginEnd="4dp"
+                        android:background="@color/chipStroke" />
 
                     <com.google.android.material.switchmaterial.SwitchMaterial
                         android:id="@+id/switchAnimations"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:minHeight="48dp"
+                        android:minHeight="56dp"
+                        android:paddingStart="4dp"
+                        android:paddingEnd="4dp"
                         android:text="@string/settings_background_animations"
-                        android:textColor="@color/textColorSecondary"
-                        android:textSize="14sp" />
+                        android:textColor="@color/textColorPrimary"
+                        android:textSize="15sp" />
+
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="1dp"
+                        android:layout_marginStart="4dp"
+                        android:layout_marginEnd="4dp"
+                        android:background="@color/chipStroke" />
 
                     <com.google.android.material.switchmaterial.SwitchMaterial
                         android:id="@+id/switchLowPowerAnimations"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:minHeight="48dp"
+                        android:minHeight="56dp"
+                        android:paddingStart="4dp"
+                        android:paddingEnd="4dp"
                         android:text="@string/settings_low_power_animations"
-                        android:textColor="@color/textColorSecondary"
-                        android:textSize="14sp" />
+                        android:textColor="@color/textColorPrimary"
+                        android:textSize="15sp" />
 
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
@@ -102,58 +147,82 @@
             <com.google.android.material.card.MaterialCardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="16dp"
-                app:cardCornerRadius="12dp"
-                app:cardElevation="4dp">
+                android:layout_marginBottom="20dp"
+                app:cardCornerRadius="16dp"
+                app:cardElevation="2dp"
+                app:strokeWidth="0dp">
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="vertical"
-                    android:padding="16dp">
+                    android:padding="20dp">
 
-                    <TextView
-                        android:layout_width="wrap_content"
+                    <LinearLayout
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginBottom="12dp"
-                        app:drawableStartCompat="@drawable/ic_theme"
-                        android:drawablePadding="12dp"
                         android:gravity="center_vertical"
-                        android:text="@string/settings_theme_title"
-                        android:textColor="@color/textColorPrimary"
-                        android:textSize="16sp"
-                        android:textStyle="bold" />
+                        android:layout_marginBottom="16dp"
+                        android:orientation="horizontal">
+
+                        <ImageView
+                            android:layout_width="28dp"
+                            android:layout_height="28dp"
+                            android:src="@drawable/ic_theme"
+                            app:tint="@color/colorPrimary"
+                            android:contentDescription="@string/settings_theme_title" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="12dp"
+                            android:text="@string/settings_theme_title"
+                            android:textColor="@color/textColorPrimary"
+                            android:textSize="18sp"
+                            android:textStyle="bold" />
+                    </LinearLayout>
 
                     <RadioGroup
                         android:id="@+id/rgTheme"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:orientation="vertical">
+                        android:orientation="vertical"
+                        android:paddingStart="4dp"
+                        android:paddingEnd="4dp">
 
                         <RadioButton
                             android:id="@+id/rbLight"
-                            android:layout_width="wrap_content"
+                            android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:minHeight="48dp"
+                            android:minHeight="52dp"
+                            android:paddingStart="8dp"
+                            android:paddingEnd="8dp"
                             android:text="@string/settings_theme_light"
-                            android:textColor="@color/textColorSecondary" />
+                            android:textColor="@color/textColorPrimary"
+                            android:textSize="15sp" />
 
                         <RadioButton
                             android:id="@+id/rbDark"
-                            android:layout_width="wrap_content"
+                            android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:minHeight="48dp"
+                            android:minHeight="52dp"
+                            android:paddingStart="8dp"
+                            android:paddingEnd="8dp"
                             android:text="@string/settings_theme_dark"
-                            android:textColor="@color/textColorSecondary" />
+                            android:textColor="@color/textColorPrimary"
+                            android:textSize="15sp" />
 
                         <RadioButton
                             android:id="@+id/rbSystem"
-                            android:layout_width="wrap_content"
+                            android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:checked="true"
-                            android:minHeight="48dp"
+                            android:minHeight="52dp"
+                            android:paddingStart="8dp"
+                            android:paddingEnd="8dp"
                             android:text="@string/settings_theme_system"
-                            android:textColor="@color/textColorSecondary" />
+                            android:textColor="@color/textColorPrimary"
+                            android:textSize="15sp" />
                     </RadioGroup>
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
@@ -162,43 +231,66 @@
             <com.google.android.material.card.MaterialCardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                app:cardCornerRadius="12dp"
-                app:cardElevation="4dp">
+                android:layout_marginBottom="20dp"
+                app:cardCornerRadius="16dp"
+                app:cardElevation="2dp"
+                app:strokeWidth="0dp">
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="vertical"
-                    android:padding="16dp">
+                    android:padding="20dp">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:gravity="center_vertical"
+                        android:layout_marginBottom="16dp"
+                        android:orientation="horizontal">
+
+                        <ImageView
+                            android:layout_width="28dp"
+                            android:layout_height="28dp"
+                            android:src="@drawable/ic_delete"
+                            app:tint="@color/wrongAnswer"
+                            android:contentDescription="@string/settings_progress_title" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="12dp"
+                            android:text="@string/settings_progress_title"
+                            android:textColor="@color/textColorPrimary"
+                            android:textSize="18sp"
+                            android:textStyle="bold" />
+                    </LinearLayout>
 
                     <TextView
-                        android:layout_width="wrap_content"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginBottom="12dp"
-                        app:drawableStartCompat="@drawable/ic_delete"
-                        android:drawablePadding="12dp"
-                        android:gravity="center_vertical"
-                        android:text="@string/settings_progress_title"
-                        android:textColor="@color/textColorPrimary"
-                        android:textSize="16sp"
-                        android:textStyle="bold" />
+                        android:layout_marginBottom="16dp"
+                        android:paddingStart="4dp"
+                        android:paddingEnd="4dp"
+                        android:text="@string/settings_reset_warning"
+                        android:textColor="@color/textColorSecondary"
+                        android:textSize="14sp"
+                        android:lineSpacingExtra="2dp" />
 
                     <com.google.android.material.button.MaterialButton
                         android:id="@+id/btnResetProgress"
                         style="@style/Widget.Material3.Button"
                         android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginBottom="8dp"
-                        android:padding="12dp"
+                        android:layout_height="56dp"
                         android:text="@string/settings_reset_progress"
+                        android:textSize="15sp"
+                        android:textStyle="bold"
+                        app:icon="@drawable/ic_delete"
+                        app:iconGravity="textStart"
+                        app:iconPadding="8dp"
+                        app:cornerRadius="12dp"
                         app:backgroundTint="@color/wrongAnswer" />
 
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="@string/settings_reset_warning"
-                        android:textColor="@color/textColorSecondary"
-                        android:textSize="12sp" />
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
 
