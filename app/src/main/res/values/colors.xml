@@ -46,4 +46,18 @@
     <color name="modeProgressEnd">#A5D6A7</color>
     <color name="chipSurface">#FFFFFFFF</color>
     <color name="chipStroke">#DFE7FF</color>
+
+    <!-- Dynamic background palette -->
+    <color name="bgMorningStart">#FFF5D6</color>
+    <color name="bgMorningMid">#FFE6F2</color>
+    <color name="bgMorningEnd">#FFD9EC</color>
+    <color name="bgDayStart">#DFF5FF</color>
+    <color name="bgDayMid">#FCE4EC</color>
+    <color name="bgDayEnd">#FFFDE7</color>
+    <color name="bgNightStart">#0D1B3D</color>
+    <color name="bgNightMid">#192863</color>
+    <color name="bgNightEnd">#3F2B96</color>
+    <color name="sparkleCore">#99FFFFFF</color>
+    <color name="sparkleHalo">#66FFD8A8</color>
+    <color name="sparkleHaloSecondary">#664FC3F7</color>
 </resources>

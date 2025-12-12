@@ -2,6 +2,8 @@ package com.edulinguaghana;
 
 import android.animation.AnimatorInflater;
 import android.animation.AnimatorSet;
+import android.animation.ObjectAnimator;
+import android.animation.ValueAnimator;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -10,10 +12,12 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.VibrationEffect;
 import android.os.Vibrator;
+import android.content.res.ColorStateList;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.animation.AnimationUtils;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -21,9 +25,13 @@ import androidx.activity.OnBackPressedCallback;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+import androidx.coordinatorlayout.widget.CoordinatorLayout;
+import androidx.core.content.ContextCompat;
+import androidx.core.widget.ImageViewCompat;
 import androidx.core.widget.NestedScrollView;
 
 import com.airbnb.lottie.LottieAnimationView;
+import com.google.android.material.appbar.AppBarLayout;
 import com.google.android.material.card.MaterialCardView;
 import com.google.android.material.chip.Chip;
 import com.google.android.material.chip.ChipGroup;
@@ -31,14 +39,18 @@ import com.google.android.material.chip.ChipGroup;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Calendar;
 
 public class MainActivity extends AppCompatActivity {
 
+    private CoordinatorLayout rootCoordinator;
+    private ImageView dynamicBackgroundOverlay;
     private ChipGroup languageChipGroup;
     private MaterialCardView btnRecitalMode, btnPracticeMode, btnQuizMode, btnProgressMode;
     private TextView tvBestScoreMain;
     private LottieAnimationView lottieAnimationView;
     private NestedScrollView nestedScrollView;
+    private ObjectAnimator overlayPulseAnimator;
 
     private static final String PREF_NAME = "EduLinguaPrefs";
     private static final String KEY_HIGH_SCORE = "HIGH_SCORE";
@@ -65,6 +77,8 @@ public class MainActivity extends AppCompatActivity {
             getSupportActionBar().setTitle(null);
         }
 
+        rootCoordinator = findViewById(R.id.rootCoordinator);
+        dynamicBackgroundOverlay = findViewById(R.id.dynamicBackgroundOverlay);
         languageChipGroup = findViewById(R.id.languageChipGroup);
         btnRecitalMode = findViewById(R.id.btnRecitalMode);
         btnPracticeMode = findViewById(R.id.btnPracticeMode);
@@ -74,6 +88,7 @@ public class MainActivity extends AppCompatActivity {
         lottieAnimationView = findViewById(R.id.lottieAnimationView);
         nestedScrollView = findViewById(R.id.nestedScrollView);
 
+        setupDynamicBackground();
         setupAnimation();
         setupLanguageChips();
         restoreLastLanguageSelection();
@@ -123,6 +138,14 @@ public class MainActivity extends AppCompatActivity {
         SharedPreferences prefs = getSharedPreferences(PREF_NAME, MODE_PRIVATE);
         int highScore = prefs.getInt(KEY_HIGH_SCORE, 0);
         tvBestScoreMain.setText("Best quiz score: " + highScore + " / 10");
+        applyDynamicBackground();
+        startOverlayPulse();
+    }
+
+    @Override
+    protected void onPause() {
+        stopOverlayPulse();
+        super.onPause();
     }
 
     // ---------------- BACK HANDLER ----------------
@@ -166,7 +189,7 @@ public class MainActivity extends AppCompatActivity {
         // Close immediately
         finish();
     }
-    
+
     private void showLicenseDialog() {
         try (InputStream inputStream = getResources().openRawResource(R.raw.license);
              ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream()) {
@@ -181,7 +204,7 @@ public class MainActivity extends AppCompatActivity {
                     .setPositiveButton("Close", null)
                     .show();
         } catch (IOException e) {
-             Toast.makeText(this, "Could not load license.", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "Could not load license.", Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -399,12 +422,66 @@ public class MainActivity extends AppCompatActivity {
     private void setupScrollAnimations() {
         nestedScrollView.setOnScrollChangeListener((NestedScrollView.OnScrollChangeListener) (v, scrollX, scrollY, oldScrollX, oldScrollY) -> {
             if (scrollY > oldScrollY) {
+
                 animateCard(btnRecitalMode, true);
                 animateCard(btnPracticeMode, true);
                 animateCard(btnQuizMode, true);
                 animateCard(btnProgressMode, true);
             }
         });
+    }
+
+    private void setupDynamicBackground() {
+        applyDynamicBackground();
+        startOverlayPulse();
+    }
+
+    private void applyDynamicBackground() {
+        if (rootCoordinator == null || dynamicBackgroundOverlay == null) return;
+
+        int hour = Calendar.getInstance().get(Calendar.HOUR_OF_DAY);
+        int backgroundRes;
+        int overlayTintRes;
+        float targetAlpha;
+
+        if (hour >= 5 && hour < 11) {
+            backgroundRes = R.drawable.bg_main_morning;
+            overlayTintRes = R.color.sparkleHalo;
+            targetAlpha = 0.45f;
+        } else if (hour >= 11 && hour < 17) {
+            backgroundRes = R.drawable.bg_main_day;
+            overlayTintRes = R.color.sparkleHaloSecondary;
+            targetAlpha = 0.4f;
+        } else {
+            backgroundRes = R.drawable.bg_main_night;
+            overlayTintRes = R.color.sparkleCore;
+            targetAlpha = 0.6f;
+        }
+
+        rootCoordinator.setBackgroundResource(backgroundRes);
+        dynamicBackgroundOverlay.setImageResource(R.drawable.bg_dynamic_sparkle);
+        ImageViewCompat.setImageTintList(dynamicBackgroundOverlay,
+                ColorStateList.valueOf(ContextCompat.getColor(this, overlayTintRes)));
+        dynamicBackgroundOverlay.setAlpha(targetAlpha);
+    }
+
+    private void startOverlayPulse() {
+        if (dynamicBackgroundOverlay == null) return;
+        if (overlayPulseAnimator == null) {
+            overlayPulseAnimator = ObjectAnimator.ofFloat(dynamicBackgroundOverlay, View.ALPHA, 0.35f, 0.65f);
+            overlayPulseAnimator.setDuration(6000);
+            overlayPulseAnimator.setRepeatMode(ValueAnimator.REVERSE);
+            overlayPulseAnimator.setRepeatCount(ValueAnimator.INFINITE);
+        }
+        if (!overlayPulseAnimator.isStarted()) {
+            overlayPulseAnimator.start();
+        }
+    }
+
+    private void stopOverlayPulse() {
+        if (overlayPulseAnimator != null && overlayPulseAnimator.isStarted()) {
+            overlayPulseAnimator.cancel();
+        }
     }
 
     private void animateCard(View view, boolean scrollingDown) {
