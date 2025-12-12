@@ -51,6 +51,8 @@ public class MainActivity extends AppCompatActivity {
     private ImageView starTopLeft, starTopRight;
     private Animator starLeftAnimator;
     private Animator starRightAnimator;
+    private ImageView bubbleTop, bubbleMidRight, bubbleBottomLeft;
+    private Animator bubbleTopAnimator, bubbleMidAnimator, bubbleBottomAnimator;
 
     private static final String PREF_NAME = "EduLinguaPrefs";
     private static final String KEY_SFX_ENABLED = "SFX_ENABLED";
@@ -81,6 +83,9 @@ public class MainActivity extends AppCompatActivity {
         heroCard = findViewById(R.id.heroCard);
         starTopLeft = findViewById(R.id.starTopLeft);
         starTopRight = findViewById(R.id.starTopRight);
+        bubbleTop = findViewById(R.id.bubbleTop);
+        bubbleMidRight = findViewById(R.id.bubbleMidRight);
+        bubbleBottomLeft = findViewById(R.id.bubbleBottomLeft);
         languageChipGroup = findViewById(R.id.languageChipGroup);
         btnRecitalMode = findViewById(R.id.btnRecitalMode);
         btnPracticeMode = findViewById(R.id.btnPracticeMode);
@@ -93,6 +98,7 @@ public class MainActivity extends AppCompatActivity {
         setupAnimation();
         setupHeroGlow();
         setupStarAnimations();
+        setupBubbleAnimations();
         setupLanguageChips();
         restoreLastLanguageSelection();
         setupButtons();
@@ -142,6 +148,29 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    private void setupBubbleAnimations() {
+        try {
+            bubbleTopAnimator = AnimatorInflater.loadAnimator(this, R.animator.bubble_float);
+            bubbleMidAnimator = AnimatorInflater.loadAnimator(this, R.animator.bubble_float);
+            bubbleBottomAnimator = AnimatorInflater.loadAnimator(this, R.animator.bubble_float);
+
+            if (bubbleTopAnimator != null && bubbleTop != null) {
+                bubbleTopAnimator.setTarget(bubbleTop);
+                bubbleTopAnimator.setStartDelay(0);
+            }
+            if (bubbleMidAnimator != null && bubbleMidRight != null) {
+                bubbleMidAnimator.setTarget(bubbleMidRight);
+                bubbleMidAnimator.setStartDelay(300);
+            }
+            if (bubbleBottomAnimator != null && bubbleBottomLeft != null) {
+                bubbleBottomAnimator.setTarget(bubbleBottomLeft);
+                bubbleBottomAnimator.setStartDelay(600);
+            }
+        } catch (Exception e) {
+            bubbleTopAnimator = bubbleMidAnimator = bubbleBottomAnimator = null;
+        }
+    }
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.main_menu, menu);
@@ -170,6 +199,9 @@ public class MainActivity extends AppCompatActivity {
         }
         if (starLeftAnimator != null && !starLeftAnimator.isStarted()) starLeftAnimator.start();
         if (starRightAnimator != null && !starRightAnimator.isStarted()) starRightAnimator.start();
+        if (bubbleTopAnimator != null && !bubbleTopAnimator.isStarted()) bubbleTopAnimator.start();
+        if (bubbleMidAnimator != null && !bubbleMidAnimator.isStarted()) bubbleMidAnimator.start();
+        if (bubbleBottomAnimator != null && !bubbleBottomAnimator.isStarted()) bubbleBottomAnimator.start();
     }
 
     @Override
@@ -180,6 +212,9 @@ public class MainActivity extends AppCompatActivity {
         }
         if (starLeftAnimator != null && starLeftAnimator.isRunning()) starLeftAnimator.end();
         if (starRightAnimator != null && starRightAnimator.isRunning()) starRightAnimator.end();
+        if (bubbleTopAnimator != null && bubbleTopAnimator.isRunning()) bubbleTopAnimator.end();
+        if (bubbleMidAnimator != null && bubbleMidAnimator.isRunning()) bubbleMidAnimator.end();
+        if (bubbleBottomAnimator != null && bubbleBottomAnimator.isRunning()) bubbleBottomAnimator.end();
         super.onPause();
     }
 
