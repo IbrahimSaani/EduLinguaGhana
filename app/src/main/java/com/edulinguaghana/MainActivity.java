@@ -187,20 +187,20 @@ public class MainActivity extends AppCompatActivity {
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.main_menu, menu);
 
-        // Animate the settings icon
+        // Animate the settings icon with bouncy entrance
         if (animationsEnabled()) {
             MenuItem settingsItem = menu.findItem(R.id.action_settings);
             if (settingsItem != null) {
                 View actionView = findViewById(R.id.action_settings);
                 if (actionView != null) {
-                    actionView.setAlpha(0f);
-                    actionView.setRotation(-90f);
+                    actionView.setScaleX(0f);
+                    actionView.setScaleY(0f);
                     actionView.animate()
-                        .alpha(1f)
-                        .rotation(0f)
-                        .setDuration(500)
-                        .setStartDelay(800)
-                        .setInterpolator(new android.view.animation.OvershootInterpolator())
+                        .scaleX(1f)
+                        .scaleY(1f)
+                        .setDuration(400)
+                        .setStartDelay(650)
+                        .setInterpolator(new android.view.animation.OvershootInterpolator(2.0f))
                         .start();
                 }
             }
@@ -243,36 +243,40 @@ public class MainActivity extends AppCompatActivity {
     private void animateToolbar(Toolbar toolbar) {
         if (!animationsEnabled()) return;
 
-        // Start with toolbar slightly above and transparent
-        toolbar.setTranslationY(-50f);
-        toolbar.setAlpha(0f);
+        // Start with toolbar scaled down and slightly transparent
+        toolbar.setScaleX(0.7f);
+        toolbar.setScaleY(0.7f);
+        toolbar.setAlpha(0.5f);
 
-        // Animate down and fade in
+        // Animate with a bouncy zoom-in effect
         toolbar.animate()
-            .translationY(0f)
+            .scaleX(1f)
+            .scaleY(1f)
             .alpha(1f)
-            .setDuration(600)
-            .setStartDelay(200)
-            .setInterpolator(new android.view.animation.DecelerateInterpolator())
+            .setDuration(500)
+            .setStartDelay(150)
+            .setInterpolator(new android.view.animation.OvershootInterpolator(1.2f))
             .start();
 
-        // Add subtle scale animation to logo
+        // Add playful rotation to logo
         toolbar.postDelayed(() -> {
             for (int i = 0; i < toolbar.getChildCount(); i++) {
                 View view = toolbar.getChildAt(i);
                 if (view instanceof ImageView) {
-                    view.setScaleX(0.8f);
-                    view.setScaleY(0.8f);
+                    view.setRotation(-15f);
+                    view.setScaleX(0.7f);
+                    view.setScaleY(0.7f);
                     view.animate()
+                        .rotation(0f)
                         .scaleX(1f)
                         .scaleY(1f)
-                        .setDuration(400)
-                        .setInterpolator(new android.view.animation.OvershootInterpolator())
+                        .setDuration(450)
+                        .setInterpolator(new android.view.animation.OvershootInterpolator(1.5f))
                         .start();
                     break;
                 }
             }
-        }, 300);
+        }, 200);
     }
 
     @Override
