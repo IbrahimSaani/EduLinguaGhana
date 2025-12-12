@@ -20,4 +20,41 @@
     <!-- Quiz-specific -->
     <color name="correctAnswer">#81C784</color>
     <color name="wrongAnswer">#E57373</color>
+
+    <!-- Progress Screen -->
+    <color name="progressScreenBackground">#1E1E1E</color>
+    <color name="progressTitleColor">#9575CD</color>
+    <color name="achievementsTextColor">#BCAAA4</color>
+
+    <!-- Playful palette for dark mode -->
+    <color name="playfulSkyStart">#2C1B47</color>
+    <color name="playfulSkyEnd">#1A237E</color>
+    <color name="playfulHeroStart">#3E2723</color>
+    <color name="playfulHeroEnd">#4A148C</color>
+    <color name="languageCardStart">#004D40</color>
+    <color name="languageCardEnd">#1B5E20</color>
+    <color name="modeRecitalStart">#4A3200</color>
+    <color name="modeRecitalEnd">#5D4037</color>
+    <color name="modePracticeStart">#4527A0</color>
+    <color name="modePracticeEnd">#5E35B1</color>
+    <color name="modeQuizStart">#006064</color>
+    <color name="modeQuizEnd">#00838F</color>
+    <color name="modeProgressStart">#1B5E20</color>
+    <color name="modeProgressEnd">#2E7D32</color>
+    <color name="chipSurface">#2C2C2C</color>
+    <color name="chipStroke">#424242</color>
+
+    <!-- Dynamic background palette for dark mode -->
+    <color name="bgMorningStart">#3E2723</color>
+    <color name="bgMorningMid">#4A148C</color>
+    <color name="bgMorningEnd">#311B92</color>
+    <color name="bgDayStart">#1A237E</color>
+    <color name="bgDayMid">#283593</color>
+    <color name="bgDayEnd">#303F9F</color>
+    <color name="bgNightStart">#0A0E1A</color>
+    <color name="bgNightMid">#0D1B3D</color>
+    <color name="bgNightEnd">#1A237E</color>
+    <color name="sparkleCore">#AAFFFFFF</color>
+    <color name="sparkleHalo">#88FFD8A8</color>
+    <color name="sparkleHaloSecondary">#884FC3F7</color>
 </resources>

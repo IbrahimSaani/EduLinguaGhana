@@ -1,4 +1,4 @@
-<resources xmlns:tools="http://schemas.android.com/tools">
+<resources>
     <!-- Base application theme. -->
     <style name="Base.Theme.EduLinguaGhana" parent="Theme.Material3.DayNight.NoActionBar">
         <!-- Primary brand color. -->
@@ -9,8 +9,13 @@
         <item name="colorSecondary">@color/colorAccent</item>
         <item name="colorSecondaryVariant">@color/colorAccent</item>
         <item name="colorOnSecondary">@color/black</item>
+        <!-- Background colors -->
+        <item name="android:colorBackground">@color/appBackground</item>
+        <item name="colorSurface">@color/cardBackground</item>
+        <item name="colorOnSurface">@color/textColorPrimary</item>
         <!-- Status bar color. -->
         <item name="android:statusBarColor">@color/colorPrimaryDark</item>
+        <item name="android:navigationBarColor">@color/white</item>
         <!-- Customize your theme here. -->
     </style>
 
