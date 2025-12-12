@@ -18,7 +18,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.animation.AnimationUtils;
 import android.widget.ImageView;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.activity.OnBackPressedCallback;
@@ -31,7 +30,6 @@ import androidx.core.widget.ImageViewCompat;
 import androidx.core.widget.NestedScrollView;
 
 import com.airbnb.lottie.LottieAnimationView;
-import com.google.android.material.appbar.AppBarLayout;
 import com.google.android.material.card.MaterialCardView;
 import com.google.android.material.chip.Chip;
 import com.google.android.material.chip.ChipGroup;
@@ -44,13 +42,11 @@ public class MainActivity extends AppCompatActivity {
     private ImageView dynamicBackgroundOverlay;
     private ChipGroup languageChipGroup;
     private MaterialCardView btnRecitalMode, btnPracticeMode, btnQuizMode, btnProgressMode;
-    private TextView tvBestScoreMain;
     private LottieAnimationView lottieAnimationView;
     private NestedScrollView nestedScrollView;
     private ObjectAnimator overlayPulseAnimator;
 
     private static final String PREF_NAME = "EduLinguaPrefs";
-    private static final String KEY_HIGH_SCORE = "HIGH_SCORE";
     private static final String KEY_SFX_ENABLED = "SFX_ENABLED";
 
     private static final String KEY_LAST_LANG_CODE = "LAST_LANG_CODE";
@@ -81,7 +77,6 @@ public class MainActivity extends AppCompatActivity {
         btnPracticeMode = findViewById(R.id.btnPracticeMode);
         btnQuizMode = findViewById(R.id.btnQuizMode);
         btnProgressMode = findViewById(R.id.btnProgressMode);
-        tvBestScoreMain = findViewById(R.id.tvBestScoreMain);
         lottieAnimationView = findViewById(R.id.lottieAnimationView);
         nestedScrollView = findViewById(R.id.nestedScrollView);
 
@@ -130,8 +125,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
         SharedPreferences prefs = getSharedPreferences(PREF_NAME, MODE_PRIVATE);
-        int highScore = prefs.getInt(KEY_HIGH_SCORE, 0);
-        tvBestScoreMain.setText("Best quiz score: " + highScore + " / 10");
+        // previously read high score to show in removed UI; keep prefs access in case other features rely on it
         applyDynamicBackground();
         startOverlayPulse();
     }

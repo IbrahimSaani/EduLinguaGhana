@@ -192,23 +192,7 @@
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
 
-            <TextView
-                android:id="@+id/tvBestScoreMain"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="16dp"
-                android:background="@drawable/bg_score_chip"
-                android:fontFamily="sans-serif-medium"
-                android:paddingStart="20dp"
-                android:paddingEnd="20dp"
-                android:paddingTop="8dp"
-                android:paddingBottom="8dp"
-                android:text="@string/main_best_score_placeholder"
-                android:textColor="@color/correctAnswer"
-                android:textSize="15sp"
-                app:layout_constraintTop_toBottomOf="@id/heroCard"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintEnd_toEndOf="parent" />
+            <!-- tvBestScoreMain (best quiz score) removed on request -->
 
             <com.google.android.material.card.MaterialCardView
                 android:id="@+id/languageCard"
@@ -217,7 +201,7 @@
                 android:layout_marginTop="24dp"
                 app:cardCornerRadius="32dp"
                 app:cardElevation="0dp"
-                app:layout_constraintTop_toBottomOf="@id/tvBestScoreMain"
+                app:layout_constraintTop_toBottomOf="@id/heroCard"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent">
 
