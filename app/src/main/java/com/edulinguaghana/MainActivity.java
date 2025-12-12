@@ -231,6 +231,11 @@ public class MainActivity extends AppCompatActivity {
                     if (textView.getText().equals(toolbar.getTitle())) {
                         textView.setTypeface(typeface);
                         textView.setTextSize(android.util.TypedValue.COMPLEX_UNIT_SP, 20);
+
+                        // Add morphing/inflating text animation
+                        if (animationsEnabled()) {
+                            animateTextMorph(textView);
+                        }
                         break;
                     }
                 }
@@ -240,22 +245,51 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    private void animateTextMorph(android.widget.TextView textView) {
+        // Start with compressed text (small scale and tight letter spacing)
+        textView.setScaleX(0.3f);
+        textView.setScaleY(0.3f);
+        textView.setAlpha(0f);
+        textView.setLetterSpacing(0.3f); // Expanded letter spacing
+
+        // Animate to normal size with morphing effect
+        textView.animate()
+            .scaleX(1f)
+            .scaleY(1f)
+            .alpha(1f)
+            .setDuration(600)
+            .setStartDelay(300)
+            .setInterpolator(new android.view.animation.OvershootInterpolator(1.5f))
+            .withEndAction(() -> {
+                // Animate letter spacing to normal
+                android.animation.ValueAnimator letterSpacingAnimator = android.animation.ValueAnimator.ofFloat(0.3f, 0.05f);
+                letterSpacingAnimator.setDuration(400);
+                letterSpacingAnimator.setInterpolator(new android.view.animation.DecelerateInterpolator());
+                letterSpacingAnimator.addUpdateListener(animation -> {
+                    float value = (float) animation.getAnimatedValue();
+                    textView.setLetterSpacing(value);
+                });
+                letterSpacingAnimator.start();
+            })
+            .start();
+    }
+
     private void animateToolbar(Toolbar toolbar) {
         if (!animationsEnabled()) return;
 
-        // Start with toolbar scaled down and slightly transparent
-        toolbar.setScaleX(0.7f);
-        toolbar.setScaleY(0.7f);
-        toolbar.setAlpha(0.5f);
+        // Start with toolbar slightly scaled down
+        toolbar.setScaleX(0.9f);
+        toolbar.setScaleY(0.9f);
+        toolbar.setAlpha(0.7f);
 
-        // Animate with a bouncy zoom-in effect
+        // Animate with a gentle zoom-in effect
         toolbar.animate()
             .scaleX(1f)
             .scaleY(1f)
             .alpha(1f)
-            .setDuration(500)
-            .setStartDelay(150)
-            .setInterpolator(new android.view.animation.OvershootInterpolator(1.2f))
+            .setDuration(400)
+            .setStartDelay(100)
+            .setInterpolator(new android.view.animation.DecelerateInterpolator(1.5f))
             .start();
 
         // Add playful rotation to logo
@@ -264,19 +298,21 @@ public class MainActivity extends AppCompatActivity {
                 View view = toolbar.getChildAt(i);
                 if (view instanceof ImageView) {
                     view.setRotation(-15f);
-                    view.setScaleX(0.7f);
-                    view.setScaleY(0.7f);
+                    view.setScaleX(0.6f);
+                    view.setScaleY(0.6f);
+                    view.setAlpha(0f);
                     view.animate()
                         .rotation(0f)
                         .scaleX(1f)
                         .scaleY(1f)
-                        .setDuration(450)
-                        .setInterpolator(new android.view.animation.OvershootInterpolator(1.5f))
+                        .alpha(1f)
+                        .setDuration(500)
+                        .setInterpolator(new android.view.animation.OvershootInterpolator(1.8f))
                         .start();
                     break;
                 }
             }
-        }, 200);
+        }, 150);
     }
 
     @Override
