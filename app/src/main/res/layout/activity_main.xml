@@ -13,13 +13,14 @@
         android:id="@+id/dynamicBackgroundOverlay"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:alpha="0.55"
+        android:alpha="0.45"
         android:contentDescription="@null"
         android:scaleType="fitXY"
-        android:src="@drawable/bg_dynamic_sparkle"
+        android:src="@drawable/bg_dynamic_sparkle_anim"
         android:clickable="false"
         android:focusable="false"
-        android:importantForAccessibility="no" />
+        android:importantForAccessibility="no"
+        tools:src="@drawable/bg_dynamic_sparkle" />
 
     <com.google.android.material.appbar.AppBarLayout
         android:id="@+id/appBarLayout"
@@ -73,6 +74,40 @@
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
 
+            <!-- playful decorative bubbles to make the background feel more kid-friendly -->
+            <ImageView
+                android:id="@+id/bubbleTop"
+                android:layout_width="80dp"
+                android:layout_height="80dp"
+                android:alpha="0.22"
+                android:src="@drawable/ic_progress_sparkle"
+                android:contentDescription="@null"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/starTopLeft"
+                android:translationX="8dp" />
+
+            <ImageView
+                android:id="@+id/bubbleMidRight"
+                android:layout_width="60dp"
+                android:layout_height="60dp"
+                android:alpha="0.18"
+                android:src="@drawable/ic_progress"
+                android:contentDescription="@null"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/starTopRight"
+                android:translationX="-12dp" />
+
+            <ImageView
+                android:id="@+id/bubbleBottomLeft"
+                android:layout_width="100dp"
+                android:layout_height="100dp"
+                android:alpha="0.16"
+                android:src="@drawable/ic_progress_sparkle"
+                android:contentDescription="@null"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/heroCard"
+                android:translationY="16dp" />
+
             <com.google.android.material.card.MaterialCardView
                 android:id="@+id/heroCard"
                 android:layout_width="0dp"
@@ -115,10 +150,20 @@
                             android:layout_width="match_parent"
                             android:layout_height="match_parent"
                             android:scaleType="centerCrop"
+                            android:contentDescription="@string/main_tap_hint"
                             app:lottie_rawRes="@raw/kids_animation"
                             app:lottie_autoPlay="true"
-                            app:lottie_loop="true" />
+                            app:lottie_loop="true"
+                            tools:visibility="gone" />
 
+                        <!-- Preview-only placeholder for layout editor (tools namespace) -->
+                        <ImageView
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:visibility="gone"
+                            tools:visibility="visible"
+                            tools:src="@drawable/ic_launcher_vector"
+                            tools:ignore="ContentDescription" />
                     </com.google.android.material.card.MaterialCardView>
 
                     <TextView
@@ -258,6 +303,7 @@
                         android:clickable="true"
                         android:focusable="true"
                         android:foreground="?attr/selectableItemBackground"
+                        android:contentDescription="@string/mode_recital_title"
                         app:cardBackgroundColor="@android:color/transparent"
                         app:cardCornerRadius="28dp"
                         app:cardElevation="0dp">
@@ -306,6 +352,7 @@
                         android:clickable="true"
                         android:focusable="true"
                         android:foreground="?attr/selectableItemBackground"
+                        android:contentDescription="@string/mode_practice_title"
                         app:cardBackgroundColor="@android:color/transparent"
                         app:cardCornerRadius="28dp"
                         app:cardElevation="0dp">
@@ -362,6 +409,7 @@
                         android:clickable="true"
                         android:focusable="true"
                         android:foreground="?attr/selectableItemBackground"
+                        android:contentDescription="@string/mode_quiz_title"
                         app:cardBackgroundColor="@android:color/transparent"
                         app:cardCornerRadius="28dp"
                         app:cardElevation="0dp">
@@ -410,6 +458,7 @@
                         android:clickable="true"
                         android:focusable="true"
                         android:foreground="?attr/selectableItemBackground"
+                        android:contentDescription="@string/mode_progress_title"
                         app:cardBackgroundColor="@android:color/transparent"
                         app:cardCornerRadius="28dp"
                         app:cardElevation="0dp">
@@ -456,5 +505,17 @@
         </androidx.constraintlayout.widget.ConstraintLayout>
 
     </androidx.core.widget.NestedScrollView>
+
+    <!-- Settings FAB to give kids a clear way to access settings; uses existing ic_settings drawable -->
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/fabSettings"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="16dp"
+        android:contentDescription="@string/settings_title"
+        app:srcCompat="@drawable/ic_settings"
+        app:tint="@color/white"
+        app:layout_anchor="@id/nestedScrollView"
+        app:layout_anchorGravity="bottom|end" />
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>
