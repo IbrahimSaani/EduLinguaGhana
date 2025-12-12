@@ -48,6 +48,9 @@ public class MainActivity extends AppCompatActivity {
     private NestedScrollView nestedScrollView;
     private ObjectAnimator overlayPulseAnimator;
     private Animator heroGlowAnimator;
+    private ImageView starTopLeft, starTopRight;
+    private Animator starLeftAnimator;
+    private Animator starRightAnimator;
 
     private static final String PREF_NAME = "EduLinguaPrefs";
     private static final String KEY_SFX_ENABLED = "SFX_ENABLED";
@@ -76,6 +79,8 @@ public class MainActivity extends AppCompatActivity {
         rootCoordinator = findViewById(R.id.rootCoordinator);
         dynamicBackgroundOverlay = findViewById(R.id.dynamicBackgroundOverlay);
         heroCard = findViewById(R.id.heroCard);
+        starTopLeft = findViewById(R.id.starTopLeft);
+        starTopRight = findViewById(R.id.starTopRight);
         languageChipGroup = findViewById(R.id.languageChipGroup);
         btnRecitalMode = findViewById(R.id.btnRecitalMode);
         btnPracticeMode = findViewById(R.id.btnPracticeMode);
@@ -87,6 +92,7 @@ public class MainActivity extends AppCompatActivity {
         setupDynamicBackground();
         setupAnimation();
         setupHeroGlow();
+        setupStarAnimations();
         setupLanguageChips();
         restoreLastLanguageSelection();
         setupButtons();
@@ -122,6 +128,20 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    private void setupStarAnimations() {
+        try {
+            starLeftAnimator = AnimatorInflater.loadAnimator(this, R.animator.star_twinkle);
+            starRightAnimator = AnimatorInflater.loadAnimator(this, R.animator.star_slow_orbit);
+
+            if (starLeftAnimator != null && starTopLeft != null) starLeftAnimator.setTarget(starTopLeft);
+            if (starRightAnimator != null && starTopRight != null) starRightAnimator.setTarget(starTopRight);
+        } catch (Exception e) {
+            // ignore if animators can't be loaded on some devices
+            starLeftAnimator = null;
+            starRightAnimator = null;
+        }
+    }
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.main_menu, menu);
@@ -148,6 +168,8 @@ public class MainActivity extends AppCompatActivity {
         if (heroGlowAnimator != null && !((Animator)heroGlowAnimator).isStarted()) {
             heroGlowAnimator.start();
         }
+        if (starLeftAnimator != null && !starLeftAnimator.isStarted()) starLeftAnimator.start();
+        if (starRightAnimator != null && !starRightAnimator.isStarted()) starRightAnimator.start();
     }
 
     @Override
@@ -156,6 +178,8 @@ public class MainActivity extends AppCompatActivity {
         if (heroGlowAnimator != null && heroGlowAnimator.isRunning()) {
             heroGlowAnimator.end();
         }
+        if (starLeftAnimator != null && starLeftAnimator.isRunning()) starLeftAnimator.end();
+        if (starRightAnimator != null && starRightAnimator.isRunning()) starRightAnimator.end();
         super.onPause();
     }
 
