@@ -17,6 +17,7 @@ public class SettingsActivity extends AppCompatActivity {
 
     private SwitchMaterial switchMusic, switchSfx;
     private SwitchMaterial switchAnimations;
+    private SwitchMaterial switchLowPowerAnimations;
     private Button btnResetProgress;
     private RadioGroup rgTheme;
     private RadioButton rbLight, rbDark, rbSystem;
@@ -25,6 +26,7 @@ public class SettingsActivity extends AppCompatActivity {
     private static final String KEY_MUSIC_ENABLED = "MUSIC_ENABLED";
     private static final String KEY_SFX_ENABLED = "SFX_ENABLED";
     private static final String KEY_ANIMATIONS_ENABLED = "ANIMATIONS_ENABLED";
+    private static final String KEY_LOW_POWER_ANIMATIONS = "LOW_POWER_ANIMATIONS";
     private static final String KEY_THEME = "THEME";
 
     private static final String KEY_HIGH_SCORE = "HIGH_SCORE";
@@ -54,6 +56,12 @@ public class SettingsActivity extends AppCompatActivity {
         } else {
             switchAnimations = null;
         }
+        int lowPowerSwitchId = getResources().getIdentifier("switchLowPowerAnimations", "id", getPackageName());
+        if (lowPowerSwitchId != 0) {
+            switchLowPowerAnimations = findViewById(lowPowerSwitchId);
+        } else {
+            switchLowPowerAnimations = null;
+        }
         btnResetProgress = findViewById(R.id.btnResetProgress);
         rgTheme = findViewById(R.id.rgTheme);
         rbLight = findViewById(R.id.rbLight);
@@ -65,6 +73,7 @@ public class SettingsActivity extends AppCompatActivity {
         boolean musicEnabled = prefs.getBoolean(KEY_MUSIC_ENABLED, true);
         boolean sfxEnabled = prefs.getBoolean(KEY_SFX_ENABLED, true);
         boolean animationsEnabled = prefs.getBoolean(KEY_ANIMATIONS_ENABLED, true);
+        boolean lowPowerEnabled = prefs.getBoolean(KEY_LOW_POWER_ANIMATIONS, false);
         int currentTheme = prefs.getInt(KEY_THEME, AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM);
 
         // Set UI states
@@ -72,6 +81,9 @@ public class SettingsActivity extends AppCompatActivity {
         switchSfx.setChecked(sfxEnabled);
         if (switchAnimations != null) {
             switchAnimations.setChecked(animationsEnabled);
+        }
+        if (switchLowPowerAnimations != null) {
+            switchLowPowerAnimations.setChecked(lowPowerEnabled);
         }
         updateThemeRadioButtons(currentTheme);
 
@@ -87,6 +99,12 @@ public class SettingsActivity extends AppCompatActivity {
         if (switchAnimations != null) {
             switchAnimations.setOnCheckedChangeListener((buttonView, isChecked) -> {
                 prefs.edit().putBoolean(KEY_ANIMATIONS_ENABLED, isChecked).apply();
+            });
+        }
+
+        if (switchLowPowerAnimations != null) {
+            switchLowPowerAnimations.setOnCheckedChangeListener((buttonView, isChecked) -> {
+                prefs.edit().putBoolean(KEY_LOW_POWER_ANIMATIONS, isChecked).apply();
             });
         }
 

@@ -25,6 +25,7 @@ import androidx.activity.OnBackPressedCallback;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+import androidx.appcompat.content.res.AppCompatResources;
 import androidx.coordinatorlayout.widget.CoordinatorLayout;
 import androidx.core.content.ContextCompat;
 import androidx.core.widget.ImageViewCompat;
@@ -54,6 +55,7 @@ public class MainActivity extends AppCompatActivity {
     private ImageView bubbleTop, bubbleMidRight, bubbleBottomLeft;
     private Animator bubbleTopAnimator, bubbleMidAnimator, bubbleBottomAnimator;
     private static final String KEY_ANIMATIONS_ENABLED = "ANIMATIONS_ENABLED";
+    private static final String KEY_LOW_POWER_ANIMATIONS = "LOW_POWER_ANIMATIONS";
 
     private static final String PREF_NAME = "EduLinguaPrefs";
     private static final String KEY_SFX_ENABLED = "SFX_ENABLED";
@@ -127,7 +129,8 @@ public class MainActivity extends AppCompatActivity {
 
     private void setupHeroGlow() {
         try {
-            heroGlowAnimator = AnimatorInflater.loadAnimator(this, R.animator.hero_glow);
+            int heroRes = animationsReduced() ? R.animator.hero_glow_reduced : R.animator.hero_glow;
+            heroGlowAnimator = AnimatorInflater.loadAnimator(this, heroRes);
             if (heroGlowAnimator != null && heroCard != null) {
                 heroGlowAnimator.setTarget(heroCard);
             }
@@ -139,8 +142,10 @@ public class MainActivity extends AppCompatActivity {
 
     private void setupStarAnimations() {
         try {
-            starLeftAnimator = AnimatorInflater.loadAnimator(this, R.animator.star_twinkle);
-            starRightAnimator = AnimatorInflater.loadAnimator(this, R.animator.star_slow_orbit);
+            int twinkleRes = animationsReduced() ? R.animator.star_twinkle_reduced : R.animator.star_twinkle;
+            int orbitRes = animationsReduced() ? R.animator.star_slow_orbit_reduced : R.animator.star_slow_orbit;
+            starLeftAnimator = AnimatorInflater.loadAnimator(this, twinkleRes);
+            starRightAnimator = AnimatorInflater.loadAnimator(this, orbitRes);
 
             if (starLeftAnimator != null && starTopLeft != null) starLeftAnimator.setTarget(starTopLeft);
             if (starRightAnimator != null && starTopRight != null) starRightAnimator.setTarget(starTopRight);
@@ -153,9 +158,10 @@ public class MainActivity extends AppCompatActivity {
 
     private void setupBubbleAnimations() {
         try {
-            bubbleTopAnimator = AnimatorInflater.loadAnimator(this, R.animator.bubble_float);
-            bubbleMidAnimator = AnimatorInflater.loadAnimator(this, R.animator.bubble_float);
-            bubbleBottomAnimator = AnimatorInflater.loadAnimator(this, R.animator.bubble_float);
+            int bubbleRes = animationsReduced() ? R.animator.bubble_float_reduced : R.animator.bubble_float;
+            bubbleTopAnimator = AnimatorInflater.loadAnimator(this, bubbleRes);
+            bubbleMidAnimator = AnimatorInflater.loadAnimator(this, bubbleRes);
+            bubbleBottomAnimator = AnimatorInflater.loadAnimator(this, bubbleRes);
 
             if (bubbleTopAnimator != null && bubbleTop != null) {
                 bubbleTopAnimator.setTarget(bubbleTop);
@@ -193,12 +199,11 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        SharedPreferences prefs = getSharedPreferences(PREF_NAME, MODE_PRIVATE);
         // previously read high score to show in removed UI; keep prefs access in case other features rely on it
         applyDynamicBackground();
         if (animationsEnabled()) {
             startOverlayPulse();
-            if (heroGlowAnimator != null && !((Animator)heroGlowAnimator).isStarted()) {
+            if (heroGlowAnimator != null && !heroGlowAnimator.isStarted()) {
                 heroGlowAnimator.start();
             }
             if (starLeftAnimator != null && !starLeftAnimator.isStarted()) starLeftAnimator.start();
@@ -229,6 +234,11 @@ public class MainActivity extends AppCompatActivity {
     private boolean animationsEnabled() {
         SharedPreferences prefs = getSharedPreferences(PREF_NAME, MODE_PRIVATE);
         return prefs.getBoolean(KEY_ANIMATIONS_ENABLED, true);
+    }
+
+    private boolean animationsReduced() {
+        SharedPreferences prefs = getSharedPreferences(PREF_NAME, MODE_PRIVATE);
+        return prefs.getBoolean(KEY_LOW_POWER_ANIMATIONS, false);
     }
 
     // ---------------- BACK HANDLER ----------------
@@ -305,7 +315,7 @@ public class MainActivity extends AppCompatActivity {
             chip.setTag(langCodes[i]);
             chip.setCheckable(true);
             chip.setClickable(true);
-            chip.setChipIcon(getDrawable(android.R.drawable.ic_btn_speak_now));
+            chip.setChipIcon(AppCompatResources.getDrawable(this, android.R.drawable.ic_btn_speak_now));
 
             chip.setOnCheckedChangeListener((buttonView, isChecked) -> {
                 if (isChecked) {

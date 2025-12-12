@@ -86,6 +86,15 @@
                         android:textColor="@color/textColorSecondary"
                         android:textSize="14sp" />
 
+                    <com.google.android.material.switchmaterial.SwitchMaterial
+                        android:id="@+id/switchLowPowerAnimations"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:minHeight="48dp"
+                        android:text="Low-power animations (reduced motion)"
+                        android:textColor="@color/textColorSecondary"
+                        android:textSize="14sp" />
+
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
 
