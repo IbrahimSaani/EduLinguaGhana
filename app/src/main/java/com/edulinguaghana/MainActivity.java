@@ -1,5 +1,6 @@
 package com.edulinguaghana;
 
+import android.animation.Animator;
 import android.animation.AnimatorInflater;
 import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
@@ -42,9 +43,11 @@ public class MainActivity extends AppCompatActivity {
     private ImageView dynamicBackgroundOverlay;
     private ChipGroup languageChipGroup;
     private MaterialCardView btnRecitalMode, btnPracticeMode, btnQuizMode, btnProgressMode;
+    private MaterialCardView heroCard;
     private LottieAnimationView lottieAnimationView;
     private NestedScrollView nestedScrollView;
     private ObjectAnimator overlayPulseAnimator;
+    private Animator heroGlowAnimator;
 
     private static final String PREF_NAME = "EduLinguaPrefs";
     private static final String KEY_SFX_ENABLED = "SFX_ENABLED";
@@ -72,6 +75,7 @@ public class MainActivity extends AppCompatActivity {
 
         rootCoordinator = findViewById(R.id.rootCoordinator);
         dynamicBackgroundOverlay = findViewById(R.id.dynamicBackgroundOverlay);
+        heroCard = findViewById(R.id.heroCard);
         languageChipGroup = findViewById(R.id.languageChipGroup);
         btnRecitalMode = findViewById(R.id.btnRecitalMode);
         btnPracticeMode = findViewById(R.id.btnPracticeMode);
@@ -82,6 +86,7 @@ public class MainActivity extends AppCompatActivity {
 
         setupDynamicBackground();
         setupAnimation();
+        setupHeroGlow();
         setupLanguageChips();
         restoreLastLanguageSelection();
         setupButtons();
@@ -103,6 +108,18 @@ public class MainActivity extends AppCompatActivity {
                 lottieAnimationView.resumeAnimation();
             }
         });
+    }
+
+    private void setupHeroGlow() {
+        try {
+            heroGlowAnimator = AnimatorInflater.loadAnimator(this, R.animator.hero_glow);
+            if (heroGlowAnimator != null && heroCard != null) {
+                heroGlowAnimator.setTarget(heroCard);
+            }
+        } catch (Exception e) {
+            // fail silently if animator isn't available on older platforms
+            heroGlowAnimator = null;
+        }
     }
 
     @Override
@@ -128,11 +145,17 @@ public class MainActivity extends AppCompatActivity {
         // previously read high score to show in removed UI; keep prefs access in case other features rely on it
         applyDynamicBackground();
         startOverlayPulse();
+        if (heroGlowAnimator != null && !((Animator)heroGlowAnimator).isStarted()) {
+            heroGlowAnimator.start();
+        }
     }
 
     @Override
     protected void onPause() {
         stopOverlayPulse();
+        if (heroGlowAnimator != null && heroGlowAnimator.isRunning()) {
+            heroGlowAnimator.end();
+        }
         super.onPause();
     }
 
