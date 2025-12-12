@@ -506,16 +506,4 @@
 
     </androidx.core.widget.NestedScrollView>
 
-    <!-- Settings FAB to give kids a clear way to access settings; uses existing ic_settings drawable -->
-    <com.google.android.material.floatingactionbutton.FloatingActionButton
-        android:id="@+id/fabSettings"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_margin="16dp"
-        android:contentDescription="@string/settings_title"
-        app:srcCompat="@drawable/ic_settings"
-        app:tint="@color/white"
-        app:layout_anchor="@id/nestedScrollView"
-        app:layout_anchorGravity="bottom|end" />
-
 </androidx.coordinatorlayout.widget.CoordinatorLayout>
