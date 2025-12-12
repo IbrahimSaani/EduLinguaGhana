@@ -15,6 +15,7 @@
     <string name="settings_audio_title">Audio Settings</string>
     <string name="settings_background_music">Background music</string>
     <string name="settings_sound_effects">Sound effects (SFX)</string>
+    <string name="settings_visual_title">Visual Settings</string>
     <string name="settings_background_animations">Background animations</string>
     <string name="settings_low_power_animations">Low-power animations (reduced motion)</string>
     <string name="settings_theme_title">Theme</string>
