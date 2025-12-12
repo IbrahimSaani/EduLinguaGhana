@@ -25,6 +25,8 @@
             app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
             app:title="@string/settings_title" />
 
+        <!-- Note: Font will be applied programmatically in SettingsActivity -->
+
     </com.google.android.material.appbar.AppBarLayout>
 
     <ScrollView
@@ -71,11 +73,12 @@
                             android:contentDescription="@string/settings_audio_title" />
 
                         <TextView
+                            android:id="@+id/tvAudioHeader"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginStart="12dp"
                             android:text="@string/settings_audio_title"
-                            android:textColor="@color/textColorPrimary"
+                            android:textColor="?attr/colorOnSurface"
                             android:textSize="18sp"
                             android:textStyle="bold" />
                     </LinearLayout>
@@ -143,6 +146,7 @@
                             android:contentDescription="@string/settings_visual_title" />
 
                         <TextView
+                            android:id="@+id/tvVisualHeader"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginStart="12dp"
@@ -214,6 +218,7 @@
                             android:contentDescription="@string/settings_theme_title" />
 
                         <TextView
+                            android:id="@+id/tvThemeHeader"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginStart="12dp"
@@ -298,6 +303,7 @@
                             android:contentDescription="@string/settings_progress_title" />
 
                         <TextView
+                            android:id="@+id/tvProgressHeader"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginStart="12dp"

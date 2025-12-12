@@ -4,12 +4,16 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.app.AppCompatDelegate;
 import androidx.appcompat.widget.Toolbar;
+import androidx.core.content.res.ResourcesCompat;
 
 import android.content.SharedPreferences;
+import android.graphics.Typeface;
 import android.os.Bundle;
+import android.view.View;
 import android.widget.Button;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
+import android.widget.TextView;
 import com.google.android.material.switchmaterial.SwitchMaterial;
 import android.widget.Toast;
 
@@ -46,6 +50,9 @@ public class SettingsActivity extends AppCompatActivity {
             getSupportActionBar().setDisplayShowHomeEnabled(true);
         }
 
+        // Apply custom font to toolbar
+        applyToolbarFont(toolbar);
+
         // Find views
         switchMusic = findViewById(R.id.switchMusic);
         switchSfx = findViewById(R.id.switchSfx);
@@ -57,6 +64,9 @@ public class SettingsActivity extends AppCompatActivity {
         rbLight = findViewById(R.id.rbLight);
         rbDark = findViewById(R.id.rbDark);
         rbSystem = findViewById(R.id.rbSystem);
+
+        // Apply custom font to section headers
+        applySectionHeaderFonts();
 
         // Load preferences
         SharedPreferences prefs = getSharedPreferences(PREF_NAME, MODE_PRIVATE);
@@ -135,6 +145,53 @@ public class SettingsActivity extends AppCompatActivity {
             rbDark.setChecked(true);
         } else {
             rbSystem.setChecked(true);
+        }
+    }
+
+    private void applyToolbarFont(Toolbar toolbar) {
+        try {
+            Typeface typeface = ResourcesCompat.getFont(this, R.font.agbalumo);
+            // Find and apply font to toolbar title
+            for (int i = 0; i < toolbar.getChildCount(); i++) {
+                View view = toolbar.getChildAt(i);
+                if (view instanceof TextView) {
+                    TextView textView = (TextView) view;
+                    if (textView.getText().equals(toolbar.getTitle())) {
+                        textView.setTypeface(typeface);
+                        textView.setTextSize(android.util.TypedValue.COMPLEX_UNIT_SP, 20);
+                        break;
+                    }
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void applySectionHeaderFonts() {
+        try {
+            Typeface typeface = ResourcesCompat.getFont(this, R.font.agbalumo);
+
+            // Apply font to all section headers
+            TextView tvAudioHeader = findViewById(R.id.tvAudioHeader);
+            TextView tvVisualHeader = findViewById(R.id.tvVisualHeader);
+            TextView tvThemeHeader = findViewById(R.id.tvThemeHeader);
+            TextView tvProgressHeader = findViewById(R.id.tvProgressHeader);
+
+            if (tvAudioHeader != null) {
+                tvAudioHeader.setTypeface(typeface, android.graphics.Typeface.BOLD);
+            }
+            if (tvVisualHeader != null) {
+                tvVisualHeader.setTypeface(typeface, android.graphics.Typeface.BOLD);
+            }
+            if (tvThemeHeader != null) {
+                tvThemeHeader.setTypeface(typeface, android.graphics.Typeface.BOLD);
+            }
+            if (tvProgressHeader != null) {
+                tvProgressHeader.setTypeface(typeface, android.graphics.Typeface.BOLD);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 }
