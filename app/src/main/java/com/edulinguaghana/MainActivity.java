@@ -77,9 +77,6 @@ public class MainActivity extends AppCompatActivity {
 
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-        if (getSupportActionBar() != null) {
-            getSupportActionBar().setTitle(null);
-        }
 
         rootCoordinator = findViewById(R.id.rootCoordinator);
         dynamicBackgroundOverlay = findViewById(R.id.dynamicBackgroundOverlay);
