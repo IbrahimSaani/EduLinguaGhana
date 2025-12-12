@@ -38,6 +38,7 @@
             app:logo="@drawable/ic_launcher_foreground"
             app:title="@string/app_name"
             app:titleTextColor="?attr/colorOnPrimary"
+            app:titleMarginStart="8dp"
             app:subtitleTextColor="?attr/colorOnPrimary"
             app:popupTheme="@style/ThemeOverlay.AppCompat.Light" />
 

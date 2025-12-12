@@ -78,6 +78,12 @@ public class MainActivity extends AppCompatActivity {
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
+        // Apply custom font to toolbar title
+        applyToolbarFont(toolbar);
+
+        // Animate toolbar entrance
+        animateToolbar(toolbar);
+
         rootCoordinator = findViewById(R.id.rootCoordinator);
         dynamicBackgroundOverlay = findViewById(R.id.dynamicBackgroundOverlay);
         heroCard = findViewById(R.id.heroCard);
@@ -180,6 +186,26 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.main_menu, menu);
+
+        // Animate the settings icon
+        if (animationsEnabled()) {
+            MenuItem settingsItem = menu.findItem(R.id.action_settings);
+            if (settingsItem != null) {
+                View actionView = findViewById(R.id.action_settings);
+                if (actionView != null) {
+                    actionView.setAlpha(0f);
+                    actionView.setRotation(-90f);
+                    actionView.animate()
+                        .alpha(1f)
+                        .rotation(0f)
+                        .setDuration(500)
+                        .setStartDelay(800)
+                        .setInterpolator(new android.view.animation.OvershootInterpolator())
+                        .start();
+                }
+            }
+        }
+
         return true;
     }
 
@@ -191,6 +217,62 @@ public class MainActivity extends AppCompatActivity {
             return true;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    private void applyToolbarFont(Toolbar toolbar) {
+        // Apply custom Agbalumo font to toolbar title
+        try {
+            android.graphics.Typeface typeface = androidx.core.content.res.ResourcesCompat.getFont(this, R.font.agbalumo);
+            // Get the TextView that displays the title
+            for (int i = 0; i < toolbar.getChildCount(); i++) {
+                View view = toolbar.getChildAt(i);
+                if (view instanceof android.widget.TextView) {
+                    android.widget.TextView textView = (android.widget.TextView) view;
+                    if (textView.getText().equals(toolbar.getTitle())) {
+                        textView.setTypeface(typeface);
+                        textView.setTextSize(android.util.TypedValue.COMPLEX_UNIT_SP, 20);
+                        break;
+                    }
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void animateToolbar(Toolbar toolbar) {
+        if (!animationsEnabled()) return;
+
+        // Start with toolbar slightly above and transparent
+        toolbar.setTranslationY(-50f);
+        toolbar.setAlpha(0f);
+
+        // Animate down and fade in
+        toolbar.animate()
+            .translationY(0f)
+            .alpha(1f)
+            .setDuration(600)
+            .setStartDelay(200)
+            .setInterpolator(new android.view.animation.DecelerateInterpolator())
+            .start();
+
+        // Add subtle scale animation to logo
+        toolbar.postDelayed(() -> {
+            for (int i = 0; i < toolbar.getChildCount(); i++) {
+                View view = toolbar.getChildAt(i);
+                if (view instanceof ImageView) {
+                    view.setScaleX(0.8f);
+                    view.setScaleY(0.8f);
+                    view.animate()
+                        .scaleX(1f)
+                        .scaleY(1f)
+                        .setDuration(400)
+                        .setInterpolator(new android.view.animation.OvershootInterpolator())
+                        .start();
+                    break;
+                }
+            }
+        }, 300);
     }
 
     @Override
