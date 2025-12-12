@@ -16,6 +16,7 @@ import android.widget.Toast;
 public class SettingsActivity extends AppCompatActivity {
 
     private SwitchMaterial switchMusic, switchSfx;
+    private SwitchMaterial switchAnimations;
     private Button btnResetProgress;
     private RadioGroup rgTheme;
     private RadioButton rbLight, rbDark, rbSystem;
@@ -23,6 +24,7 @@ public class SettingsActivity extends AppCompatActivity {
     private static final String PREF_NAME = "EduLinguaPrefs";
     private static final String KEY_MUSIC_ENABLED = "MUSIC_ENABLED";
     private static final String KEY_SFX_ENABLED = "SFX_ENABLED";
+    private static final String KEY_ANIMATIONS_ENABLED = "ANIMATIONS_ENABLED";
     private static final String KEY_THEME = "THEME";
 
     private static final String KEY_HIGH_SCORE = "HIGH_SCORE";
@@ -45,6 +47,13 @@ public class SettingsActivity extends AppCompatActivity {
         // Find views
         switchMusic = findViewById(R.id.switchMusic);
         switchSfx = findViewById(R.id.switchSfx);
+        // Guarded lookup: layout may differ across variants; use identifier lookup and null check
+        int animSwitchId = getResources().getIdentifier("switchAnimations", "id", getPackageName());
+        if (animSwitchId != 0) {
+            switchAnimations = findViewById(animSwitchId);
+        } else {
+            switchAnimations = null;
+        }
         btnResetProgress = findViewById(R.id.btnResetProgress);
         rgTheme = findViewById(R.id.rgTheme);
         rbLight = findViewById(R.id.rbLight);
@@ -55,11 +64,15 @@ public class SettingsActivity extends AppCompatActivity {
         SharedPreferences prefs = getSharedPreferences(PREF_NAME, MODE_PRIVATE);
         boolean musicEnabled = prefs.getBoolean(KEY_MUSIC_ENABLED, true);
         boolean sfxEnabled = prefs.getBoolean(KEY_SFX_ENABLED, true);
+        boolean animationsEnabled = prefs.getBoolean(KEY_ANIMATIONS_ENABLED, true);
         int currentTheme = prefs.getInt(KEY_THEME, AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM);
 
         // Set UI states
         switchMusic.setChecked(musicEnabled);
         switchSfx.setChecked(sfxEnabled);
+        if (switchAnimations != null) {
+            switchAnimations.setChecked(animationsEnabled);
+        }
         updateThemeRadioButtons(currentTheme);
 
         // Save preferences when toggles change
@@ -70,6 +83,12 @@ public class SettingsActivity extends AppCompatActivity {
         switchSfx.setOnCheckedChangeListener((buttonView, isChecked) -> {
             prefs.edit().putBoolean(KEY_SFX_ENABLED, isChecked).apply();
         });
+
+        if (switchAnimations != null) {
+            switchAnimations.setOnCheckedChangeListener((buttonView, isChecked) -> {
+                prefs.edit().putBoolean(KEY_ANIMATIONS_ENABLED, isChecked).apply();
+            });
+        }
 
         // Change theme when radio button is selected
         rgTheme.setOnCheckedChangeListener((group, checkedId) -> {

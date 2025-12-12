@@ -53,6 +53,7 @@ public class MainActivity extends AppCompatActivity {
     private Animator starRightAnimator;
     private ImageView bubbleTop, bubbleMidRight, bubbleBottomLeft;
     private Animator bubbleTopAnimator, bubbleMidAnimator, bubbleBottomAnimator;
+    private static final String KEY_ANIMATIONS_ENABLED = "ANIMATIONS_ENABLED";
 
     private static final String PREF_NAME = "EduLinguaPrefs";
     private static final String KEY_SFX_ENABLED = "SFX_ENABLED";
@@ -110,7 +111,9 @@ public class MainActivity extends AppCompatActivity {
     private void setupAnimation() {
         AnimatorSet pulse = (AnimatorSet) AnimatorInflater.loadAnimator(this, R.animator.pulse);
         pulse.setTarget(lottieAnimationView);
-        pulse.start();
+        if (animationsEnabled()) {
+            pulse.start();
+        }
 
         lottieAnimationView.setOnClickListener(v -> {
             vibrate();
@@ -193,15 +196,20 @@ public class MainActivity extends AppCompatActivity {
         SharedPreferences prefs = getSharedPreferences(PREF_NAME, MODE_PRIVATE);
         // previously read high score to show in removed UI; keep prefs access in case other features rely on it
         applyDynamicBackground();
-        startOverlayPulse();
-        if (heroGlowAnimator != null && !((Animator)heroGlowAnimator).isStarted()) {
-            heroGlowAnimator.start();
+        if (animationsEnabled()) {
+            startOverlayPulse();
+            if (heroGlowAnimator != null && !((Animator)heroGlowAnimator).isStarted()) {
+                heroGlowAnimator.start();
+            }
+            if (starLeftAnimator != null && !starLeftAnimator.isStarted()) starLeftAnimator.start();
+            if (starRightAnimator != null && !starRightAnimator.isStarted()) starRightAnimator.start();
+            if (bubbleTopAnimator != null && !bubbleTopAnimator.isStarted()) bubbleTopAnimator.start();
+            if (bubbleMidAnimator != null && !bubbleMidAnimator.isStarted()) bubbleMidAnimator.start();
+            if (bubbleBottomAnimator != null && !bubbleBottomAnimator.isStarted()) bubbleBottomAnimator.start();
+        } else {
+            // ensure overlay alpha is set to default when animations disabled
+            if (dynamicBackgroundOverlay != null) dynamicBackgroundOverlay.setAlpha(0.45f);
         }
-        if (starLeftAnimator != null && !starLeftAnimator.isStarted()) starLeftAnimator.start();
-        if (starRightAnimator != null && !starRightAnimator.isStarted()) starRightAnimator.start();
-        if (bubbleTopAnimator != null && !bubbleTopAnimator.isStarted()) bubbleTopAnimator.start();
-        if (bubbleMidAnimator != null && !bubbleMidAnimator.isStarted()) bubbleMidAnimator.start();
-        if (bubbleBottomAnimator != null && !bubbleBottomAnimator.isStarted()) bubbleBottomAnimator.start();
     }
 
     @Override
@@ -216,6 +224,11 @@ public class MainActivity extends AppCompatActivity {
         if (bubbleMidAnimator != null && bubbleMidAnimator.isRunning()) bubbleMidAnimator.end();
         if (bubbleBottomAnimator != null && bubbleBottomAnimator.isRunning()) bubbleBottomAnimator.end();
         super.onPause();
+    }
+
+    private boolean animationsEnabled() {
+        SharedPreferences prefs = getSharedPreferences(PREF_NAME, MODE_PRIVATE);
+        return prefs.getBoolean(KEY_ANIMATIONS_ENABLED, true);
     }
 
     // ---------------- BACK HANDLER ----------------
@@ -485,7 +498,7 @@ public class MainActivity extends AppCompatActivity {
 
     private void setupDynamicBackground() {
         applyDynamicBackground();
-        startOverlayPulse();
+        // overlay pulse is started from onResume() when animations are enabled
     }
 
     private void applyDynamicBackground() {
