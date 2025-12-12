@@ -69,6 +69,7 @@ public class MainActivity extends AppCompatActivity {
 
     private String[] langNames = {"English", "French", "Twi", "Ewe", "Ga"};
     private String[] langCodes = {"en", "fr", "ak", "ee", "gaa"};
+    private int[] langFlags = {R.drawable.ic_flag_uk, R.drawable.ic_flag_france, R.drawable.ic_flag_ghana, R.drawable.ic_flag_ghana, R.drawable.ic_flag_ghana};
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -434,7 +435,7 @@ public class MainActivity extends AppCompatActivity {
             chip.setTag(langCodes[i]);
             chip.setCheckable(true);
             chip.setClickable(true);
-            chip.setChipIcon(AppCompatResources.getDrawable(this, android.R.drawable.ic_btn_speak_now));
+            chip.setChipIcon(AppCompatResources.getDrawable(this, langFlags[i]));
 
             chip.setOnCheckedChangeListener((buttonView, isChecked) -> {
                 if (isChecked) {
