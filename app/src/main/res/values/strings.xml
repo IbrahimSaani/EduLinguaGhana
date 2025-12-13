@@ -77,4 +77,17 @@
     <string name="mode_cta_ready">I\'m ready!</string>
     <string name="mode_cta_game_on">Game on!</string>
     <string name="mode_cta_view">View stats</string>
+
+    <!-- Main Screen Enhancements -->
+    <string name="daily_motivation_title">Today\'s Motivation</string>
+    <string name="learning_streak_title">Learning Streak</string>
+    <string name="learning_streak_days">%d days</string>
+    <string name="quick_actions_title">Quick Actions</string>
+    <string name="fun_fact_title">Did You Know?</string>
+    <string name="welcome_back">Welcome back, Learner!</string>
+    <string name="welcome_morning">Good morning! ☀️</string>
+    <string name="welcome_afternoon">Good afternoon! 🌤️</string>
+    <string name="welcome_evening">Good evening! 🌙</string>
+    <string name="achievements_preview">Latest Achievement</string>
+    <string name="recent_activity">Recently Used</string>
 </resources>

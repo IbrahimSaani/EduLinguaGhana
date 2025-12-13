@@ -527,16 +527,143 @@
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
 
+            <!-- Daily Motivation & Learning Streak Row -->
+            <LinearLayout
+                android:id="@+id/motivationStreakRow"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:orientation="horizontal"
+                app:layout_constraintTop_toBottomOf="@id/heroCard"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent">
+
+                <!-- Daily Motivation Card -->
+                <com.google.android.material.card.MaterialCardView
+                    android:id="@+id/motivationCard"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:layout_marginEnd="8dp"
+                    app:cardCornerRadius="20dp"
+                    app:cardElevation="4dp">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:background="@drawable/bg_motivation_card"
+                        android:orientation="vertical"
+                        android:padding="16dp">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/daily_motivation_title"
+                            android:textSize="12sp"
+                            android:textColor="@color/textColorSecondary"
+                            android:textStyle="bold" />
+
+                        <TextView
+                            android:id="@+id/tvMotivationMessage"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="4dp"
+                            android:text="Keep learning! 🌟"
+                            android:textSize="14sp"
+                            android:fontFamily="@font/agbalumo"
+                            android:textColor="@color/textColorPrimary" />
+                    </LinearLayout>
+                </com.google.android.material.card.MaterialCardView>
+
+                <!-- Learning Streak Card -->
+                <com.google.android.material.card.MaterialCardView
+                    android:id="@+id/streakCard"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:layout_marginStart="8dp"
+                    app:cardCornerRadius="20dp"
+                    app:cardElevation="4dp">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:background="@drawable/bg_streak_card"
+                        android:orientation="vertical"
+                        android:gravity="center"
+                        android:padding="16dp">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/learning_streak_title"
+                            android:textSize="12sp"
+                            android:textColor="@color/textColorSecondary"
+                            android:textStyle="bold" />
+
+                        <TextView
+                            android:id="@+id/tvStreakCount"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="4dp"
+                            android:text="🔥 0 days"
+                            android:textSize="18sp"
+                            android:fontFamily="@font/agbalumo"
+                            android:textColor="@color/colorPrimary" />
+                    </LinearLayout>
+                </com.google.android.material.card.MaterialCardView>
+
+            </LinearLayout>
+
+            <!-- Fun Fact Card -->
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/funFactCard"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                app:cardCornerRadius="20dp"
+                app:cardElevation="4dp"
+                app:layout_constraintTop_toBottomOf="@id/motivationStreakRow"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/bg_fun_fact_card"
+                    android:orientation="vertical"
+                    android:padding="16dp">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/fun_fact_title"
+                        android:textSize="14sp"
+                        android:textColor="@color/textColorSecondary"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:id="@+id/tvFunFact"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="8dp"
+                        android:text="Ghana has over 80 languages! 🇬🇭"
+                        android:textSize="14sp"
+                        android:textColor="@color/textColorPrimary"
+                        android:lineSpacingExtra="2dp" />
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
             <!-- tvBestScoreMain (best quiz score) removed on request -->
 
             <com.google.android.material.card.MaterialCardView
                 android:id="@+id/languageCard"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="24dp"
+                android:layout_marginTop="16dp"
                 app:cardCornerRadius="32dp"
                 app:cardElevation="0dp"
-                app:layout_constraintTop_toBottomOf="@id/heroCard"
+                app:layout_constraintTop_toBottomOf="@id/funFactCard"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent">
 
@@ -776,11 +903,11 @@
                         android:layout_marginStart="8dp"
                         android:clickable="true"
                         android:focusable="true"
-                        android:foreground="?attr/selectableItemBackground"
+                        android:foreground="@drawable/ripple_card_effect"
                         android:contentDescription="@string/mode_progress_title"
                         app:cardBackgroundColor="@android:color/transparent"
                         app:cardCornerRadius="28dp"
-                        app:cardElevation="0dp">
+                        app:cardElevation="4dp">
 
                         <LinearLayout
                             android:layout_width="match_parent"

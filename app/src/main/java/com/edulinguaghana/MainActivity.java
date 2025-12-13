@@ -56,6 +56,9 @@ public class MainActivity extends AppCompatActivity {
     private Animator bubbleTopAnimator, bubbleMidAnimator, bubbleBottomAnimator;
     private android.view.ViewGroup floatingElementsContainer;
     private android.view.ViewGroup animatedShapesContainer;
+    private android.widget.TextView tvMotivationMessage;
+    private android.widget.TextView tvStreakCount;
+    private android.widget.TextView tvFunFact;
     private static final String KEY_ANIMATIONS_ENABLED = "ANIMATIONS_ENABLED";
     private static final String KEY_LOW_POWER_ANIMATIONS = "LOW_POWER_ANIMATIONS";
 
@@ -97,6 +100,9 @@ public class MainActivity extends AppCompatActivity {
         bubbleBottomLeft = findViewById(R.id.bubbleBottomLeft);
         floatingElementsContainer = findViewById(R.id.floatingElementsContainer);
         animatedShapesContainer = findViewById(R.id.animatedShapesContainer);
+        tvMotivationMessage = findViewById(R.id.tvMotivationMessage);
+        tvStreakCount = findViewById(R.id.tvStreakCount);
+        tvFunFact = findViewById(R.id.tvFunFact);
         languageChipGroup = findViewById(R.id.languageChipGroup);
         btnRecitalMode = findViewById(R.id.btnRecitalMode);
         btnPracticeMode = findViewById(R.id.btnPracticeMode);
@@ -112,6 +118,7 @@ public class MainActivity extends AppCompatActivity {
         setupBubbleAnimations();
         setupFloatingElements();
         setupAnimatedShapes();
+        setupEnhancedFeatures();
         setupLanguageChips();
         restoreLastLanguageSelection();
         setupButtons();
@@ -254,6 +261,120 @@ public class MainActivity extends AppCompatActivity {
             }
         } catch (Exception e) {
             // Fail silently if animations can't be loaded
+        }
+    }
+
+    private void setupEnhancedFeatures() {
+        // Setup daily motivational message
+        setupDailyMotivation();
+
+        // Setup learning streak
+        setupLearningStreak();
+
+        // Setup fun facts
+        setupFunFacts();
+
+        // Animate cards on entrance
+        animateEnhancedCards();
+    }
+
+    private void setupDailyMotivation() {
+        if (tvMotivationMessage == null) return;
+
+        String[] motivationMessages = {
+            "You're doing great! 🌟",
+            "Keep learning! 💪",
+            "Every day is progress! 🚀",
+            "You're amazing! ✨",
+            "Learning is fun! 🎉",
+            "Stay curious! 🤔",
+            "You can do it! 💫",
+            "Believe in yourself! 🌈"
+        };
+
+        // Pick a random motivational message
+        int index = (int) (Math.random() * motivationMessages.length);
+        tvMotivationMessage.setText(motivationMessages[index]);
+    }
+
+    private void setupLearningStreak() {
+        if (tvStreakCount == null) return;
+
+        SharedPreferences prefs = getSharedPreferences(PREF_NAME, MODE_PRIVATE);
+        long lastVisit = prefs.getLong("LAST_VISIT_DATE", 0);
+        int streak = prefs.getInt("LEARNING_STREAK", 0);
+
+        long currentDate = System.currentTimeMillis() / (1000 * 60 * 60 * 24); // Days since epoch
+        long lastDate = lastVisit / (1000 * 60 * 60 * 24);
+
+        if (currentDate == lastDate) {
+            // Same day visit
+            tvStreakCount.setText(String.format("🔥 %d days", streak));
+        } else if (currentDate == lastDate + 1) {
+            // Consecutive day visit
+            streak++;
+            SharedPreferences.Editor editor = prefs.edit();
+            editor.putInt("LEARNING_STREAK", streak);
+            editor.putLong("LAST_VISIT_DATE", System.currentTimeMillis());
+            editor.apply();
+            tvStreakCount.setText(String.format("🔥 %d days", streak));
+        } else {
+            // Streak broken
+            streak = 1;
+            SharedPreferences.Editor editor = prefs.edit();
+            editor.putInt("LEARNING_STREAK", streak);
+            editor.putLong("LAST_VISIT_DATE", System.currentTimeMillis());
+            editor.apply();
+            tvStreakCount.setText("🔥 1 day");
+        }
+    }
+
+    private void setupFunFacts() {
+        if (tvFunFact == null) return;
+
+        String[] funFacts = {
+            "Ghana has over 80 languages! 🇬🇭",
+            "Twi is spoken by 9 million people! 💬",
+            "Learning languages makes your brain stronger! 🧠",
+            "French is spoken in 29 countries! 🌍",
+            "Ewe has unique tonal sounds! 🎵",
+            "The Ga people live near Accra! 🏙️",
+            "Bilingual children are better problem solvers! ⚡",
+            "Learning a language connects you to cultures! 🤝"
+        };
+
+        // Pick a random fun fact
+        int index = (int) (Math.random() * funFacts.length);
+        tvFunFact.setText(funFacts[index]);
+    }
+
+    private void animateEnhancedCards() {
+        if (!animationsEnabled()) return;
+
+        try {
+            View motivationCard = findViewById(R.id.motivationCard);
+            View streakCard = findViewById(R.id.streakCard);
+            View funFactCard = findViewById(R.id.funFactCard);
+
+            if (motivationCard != null) {
+                android.view.animation.Animation anim = AnimationUtils.loadAnimation(this, R.anim.slide_up_gentle);
+                anim.setStartOffset(200);
+                motivationCard.startAnimation(anim);
+            }
+
+            if (streakCard != null) {
+                android.view.animation.Animation anim = AnimationUtils.loadAnimation(this, R.anim.slide_up_gentle);
+                anim.setStartOffset(300);
+                streakCard.startAnimation(anim);
+            }
+
+            if (funFactCard != null) {
+                android.view.animation.Animation anim = AnimationUtils.loadAnimation(this, R.anim.slide_up_gentle);
+                anim.setStartOffset(400);
+                funFactCard.startAnimation(anim);
+            }
+        } catch (Exception e) {
+            // Fail silently
         }
     }
 
