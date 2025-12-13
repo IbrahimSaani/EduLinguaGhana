@@ -30,6 +30,14 @@ public class SplashActivity extends AppCompatActivity {
     private ObjectAnimator sparkleAnimator;
 
     private ImageView progressSparkle;
+    private ImageView topWave;
+    private ImageView bottomWave;
+    private LinearLayout centerCard;
+
+    // Decorative elements
+    private ImageView decorStar1, decorStar2;
+    private ImageView decorCircle1, decorCircle2;
+    private ImageView decorDiamond1, decorDiamond2, decorDiamond3;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -43,11 +51,25 @@ public class SplashActivity extends AppCompatActivity {
         progressBar = findViewById(R.id.progressBar);
         progressContainer = findViewById(R.id.progressContainer);
         progressSparkle = findViewById(R.id.progressSparkle);
+        topWave = findViewById(R.id.topWave);
+        bottomWave = findViewById(R.id.bottomWave);
+        centerCard = findViewById(R.id.centerCard);
+
+        // Bind decorative elements
+        decorStar1 = findViewById(R.id.decorStar1);
+        decorStar2 = findViewById(R.id.decorStar2);
+        decorCircle1 = findViewById(R.id.decorCircle1);
+        decorCircle2 = findViewById(R.id.decorCircle2);
+        decorDiamond1 = findViewById(R.id.decorDiamond1);
+        decorDiamond2 = findViewById(R.id.decorDiamond2);
+        decorDiamond3 = findViewById(R.id.decorDiamond3);
+
         progressBar.setMax(100);
         progressBar.setProgress(0);
 
         setupInitialAnimationState();
         startIntroAnimations();
+        startDecorativeAnimations();
         startLoading();
     }
 
@@ -76,12 +98,13 @@ public class SplashActivity extends AppCompatActivity {
     }
 
     private void startIntroAnimations() {
-        // Bounce-in logo
+        // Bounce-in logo with rotation
         ivLogo.animate()
                 .alpha(1f)
                 .scaleX(1f)
                 .scaleY(1f)
-                .setDuration(900)
+                .rotation(360f)
+                .setDuration(1100)
                 .setInterpolator(new OvershootInterpolator())
                 .start();
 
@@ -116,6 +139,70 @@ public class SplashActivity extends AppCompatActivity {
                     .setDuration(400)
                     .start();
         }
+    }
+
+    private void startDecorativeAnimations() {
+        // Animate waves
+        if (topWave != null) {
+            topWave.startAnimation(android.view.animation.AnimationUtils.loadAnimation(this, R.anim.wave_top_animation));
+        }
+        if (bottomWave != null) {
+            bottomWave.startAnimation(android.view.animation.AnimationUtils.loadAnimation(this, R.anim.wave_bottom_animation));
+        }
+
+        // Add pulse animation to center card
+        if (centerCard != null) {
+            centerCard.postDelayed(() -> {
+                if (centerCard != null) {
+                    centerCard.startAnimation(android.view.animation.AnimationUtils.loadAnimation(this, R.anim.center_card_pulse));
+                }
+            }, 1500);
+        }
+
+        // Add shimmer effect to logo
+        if (ivLogo != null) {
+            ivLogo.postDelayed(() -> {
+                if (ivLogo != null) {
+                    ivLogo.startAnimation(android.view.animation.AnimationUtils.loadAnimation(this, R.anim.logo_shimmer));
+                }
+            }, 1000);
+        }
+
+        // Animate decorative elements with staggered delays
+        animateDecorativeElement(decorStar1, 1200, 0, true);
+        animateDecorativeElement(decorStar2, 1400, 200, true);
+        animateDecorativeElement(decorCircle1, 1600, 400, false);
+        animateDecorativeElement(decorCircle2, 1800, 600, false);
+        animateDecorativeElement(decorDiamond1, 2000, 800, false);
+        animateDecorativeElement(decorDiamond2, 2200, 1000, false);
+        animateDecorativeElement(decorDiamond3, 2400, 1200, false);
+    }
+
+    private void animateDecorativeElement(ImageView element, long fadeInDelay, long floatDelay, boolean isStar) {
+        if (element == null) return;
+
+        // Fade in animation
+        element.animate()
+                .alpha(0.8f)
+                .setStartDelay(fadeInDelay)
+                .setDuration(600)
+                .withEndAction(() -> {
+                    if (element != null) {
+                        // Start special animation after fade in
+                        element.postDelayed(() -> {
+                            if (element != null) {
+                                if (isStar) {
+                                    // Stars get a twinkling effect
+                                    element.startAnimation(android.view.animation.AnimationUtils.loadAnimation(this, R.anim.star_twinkle));
+                                } else {
+                                    // Others get floating effect
+                                    element.startAnimation(android.view.animation.AnimationUtils.loadAnimation(this, R.anim.floating_element));
+                                }
+                            }
+                        }, floatDelay);
+                    }
+                })
+                .start();
     }
 
     private void startLoading() {
