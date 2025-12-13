@@ -169,79 +169,57 @@
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
 
-            <RelativeLayout
+            <!-- Main Content Area -->
+            <FrameLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="16dp">
-
-                <com.google.android.material.button.MaterialButton
-                    android:id="@+id/btnPrev"
-                    style="@style/Widget.Material3.Button.TonalButton.Icon"
-                    android:layout_width="64dp"
-                    android:layout_height="64dp"
-                    android:layout_alignParentStart="true"
-                    android:layout_centerVertical="true"
-                    android:contentDescription="@string/content_description_previous"
-                    app:cornerRadius="32dp"
-                    app:icon="@drawable/ic_arrow_back"
-                    app:iconGravity="textStart"
-                    app:iconSize="32dp"
-                    app:iconPadding="0dp" />
 
                 <com.google.android.material.card.MaterialCardView
                     android:id="@+id/letterCard"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_toStartOf="@id/btnNext"
-                    android:layout_toEndOf="@id/btnPrev"
-                    android:layout_marginStart="8dp"
-                    android:layout_marginEnd="8dp"
-                    android:foreground="@drawable/ripple_card_effect"
-                    app:cardCornerRadius="24dp"
-                    app:cardElevation="12dp"
+                    android:layout_marginStart="80dp"
+                    android:layout_marginEnd="80dp"
+                    app:cardCornerRadius="28dp"
+                    app:cardElevation="16dp"
                     app:strokeColor="@color/colorPrimary"
-                    app:strokeWidth="3dp">
+                    app:strokeWidth="2dp">
 
-                    <!-- Gradient background overlay -->
+                    <!-- Subtle gradient background -->
                     <View
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
-                        android:alpha="0.05"
+                        android:alpha="0.03"
                         android:background="@drawable/bg_splash_gradient" />
 
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:gravity="center_horizontal"
+                        android:gravity="center"
                         android:orientation="vertical"
-                        android:padding="32dp">
+                        android:paddingTop="40dp"
+                        android:paddingBottom="40dp"
+                        android:paddingStart="24dp"
+                        android:paddingEnd="24dp">
 
-                        <!-- Decorative top accent -->
-                        <ImageView
-                            android:id="@+id/topAccent"
-                            android:layout_width="48dp"
-                            android:layout_height="48dp"
-                            android:layout_marginBottom="8dp"
-                            android:alpha="0.4"
-                            android:contentDescription="@null"
-                            android:src="@drawable/ic_decorative_star" />
-
+                        <!-- Main letter with subtle shadow -->
                         <FrameLayout
                             android:layout_width="wrap_content"
-                            android:layout_height="wrap_content">
+                            android:layout_height="wrap_content"
+                            android:layout_marginBottom="20dp">
 
-                            <!-- Shadow effect for letter -->
                             <TextView
                                 android:id="@+id/tvLetterShadow"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:layout_marginTop="4dp"
-                                android:layout_marginStart="4dp"
+                                android:layout_marginTop="3dp"
+                                android:layout_marginStart="3dp"
                                 android:fontFamily="@font/agbalumo"
                                 android:text="A"
-                                android:alpha="0.2"
+                                android:alpha="0.15"
                                 android:textColor="@android:color/black"
-                                android:textSize="120sp"
+                                android:textSize="140sp"
                                 android:textStyle="bold" />
 
                             <TextView
@@ -251,74 +229,70 @@
                                 android:fontFamily="@font/agbalumo"
                                 android:text="A"
                                 android:textColor="@color/colorAccent"
-                                android:textSize="120sp"
-                                android:textStyle="bold"
-                                android:shadowColor="@color/colorPrimary"
-                                android:shadowDx="0"
-                                android:shadowDy="0"
-                                android:shadowRadius="8" />
+                                android:textSize="140sp"
+                                android:textStyle="bold" />
                         </FrameLayout>
 
-                        <!-- Divider line -->
-                        <View
-                            android:layout_width="80dp"
-                            android:layout_height="4dp"
-                            android:layout_marginTop="16dp"
-                            android:layout_marginBottom="16dp"
-                            android:background="@color/colorAccent"
-                            android:alpha="0.5" />
-
+                        <!-- Word display -->
                         <TextView
                             android:id="@+id/tvLetterWord"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
+                            android:layout_marginBottom="24dp"
                             android:textColor="@color/colorPrimary"
-                            android:textSize="28sp"
+                            android:textSize="32sp"
                             android:textStyle="bold"
                             android:fontFamily="@font/agbalumo"
                             tools:text="Apple" />
 
+                        <!-- Speak button -->
                         <com.google.android.material.button.MaterialButton
                             android:id="@+id/btnSpeak"
                             style="@style/Widget.Material3.Button.Icon"
                             android:layout_width="wrap_content"
-                            android:layout_height="64dp"
-                            android:layout_marginTop="24dp"
-                            android:paddingStart="24dp"
-                            android:paddingEnd="24dp"
+                            android:layout_height="56dp"
+                            android:minWidth="180dp"
+                            android:paddingStart="28dp"
+                            android:paddingEnd="28dp"
                             android:text="@string/speak_button"
-                            android:textSize="18sp"
-                            app:cornerRadius="32dp"
+                            android:textSize="16sp"
+                            app:cornerRadius="28dp"
                             app:icon="@drawable/ic_speak"
-                            app:iconSize="28dp" />
-
-                        <!-- Decorative bottom accent -->
-                        <ImageView
-                            android:id="@+id/bottomAccent"
-                            android:layout_width="40dp"
-                            android:layout_height="40dp"
-                            android:layout_marginTop="12dp"
-                            android:alpha="0.4"
-                            android:contentDescription="@null"
-                            android:src="@drawable/ic_decorative_circle" />
+                            app:iconSize="24dp" />
                     </LinearLayout>
                 </com.google.android.material.card.MaterialCardView>
 
+                <!-- Navigation Buttons Overlay -->
                 <com.google.android.material.button.MaterialButton
-                    android:id="@+id/btnNext"
-                    style="@style/Widget.Material3.Button.TonalButton.Icon"
-                    android:layout_width="64dp"
-                    android:layout_height="64dp"
-                    android:layout_alignParentEnd="true"
-                    android:layout_centerVertical="true"
-                    android:contentDescription="@string/content_description_next"
-                    app:cornerRadius="32dp"
-                    app:icon="@drawable/ic_arrow_forward"
+                    android:id="@+id/btnPrev"
+                    style="@style/Widget.Material3.Button.ElevatedButton.Icon"
+                    android:layout_width="56dp"
+                    android:layout_height="56dp"
+                    android:layout_gravity="center_vertical|start"
+                    android:layout_marginStart="8dp"
+                    android:contentDescription="@string/content_description_previous"
+                    app:cornerRadius="28dp"
+                    app:elevation="8dp"
+                    app:icon="@drawable/ic_arrow_back"
                     app:iconGravity="textStart"
-                    app:iconSize="32dp"
+                    app:iconSize="28dp"
                     app:iconPadding="0dp" />
 
-            </RelativeLayout>
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnNext"
+                    style="@style/Widget.Material3.Button.ElevatedButton.Icon"
+                    android:layout_width="56dp"
+                    android:layout_height="56dp"
+                    android:layout_gravity="center_vertical|end"
+                    android:layout_marginEnd="8dp"
+                    android:contentDescription="@string/content_description_next"
+                    app:cornerRadius="28dp"
+                    app:elevation="8dp"
+                    app:icon="@drawable/ic_arrow_forward"
+                    app:iconGravity="textStart"
+                    app:iconSize="28dp"
+                    app:iconPadding="0dp" />
+            </FrameLayout>
         </LinearLayout>
     </ScrollView>
 

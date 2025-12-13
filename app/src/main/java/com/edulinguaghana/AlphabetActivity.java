@@ -34,7 +34,7 @@ public class AlphabetActivity extends AppCompatActivity {
     private LinearProgressIndicator progressBar;
     private MaterialCardView letterCard, languageCard;
     private ImageView decorativeShape1, decorativeShape2, decorativeShape3, decorativeShape4;
-    private ImageView topAccent, bottomAccent, progressIcon, languageIcon, modeIcon;
+    private ImageView progressIcon, languageIcon, modeIcon;
 
     private String languageCode;
     private String languageName;
@@ -89,8 +89,6 @@ public class AlphabetActivity extends AppCompatActivity {
         decorativeShape2 = findViewById(R.id.decorativeShape2);
         decorativeShape3 = findViewById(R.id.decorativeShape3);
         decorativeShape4 = findViewById(R.id.decorativeShape4);
-        topAccent = findViewById(R.id.topAccent);
-        bottomAccent = findViewById(R.id.bottomAccent);
         progressIcon = findViewById(R.id.progressIcon);
         languageIcon = findViewById(R.id.languageIcon);
         modeIcon = findViewById(R.id.modeIcon);
@@ -216,9 +214,9 @@ public class AlphabetActivity extends AppCompatActivity {
     }
 
     private void updateLetterWithAnimation() {
-        // Animate card transition
+        // Animate letter change with smooth fade and scale
         try {
-            animateCardTransition();
+            animateLetterChange();
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -252,13 +250,6 @@ public class AlphabetActivity extends AppCompatActivity {
             // Animate word text
             Animation wordAnim = AnimationUtils.loadAnimation(this, R.anim.fade_in);
             tvLetterWord.startAnimation(wordAnim);
-
-            // Animate accents
-            if (topAccent != null && bottomAccent != null) {
-                Animation twinkle = AnimationUtils.loadAnimation(this, R.anim.star_twinkle);
-                topAccent.startAnimation(twinkle);
-                bottomAccent.startAnimation(twinkle);
-            }
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -312,25 +303,54 @@ public class AlphabetActivity extends AppCompatActivity {
         }
     }
 
-    private void animateCardTransition() {
+    private void animateLetterChange() {
         try {
-            if (letterCard != null) {
-                Animation slideOut = AnimationUtils.loadAnimation(this, R.anim.slide_up);
-                Animation slideIn = AnimationUtils.loadAnimation(this, R.anim.slide_in_bottom);
+            if (tvLetter != null && tvLetterWord != null) {
+                // Create smooth scale and fade animation
+                tvLetter.animate()
+                    .scaleX(0.8f)
+                    .scaleY(0.8f)
+                    .alpha(0.5f)
+                    .setDuration(100)
+                    .withEndAction(() -> {
+                        tvLetter.animate()
+                            .scaleX(1.0f)
+                            .scaleY(1.0f)
+                            .alpha(1.0f)
+                            .setDuration(150)
+                            .start();
+                    })
+                    .start();
 
-                letterCard.startAnimation(slideOut);
-                slideOut.setAnimationListener(new Animation.AnimationListener() {
-                    @Override
-                    public void onAnimationStart(Animation animation) {}
+                // Fade word
+                tvLetterWord.animate()
+                    .alpha(0f)
+                    .setDuration(100)
+                    .withEndAction(() -> {
+                        tvLetterWord.animate()
+                            .alpha(1f)
+                            .setDuration(150)
+                            .start();
+                    })
+                    .start();
 
-                    @Override
-                    public void onAnimationEnd(Animation animation) {
-                        letterCard.startAnimation(slideIn);
-                    }
-
-                    @Override
-                    public void onAnimationRepeat(Animation animation) {}
-                });
+                // Also animate shadow if available
+                if (tvLetterShadow != null) {
+                    tvLetterShadow.animate()
+                        .scaleX(0.8f)
+                        .scaleY(0.8f)
+                        .alpha(0.1f)
+                        .setDuration(100)
+                        .withEndAction(() -> {
+                            tvLetterShadow.animate()
+                                .scaleX(1.0f)
+                                .scaleY(1.0f)
+                                .alpha(0.15f)
+                                .setDuration(150)
+                                .start();
+                        })
+                        .start();
+                }
             }
         } catch (Exception e) {
             e.printStackTrace();
