@@ -45,7 +45,7 @@ public class MainActivity extends AppCompatActivity {
     private ChipGroup languageChipGroup;
     private MaterialCardView btnRecitalMode, btnPracticeMode, btnQuizMode, btnProgressMode;
     private MaterialCardView heroCard;
-    private LottieAnimationView lottieAnimationView;
+    private ImageView mascotView;
     private NestedScrollView nestedScrollView;
     private ObjectAnimator overlayPulseAnimator;
     private Animator heroGlowAnimator;
@@ -108,11 +108,11 @@ public class MainActivity extends AppCompatActivity {
         btnPracticeMode = findViewById(R.id.btnPracticeMode);
         btnQuizMode = findViewById(R.id.btnQuizMode);
         btnProgressMode = findViewById(R.id.btnProgressMode);
-        lottieAnimationView = findViewById(R.id.lottieAnimationView);
+        mascotView = findViewById(R.id.mascotView);
         nestedScrollView = findViewById(R.id.nestedScrollView);
 
         setupDynamicBackground();
-        setupAnimation();
+        setupMascot();
         setupHeroGlow();
         setupStarAnimations();
         setupBubbleAnimations();
@@ -127,21 +127,151 @@ public class MainActivity extends AppCompatActivity {
         showIntroIfFirstTime();
     }
 
-    private void setupAnimation() {
-        AnimatorSet pulse = (AnimatorSet) AnimatorInflater.loadAnimator(this, R.animator.pulse);
-        pulse.setTarget(lottieAnimationView);
-        if (animationsEnabled()) {
-            pulse.start();
-        }
+    private void setupMascot() {
+        if (mascotView == null) return;
 
-        lottieAnimationView.setOnClickListener(v -> {
-            vibrate();
-            if (lottieAnimationView.isAnimating()) {
-                lottieAnimationView.pauseAnimation();
-            } else {
-                lottieAnimationView.resumeAnimation();
-            }
+        // Start idle animation
+        startMascotIdleAnimation();
+
+        // Set up interactive click listener
+        mascotView.setOnClickListener(v -> {
+            onMascotClicked();
         });
+
+        // Set up long click for special animation
+        mascotView.setOnLongClickListener(v -> {
+            playMascotCelebration();
+            return true;
+        });
+    }
+
+    private void startMascotIdleAnimation() {
+        if (mascotView == null || !animationsEnabled()) return;
+
+        try {
+            android.view.animation.Animation idleAnim = AnimationUtils.loadAnimation(this, R.anim.mascot_idle);
+            mascotView.startAnimation(idleAnim);
+        } catch (Exception e) {
+            // Fail silently
+        }
+    }
+
+    private void onMascotClicked() {
+        if (mascotView == null) return;
+
+        vibrate();
+
+        // Random interaction
+        int interaction = (int) (Math.random() * 3);
+
+        switch (interaction) {
+            case 0:
+                playMascotJump();
+                showMascotMessage(getMascotGreeting());
+                break;
+            case 1:
+                playMascotShake();
+                showMascotMessage(getMascotEncouragement());
+                break;
+            case 2:
+                playMascotCelebration();
+                showMascotMessage("Yay! 🎉");
+                break;
+        }
+    }
+
+    private void playMascotJump() {
+        if (mascotView == null || !animationsEnabled()) return;
+
+        try {
+            android.view.animation.Animation jumpAnim = AnimationUtils.loadAnimation(this, R.anim.mascot_jump);
+            jumpAnim.setAnimationListener(new android.view.animation.Animation.AnimationListener() {
+                @Override
+                public void onAnimationStart(android.view.animation.Animation animation) {}
+
+                @Override
+                public void onAnimationEnd(android.view.animation.Animation animation) {
+                    startMascotIdleAnimation();
+                }
+
+                @Override
+                public void onAnimationRepeat(android.view.animation.Animation animation) {}
+            });
+            mascotView.startAnimation(jumpAnim);
+        } catch (Exception e) {
+            // Fail silently
+        }
+    }
+
+    private void playMascotShake() {
+        if (mascotView == null || !animationsEnabled()) return;
+
+        try {
+            android.view.animation.Animation shakeAnim = AnimationUtils.loadAnimation(this, R.anim.mascot_shake);
+            shakeAnim.setAnimationListener(new android.view.animation.Animation.AnimationListener() {
+                @Override
+                public void onAnimationStart(android.view.animation.Animation animation) {}
+
+                @Override
+                public void onAnimationEnd(android.view.animation.Animation animation) {
+                    startMascotIdleAnimation();
+                }
+
+                @Override
+                public void onAnimationRepeat(android.view.animation.Animation animation) {}
+            });
+            mascotView.startAnimation(shakeAnim);
+        } catch (Exception e) {
+            // Fail silently
+        }
+    }
+
+    private void playMascotCelebration() {
+        if (mascotView == null || !animationsEnabled()) return;
+
+        vibrate();
+
+        try {
+            android.view.animation.Animation celebrateAnim = AnimationUtils.loadAnimation(this, R.anim.mascot_celebrate);
+            celebrateAnim.setAnimationListener(new android.view.animation.Animation.AnimationListener() {
+                @Override
+                public void onAnimationStart(android.view.animation.Animation animation) {}
+
+                @Override
+                public void onAnimationEnd(android.view.animation.Animation animation) {
+                    startMascotIdleAnimation();
+                }
+
+                @Override
+                public void onAnimationRepeat(android.view.animation.Animation animation) {}
+            });
+            mascotView.startAnimation(celebrateAnim);
+        } catch (Exception e) {
+            // Fail silently
+        }
+    }
+
+    private String getMascotGreeting() {
+        String[] greetings = {
+            getString(R.string.mascot_greeting_1),
+            getString(R.string.mascot_greeting_2),
+            getString(R.string.mascot_greeting_3),
+            getString(R.string.mascot_greeting_4)
+        };
+        return greetings[(int) (Math.random() * greetings.length)];
+    }
+
+    private String getMascotEncouragement() {
+        String[] encouragements = {
+            getString(R.string.mascot_encouragement_1),
+            getString(R.string.mascot_encouragement_2),
+            getString(R.string.mascot_encouragement_3)
+        };
+        return encouragements[(int) (Math.random() * encouragements.length)];
+    }
+
+    private void showMascotMessage(String message) {
+        Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
     }
 
     private void setupHeroGlow() {

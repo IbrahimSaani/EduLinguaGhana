@@ -90,4 +90,14 @@
     <string name="welcome_evening">Good evening! 🌙</string>
     <string name="achievements_preview">Latest Achievement</string>
     <string name="recent_activity">Recently Used</string>
+
+    <!-- Mascot Messages -->
+    <string name="mascot_tap_me">Tap me!</string>
+    <string name="mascot_greeting_1">Hello, friend! 🦉</string>
+    <string name="mascot_greeting_2">Ready to learn? 📚</string>
+    <string name="mascot_greeting_3">Let\'s explore!</string>
+    <string name="mascot_greeting_4">I\'m Owlbert, your learning buddy! 🎓</string>
+    <string name="mascot_encouragement_1">You\'re doing great!</string>
+    <string name="mascot_encouragement_2">Keep it up!</string>
+    <string name="mascot_encouragement_3">Amazing work!</string>
 </resources>

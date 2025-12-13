@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="200dp"
+    android:height="200dp"
+    android:viewportWidth="200"
+    android:viewportHeight="200">
+
+    <!-- Owl Body -->
+    <path
+        android:fillColor="#FF8F6B"
+        android:pathData="M100,40 Q130,40 140,70 L140,130 Q140,150 120,155 L80,155 Q60,150 60,130 L60,70 Q70,40 100,40 Z" />
+
+    <!-- Belly -->
+    <path
+        android:fillColor="#FFB596"
+        android:pathData="M100,80 Q115,80 120,100 L120,140 Q115,150 100,150 Q85,150 80,140 L80,100 Q85,80 100,80 Z" />
+
+    <!-- Left Eye Background (white circle) -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M80,52 A18,18 0 1,1 80,88 A18,18 0 1,1 80,52 Z" />
+
+    <!-- Right Eye Background (white circle) -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M120,52 A18,18 0 1,1 120,88 A18,18 0 1,1 120,52 Z" />
+
+    <!-- Left Pupil -->
+    <path
+        android:fillColor="#3D3D3D"
+        android:pathData="M80,60 A10,10 0 1,1 80,80 A10,10 0 1,1 80,60 Z" />
+
+    <!-- Right Pupil -->
+    <path
+        android:fillColor="#3D3D3D"
+        android:pathData="M120,60 A10,10 0 1,1 120,80 A10,10 0 1,1 120,60 Z" />
+
+    <!-- Left Eye Shine -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M83,63 A4,4 0 1,1 83,71 A4,4 0 1,1 83,63 Z" />
+
+    <!-- Right Eye Shine -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M123,63 A4,4 0 1,1 123,71 A4,4 0 1,1 123,63 Z" />
+
+    <!-- Beak -->
+    <path
+        android:fillColor="#FFB84D"
+        android:pathData="M100,85 L90,95 L110,95 Z" />
+
+    <!-- Left Wing -->
+    <path
+        android:fillColor="#FF7A52"
+        android:pathData="M60,100 Q50,110 55,120 L65,115 Q62,108 60,100 Z" />
+
+    <!-- Right Wing -->
+    <path
+        android:fillColor="#FF7A52"
+        android:pathData="M140,100 Q150,110 145,120 L135,115 Q138,108 140,100 Z" />
+
+    <!-- Left Ear Tuft -->
+    <path
+        android:fillColor="#FF8F6B"
+        android:pathData="M70,35 L65,20 L75,30 Z" />
+
+    <!-- Right Ear Tuft -->
+    <path
+        android:fillColor="#FF8F6B"
+        android:pathData="M130,35 L135,20 L125,30 Z" />
+
+    <!-- Left Foot -->
+    <path
+        android:fillColor="#FFB84D"
+        android:pathData="M85,153 Q77,153 77,158 Q77,163 85,163 Q93,163 93,158 Q93,153 85,153 Z" />
+
+    <!-- Right Foot -->
+    <path
+        android:fillColor="#FFB84D"
+        android:pathData="M115,153 Q107,153 107,158 Q107,163 115,163 Q123,163 123,158 Q123,153 115,153 Z" />
+
+    <!-- Book in wings -->
+    <path
+        android:fillColor="#4CAF50"
+        android:pathData="M85,110 L85,135 L115,135 L115,110 Z" />
+
+    <!-- Book spine -->
+    <path
+        android:fillColor="#2E7D32"
+        android:pathData="M99,110 L99,135 L101,135 L101,110 Z" />
+
+    <!-- Graduation Cap -->
+    <path
+        android:fillColor="#1A237E"
+        android:pathData="M70,38 L130,38 L125,45 L75,45 Z" />
+
+    <!-- Cap Tassel (circle) -->
+    <path
+        android:fillColor="#FFAB40"
+        android:pathData="M130,34 A4,4 0 1,1 130,42 A4,4 0 1,1 130,34 Z" />
+
+</vector>
+

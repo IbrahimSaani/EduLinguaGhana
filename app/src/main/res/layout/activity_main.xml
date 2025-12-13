@@ -480,25 +480,18 @@
                         app:cardElevation="12dp"
                         app:cardUseCompatPadding="false">
 
-                        <com.airbnb.lottie.LottieAnimationView
-                            android:id="@+id/lottieAnimationView"
-                            android:layout_width="match_parent"
-                            android:layout_height="match_parent"
-                            android:scaleType="centerCrop"
-                            android:contentDescription="@string/main_tap_hint"
-                            app:lottie_rawRes="@raw/kids_animation"
-                            app:lottie_autoPlay="true"
-                            app:lottie_loop="true"
-                            tools:visibility="gone" />
-
-                        <!-- Preview-only placeholder for layout editor (tools namespace) -->
+                        <!-- Interactive Mascot Owl -->
                         <ImageView
+                            android:id="@+id/mascotView"
                             android:layout_width="match_parent"
                             android:layout_height="match_parent"
-                            android:visibility="gone"
-                            tools:visibility="visible"
-                            tools:src="@drawable/ic_launcher_vector"
-                            tools:ignore="ContentDescription" />
+                            android:padding="30dp"
+                            android:scaleType="fitCenter"
+                            android:src="@drawable/mascot_owl"
+                            android:contentDescription="@string/main_tap_hint"
+                            android:clickable="true"
+                            android:focusable="true" />
+
                     </com.google.android.material.card.MaterialCardView>
 
                     <TextView
