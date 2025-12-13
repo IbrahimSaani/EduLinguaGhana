@@ -7,12 +7,57 @@
     android:background="@color/appBackground"
     tools:context=".AlphabetActivity">
 
+    <!-- Decorative background elements -->
+    <ImageView
+        android:id="@+id/decorativeShape1"
+        android:layout_width="60dp"
+        android:layout_height="60dp"
+        android:layout_gravity="top|start"
+        android:layout_marginStart="20dp"
+        android:layout_marginTop="100dp"
+        android:alpha="0.3"
+        android:contentDescription="@null"
+        android:src="@drawable/shape_circle_pink" />
+
+    <ImageView
+        android:id="@+id/decorativeShape2"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:layout_gravity="top|end"
+        android:layout_marginTop="200dp"
+        android:layout_marginEnd="30dp"
+        android:alpha="0.3"
+        android:contentDescription="@null"
+        android:src="@drawable/shape_star" />
+
+    <ImageView
+        android:id="@+id/decorativeShape3"
+        android:layout_width="45dp"
+        android:layout_height="45dp"
+        android:layout_gravity="bottom|start"
+        android:layout_marginStart="40dp"
+        android:layout_marginBottom="150dp"
+        android:alpha="0.3"
+        android:contentDescription="@null"
+        android:src="@drawable/shape_circle_cyan" />
+
+    <ImageView
+        android:id="@+id/decorativeShape4"
+        android:layout_width="55dp"
+        android:layout_height="55dp"
+        android:layout_gravity="center|end"
+        android:layout_marginEnd="25dp"
+        android:alpha="0.3"
+        android:contentDescription="@null"
+        android:src="@drawable/shape_sparkle" />
+
     <com.google.android.material.appbar.AppBarLayout
         android:id="@+id/appBarLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@color/colorPrimary"
-        android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar">
+        android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
+        android:elevation="4dp">
 
         <androidx.appcompat.widget.Toolbar
             android:id="@+id/toolbar"
@@ -35,45 +80,92 @@
             android:orientation="vertical"
             android:padding="16dp">
 
-            <com.google.android.material.progressindicator.LinearProgressIndicator
-                android:id="@+id/progressBar"
+            <!-- Progress Section with Icon -->
+            <RelativeLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="16dp"
-                android:progress="0"
-                app:indicatorColor="@color/colorAccent"
-                app:trackColor="@color/buttonSecondary" />
+                android:layout_marginBottom="16dp">
+
+                <ImageView
+                    android:id="@+id/progressIcon"
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:layout_alignParentStart="true"
+                    android:layout_centerVertical="true"
+                    android:layout_marginEnd="8dp"
+                    android:contentDescription="@null"
+                    android:src="@drawable/ic_progress_sparkle"
+                    app:tint="@color/colorAccent" />
+
+                <com.google.android.material.progressindicator.LinearProgressIndicator
+                    android:id="@+id/progressBar"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_toEndOf="@id/progressIcon"
+                    android:progress="0"
+                    app:indicatorColor="@color/colorAccent"
+                    app:trackColor="@color/buttonSecondary"
+                    app:trackCornerRadius="8dp"
+                    app:trackThickness="8dp" />
+            </RelativeLayout>
 
             <com.google.android.material.card.MaterialCardView
+                android:id="@+id/languageCard"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="16dp"
+                android:foreground="@drawable/ripple_card_effect"
                 app:cardCornerRadius="16dp"
-                app:cardElevation="8dp">
+                app:cardElevation="8dp"
+                app:strokeWidth="0dp">
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:padding="16dp">
+                    android:orientation="horizontal"
+                    android:padding="16dp"
+                    android:gravity="center_vertical">
 
-                    <TextView
-                        android:id="@+id/tvLanguageTitle"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="@string/language_prefix"
-                        android:textColor="@color/colorPrimary"
-                        android:textSize="18sp"
-                        android:textStyle="bold" />
+                    <ImageView
+                        android:id="@+id/languageIcon"
+                        android:layout_width="32dp"
+                        android:layout_height="32dp"
+                        android:layout_marginEnd="12dp"
+                        android:contentDescription="@null"
+                        android:src="@drawable/ic_flag_ghana" />
 
-                    <TextView
-                        android:id="@+id/tvModeLabel"
-                        android:layout_width="wrap_content"
+                    <LinearLayout
+                        android:layout_width="0dp"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="4dp"
-                        android:text="@string/alphabet_mode"
-                        android:textColor="@color/textColorSecondary"
-                        android:textSize="14sp" />
+                        android:layout_weight="1"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:id="@+id/tvLanguageTitle"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/language_prefix"
+                            android:textColor="@color/colorPrimary"
+                            android:textSize="18sp"
+                            android:textStyle="bold" />
+
+                        <TextView
+                            android:id="@+id/tvModeLabel"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="4dp"
+                            android:text="@string/alphabet_mode"
+                            android:textColor="@color/textColorSecondary"
+                            android:textSize="14sp" />
+                    </LinearLayout>
+
+                    <ImageView
+                        android:id="@+id/modeIcon"
+                        android:layout_width="24dp"
+                        android:layout_height="24dp"
+                        android:contentDescription="@null"
+                        android:src="@drawable/ic_decorative_star"
+                        app:tint="@color/colorAccent" />
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
 
@@ -82,74 +174,149 @@
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="16dp">
 
-                <ImageButton
+                <com.google.android.material.button.MaterialButton
                     android:id="@+id/btnPrev"
-                    android:layout_width="56dp"
-                    android:layout_height="56dp"
+                    style="@style/Widget.Material3.Button.TonalButton.Icon"
+                    android:layout_width="64dp"
+                    android:layout_height="64dp"
                     android:layout_alignParentStart="true"
                     android:layout_centerVertical="true"
-                    android:background="?attr/selectableItemBackgroundBorderless"
                     android:contentDescription="@string/content_description_previous"
-                    android:src="@drawable/ic_arrow_back" />
+                    app:cornerRadius="32dp"
+                    app:icon="@drawable/ic_arrow_back"
+                    app:iconGravity="textStart"
+                    app:iconSize="32dp"
+                    app:iconPadding="0dp" />
 
                 <com.google.android.material.card.MaterialCardView
+                    android:id="@+id/letterCard"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_toStartOf="@id/btnNext"
                     android:layout_toEndOf="@id/btnPrev"
-                    app:cardCornerRadius="16dp"
-                    app:cardElevation="8dp"
+                    android:layout_marginStart="8dp"
+                    android:layout_marginEnd="8dp"
+                    android:foreground="@drawable/ripple_card_effect"
+                    app:cardCornerRadius="24dp"
+                    app:cardElevation="12dp"
                     app:strokeColor="@color/colorPrimary"
-                    app:strokeWidth="2dp">
+                    app:strokeWidth="3dp">
+
+                    <!-- Gradient background overlay -->
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:alpha="0.05"
+                        android:background="@drawable/bg_splash_gradient" />
 
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:gravity="center_horizontal"
                         android:orientation="vertical"
-                        android:padding="24dp">
+                        android:padding="32dp">
 
-                        <TextView
-                            android:id="@+id/tvLetter"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
+                        <!-- Decorative top accent -->
+                        <ImageView
+                            android:id="@+id/topAccent"
+                            android:layout_width="48dp"
+                            android:layout_height="48dp"
                             android:layout_marginBottom="8dp"
-                            android:fontFamily="@font/agbalumo"
-                            android:text="A"
-                            android:textColor="@color/colorAccent"
-                            android:textSize="120sp"
-                            android:textStyle="bold" />
+                            android:alpha="0.4"
+                            android:contentDescription="@null"
+                            android:src="@drawable/ic_decorative_star" />
+
+                        <FrameLayout
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content">
+
+                            <!-- Shadow effect for letter -->
+                            <TextView
+                                android:id="@+id/tvLetterShadow"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="4dp"
+                                android:layout_marginStart="4dp"
+                                android:fontFamily="@font/agbalumo"
+                                android:text="A"
+                                android:alpha="0.2"
+                                android:textColor="@android:color/black"
+                                android:textSize="120sp"
+                                android:textStyle="bold" />
+
+                            <TextView
+                                android:id="@+id/tvLetter"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:fontFamily="@font/agbalumo"
+                                android:text="A"
+                                android:textColor="@color/colorAccent"
+                                android:textSize="120sp"
+                                android:textStyle="bold"
+                                android:shadowColor="@color/colorPrimary"
+                                android:shadowDx="0"
+                                android:shadowDy="0"
+                                android:shadowRadius="8" />
+                        </FrameLayout>
+
+                        <!-- Divider line -->
+                        <View
+                            android:layout_width="80dp"
+                            android:layout_height="4dp"
+                            android:layout_marginTop="16dp"
+                            android:layout_marginBottom="16dp"
+                            android:background="@color/colorAccent"
+                            android:alpha="0.5" />
 
                         <TextView
                             android:id="@+id/tvLetterWord"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_marginTop="8dp"
-                            android:textColor="@color/textColorSecondary"
-                            android:textSize="24sp"
-                            android:textStyle="italic"
+                            android:textColor="@color/colorPrimary"
+                            android:textSize="28sp"
+                            android:textStyle="bold"
+                            android:fontFamily="@font/agbalumo"
                             tools:text="Apple" />
 
                         <com.google.android.material.button.MaterialButton
                             android:id="@+id/btnSpeak"
-                            style="@style/Widget.Material3.Button"
+                            style="@style/Widget.Material3.Button.Icon"
                             android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginTop="16dp"
+                            android:layout_height="64dp"
+                            android:layout_marginTop="24dp"
+                            android:paddingStart="24dp"
+                            android:paddingEnd="24dp"
                             android:text="@string/speak_button"
-                            app:icon="@drawable/ic_speak" />
+                            android:textSize="18sp"
+                            app:cornerRadius="32dp"
+                            app:icon="@drawable/ic_speak"
+                            app:iconSize="28dp" />
+
+                        <!-- Decorative bottom accent -->
+                        <ImageView
+                            android:id="@+id/bottomAccent"
+                            android:layout_width="40dp"
+                            android:layout_height="40dp"
+                            android:layout_marginTop="12dp"
+                            android:alpha="0.4"
+                            android:contentDescription="@null"
+                            android:src="@drawable/ic_decorative_circle" />
                     </LinearLayout>
                 </com.google.android.material.card.MaterialCardView>
 
-                <ImageButton
+                <com.google.android.material.button.MaterialButton
                     android:id="@+id/btnNext"
-                    android:layout_width="56dp"
-                    android:layout_height="56dp"
+                    style="@style/Widget.Material3.Button.TonalButton.Icon"
+                    android:layout_width="64dp"
+                    android:layout_height="64dp"
                     android:layout_alignParentEnd="true"
                     android:layout_centerVertical="true"
-                    android:background="?attr/selectableItemBackgroundBorderless"
                     android:contentDescription="@string/content_description_next"
-                    android:src="@drawable/ic_arrow_forward" />
+                    app:cornerRadius="32dp"
+                    app:icon="@drawable/ic_arrow_forward"
+                    app:iconGravity="textStart"
+                    app:iconSize="32dp"
+                    app:iconPadding="0dp" />
 
             </RelativeLayout>
         </LinearLayout>

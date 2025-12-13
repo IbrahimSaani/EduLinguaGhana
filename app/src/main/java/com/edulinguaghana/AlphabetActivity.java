@@ -14,11 +14,12 @@ import android.speech.RecognizerIntent;
 import android.speech.tts.TextToSpeech;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
-import android.widget.Button;
-import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.material.button.MaterialButton;
+import com.google.android.material.card.MaterialCardView;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.progressindicator.LinearProgressIndicator;
 
@@ -27,11 +28,13 @@ import java.util.Locale;
 
 public class AlphabetActivity extends AppCompatActivity {
 
-    private TextView tvLanguageTitle, tvLetter, tvLetterWord;
-    private ImageButton btnPrev, btnNext;
+    private TextView tvLanguageTitle, tvLetter, tvLetterWord, tvLetterShadow;
+    private MaterialButton btnPrev, btnNext, btnSpeak;
     private FloatingActionButton btnBack;
-    private Button btnSpeak;
     private LinearProgressIndicator progressBar;
+    private MaterialCardView letterCard, languageCard;
+    private ImageView decorativeShape1, decorativeShape2, decorativeShape3, decorativeShape4;
+    private ImageView topAccent, bottomAccent, progressIcon, languageIcon, modeIcon;
 
     private String languageCode;
     private String languageName;
@@ -64,14 +67,34 @@ public class AlphabetActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_alphabet);
 
+        // Initialize text views
         tvLanguageTitle = findViewById(R.id.tvLanguageTitle);
         tvLetter = findViewById(R.id.tvLetter);
         tvLetterWord = findViewById(R.id.tvLetterWord);
+        tvLetterShadow = findViewById(R.id.tvLetterShadow);
+
+        // Initialize buttons
         btnPrev = findViewById(R.id.btnPrev);
         btnNext = findViewById(R.id.btnNext);
         btnBack = findViewById(R.id.btnBack);
         btnSpeak = findViewById(R.id.btnSpeak);
+
+        // Initialize other views
         progressBar = findViewById(R.id.progressBar);
+        letterCard = findViewById(R.id.letterCard);
+        languageCard = findViewById(R.id.languageCard);
+
+        // Initialize decorative elements
+        decorativeShape1 = findViewById(R.id.decorativeShape1);
+        decorativeShape2 = findViewById(R.id.decorativeShape2);
+        decorativeShape3 = findViewById(R.id.decorativeShape3);
+        decorativeShape4 = findViewById(R.id.decorativeShape4);
+        topAccent = findViewById(R.id.topAccent);
+        bottomAccent = findViewById(R.id.bottomAccent);
+        progressIcon = findViewById(R.id.progressIcon);
+        languageIcon = findViewById(R.id.languageIcon);
+        modeIcon = findViewById(R.id.modeIcon);
+
 
         languageCode = getIntent().getStringExtra("LANG_CODE");
         languageName = getIntent().getStringExtra("LANG_NAME");
@@ -111,6 +134,14 @@ public class AlphabetActivity extends AppCompatActivity {
 
         progressBar.setMax(letters.length);
 
+        // Start background animations after views are ready
+        try {
+            startBackgroundAnimations();
+        } catch (Exception e) {
+            // Animations failed, but continue without them
+            e.printStackTrace();
+        }
+
         tts = new TextToSpeech(this, status -> {
             if (status == TextToSpeech.SUCCESS) {
                 tts.setLanguage(getLocaleForLanguage(languageCode));
@@ -125,22 +156,44 @@ public class AlphabetActivity extends AppCompatActivity {
         });
 
         btnNext.setOnClickListener(v -> {
+            try {
+                animateButtonPress(btnNext);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
             currentIndex++;
             if (currentIndex >= letters.length) currentIndex = 0;
-            updateLetter();
+            updateLetterWithAnimation();
             if (isRecitalMode) speakCurrentLetter();
         });
 
         btnPrev.setOnClickListener(v -> {
+            try {
+                animateButtonPress(btnPrev);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
             currentIndex--;
             if (currentIndex < 0) currentIndex = letters.length - 1;
-            updateLetter();
+            updateLetterWithAnimation();
             if (isRecitalMode) speakCurrentLetter();
         });
 
-        btnBack.setOnClickListener(v -> finish());
+        btnBack.setOnClickListener(v -> {
+            try {
+                animateButtonPress(btnBack);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            finish();
+        });
 
         btnSpeak.setOnClickListener(v -> {
+            try {
+                animateButtonPress(btnSpeak);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
             if (isRecitalMode) {
                 speakCurrentLetter();
             } else {
@@ -150,14 +203,149 @@ public class AlphabetActivity extends AppCompatActivity {
     }
 
     private void updateLetter() {
-        tvLetter.setText(letters[currentIndex]);
+        // Update text with letter and shadow
+        String letter = letters[currentIndex];
+        tvLetter.setText(letter);
+        if (tvLetterShadow != null) {
+            tvLetterShadow.setText(letter);
+        }
         tvLetterWord.setText(words[currentIndex]);
+
+        // Update progress
         progressBar.setProgress(currentIndex + 1);
     }
 
+    private void updateLetterWithAnimation() {
+        // Animate card transition
+        try {
+            animateCardTransition();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        // Update text with letter and shadow
+        String letter = letters[currentIndex];
+        tvLetter.setText(letter);
+        if (tvLetterShadow != null) {
+            tvLetterShadow.setText(letter);
+        }
+        tvLetterWord.setText(words[currentIndex]);
+
+        // Update progress
+        progressBar.setProgress(currentIndex + 1);
+
+        try {
+            animateProgressIcon();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
     private void animateLetter() {
-        Animation anim = AnimationUtils.loadAnimation(this, R.anim.letter_bounce);
-        tvLetter.startAnimation(anim);
+        try {
+            Animation letterAnim = AnimationUtils.loadAnimation(this, R.anim.letter_bounce);
+            tvLetter.startAnimation(letterAnim);
+            if (tvLetterShadow != null) {
+                tvLetterShadow.startAnimation(letterAnim);
+            }
+
+            // Animate word text
+            Animation wordAnim = AnimationUtils.loadAnimation(this, R.anim.fade_in);
+            tvLetterWord.startAnimation(wordAnim);
+
+            // Animate accents
+            if (topAccent != null && bottomAccent != null) {
+                Animation twinkle = AnimationUtils.loadAnimation(this, R.anim.star_twinkle);
+                topAccent.startAnimation(twinkle);
+                bottomAccent.startAnimation(twinkle);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void startBackgroundAnimations() {
+        try {
+            // Floating animations for decorative shapes
+            if (decorativeShape1 != null && decorativeShape2 != null &&
+                decorativeShape3 != null && decorativeShape4 != null) {
+                Animation float1 = AnimationUtils.loadAnimation(this, R.anim.floating_element);
+                Animation float2 = AnimationUtils.loadAnimation(this, R.anim.diagonal_drift);
+                Animation float3 = AnimationUtils.loadAnimation(this, R.anim.circular_orbit);
+                Animation float4 = AnimationUtils.loadAnimation(this, R.anim.zigzag_path);
+
+                float1.setStartOffset(0);
+                float2.setStartOffset(500);
+                float3.setStartOffset(1000);
+                float4.setStartOffset(1500);
+
+                decorativeShape1.startAnimation(float1);
+                decorativeShape2.startAnimation(float2);
+                decorativeShape3.startAnimation(float3);
+                decorativeShape4.startAnimation(float4);
+            }
+
+            // Animate language card icon
+            if (modeIcon != null) {
+                Animation pulse = AnimationUtils.loadAnimation(this, R.anim.pulse);
+                modeIcon.startAnimation(pulse);
+            }
+
+            // Animate progress icon
+            if (progressIcon != null) {
+                Animation sparkle = AnimationUtils.loadAnimation(this, R.anim.star_twinkle);
+                progressIcon.startAnimation(sparkle);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void animateButtonPress(android.view.View button) {
+        try {
+            if (button != null) {
+                Animation bounce = AnimationUtils.loadAnimation(this, R.anim.bounce_pop);
+                button.startAnimation(bounce);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void animateCardTransition() {
+        try {
+            if (letterCard != null) {
+                Animation slideOut = AnimationUtils.loadAnimation(this, R.anim.slide_up);
+                Animation slideIn = AnimationUtils.loadAnimation(this, R.anim.slide_in_bottom);
+
+                letterCard.startAnimation(slideOut);
+                slideOut.setAnimationListener(new Animation.AnimationListener() {
+                    @Override
+                    public void onAnimationStart(Animation animation) {}
+
+                    @Override
+                    public void onAnimationEnd(Animation animation) {
+                        letterCard.startAnimation(slideIn);
+                    }
+
+                    @Override
+                    public void onAnimationRepeat(Animation animation) {}
+                });
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void animateProgressIcon() {
+        try {
+            if (progressIcon != null) {
+                Animation bounce = AnimationUtils.loadAnimation(this, R.anim.bounce_pop);
+                progressIcon.startAnimation(bounce);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     private void speakCurrentLetter() {
