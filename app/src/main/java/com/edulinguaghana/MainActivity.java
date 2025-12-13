@@ -8,7 +8,6 @@ import android.animation.ValueAnimator;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.media.MediaPlayer;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.VibrationEffect;
@@ -63,7 +62,6 @@ public class MainActivity extends AppCompatActivity {
     private static final String KEY_LOW_POWER_ANIMATIONS = "LOW_POWER_ANIMATIONS";
 
     private static final String PREF_NAME = "EduLinguaPrefs";
-    private static final String KEY_SFX_ENABLED = "SFX_ENABLED";
 
     private static final String KEY_LAST_LANG_CODE = "LAST_LANG_CODE";
     private static final String KEY_LAST_LANG_NAME = "LAST_LANG_NAME";
@@ -708,20 +706,6 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void playAppExitSoundAndExit() {
-        SharedPreferences prefs = getSharedPreferences(PREF_NAME, MODE_PRIVATE);
-        boolean sfxOn = prefs.getBoolean(KEY_SFX_ENABLED, true);
-
-        if (sfxOn) {
-            try {
-                MediaPlayer mp = MediaPlayer.create(getApplicationContext(), R.raw.app_exit);
-                if (mp != null) {
-                    mp.setOnCompletionListener(MediaPlayer::release);
-                    mp.start();
-                }
-            } catch (Exception e) {
-                // ignore sound errors
-            }
-        }
 
         // Close immediately
         finish();
