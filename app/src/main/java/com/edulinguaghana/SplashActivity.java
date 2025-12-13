@@ -8,6 +8,7 @@ import android.content.Intent;
 import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.os.CountDownTimer;
+import android.view.View;
 import android.view.animation.AccelerateDecelerateInterpolator;
 import android.view.animation.LinearInterpolator;
 import android.view.animation.OvershootInterpolator;
@@ -33,6 +34,10 @@ public class SplashActivity extends AppCompatActivity {
     private ImageView topWave;
     private ImageView bottomWave;
     private LinearLayout centerCard;
+    private LinearLayout morphDotsContainer;
+
+    // Morph dots
+    private View dot1, dot2, dot3, dot4, dot5;
 
     // Decorative elements
     private ImageView decorStar1, decorStar2;
@@ -54,6 +59,14 @@ public class SplashActivity extends AppCompatActivity {
         topWave = findViewById(R.id.topWave);
         bottomWave = findViewById(R.id.bottomWave);
         centerCard = findViewById(R.id.centerCard);
+        morphDotsContainer = findViewById(R.id.morphDotsContainer);
+
+        // Bind morph dots
+        dot1 = findViewById(R.id.dot1);
+        dot2 = findViewById(R.id.dot2);
+        dot3 = findViewById(R.id.dot3);
+        dot4 = findViewById(R.id.dot4);
+        dot5 = findViewById(R.id.dot5);
 
         // Bind decorative elements
         decorStar1 = findViewById(R.id.decorStar1);
@@ -106,21 +119,17 @@ public class SplashActivity extends AppCompatActivity {
                 .rotation(360f)
                 .setDuration(1100)
                 .setInterpolator(new OvershootInterpolator())
-                .start();
-
-        // Slide + fade app name
-        tvAppNameSplash.animate()
-                .alpha(1f)
-                .translationY(0f)
-                .setStartDelay(300)
-                .setDuration(700)
+                .withEndAction(() -> {
+                    // Start morph dot animation after logo completes
+                    startMorphDotAnimation();
+                })
                 .start();
 
         // Slide + fade tagline
         tvTaglineSplash.animate()
                 .alpha(1f)
                 .translationY(0f)
-                .setStartDelay(550)
+                .setStartDelay(2800)
                 .setDuration(700)
                 .start();
 
@@ -128,17 +137,77 @@ public class SplashActivity extends AppCompatActivity {
             progressContainer.animate()
                     .alpha(1f)
                     .translationY(0f)
-                    .setStartDelay(700)
+                    .setStartDelay(3000)
                     .setDuration(600)
                     .start();
         }
         if (progressSparkle != null) {
             progressSparkle.animate()
                     .alpha(1f)
-                    .setStartDelay(900)
+                    .setStartDelay(3200)
                     .setDuration(400)
                     .start();
         }
+    }
+
+    private void startMorphDotAnimation() {
+        // Animate dots appearing one by one with pulse
+        View[] dots = {dot1, dot2, dot3, dot4, dot5};
+        long baseDelay = 200;
+
+        for (int i = 0; i < dots.length; i++) {
+            final View dot = dots[i];
+            final int index = i;
+
+            if (dot != null) {
+                dot.postDelayed(() -> {
+                    dot.animate()
+                            .alpha(1f)
+                            .scaleX(1.2f)
+                            .scaleY(1.2f)
+                            .setDuration(300)
+                            .setInterpolator(new OvershootInterpolator())
+                            .withEndAction(() -> {
+                                // Pulse the dot
+                                dot.animate()
+                                        .scaleX(1f)
+                                        .scaleY(1f)
+                                        .setDuration(200)
+                                        .start();
+                            })
+                            .start();
+                }, baseDelay * index);
+            }
+        }
+
+        // After all dots appear, morph them into text
+        long morphDelay = baseDelay * dots.length + 400;
+        morphDotsContainer.postDelayed(() -> {
+            // Fade out dots container
+            morphDotsContainer.animate()
+                    .alpha(0f)
+                    .scaleX(0.8f)
+                    .scaleY(0.8f)
+                    .setDuration(300)
+                    .withEndAction(() -> {
+                        morphDotsContainer.setVisibility(android.view.View.GONE);
+                        // Reveal text with morph effect
+                        revealAppName();
+                    })
+                    .start();
+        }, morphDelay);
+    }
+
+    private void revealAppName() {
+        tvAppNameSplash.setScaleX(0.5f);
+        tvAppNameSplash.setScaleY(0.5f);
+        tvAppNameSplash.animate()
+                .alpha(1f)
+                .scaleX(1f)
+                .scaleY(1f)
+                .setDuration(600)
+                .setInterpolator(new OvershootInterpolator())
+                .start();
     }
 
     private void startDecorativeAnimations() {
@@ -156,7 +225,7 @@ public class SplashActivity extends AppCompatActivity {
                 if (centerCard != null) {
                     centerCard.startAnimation(android.view.animation.AnimationUtils.loadAnimation(this, R.anim.center_card_pulse));
                 }
-            }, 1500);
+            }, 2000);
         }
 
         // Add shimmer effect to logo
@@ -165,17 +234,17 @@ public class SplashActivity extends AppCompatActivity {
                 if (ivLogo != null) {
                     ivLogo.startAnimation(android.view.animation.AnimationUtils.loadAnimation(this, R.anim.logo_shimmer));
                 }
-            }, 1000);
+            }, 1500);
         }
 
-        // Animate decorative elements with staggered delays
-        animateDecorativeElement(decorStar1, 1200, 0, true);
-        animateDecorativeElement(decorStar2, 1400, 200, true);
-        animateDecorativeElement(decorCircle1, 1600, 400, false);
-        animateDecorativeElement(decorCircle2, 1800, 600, false);
-        animateDecorativeElement(decorDiamond1, 2000, 800, false);
-        animateDecorativeElement(decorDiamond2, 2200, 1000, false);
-        animateDecorativeElement(decorDiamond3, 2400, 1200, false);
+        // Animate decorative elements with staggered delays - start after morph animation
+        animateDecorativeElement(decorStar1, 2000, 0, true);
+        animateDecorativeElement(decorStar2, 2200, 200, true);
+        animateDecorativeElement(decorCircle1, 2400, 400, false);
+        animateDecorativeElement(decorCircle2, 2600, 600, false);
+        animateDecorativeElement(decorDiamond1, 2800, 800, false);
+        animateDecorativeElement(decorDiamond2, 3000, 1000, false);
+        animateDecorativeElement(decorDiamond3, 3200, 1200, false);
     }
 
     private void animateDecorativeElement(ImageView element, long fadeInDelay, long floatDelay, boolean isStar) {
