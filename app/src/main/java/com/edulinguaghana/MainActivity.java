@@ -54,6 +54,7 @@ public class MainActivity extends AppCompatActivity {
     private Animator starRightAnimator;
     private ImageView bubbleTop, bubbleMidRight, bubbleBottomLeft;
     private Animator bubbleTopAnimator, bubbleMidAnimator, bubbleBottomAnimator;
+    private android.view.ViewGroup floatingElementsContainer;
     private static final String KEY_ANIMATIONS_ENABLED = "ANIMATIONS_ENABLED";
     private static final String KEY_LOW_POWER_ANIMATIONS = "LOW_POWER_ANIMATIONS";
 
@@ -93,6 +94,7 @@ public class MainActivity extends AppCompatActivity {
         bubbleTop = findViewById(R.id.bubbleTop);
         bubbleMidRight = findViewById(R.id.bubbleMidRight);
         bubbleBottomLeft = findViewById(R.id.bubbleBottomLeft);
+        floatingElementsContainer = findViewById(R.id.floatingElementsContainer);
         languageChipGroup = findViewById(R.id.languageChipGroup);
         btnRecitalMode = findViewById(R.id.btnRecitalMode);
         btnPracticeMode = findViewById(R.id.btnPracticeMode);
@@ -106,6 +108,7 @@ public class MainActivity extends AppCompatActivity {
         setupHeroGlow();
         setupStarAnimations();
         setupBubbleAnimations();
+        setupFloatingElements();
         setupLanguageChips();
         restoreLastLanguageSelection();
         setupButtons();
@@ -181,6 +184,38 @@ public class MainActivity extends AppCompatActivity {
             }
         } catch (Exception e) {
             bubbleTopAnimator = bubbleMidAnimator = bubbleBottomAnimator = null;
+        }
+    }
+
+    private void setupFloatingElements() {
+        if (floatingElementsContainer == null || !animationsEnabled()) return;
+
+        try {
+            // Get all child FrameLayouts (each contains a letter or number)
+            for (int i = 0; i < floatingElementsContainer.getChildCount(); i++) {
+                View floatingElement = floatingElementsContainer.getChildAt(i);
+
+                // Choose animation based on position (vary the animations)
+                int animRes;
+                switch (i % 3) {
+                    case 0:
+                        animRes = R.anim.float_up_slow;
+                        break;
+                    case 1:
+                        animRes = R.anim.float_up_medium;
+                        break;
+                    default:
+                        animRes = R.anim.float_up_fast;
+                        break;
+                }
+
+                android.view.animation.Animation floatAnim = AnimationUtils.loadAnimation(this, animRes);
+                // Stagger the start of each animation
+                floatAnim.setStartOffset(i * 400L);
+                floatingElement.startAnimation(floatAnim);
+            }
+        } catch (Exception e) {
+            // Fail silently if animations can't be loaded
         }
     }
 
