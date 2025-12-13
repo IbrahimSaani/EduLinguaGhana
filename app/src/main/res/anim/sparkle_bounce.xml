@@ -1,21 +1,23 @@
 <?xml version="1.0" encoding="utf-8"?>
 <set xmlns:android="http://schemas.android.com/apk/res/android"
-    android:interpolator="@android:interpolator/accelerate_decelerate">
-
+    android:interpolator="@android:anim/bounce_interpolator">
     <scale
-        android:duration="900"
-        android:fromXScale="0.4"
-        android:fromYScale="0.4"
-        android:repeatCount="infinite"
-        android:repeatMode="reverse"
+        android:fromXScale="0.8"
         android:toXScale="1.2"
-        android:toYScale="1.2" />
-
-    <alpha
-        android:duration="900"
-        android:fromAlpha="0.3"
+        android:fromYScale="0.8"
+        android:toYScale="1.2"
+        android:pivotX="50%"
+        android:pivotY="50%"
+        android:duration="400"
         android:repeatCount="infinite"
-        android:repeatMode="reverse"
-        android:toAlpha="1" />
+        android:repeatMode="reverse" />
+    <rotate
+        android:fromDegrees="0"
+        android:toDegrees="360"
+        android:pivotX="50%"
+        android:pivotY="50%"
+        android:duration="1200"
+        android:repeatCount="infinite"
+        android:repeatMode="restart" />
 </set>
 

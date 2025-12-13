@@ -111,49 +111,48 @@ public class SplashActivity extends AppCompatActivity {
     }
 
     private void startIntroAnimations() {
-        // Bounce-in logo with rotation
+        // Simplified logo animation - faster and smoother
         ivLogo.animate()
                 .alpha(1f)
                 .scaleX(1f)
                 .scaleY(1f)
-                .rotation(360f)
-                .setDuration(1100)
-                .setInterpolator(new OvershootInterpolator())
+                .setDuration(800)
+                .setInterpolator(new OvershootInterpolator(1.2f))
                 .withEndAction(() -> {
                     // Start morph dot animation after logo completes
                     startMorphDotAnimation();
                 })
                 .start();
 
-        // Slide + fade tagline
+        // Slide + fade tagline with reduced delay
         tvTaglineSplash.animate()
                 .alpha(1f)
                 .translationY(0f)
-                .setStartDelay(2800)
-                .setDuration(700)
+                .setStartDelay(2000)
+                .setDuration(500)
                 .start();
 
         if (progressContainer != null) {
             progressContainer.animate()
                     .alpha(1f)
                     .translationY(0f)
-                    .setStartDelay(3000)
-                    .setDuration(600)
+                    .setStartDelay(2200)
+                    .setDuration(500)
                     .start();
         }
         if (progressSparkle != null) {
             progressSparkle.animate()
                     .alpha(1f)
-                    .setStartDelay(3200)
-                    .setDuration(400)
+                    .setStartDelay(2300)
+                    .setDuration(300)
                     .start();
         }
     }
 
     private void startMorphDotAnimation() {
-        // Animate dots appearing one by one with pulse
+        // Animate dots appearing one by one with pulse - faster timing
         View[] dots = {dot1, dot2, dot3, dot4, dot5};
-        long baseDelay = 200;
+        long baseDelay = 120; // Reduced from 200
 
         for (int i = 0; i < dots.length; i++) {
             final View dot = dots[i];
@@ -163,16 +162,16 @@ public class SplashActivity extends AppCompatActivity {
                 dot.postDelayed(() -> {
                     dot.animate()
                             .alpha(1f)
-                            .scaleX(1.2f)
-                            .scaleY(1.2f)
-                            .setDuration(300)
-                            .setInterpolator(new OvershootInterpolator())
+                            .scaleX(1.15f)
+                            .scaleY(1.15f)
+                            .setDuration(250)
+                            .setInterpolator(new OvershootInterpolator(1.5f))
                             .withEndAction(() -> {
                                 // Pulse the dot
                                 dot.animate()
                                         .scaleX(1f)
                                         .scaleY(1f)
-                                        .setDuration(200)
+                                        .setDuration(150)
                                         .start();
                             })
                             .start();
@@ -180,15 +179,15 @@ public class SplashActivity extends AppCompatActivity {
             }
         }
 
-        // After all dots appear, morph them into text
-        long morphDelay = baseDelay * dots.length + 400;
+        // After all dots appear, morph them into text - faster timing
+        long morphDelay = baseDelay * dots.length + 300; // Reduced from 400
         morphDotsContainer.postDelayed(() -> {
             // Fade out dots container
             morphDotsContainer.animate()
                     .alpha(0f)
-                    .scaleX(0.8f)
-                    .scaleY(0.8f)
-                    .setDuration(300)
+                    .scaleX(0.85f)
+                    .scaleY(0.85f)
+                    .setDuration(250)
                     .withEndAction(() -> {
                         morphDotsContainer.setVisibility(android.view.View.GONE);
                         // Reveal text with morph effect
@@ -199,76 +198,68 @@ public class SplashActivity extends AppCompatActivity {
     }
 
     private void revealAppName() {
-        tvAppNameSplash.setScaleX(0.5f);
-        tvAppNameSplash.setScaleY(0.5f);
+        tvAppNameSplash.setScaleX(0.6f);
+        tvAppNameSplash.setScaleY(0.6f);
         tvAppNameSplash.animate()
                 .alpha(1f)
                 .scaleX(1f)
                 .scaleY(1f)
-                .setDuration(600)
-                .setInterpolator(new OvershootInterpolator())
+                .setDuration(450)
+                .setInterpolator(new OvershootInterpolator(1.5f))
                 .start();
     }
 
     private void startDecorativeAnimations() {
-        // Animate waves
+        // Animate waves with error handling
         if (topWave != null) {
-            topWave.startAnimation(android.view.animation.AnimationUtils.loadAnimation(this, R.anim.wave_top_animation));
+            try {
+                topWave.startAnimation(android.view.animation.AnimationUtils.loadAnimation(this, R.anim.wave_top_animation));
+            } catch (Exception e) {
+                // Ignore animation errors
+            }
         }
         if (bottomWave != null) {
-            bottomWave.startAnimation(android.view.animation.AnimationUtils.loadAnimation(this, R.anim.wave_bottom_animation));
+            try {
+                bottomWave.startAnimation(android.view.animation.AnimationUtils.loadAnimation(this, R.anim.wave_bottom_animation));
+            } catch (Exception e) {
+                // Ignore animation errors
+            }
         }
 
-        // Add pulse animation to center card
-        if (centerCard != null) {
-            centerCard.postDelayed(() -> {
-                if (centerCard != null) {
-                    centerCard.startAnimation(android.view.animation.AnimationUtils.loadAnimation(this, R.anim.center_card_pulse));
-                }
-            }, 2000);
-        }
+        // Simplified decorative animations - only animate key elements
+        // Stars twinkle
+        animateDecorativeElement(decorStar1, 1200, true);
+        animateDecorativeElement(decorStar2, 1400, true);
 
-        // Add shimmer effect to logo
-        if (ivLogo != null) {
-            ivLogo.postDelayed(() -> {
-                if (ivLogo != null) {
-                    ivLogo.startAnimation(android.view.animation.AnimationUtils.loadAnimation(this, R.anim.logo_shimmer));
-                }
-            }, 1500);
-        }
+        // Circles float
+        animateDecorativeElement(decorCircle1, 1600, false);
+        animateDecorativeElement(decorCircle2, 1800, false);
 
-        // Animate decorative elements with staggered delays - start after morph animation
-        animateDecorativeElement(decorStar1, 2000, 0, true);
-        animateDecorativeElement(decorStar2, 2200, 200, true);
-        animateDecorativeElement(decorCircle1, 2400, 400, false);
-        animateDecorativeElement(decorCircle2, 2600, 600, false);
-        animateDecorativeElement(decorDiamond1, 2800, 800, false);
-        animateDecorativeElement(decorDiamond2, 3000, 1000, false);
-        animateDecorativeElement(decorDiamond3, 3200, 1200, false);
+        // Only animate one diamond to reduce load
+        animateDecorativeElement(decorDiamond1, 2000, false);
     }
 
-    private void animateDecorativeElement(ImageView element, long fadeInDelay, long floatDelay, boolean isStar) {
+    private void animateDecorativeElement(ImageView element, long fadeInDelay, boolean isStar) {
         if (element == null) return;
 
-        // Fade in animation
+        // Simplified fade in animation
         element.animate()
-                .alpha(0.8f)
+                .alpha(0.7f)
                 .setStartDelay(fadeInDelay)
-                .setDuration(600)
+                .setDuration(400)
                 .withEndAction(() -> {
                     if (element != null) {
-                        // Start special animation after fade in
-                        element.postDelayed(() -> {
-                            if (element != null) {
-                                if (isStar) {
-                                    // Stars get a twinkling effect
-                                    element.startAnimation(android.view.animation.AnimationUtils.loadAnimation(this, R.anim.star_twinkle));
-                                } else {
-                                    // Others get floating effect
-                                    element.startAnimation(android.view.animation.AnimationUtils.loadAnimation(this, R.anim.floating_element));
-                                }
+                        try {
+                            if (isStar) {
+                                // Stars get a twinkling effect
+                                element.startAnimation(android.view.animation.AnimationUtils.loadAnimation(this, R.anim.star_twinkle));
+                            } else {
+                                // Others get floating effect
+                                element.startAnimation(android.view.animation.AnimationUtils.loadAnimation(this, R.anim.floating_element));
                             }
-                        }, floatDelay);
+                        } catch (Exception e) {
+                            // Ignore animation errors
+                        }
                     }
                 })
                 .start();
@@ -348,13 +339,13 @@ public class SplashActivity extends AppCompatActivity {
         if (sparkleAnimator != null) {
             sparkleAnimator.cancel();
         }
-        sparkleAnimator = ObjectAnimator.ofFloat(progressSparkle, "translationX", 0f, -progressSparkle.getWidth());
-        sparkleAnimator.setDuration(duration);
+        // Simplified sparkle animation - just follow the progress
+        sparkleAnimator = ObjectAnimator.ofFloat(progressSparkle, "alpha", 0.8f, 1.0f);
+        sparkleAnimator.setDuration(400);
         sparkleAnimator.setRepeatCount(ValueAnimator.INFINITE);
-        sparkleAnimator.setRepeatMode(ValueAnimator.RESTART);
-        sparkleAnimator.setInterpolator(new LinearInterpolator());
+        sparkleAnimator.setRepeatMode(ValueAnimator.REVERSE);
+        sparkleAnimator.setInterpolator(new AccelerateDecelerateInterpolator());
         sparkleAnimator.start();
-        progressSparkle.startAnimation(android.view.animation.AnimationUtils.loadAnimation(this, R.anim.sparkle_bounce));
     }
 
     private void animateSparkle(int progress) {
@@ -370,9 +361,21 @@ public class SplashActivity extends AppCompatActivity {
         if (hasNavigated) return;   // avoid double navigation
         hasNavigated = true;
 
+        // Clean up hardware layers before transitioning
+        cleanupHardwareAcceleration();
+
         Intent intent = new Intent(SplashActivity.this, MainActivity.class);
         startActivity(intent);
         finish();
+    }
+
+    private void cleanupHardwareAcceleration() {
+        // Return to normal rendering mode to free GPU memory
+        if (ivLogo != null) ivLogo.setLayerType(View.LAYER_TYPE_NONE, null);
+        if (tvAppNameSplash != null) tvAppNameSplash.setLayerType(View.LAYER_TYPE_NONE, null);
+        if (tvTaglineSplash != null) tvTaglineSplash.setLayerType(View.LAYER_TYPE_NONE, null);
+        if (progressBar != null) progressBar.setLayerType(View.LAYER_TYPE_NONE, null);
+        if (centerCard != null) centerCard.setLayerType(View.LAYER_TYPE_NONE, null);
     }
 
     @Override
