@@ -209,6 +209,147 @@
 
     </FrameLayout>
 
+    <!-- Animated Background Shapes and Particles -->
+    <FrameLayout
+        android:id="@+id/animatedShapesContainer"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:clickable="false"
+        android:focusable="false"
+        android:importantForAccessibility="no">
+
+        <!-- Star 1 - Diagonal drift -->
+        <ImageView
+            android:id="@+id/star1"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:layout_marginStart="50dp"
+            android:layout_marginTop="300dp"
+            android:src="@drawable/shape_star"
+            android:contentDescription="@null" />
+
+        <!-- Circle Cyan - Bounce rotate -->
+        <ImageView
+            android:id="@+id/circleCyan"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_marginStart="300dp"
+            android:layout_marginTop="150dp"
+            android:src="@drawable/shape_circle_cyan"
+            android:contentDescription="@null" />
+
+        <!-- Triangle - Circular orbit -->
+        <ImageView
+            android:id="@+id/triangle1"
+            android:layout_width="28dp"
+            android:layout_height="28dp"
+            android:layout_marginStart="180dp"
+            android:layout_marginTop="250dp"
+            android:src="@drawable/shape_triangle"
+            android:contentDescription="@null" />
+
+        <!-- Square - Zigzag path -->
+        <ImageView
+            android:id="@+id/square1"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:layout_marginStart="280dp"
+            android:layout_marginTop="450dp"
+            android:src="@drawable/shape_square"
+            android:contentDescription="@null" />
+
+        <!-- Circle Pink - Shimmer wave -->
+        <ImageView
+            android:id="@+id/circlePink"
+            android:layout_width="36dp"
+            android:layout_height="36dp"
+            android:layout_marginStart="100dp"
+            android:layout_marginTop="550dp"
+            android:src="@drawable/shape_circle_pink"
+            android:contentDescription="@null" />
+
+        <!-- Star 2 - Bounce rotate -->
+        <ImageView
+            android:id="@+id/star2"
+            android:layout_width="28dp"
+            android:layout_height="28dp"
+            android:layout_marginStart="320dp"
+            android:layout_marginTop="650dp"
+            android:src="@drawable/shape_star"
+            android:contentDescription="@null" />
+
+        <!-- Circle Green - Diagonal drift -->
+        <ImageView
+            android:id="@+id/circleGreen"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:layout_marginStart="60dp"
+            android:layout_marginTop="750dp"
+            android:src="@drawable/shape_circle_green"
+            android:contentDescription="@null" />
+
+        <!-- Sparkle 1 - Circular orbit -->
+        <ImageView
+            android:id="@+id/sparkle1"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:layout_marginStart="200dp"
+            android:layout_marginTop="400dp"
+            android:src="@drawable/shape_sparkle"
+            android:contentDescription="@null" />
+
+        <!-- Ring - Zigzag path -->
+        <ImageView
+            android:id="@+id/ring1"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_marginStart="120dp"
+            android:layout_marginTop="100dp"
+            android:src="@drawable/shape_ring"
+            android:contentDescription="@null" />
+
+        <!-- Square 2 - Diagonal drift -->
+        <ImageView
+            android:id="@+id/square2"
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:layout_marginStart="250dp"
+            android:layout_marginTop="800dp"
+            android:src="@drawable/shape_square"
+            android:contentDescription="@null" />
+
+        <!-- Triangle 2 - Shimmer wave -->
+        <ImageView
+            android:id="@+id/triangle2"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:layout_marginStart="20dp"
+            android:layout_marginTop="500dp"
+            android:src="@drawable/shape_triangle"
+            android:contentDescription="@null" />
+
+        <!-- Circle Cyan 2 - Circular orbit -->
+        <ImageView
+            android:id="@+id/circleCyan2"
+            android:layout_width="28dp"
+            android:layout_height="28dp"
+            android:layout_marginStart="340dp"
+            android:layout_marginTop="350dp"
+            android:src="@drawable/shape_circle_cyan"
+            android:contentDescription="@null" />
+
+        <!-- Star 3 - Zigzag path -->
+        <ImageView
+            android:id="@+id/star3"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:layout_marginStart="150dp"
+            android:layout_marginTop="700dp"
+            android:src="@drawable/shape_star"
+            android:contentDescription="@null" />
+
+    </FrameLayout>
+
     <com.google.android.material.appbar.AppBarLayout
         android:id="@+id/appBarLayout"
         android:layout_width="match_parent"

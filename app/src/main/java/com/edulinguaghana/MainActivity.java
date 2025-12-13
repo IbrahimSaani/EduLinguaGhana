@@ -55,6 +55,7 @@ public class MainActivity extends AppCompatActivity {
     private ImageView bubbleTop, bubbleMidRight, bubbleBottomLeft;
     private Animator bubbleTopAnimator, bubbleMidAnimator, bubbleBottomAnimator;
     private android.view.ViewGroup floatingElementsContainer;
+    private android.view.ViewGroup animatedShapesContainer;
     private static final String KEY_ANIMATIONS_ENABLED = "ANIMATIONS_ENABLED";
     private static final String KEY_LOW_POWER_ANIMATIONS = "LOW_POWER_ANIMATIONS";
 
@@ -95,6 +96,7 @@ public class MainActivity extends AppCompatActivity {
         bubbleMidRight = findViewById(R.id.bubbleMidRight);
         bubbleBottomLeft = findViewById(R.id.bubbleBottomLeft);
         floatingElementsContainer = findViewById(R.id.floatingElementsContainer);
+        animatedShapesContainer = findViewById(R.id.animatedShapesContainer);
         languageChipGroup = findViewById(R.id.languageChipGroup);
         btnRecitalMode = findViewById(R.id.btnRecitalMode);
         btnPracticeMode = findViewById(R.id.btnPracticeMode);
@@ -109,6 +111,7 @@ public class MainActivity extends AppCompatActivity {
         setupStarAnimations();
         setupBubbleAnimations();
         setupFloatingElements();
+        setupAnimatedShapes();
         setupLanguageChips();
         restoreLastLanguageSelection();
         setupButtons();
@@ -213,6 +216,41 @@ public class MainActivity extends AppCompatActivity {
                 // Stagger the start of each animation
                 floatAnim.setStartOffset(i * 400L);
                 floatingElement.startAnimation(floatAnim);
+            }
+        } catch (Exception e) {
+            // Fail silently if animations can't be loaded
+        }
+    }
+
+    private void setupAnimatedShapes() {
+        if (animatedShapesContainer == null || !animationsEnabled()) return;
+
+        try {
+            // Animation resource mapping
+            int[] animResources = {
+                R.anim.diagonal_drift,      // star1
+                R.anim.bounce_rotate,       // circleCyan
+                R.anim.circular_orbit,      // triangle1
+                R.anim.zigzag_path,         // square1
+                R.anim.shimmer_wave,        // circlePink
+                R.anim.bounce_rotate,       // star2
+                R.anim.diagonal_drift,      // circleGreen
+                R.anim.circular_orbit,      // sparkle1
+                R.anim.zigzag_path,         // ring1
+                R.anim.diagonal_drift,      // square2
+                R.anim.shimmer_wave,        // triangle2
+                R.anim.circular_orbit,      // circleCyan2
+                R.anim.zigzag_path          // star3
+            };
+
+            // Apply animations to each shape with varied timing
+            for (int i = 0; i < animatedShapesContainer.getChildCount() && i < animResources.length; i++) {
+                View shape = animatedShapesContainer.getChildAt(i);
+                android.view.animation.Animation shapeAnim = AnimationUtils.loadAnimation(this, animResources[i]);
+
+                // Stagger start times for organic feel
+                shapeAnim.setStartOffset(i * 300L);
+                shape.startAnimation(shapeAnim);
             }
         } catch (Exception e) {
             // Fail silently if animations can't be loaded
