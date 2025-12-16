@@ -9,10 +9,10 @@
             <InsightsFilterSettings>
               <option name="connection">
                 <ConnectionSetting>
-                  <option name="appId" value="PLACEHOLDER" />
-                  <option name="mobileSdkAppId" value="" />
-                  <option name="projectId" value="" />
-                  <option name="projectNumber" value="" />
+                  <option name="appId" value="com.edulinguaghana" />
+                  <option name="mobileSdkAppId" value="1:340016497126:android:36b6e04f90691927389627" />
+                  <option name="projectId" value="edulinguaghana-7522e68f" />
+                  <option name="projectNumber" value="340016497126" />
                 </ConnectionSetting>
               </option>
               <option name="signal" value="SIGNAL_UNSPECIFIED" />

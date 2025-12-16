@@ -100,4 +100,16 @@
     <string name="mascot_encouragement_1">You\'re doing great!</string>
     <string name="mascot_encouragement_2">Keep it up!</string>
     <string name="mascot_encouragement_3">Amazing work!</string>
+
+    <!-- Bottom Navigation -->
+    <string name="nav_home">Home</string>
+    <string name="nav_profile">Profile</string>
+    <string name="nav_settings">Settings</string>
+    <string name="nav_notifications">Notifications</string>
+
+    <!-- Authentication -->
+    <string name="default_web_client_id">340016497126-2k1gekp5ntr5vj5bmhe14265bb5h1897.apps.googleusercontent.com</string>
+    <string name="facebook_app_id">1391797185678939</string>
+    <string name="facebook_client_token">78aafccabd793486e3a4ef87ec24bc8a</string>
+    <string name="fb_login_protocol_scheme">fb1391797185678939</string>
 </resources>

@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "340016497126",
+    "project_id": "edulinguaghana-7522e68f",
+    "storage_bucket": "edulinguaghana-7522e68f.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:340016497126:android:36b6e04f90691927389627",
+        "android_client_info": {
+          "package_name": "com.edulinguaghana"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC8CmWHIAOhfq1yOcnX8G4iXvvlSzojsGU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

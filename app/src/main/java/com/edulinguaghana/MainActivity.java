@@ -31,6 +31,7 @@ import androidx.core.widget.ImageViewCompat;
 import androidx.core.widget.NestedScrollView;
 
 import com.airbnb.lottie.LottieAnimationView;
+import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.card.MaterialCardView;
 import com.google.android.material.chip.Chip;
 import com.google.android.material.chip.ChipGroup;
@@ -58,6 +59,7 @@ public class MainActivity extends AppCompatActivity {
     private android.widget.TextView tvMotivationMessage;
     private android.widget.TextView tvStreakCount;
     private android.widget.TextView tvFunFact;
+    private BottomNavigationView bottomNavigation;
     private static final String KEY_ANIMATIONS_ENABLED = "ANIMATIONS_ENABLED";
     private static final String KEY_LOW_POWER_ANIMATIONS = "LOW_POWER_ANIMATIONS";
 
@@ -108,6 +110,7 @@ public class MainActivity extends AppCompatActivity {
         btnProgressMode = findViewById(R.id.btnProgressMode);
         mascotView = findViewById(R.id.mascotView);
         nestedScrollView = findViewById(R.id.nestedScrollView);
+        bottomNavigation = findViewById(R.id.bottomNavigation);
 
         setupDynamicBackground();
         setupMascot();
@@ -120,6 +123,7 @@ public class MainActivity extends AppCompatActivity {
         setupLanguageChips();
         restoreLastLanguageSelection();
         setupButtons();
+        setupBottomNavigation();
         setupScrollAnimations();
         setupBackHandler();
         showIntroIfFirstTime();
@@ -991,5 +995,46 @@ public class MainActivity extends AppCompatActivity {
         if (scrollingDown) {
             view.startAnimation(AnimationUtils.loadAnimation(this, R.anim.slide_up));
         }
+    }
+
+    private void setupBottomNavigation() {
+        if (bottomNavigation == null) return;
+
+        // Set Home as selected by default
+        bottomNavigation.setSelectedItemId(R.id.nav_home);
+
+        bottomNavigation.setOnItemSelectedListener(item -> {
+            vibrate();
+            int itemId = item.getItemId();
+
+            if (itemId == R.id.nav_home) {
+                // Already on home, maybe scroll to top
+                if (nestedScrollView != null) {
+                    nestedScrollView.smoothScrollTo(0, 0);
+                }
+                return true;
+            } else if (itemId == R.id.nav_profile) {
+                openProfileScreen();
+                return true;
+            } else if (itemId == R.id.nav_settings) {
+                Intent intent = new Intent(MainActivity.this, SettingsActivity.class);
+                startActivity(intent);
+                return true;
+            } else if (itemId == R.id.nav_notifications) {
+                openNotificationsScreen();
+                return true;
+            }
+            return false;
+        });
+    }
+
+    private void openProfileScreen() {
+        Intent intent = new Intent(MainActivity.this, ProfileActivity.class);
+        startActivity(intent);
+    }
+
+    private void openNotificationsScreen() {
+        Intent intent = new Intent(MainActivity.this, NotificationsActivity.class);
+        startActivity(intent);
     }
 }
