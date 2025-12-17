@@ -63,6 +63,7 @@ public class MainActivity extends AppCompatActivity {
     private android.widget.TextView tvAccuracy;
     private android.widget.TextView tvAchievements;
     private android.widget.TextView notificationBadge;
+    private android.view.View offlineBanner;
     private BottomNavigationView bottomNavigation;
     private static final String KEY_ANIMATIONS_ENABLED = "ANIMATIONS_ENABLED";
     private static final String KEY_LOW_POWER_ANIMATIONS = "LOW_POWER_ANIMATIONS";
@@ -110,6 +111,7 @@ public class MainActivity extends AppCompatActivity {
         tvTotalQuizzes = findViewById(R.id.tvTotalQuizzes);
         tvAccuracy = findViewById(R.id.tvAccuracy);
         tvAchievements = findViewById(R.id.tvAchievements);
+        offlineBanner = findViewById(R.id.offlineBanner);
         languageChipGroup = findViewById(R.id.languageChipGroup);
         btnRecitalMode = findViewById(R.id.btnRecitalMode);
         btnPracticeMode = findViewById(R.id.btnPracticeMode);
@@ -128,6 +130,7 @@ public class MainActivity extends AppCompatActivity {
         setupAnimatedShapes();
         setupEnhancedFeatures();
         setupQuickStats();
+        setupOfflineIndicator();
         setupLanguageChips();
         restoreLastLanguageSelection();
         setupButtons();
@@ -138,6 +141,17 @@ public class MainActivity extends AppCompatActivity {
 
         // Initialize notification system
         initializeNotifications();
+    }
+
+    private void setupOfflineIndicator() {
+        if (offlineBanner == null) return;
+
+        OfflineManager offlineManager = new OfflineManager(this);
+        if (offlineManager.isOnline()) {
+            offlineBanner.setVisibility(View.GONE);
+        } else {
+            offlineBanner.setVisibility(View.VISIBLE);
+        }
     }
 
     private void setupQuickStats() {
@@ -160,6 +174,44 @@ public class MainActivity extends AppCompatActivity {
             int total = achievementManager.getTotalCount();
             tvAchievements.setText(unlocked + "/" + total);
         }
+
+        // Setup badges click handler
+        View badgesClickArea = findViewById(R.id.badgesClickArea);
+        if (badgesClickArea != null) {
+            badgesClickArea.setOnClickListener(v -> openAchievementsScreen());
+        }
+    }
+
+    private void openAchievementsScreen() {
+        OfflineManager offlineManager = new OfflineManager(this);
+
+        // Check if user is logged in
+        if (!offlineManager.isLoggedIn()) {
+            new AlertDialog.Builder(this)
+                .setTitle("Login Required 🔒")
+                .setMessage(offlineManager.getLoginRequiredMessage("Achievements"))
+                .setPositiveButton("Sign In", (dialog, which) -> {
+                    Intent intent = new Intent(this, LoginActivity.class);
+                    startActivity(intent);
+                })
+                .setNegativeButton("Cancel", null)
+                .show();
+            return;
+        }
+
+        // Check internet connection
+        if (!offlineManager.isOnline()) {
+            new AlertDialog.Builder(this)
+                .setTitle("Internet Required 📶")
+                .setMessage("Achievements require an internet connection. Please connect and try again.")
+                .setPositiveButton("OK", null)
+                .show();
+            return;
+        }
+
+        // Open achievements screen
+        Intent intent = new Intent(this, AchievementsActivity.class);
+        startActivity(intent);
     }
 
     private void initializeNotifications() {
@@ -706,6 +758,7 @@ public class MainActivity extends AppCompatActivity {
         // Refresh quick stats
         setupQuickStats();
         setupLearningStreak();
+        setupOfflineIndicator();
         updateNotificationBadge();
 
         // Check and unlock achievements
