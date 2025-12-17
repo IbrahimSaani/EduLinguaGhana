@@ -59,6 +59,10 @@ public class MainActivity extends AppCompatActivity {
     private android.widget.TextView tvMotivationMessage;
     private android.widget.TextView tvStreakCount;
     private android.widget.TextView tvFunFact;
+    private android.widget.TextView tvTotalQuizzes;
+    private android.widget.TextView tvAccuracy;
+    private android.widget.TextView tvAchievements;
+    private android.widget.TextView notificationBadge;
     private BottomNavigationView bottomNavigation;
     private static final String KEY_ANIMATIONS_ENABLED = "ANIMATIONS_ENABLED";
     private static final String KEY_LOW_POWER_ANIMATIONS = "LOW_POWER_ANIMATIONS";
@@ -103,6 +107,9 @@ public class MainActivity extends AppCompatActivity {
         tvMotivationMessage = findViewById(R.id.tvMotivationMessage);
         tvStreakCount = findViewById(R.id.tvStreakCount);
         tvFunFact = findViewById(R.id.tvFunFact);
+        tvTotalQuizzes = findViewById(R.id.tvTotalQuizzes);
+        tvAccuracy = findViewById(R.id.tvAccuracy);
+        tvAchievements = findViewById(R.id.tvAchievements);
         languageChipGroup = findViewById(R.id.languageChipGroup);
         btnRecitalMode = findViewById(R.id.btnRecitalMode);
         btnPracticeMode = findViewById(R.id.btnPracticeMode);
@@ -120,6 +127,7 @@ public class MainActivity extends AppCompatActivity {
         setupFloatingElements();
         setupAnimatedShapes();
         setupEnhancedFeatures();
+        setupQuickStats();
         setupLanguageChips();
         restoreLastLanguageSelection();
         setupButtons();
@@ -130,6 +138,28 @@ public class MainActivity extends AppCompatActivity {
 
         // Initialize notification system
         initializeNotifications();
+    }
+
+    private void setupQuickStats() {
+        // Update Total Quizzes
+        if (tvTotalQuizzes != null) {
+            int totalQuizzes = ProgressManager.getTotalQuizzes(this);
+            tvTotalQuizzes.setText(String.valueOf(totalQuizzes));
+        }
+
+        // Update Accuracy
+        if (tvAccuracy != null) {
+            int accuracy = ProgressManager.getAccuracy(this);
+            tvAccuracy.setText(accuracy + "%");
+        }
+
+        // Update Achievements
+        if (tvAchievements != null) {
+            AchievementManager achievementManager = new AchievementManager(this);
+            int unlocked = achievementManager.getUnlockedCount();
+            int total = achievementManager.getTotalCount();
+            tvAchievements.setText(unlocked + "/" + total);
+        }
     }
 
     private void initializeNotifications() {
@@ -473,32 +503,15 @@ public class MainActivity extends AppCompatActivity {
     private void setupLearningStreak() {
         if (tvStreakCount == null) return;
 
-        SharedPreferences prefs = getSharedPreferences(PREF_NAME, MODE_PRIVATE);
-        long lastVisit = prefs.getLong("LAST_VISIT_DATE", 0);
-        int streak = prefs.getInt("LEARNING_STREAK", 0);
+        StreakManager streakManager = new StreakManager(this);
+        int streak = streakManager.getCurrentStreak();
 
-        long currentDate = System.currentTimeMillis() / (1000 * 60 * 60 * 24); // Days since epoch
-        long lastDate = lastVisit / (1000 * 60 * 60 * 24);
-
-        if (currentDate == lastDate) {
-            // Same day visit
-            tvStreakCount.setText(String.format("🔥 %d days", streak));
-        } else if (currentDate == lastDate + 1) {
-            // Consecutive day visit
-            streak++;
-            SharedPreferences.Editor editor = prefs.edit();
-            editor.putInt("LEARNING_STREAK", streak);
-            editor.putLong("LAST_VISIT_DATE", System.currentTimeMillis());
-            editor.apply();
-            tvStreakCount.setText(String.format("🔥 %d days", streak));
-        } else {
-            // Streak broken
-            streak = 1;
-            SharedPreferences.Editor editor = prefs.edit();
-            editor.putInt("LEARNING_STREAK", streak);
-            editor.putLong("LAST_VISIT_DATE", System.currentTimeMillis());
-            editor.apply();
+        if (streak == 0) {
+            tvStreakCount.setText("🔥 Start today!");
+        } else if (streak == 1) {
             tvStreakCount.setText("🔥 1 day");
+        } else {
+            tvStreakCount.setText("🔥 " + streak + " days");
         }
     }
 
@@ -554,7 +567,35 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.main_menu, menu);
+
+        // Setup notification badge
+        MenuItem notificationItem = menu.findItem(R.id.action_notifications);
+        if (notificationItem != null) {
+            View actionView = notificationItem.getActionView();
+            if (actionView != null) {
+                notificationBadge = actionView.findViewById(R.id.notification_badge);
+                updateNotificationBadge();
+
+                // Set click listener on the action view
+                actionView.setOnClickListener(v -> openNotificationsScreen());
+            }
+        }
+
         return true;
+    }
+
+    private void updateNotificationBadge() {
+        if (notificationBadge == null) return;
+
+        NotificationManager notificationManager = new NotificationManager(this);
+        int unreadCount = notificationManager.getUnreadCount();
+
+        if (unreadCount > 0) {
+            notificationBadge.setVisibility(View.VISIBLE);
+            notificationBadge.setText(unreadCount > 9 ? "9+" : String.valueOf(unreadCount));
+        } else {
+            notificationBadge.setVisibility(View.GONE);
+        }
     }
 
     @Override
@@ -661,6 +702,16 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
+
+        // Refresh quick stats
+        setupQuickStats();
+        setupLearningStreak();
+        updateNotificationBadge();
+
+        // Check and unlock achievements
+        AchievementManager achievementManager = new AchievementManager(this);
+        achievementManager.checkAndUnlockAchievements();
+
         // previously read high score to show in removed UI; keep prefs access in case other features rely on it
         applyDynamicBackground();
         if (animationsEnabled()) {

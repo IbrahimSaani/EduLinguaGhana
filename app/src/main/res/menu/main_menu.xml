@@ -1,5 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
-    <!-- Settings icon removed - now available in bottom navigation -->
+
+    <item
+        android:id="@+id/action_notifications"
+        android:title="Notifications"
+        android:icon="@android:drawable/ic_popup_reminder"
+        app:showAsAction="always"
+        app:actionLayout="@layout/notification_badge_layout" />
+
 </menu>

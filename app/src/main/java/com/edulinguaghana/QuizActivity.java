@@ -499,6 +499,14 @@ public class QuizActivity extends AppCompatActivity {
         // Update overall progress
         ProgressManager.updateProgress(this, quizType, score, score);
 
+        // Record practice for streak
+        StreakManager streakManager = new StreakManager(this);
+        streakManager.recordPractice();
+
+        // Check and unlock achievements
+        AchievementManager achievementManager = new AchievementManager(this);
+        achievementManager.checkAndUnlockAchievements();
+
         // Trigger notifications for achievements
         NotificationManager notificationManager = new NotificationManager(this);
 
