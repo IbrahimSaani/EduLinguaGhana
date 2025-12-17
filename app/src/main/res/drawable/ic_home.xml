@@ -3,7 +3,71 @@
     android:height="24dp"
     android:viewportWidth="24"
     android:viewportHeight="24">
+
+    <!-- Cartoon house walls - main body -->
     <path
-        android:fillColor="@android:color/white"
-        android:pathData="M10,20v-6h4v6h5v-8h3L12,3 2,12h3v8z"/>
+        android:fillColor="#FFD54F"
+        android:pathData="M7,11v10c0,0.5 0.5,1 1,1h3v-6h2v6h3c0.5,0 1,-0.5 1,-1V11L12,6z"/>
+
+    <!-- House outline for definition -->
+    <path
+        android:fillColor="@android:color/transparent"
+        android:strokeColor="#FFA000"
+        android:strokeWidth="0.8"
+        android:pathData="M7,11v10c0,0.5 0.5,1 1,1h3v-6h2v6h3c0.5,0 1,-0.5 1,-1V11"/>
+
+    <!-- Cartoon roof - bright red -->
+    <path
+        android:fillColor="#E53935"
+        android:pathData="M12,3l-11,8h4l7,-5l7,5h4z"/>
+
+    <!-- Roof shadow for depth -->
+    <path
+        android:fillColor="#C62828"
+        android:fillAlpha="0.5"
+        android:pathData="M12,3l-3,2.2l3,2.8l3,-2.8z"/>
+
+    <!-- Chimney -->
+    <path
+        android:fillColor="#8D6E63"
+        android:pathData="M16,4h2v3h-2z"/>
+    <path
+        android:fillColor="#5D4037"
+        android:pathData="M16,4h2v1h-2z"/>
+
+    <!-- Door - colorful -->
+    <path
+        android:fillColor="#4CAF50"
+        android:pathData="M10.5,16h3c0.3,0 0.5,0.2 0.5,0.5v5.5h-4v-5.5C10,16.2 10.2,16 10.5,16z"/>
+
+    <!-- Door knob -->
+    <path
+        android:fillColor="#FFC107"
+        android:pathData="M13,18.5c0,-0.3 -0.2,-0.5 -0.5,-0.5s-0.5,0.2 -0.5,0.5s0.2,0.5 0.5,0.5S13,18.8 13,18.5z"/>
+
+    <!-- Windows with frames -->
+    <path
+        android:fillColor="#42A5F5"
+        android:pathData="M8.5,13h2c0.3,0 0.5,0.2 0.5,0.5v2c0,0.3 -0.2,0.5 -0.5,0.5h-2c-0.3,0 -0.5,-0.2 -0.5,-0.5v-2C8,13.2 8.2,13 8.5,13z"/>
+    <path
+        android:fillColor="#42A5F5"
+        android:pathData="M13.5,13h2c0.3,0 0.5,0.2 0.5,0.5v2c0,0.3 -0.2,0.5 -0.5,0.5h-2c-0.3,0 -0.5,-0.2 -0.5,-0.5v-2C13,13.2 13.2,13 13.5,13z"/>
+
+    <!-- Window panes -->
+    <path
+        android:fillColor="@android:color/transparent"
+        android:strokeColor="#1976D2"
+        android:strokeWidth="0.5"
+        android:pathData="M9.5,13v3M8,14.5h3M14.5,13v3M13,14.5h3"/>
+
+    <!-- Smoke from chimney -->
+    <path
+        android:fillColor="#90A4AE"
+        android:fillAlpha="0.6"
+        android:pathData="M17,2c0.5,0 1,0.5 1,1s-0.5,1 -1,1s-1,-0.5 -1,-1S16.5,2 17,2z"/>
+    <path
+        android:fillColor="#90A4AE"
+        android:fillAlpha="0.4"
+        android:pathData="M18.5,1c0.4,0 0.8,0.3 0.8,0.8s-0.4,0.8 -0.8,0.8s-0.8,-0.4 -0.8,-0.8S18.1,1 18.5,1z"/>
+
 </vector>

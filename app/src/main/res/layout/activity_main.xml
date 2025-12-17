@@ -952,7 +952,7 @@
         android:layout_gravity="bottom"
         android:background="?attr/colorSurface"
         android:elevation="8dp"
-        app:itemIconTint="@color/bottom_nav_color"
+        app:itemIconTint="@null"
         app:itemTextColor="@color/bottom_nav_color"
         app:labelVisibilityMode="labeled"
         app:menu="@menu/bottom_navigation_menu" />

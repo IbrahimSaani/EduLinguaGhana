@@ -975,6 +975,9 @@ public class MainActivity extends AppCompatActivity {
     private void setupBottomNavigation() {
         if (bottomNavigation == null) return;
 
+        // Disable icon tinting to show colorful cartoon icons
+        bottomNavigation.setItemIconTintList(null);
+
         // Set Home as selected by default
         bottomNavigation.setSelectedItemId(R.id.nav_home);
 
