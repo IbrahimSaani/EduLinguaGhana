@@ -23,6 +23,9 @@ public class SettingsActivity extends AppCompatActivity {
     private SwitchMaterial switchAnimations;
     private SwitchMaterial switchLowPowerAnimations;
     private Button btnResetProgress;
+    private Button btnSyncToCloud;
+    private Button btnSyncFromCloud;
+    private TextView tvLastSync;
     private RadioGroup rgTheme;
     private RadioButton rbLight, rbDark, rbSystem;
 
@@ -60,6 +63,9 @@ public class SettingsActivity extends AppCompatActivity {
         switchAnimations = findViewById(R.id.switchAnimations);
         switchLowPowerAnimations = findViewById(R.id.switchLowPowerAnimations);
         btnResetProgress = findViewById(R.id.btnResetProgress);
+        btnSyncToCloud = findViewById(R.id.btnSyncToCloud);
+        btnSyncFromCloud = findViewById(R.id.btnSyncFromCloud);
+        tvLastSync = findViewById(R.id.tvLastSync);
         rgTheme = findViewById(R.id.rgTheme);
         rbLight = findViewById(R.id.rbLight);
         rbDark = findViewById(R.id.rbDark);
@@ -67,6 +73,9 @@ public class SettingsActivity extends AppCompatActivity {
 
         // Apply custom font to section headers
         applySectionHeaderFonts();
+
+        // Update last sync time
+        updateLastSyncTime();
 
         // Load preferences
         SharedPreferences prefs = getSharedPreferences(PREF_NAME, MODE_PRIVATE);
@@ -113,6 +122,10 @@ public class SettingsActivity extends AppCompatActivity {
             prefs.edit().putInt(KEY_THEME, newTheme).apply();
             AppCompatDelegate.setDefaultNightMode(newTheme);
         });
+
+        // Cloud Sync buttons
+        btnSyncToCloud.setOnClickListener(v -> syncToCloud());
+        btnSyncFromCloud.setOnClickListener(v -> syncFromCloud());
 
         // Reset quiz progress when clicked
         btnResetProgress.setOnClickListener(v -> {
@@ -193,5 +206,95 @@ public class SettingsActivity extends AppCompatActivity {
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    private void updateLastSyncTime() {
+        if (tvLastSync == null) return;
+
+        CloudSyncManager syncManager = new CloudSyncManager(this);
+        String lastSyncTime = syncManager.getLastSyncTimeString();
+        tvLastSync.setText("Last sync: " + lastSyncTime);
+    }
+
+    private void syncToCloud() {
+        CloudSyncManager syncManager = new CloudSyncManager(this);
+
+        if (!syncManager.canSync()) {
+            new AlertDialog.Builder(this)
+                .setTitle("Sync Unavailable")
+                .setMessage("Cloud sync requires login and internet connection.")
+                .setPositiveButton("OK", null)
+                .show();
+            return;
+        }
+
+        // Show progress dialog
+        AlertDialog progressDialog = new AlertDialog.Builder(this)
+            .setTitle("Syncing to Cloud")
+            .setMessage("Uploading your progress...")
+            .setCancelable(false)
+            .create();
+        progressDialog.show();
+
+        syncManager.syncToCloud((success, message) -> {
+            runOnUiThread(() -> {
+                progressDialog.dismiss();
+
+                new AlertDialog.Builder(this)
+                    .setTitle(success ? "Sync Complete" : "Sync Failed")
+                    .setMessage(message)
+                    .setPositiveButton("OK", null)
+                    .show();
+
+                if (success) {
+                    updateLastSyncTime();
+                }
+            });
+        });
+    }
+
+    private void syncFromCloud() {
+        CloudSyncManager syncManager = new CloudSyncManager(this);
+
+        if (!syncManager.canSync()) {
+            new AlertDialog.Builder(this)
+                .setTitle("Sync Unavailable")
+                .setMessage("Cloud sync requires login and internet connection.")
+                .setPositiveButton("OK", null)
+                .show();
+            return;
+        }
+
+        // Show confirmation
+        new AlertDialog.Builder(this)
+            .setTitle("Download Progress")
+            .setMessage("This will replace your local progress with cloud data. Continue?")
+            .setPositiveButton("Download", (dialog, which) -> {
+                // Show progress dialog
+                AlertDialog progressDialog = new AlertDialog.Builder(this)
+                    .setTitle("Syncing from Cloud")
+                    .setMessage("Downloading your progress...")
+                    .setCancelable(false)
+                    .create();
+                progressDialog.show();
+
+                syncManager.syncFromCloud((success, message) -> {
+                    runOnUiThread(() -> {
+                        progressDialog.dismiss();
+
+                        new AlertDialog.Builder(this)
+                            .setTitle(success ? "Sync Complete" : "Sync Failed")
+                            .setMessage(message)
+                            .setPositiveButton("OK", null)
+                            .show();
+
+                        if (success) {
+                            updateLastSyncTime();
+                        }
+                    });
+                });
+            })
+            .setNegativeButton("Cancel", null)
+            .show();
     }
 }

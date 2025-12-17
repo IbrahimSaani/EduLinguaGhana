@@ -38,12 +38,14 @@ dependencies {
     implementation(libs.activity)
     implementation(libs.constraintlayout)
     implementation("androidx.cardview:cardview:1.0.0")
+    implementation("androidx.annotation:annotation:1.7.0")
     implementation("com.airbnb.android:lottie:6.7.1")
     implementation("com.google.code.gson:gson:2.10.1")
 
     // Firebase Authentication
     implementation(platform("com.google.firebase:firebase-bom:32.7.0"))
     implementation("com.google.firebase:firebase-auth")
+    implementation("com.google.firebase:firebase-database")
     implementation("com.google.android.gms:play-services-auth:20.7.0")
 
     // Facebook Login

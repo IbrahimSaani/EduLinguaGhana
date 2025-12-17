@@ -1136,6 +1136,9 @@ public class MainActivity extends AppCompatActivity {
                     nestedScrollView.smoothScrollTo(0, 0);
                 }
                 return true;
+            } else if (itemId == R.id.nav_leaderboard) {
+                openLeaderboardScreen();
+                return true;
             } else if (itemId == R.id.nav_profile) {
                 openProfileScreen();
                 return true;
@@ -1149,6 +1152,37 @@ public class MainActivity extends AppCompatActivity {
             }
             return false;
         });
+    }
+
+    private void openLeaderboardScreen() {
+        OfflineManager offlineManager = new OfflineManager(this);
+
+        // Check if user is logged in
+        if (!offlineManager.isLoggedIn()) {
+            new AlertDialog.Builder(this)
+                .setTitle("Login Required 🔒")
+                .setMessage("Sign in to compete on the leaderboard and see global rankings!")
+                .setPositiveButton("Sign In", (dialog, which) -> {
+                    Intent intent = new Intent(this, LoginActivity.class);
+                    startActivity(intent);
+                })
+                .setNegativeButton("Cancel", null)
+                .show();
+            return;
+        }
+
+        // Check internet connection
+        if (!offlineManager.isOnline()) {
+            new AlertDialog.Builder(this)
+                .setTitle("Internet Required 📶")
+                .setMessage("Leaderboard requires an internet connection to show global rankings.")
+                .setPositiveButton("OK", null)
+                .show();
+            return;
+        }
+
+        Intent intent = new Intent(MainActivity.this, LeaderboardActivity.class);
+        startActivity(intent);
     }
 
     private void openProfileScreen() {

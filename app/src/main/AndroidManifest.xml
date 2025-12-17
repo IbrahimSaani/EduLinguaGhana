@@ -58,6 +58,8 @@
         <activity android:name=".NotificationsActivity" android:exported="false"/>
         <!--  AchievementsActivity  -->
         <activity android:name=".AchievementsActivity" android:exported="false"/>
+        <!--  LeaderboardActivity  -->
+        <activity android:name=".LeaderboardActivity" android:exported="false"/>
         <!--  LoginActivity  -->
         <activity android:name=".LoginActivity" android:exported="false"/>
         <!--  SignUpActivity  -->

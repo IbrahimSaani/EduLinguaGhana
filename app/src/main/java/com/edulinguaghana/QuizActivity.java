@@ -507,6 +507,18 @@ public class QuizActivity extends AppCompatActivity {
         AchievementManager achievementManager = new AchievementManager(this);
         achievementManager.checkAndUnlockAchievements();
 
+        // Upload to leaderboard if score is good and user is online
+        if (score >= 50) {
+            CloudSyncManager cloudSync = new CloudSyncManager(this);
+            if (cloudSync.canSync()) {
+                SharedPreferences prefs = getSharedPreferences("UserPrefs", MODE_PRIVATE);
+                String userName = prefs.getString("USER_NAME", "Anonymous");
+                cloudSync.uploadToLeaderboard(userName, score, (success, message) -> {
+                    // Silent upload, no need to notify user
+                });
+            }
+        }
+
         // Trigger notifications for achievements
         NotificationManager notificationManager = new NotificationManager(this);
 
