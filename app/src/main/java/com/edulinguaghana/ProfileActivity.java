@@ -33,7 +33,7 @@ public class ProfileActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
         if (getSupportActionBar() != null) {
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-            getSupportActionBar().setTitle("Profile");
+            getSupportActionBar().setDisplayShowTitleEnabled(false);
         }
 
         initViews();

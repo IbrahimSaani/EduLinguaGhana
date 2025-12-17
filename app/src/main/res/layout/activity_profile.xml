@@ -18,7 +18,19 @@
             android:background="?attr/colorPrimary"
             android:elevation="0dp"
             app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
-            app:titleTextColor="@color/white" />
+            app:titleTextColor="@color/white">
+
+            <TextView
+                android:id="@+id/toolbarTitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Profile"
+                android:textSize="20sp"
+                android:textColor="@color/white"
+                android:fontFamily="@font/agbalumo"
+                android:textStyle="bold" />
+
+        </androidx.appcompat.widget.Toolbar>
 
     </com.google.android.material.appbar.AppBarLayout>
 
@@ -57,7 +69,7 @@
                     <ImageView
                         android:layout_width="140dp"
                         android:layout_height="140dp"
-                        android:src="@mipmap/ic_launcher"
+                        android:src="@drawable/ic_graduation_cap"
                         android:contentDescription="App Icon"
                         android:scaleType="centerInside" />
 
@@ -123,8 +135,8 @@
                         android:id="@+id/profileImage"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
-                        android:src="@mipmap/ic_launcher"
-                        android:scaleType="centerCrop"
+                        android:src="@drawable/ic_graduation_cap"
+                        android:scaleType="centerInside"
                         android:contentDescription="Profile Picture" />
 
                 </com.google.android.material.card.MaterialCardView>

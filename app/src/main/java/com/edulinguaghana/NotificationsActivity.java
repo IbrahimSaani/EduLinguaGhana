@@ -18,7 +18,7 @@ public class NotificationsActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
         if (getSupportActionBar() != null) {
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-            getSupportActionBar().setTitle("Notifications");
+            getSupportActionBar().setDisplayShowTitleEnabled(false);
         }
 
         // Initialize notifications
