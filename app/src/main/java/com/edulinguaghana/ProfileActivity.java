@@ -4,7 +4,6 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -19,9 +18,9 @@ import com.google.firebase.auth.FirebaseUser;
 public class ProfileActivity extends AppCompatActivity {
 
     private FirebaseAuth mAuth;
-    private LinearLayout notSignedInLayout, signedInLayout;
+    private View notSignedInLayout, signedInLayout;
     private MaterialButton btnGoToLogin, btnManageAccount, btnSignOut;
-    private TextView tvUserName, tvUserEmail;
+    private TextView tvUserName, tvUserEmail, tvProfileStreak, tvTotalLessons, tvBestScore, tvFavoriteLanguage;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -50,6 +49,10 @@ public class ProfileActivity extends AppCompatActivity {
         btnSignOut = findViewById(R.id.btnSignOut);
         tvUserName = findViewById(R.id.tvUserName);
         tvUserEmail = findViewById(R.id.tvUserEmail);
+        tvProfileStreak = findViewById(R.id.tvProfileStreak);
+        tvTotalLessons = findViewById(R.id.tvTotalLessons);
+        tvBestScore = findViewById(R.id.tvBestScore);
+        tvFavoriteLanguage = findViewById(R.id.tvFavoriteLanguage);
     }
 
     private void setupProfile() {
@@ -67,11 +70,20 @@ public class ProfileActivity extends AppCompatActivity {
             tvUserName.setText(displayName != null ? displayName : "User");
             tvUserEmail.setText(email != null ? email : "");
 
-            // TODO: Load user statistics from database
-            // - Learning streak
-            // - Total lessons completed
-            // - Best quiz score
-            // - Achievements
+            // Load user statistics from ProgressManager
+            // Display streak (TODO: implement streak tracking)
+            tvProfileStreak.setText("0 days");
+
+            // Display total lessons (using total quizzes as proxy)
+            int totalLessons = ProgressManager.getTotalQuizzes(this);
+            tvTotalLessons.setText(String.valueOf(totalLessons));
+
+            // Display best score
+            int bestScore = ProgressManager.getHighScore(this);
+            tvBestScore.setText(bestScore + " / 10");
+
+            // Display favorite language (TODO: implement favorite language tracking)
+            tvFavoriteLanguage.setText("Not set yet");
         } else {
             // User is not signed in
             notSignedInLayout.setVisibility(View.VISIBLE);
