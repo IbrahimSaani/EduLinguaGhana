@@ -60,5 +60,7 @@
         <activity android:name=".LoginActivity" android:exported="false"/>
         <!--  SignUpActivity  -->
         <activity android:name=".SignUpActivity" android:exported="false"/>
+        <!--  AccountManagementActivity  -->
+        <activity android:name=".AccountManagementActivity" android:exported="false"/>
     </application>
 </manifest>

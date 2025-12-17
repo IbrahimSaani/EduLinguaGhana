@@ -98,8 +98,8 @@ public class ProfileActivity extends AppCompatActivity {
         });
 
         btnManageAccount.setOnClickListener(v -> {
-            Toast.makeText(this, "Account management coming soon!", Toast.LENGTH_SHORT).show();
-            // TODO: Implement account management (change password, update profile, etc.)
+            Intent intent = new Intent(ProfileActivity.this, AccountManagementActivity.class);
+            startActivity(intent);
         });
 
         btnSignOut.setOnClickListener(v -> showSignOutDialog());
