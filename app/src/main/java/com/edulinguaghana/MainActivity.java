@@ -127,6 +127,47 @@ public class MainActivity extends AppCompatActivity {
         setupScrollAnimations();
         setupBackHandler();
         showIntroIfFirstTime();
+
+        // Initialize notification system
+        initializeNotifications();
+    }
+
+    private void initializeNotifications() {
+        NotificationManager notificationManager = new NotificationManager(this);
+
+        // Check if this is first launch
+        SharedPreferences prefs = getSharedPreferences(PREF_NAME, MODE_PRIVATE);
+        boolean isFirstLaunch = !prefs.getBoolean("HAS_LAUNCHED_BEFORE", false);
+
+        if (isFirstLaunch) {
+            // Welcome notification
+            notificationManager.addNotification(
+                "Welcome to EduLingua Ghana! 🎉",
+                "Start your journey to mastering Ghanaian languages today!",
+                "🎉",
+                Notification.NotificationType.MOTIVATIONAL
+            );
+
+            // Add some sample notifications to show the feature
+            notificationManager.addNotification(
+                "Let's Get Started! 🚀",
+                "Choose a language and begin your first lesson.",
+                "🚀",
+                Notification.NotificationType.REMINDER
+            );
+
+            notificationManager.addNotification(
+                "Daily Practice Tip 💡",
+                "Just 10 minutes a day can make a huge difference in language learning!",
+                "💡",
+                Notification.NotificationType.MOTIVATIONAL
+            );
+
+            prefs.edit().putBoolean("HAS_LAUNCHED_BEFORE", true).apply();
+        } else {
+            // Check and generate automatic notifications
+            notificationManager.checkAndGenerateNotifications();
+        }
     }
 
     private void setupMascot() {

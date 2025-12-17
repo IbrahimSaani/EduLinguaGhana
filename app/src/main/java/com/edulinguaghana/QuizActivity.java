@@ -499,6 +499,23 @@ public class QuizActivity extends AppCompatActivity {
         // Update overall progress
         ProgressManager.updateProgress(this, quizType, score, score);
 
+        // Trigger notifications for achievements
+        NotificationManager notificationManager = new NotificationManager(this);
+
+        if (newHighScore && score >= 80) {
+            notificationManager.sendAchievementNotification(
+                "New High Score! 🏆",
+                "Amazing! You scored " + score + " points in " + quizType + " mode!"
+            );
+        }
+
+        if (score == 100) {
+            notificationManager.sendAchievementNotification(
+                "Perfect Score! ⭐",
+                "Outstanding! You got a perfect score in " + quizType + " mode!"
+            );
+        }
+
         // Show end screen
         Animation fadeIn = AnimationUtils.loadAnimation(this, R.anim.fade_in);
         quizContentContainer.setVisibility(View.GONE);

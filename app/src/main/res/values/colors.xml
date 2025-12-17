@@ -60,4 +60,7 @@
     <color name="sparkleCore">#99FFFFFF</color>
     <color name="sparkleHalo">#66FFD8A8</color>
     <color name="sparkleHaloSecondary">#664FC3F7</color>
+
+    <!-- Notifications -->
+    <color name="notification_unread_bg">#E8EAF6</color>
 </resources>
