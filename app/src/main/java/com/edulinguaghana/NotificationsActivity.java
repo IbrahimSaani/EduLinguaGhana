@@ -55,6 +55,14 @@ public class NotificationsActivity extends AppCompatActivity implements Notifica
     private void setupRecyclerView() {
         notificationsRecyclerView.setLayoutManager(new LinearLayoutManager(this));
         notificationsRecyclerView.setHasFixedSize(true);
+
+        // Add fade-in animation when activity opens
+        notificationsRecyclerView.setAlpha(0f);
+        notificationsRecyclerView.animate()
+            .alpha(1f)
+            .setDuration(500)
+            .setStartDelay(100)
+            .start();
     }
 
     private void loadNotifications() {
@@ -82,23 +90,33 @@ public class NotificationsActivity extends AppCompatActivity implements Notifica
         // Refresh the list
         loadNotifications();
 
-        // Show details in a dialog
+        // Show details in a styled dialog
+        String title = notification.getEmoji() + " " + notification.getTitle();
         new AlertDialog.Builder(this)
-                .setTitle(notification.getTitle())
+                .setTitle(title)
                 .setMessage(notification.getMessage())
-                .setPositiveButton("OK", null)
+                .setPositiveButton("Got it!", null)
+                .setIcon(android.R.drawable.ic_dialog_info)
                 .show();
     }
 
     @Override
     public void onNotificationDelete(Notification notification) {
-        // Delete notification
-        notificationManager.deleteNotification(notification.getId());
+        // Show confirmation dialog
+        new AlertDialog.Builder(this)
+                .setTitle("Delete Notification")
+                .setMessage("Remove this notification?")
+                .setPositiveButton("Delete", (dialog, which) -> {
+                    // Delete notification
+                    notificationManager.deleteNotification(notification.getId());
 
-        // Refresh the list
-        loadNotifications();
+                    // Refresh the list
+                    loadNotifications();
 
-        Toast.makeText(this, "Notification deleted", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(this, "Notification deleted", Toast.LENGTH_SHORT).show();
+                })
+                .setNegativeButton("Cancel", null)
+                .show();
     }
 
     @Override

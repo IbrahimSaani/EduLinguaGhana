@@ -5,7 +5,6 @@ import android.text.format.DateUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -58,18 +57,44 @@ public class NotificationsAdapter extends RecyclerView.Adapter<NotificationsAdap
         );
         holder.tvTime.setText(timeAgo);
 
-        // Set background based on read status
+        // Enhanced visual styling based on read status and notification type
         if (notification.isRead()) {
             holder.cardView.setCardBackgroundColor(ContextCompat.getColor(context, android.R.color.white));
+            holder.cardView.setCardElevation(2f);
             holder.tvTitle.setAlpha(0.7f);
             holder.tvMessage.setAlpha(0.7f);
+            holder.tvEmoji.setAlpha(0.7f);
         } else {
-            holder.cardView.setCardBackgroundColor(ContextCompat.getColor(context, R.color.notification_unread_bg));
+            // Set background color based on notification type
+            int backgroundColor;
+            switch (notification.getType()) {
+                case ACHIEVEMENT:
+                    backgroundColor = R.color.notification_achievement_bg;
+                    break;
+                case MILESTONE:
+                    backgroundColor = R.color.notification_milestone_bg;
+                    break;
+                case STREAK:
+                    backgroundColor = R.color.notification_streak_bg;
+                    break;
+                case MOTIVATIONAL:
+                    backgroundColor = R.color.notification_motivational_bg;
+                    break;
+                case REMINDER:
+                    backgroundColor = R.color.notification_reminder_bg;
+                    break;
+                default:
+                    backgroundColor = R.color.notification_unread_bg;
+                    break;
+            }
+            holder.cardView.setCardBackgroundColor(ContextCompat.getColor(context, backgroundColor));
+            holder.cardView.setCardElevation(4f);
             holder.tvTitle.setAlpha(1.0f);
             holder.tvMessage.setAlpha(1.0f);
+            holder.tvEmoji.setAlpha(1.0f);
         }
 
-        // Click listeners
+        // Click listeners with visual feedback
         holder.cardView.setOnClickListener(v -> {
             if (listener != null) {
                 listener.onNotificationClick(notification);
@@ -81,6 +106,16 @@ public class NotificationsAdapter extends RecyclerView.Adapter<NotificationsAdap
                 listener.onNotificationDelete(notification);
             }
         });
+
+        // Add entrance animation
+        holder.itemView.setAlpha(0f);
+        holder.itemView.setTranslationX(100f);
+        holder.itemView.animate()
+            .alpha(1f)
+            .translationX(0f)
+            .setDuration(300)
+            .setStartDelay(position * 50L)
+            .start();
     }
 
     @Override
@@ -99,7 +134,7 @@ public class NotificationsAdapter extends RecyclerView.Adapter<NotificationsAdap
         TextView tvTitle;
         TextView tvMessage;
         TextView tvTime;
-        ImageView btnDelete;
+        MaterialCardView btnDelete;
 
         public NotificationViewHolder(@NonNull View itemView) {
             super(itemView);

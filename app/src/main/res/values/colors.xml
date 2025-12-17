@@ -63,4 +63,9 @@
 
     <!-- Notifications -->
     <color name="notification_unread_bg">#E8EAF6</color>
+    <color name="notification_achievement_bg">#FFF3E0</color>
+    <color name="notification_milestone_bg">#E1F5FE</color>
+    <color name="notification_streak_bg">#FFEBEE</color>
+    <color name="notification_motivational_bg">#F3E5F5</color>
+    <color name="notification_reminder_bg">#E8F5E9</color>
 </resources>
