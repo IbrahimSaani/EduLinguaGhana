@@ -65,6 +65,24 @@ public class SignUpActivity extends AppCompatActivity {
 
         initViews();
         setupListeners();
+        animateViews();
+    }
+
+    private void animateViews() {
+        // Animate logo
+        android.view.View logo = findViewById(R.id.ivLogo);
+        if (logo != null) {
+            android.view.animation.Animation logoAnim = android.view.animation.AnimationUtils.loadAnimation(this, R.anim.logo_bounce_in);
+            logo.startAnimation(logoAnim);
+        }
+
+        // Animate form card
+        android.view.View formCard = findViewById(R.id.signupFormCard);
+        if (formCard != null) {
+            android.view.animation.Animation cardAnim = android.view.animation.AnimationUtils.loadAnimation(this, R.anim.slide_up_fade_in);
+            cardAnim.setStartOffset(300);
+            formCard.startAnimation(cardAnim);
+        }
     }
 
     private void initViews() {
