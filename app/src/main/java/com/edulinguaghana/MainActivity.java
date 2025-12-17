@@ -513,36 +513,11 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.main_menu, menu);
-
-        // Animate the settings icon with bouncy entrance
-        if (animationsEnabled()) {
-            MenuItem settingsItem = menu.findItem(R.id.action_settings);
-            if (settingsItem != null) {
-                View actionView = findViewById(R.id.action_settings);
-                if (actionView != null) {
-                    actionView.setScaleX(0f);
-                    actionView.setScaleY(0f);
-                    actionView.animate()
-                        .scaleX(1f)
-                        .scaleY(1f)
-                        .setDuration(400)
-                        .setStartDelay(650)
-                        .setInterpolator(new android.view.animation.OvershootInterpolator(2.0f))
-                        .start();
-                }
-            }
-        }
-
         return true;
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        if (item.getItemId() == R.id.action_settings) {
-            Intent intent = new Intent(MainActivity.this, SettingsActivity.class);
-            startActivity(intent);
-            return true;
-        }
         return super.onOptionsItemSelected(item);
     }
 
