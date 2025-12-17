@@ -46,9 +46,10 @@ public class OfflineManager {
      * Check if user is logged in
      */
     public boolean isLoggedIn() {
-        // Check if user is authenticated (you can expand this based on your auth system)
-        return context.getSharedPreferences("UserPrefs", Context.MODE_PRIVATE)
-                .getBoolean("IS_LOGGED_IN", false);
+        // Check Firebase Authentication status
+        com.google.firebase.auth.FirebaseAuth auth = com.google.firebase.auth.FirebaseAuth.getInstance();
+        com.google.firebase.auth.FirebaseUser user = auth.getCurrentUser();
+        return user != null;
     }
 
     /**
