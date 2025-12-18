@@ -16,6 +16,8 @@ import androidx.appcompat.widget.Toolbar;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -40,6 +42,7 @@ public class LeaderboardActivity extends AppCompatActivity {
     private DatabaseReference leaderboardRef;
     private List<LeaderboardEntry> leaderboardList;
     private LeaderboardAdapter adapter;
+    private FirebaseUser currentUser;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -65,9 +68,10 @@ public class LeaderboardActivity extends AppCompatActivity {
         offlineManager = new OfflineManager(this);
         leaderboardRef = FirebaseDatabase.getInstance().getReference("leaderboard");
         leaderboardList = new ArrayList<>();
+        currentUser = FirebaseAuth.getInstance().getCurrentUser();
 
         // Check if user is logged in
-        if (!offlineManager.isLoggedIn()) {
+        if (!offlineManager.isLoggedIn() || currentUser == null) {
             showLoginRequired();
             return;
         }
@@ -100,16 +104,18 @@ public class LeaderboardActivity extends AppCompatActivity {
 
     private void showOfflineMessage() {
         new AlertDialog.Builder(this)
-            .setTitle("Internet Required")
-            .setMessage("Leaderboard requires an internet connection. Please connect and try again.")
-            .setPositiveButton("OK", (dialog, which) -> finish())
-            .setCancelable(false)
-            .show();
+                .setTitle("Internet Required")
+                .setMessage("Leaderboard requires an internet connection. Please connect and try again.")
+                .setPositiveButton("OK", (dialog, which) -> finish())
+                .setCancelable(false)
+                .show();
     }
 
     private void setupRecyclerView() {
         leaderboardRecyclerView.setLayoutManager(new LinearLayoutManager(this));
         leaderboardRecyclerView.setHasFixedSize(true);
+        adapter = new LeaderboardAdapter(this, leaderboardList);
+        leaderboardRecyclerView.setAdapter(adapter);
     }
 
     private void loadLeaderboard() {
@@ -118,10 +124,20 @@ public class LeaderboardActivity extends AppCompatActivity {
         // Query top 100 scores ordered by score
         Query leaderboardQuery = leaderboardRef.orderByChild("score").limitToLast(100);
 
-        leaderboardQuery.addValueEventListener(new ValueEventListener() {
+        leaderboardQuery.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 leaderboardList.clear();
+
+                if (!snapshot.exists()) {
+                    // No data yet - show empty state
+                    progressBar.setVisibility(View.GONE);
+                    emptyStateLayout.setVisibility(View.VISIBLE);
+                    leaderboardRecyclerView.setVisibility(View.GONE);
+                    tvYourRank.setText("Your Rank: Not ranked yet");
+                    tvYourScore.setText("Your Score: Complete a quiz to rank!");
+                    return;
+                }
 
                 for (DataSnapshot entrySnapshot : snapshot.getChildren()) {
                     LeaderboardEntry entry = entrySnapshot.getValue(LeaderboardEntry.class);
@@ -143,12 +159,12 @@ public class LeaderboardActivity extends AppCompatActivity {
                 if (leaderboardList.isEmpty()) {
                     emptyStateLayout.setVisibility(View.VISIBLE);
                     leaderboardRecyclerView.setVisibility(View.GONE);
+                    tvYourRank.setText("Your Rank: Not ranked yet");
+                    tvYourScore.setText("Your Score: Complete a quiz to rank!");
                 } else {
                     emptyStateLayout.setVisibility(View.GONE);
                     leaderboardRecyclerView.setVisibility(View.VISIBLE);
-
-                    adapter = new LeaderboardAdapter(LeaderboardActivity.this, leaderboardList);
-                    leaderboardRecyclerView.setAdapter(adapter);
+                    adapter.notifyDataSetChanged();
 
                     // Update user's rank and score
                     updateUserRank();
@@ -159,29 +175,39 @@ public class LeaderboardActivity extends AppCompatActivity {
             public void onCancelled(@NonNull DatabaseError error) {
                 progressBar.setVisibility(View.GONE);
                 Toast.makeText(LeaderboardActivity.this,
-                    "Failed to load leaderboard", Toast.LENGTH_SHORT).show();
+                        "Failed to load leaderboard: " + error.getMessage(),
+                        Toast.LENGTH_SHORT).show();
             }
         });
     }
 
     private void updateUserRank() {
-        int userScore = ProgressManager.getHighScore(this);
-        tvYourScore.setText(String.valueOf(userScore));
+        if (currentUser == null) {
+            tvYourRank.setText("Your Rank: Not logged in");
+            tvYourScore.setText("Your Score: --");
+            return;
+        }
 
-        // Find user's rank
+        // Find user's rank and score from leaderboard
         int rank = -1;
+        int userScore = 0;
+
         for (int i = 0; i < leaderboardList.size(); i++) {
-            if (leaderboardList.get(i).getScore() <= userScore) {
+            LeaderboardEntry entry = leaderboardList.get(i);
+            if (entry.getUserId() != null && entry.getUserId().equals(currentUser.getUid())) {
                 rank = i + 1;
+                userScore = entry.getScore();
                 break;
             }
         }
 
-        if (rank == -1) {
-            rank = leaderboardList.size() + 1;
+        if (rank > 0) {
+            tvYourRank.setText("Your Rank: #" + rank);
+            tvYourScore.setText("Your Score: " + userScore);
+        } else {
+            tvYourRank.setText("Your Rank: Not ranked yet");
+            tvYourScore.setText("Your Score: Complete a quiz to rank!");
         }
-
-        tvYourRank.setText(String.valueOf(rank));
     }
 
     @Override
@@ -193,4 +219,3 @@ public class LeaderboardActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 }
-

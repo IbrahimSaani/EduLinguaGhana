@@ -508,7 +508,7 @@ public class QuizActivity extends AppCompatActivity {
         achievementManager.checkAndUnlockAchievements();
 
         // Upload to leaderboard if score is good and user is online
-        if (score >= 50) {
+        if (score >= 10) {
             CloudSyncManager cloudSync = new CloudSyncManager(this);
             if (cloudSync.canSync()) {
                 SharedPreferences prefs = getSharedPreferences("UserPrefs", MODE_PRIVATE);

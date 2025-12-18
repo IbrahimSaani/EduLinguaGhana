@@ -17,6 +17,9 @@ import android.widget.TextView;
 import com.google.android.material.switchmaterial.SwitchMaterial;
 import android.widget.Toast;
 
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+
 public class SettingsActivity extends AppCompatActivity {
 
     private SwitchMaterial switchMusic, switchSfx;
@@ -126,6 +129,13 @@ public class SettingsActivity extends AppCompatActivity {
         // Cloud Sync buttons
         btnSyncToCloud.setOnClickListener(v -> syncToCloud());
         btnSyncFromCloud.setOnClickListener(v -> syncFromCloud());
+
+        // Test upload score button
+        btnSyncToCloud.setOnLongClickListener(v -> {
+            // Long press to test upload a score
+            testUploadScore();
+            return true;
+        });
 
         // Reset quiz progress when clicked
         btnResetProgress.setOnClickListener(v -> {
@@ -293,6 +303,46 @@ public class SettingsActivity extends AppCompatActivity {
                         }
                     });
                 });
+            })
+            .setNegativeButton("Cancel", null)
+            .show();
+    }
+
+    /**
+     * Test method to upload a score manually
+     * Triggered by long-pressing the "Sync to Cloud" button
+     */
+    private void testUploadScore() {
+        FirebaseAuth auth = FirebaseAuth.getInstance();
+        FirebaseUser user = auth.getCurrentUser();
+
+        if (user == null) {
+            Toast.makeText(this, "Please log in first", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        // Show dialog to enter test score
+        final android.widget.EditText input = new android.widget.EditText(this);
+        input.setInputType(android.text.InputType.TYPE_CLASS_NUMBER);
+        input.setHint("Enter score (0-100)");
+        input.setText("75");
+
+        new AlertDialog.Builder(this)
+            .setTitle("Test Upload Score")
+            .setMessage("Upload a test score to the leaderboard:")
+            .setView(input)
+            .setPositiveButton("Upload", (dialog, which) -> {
+                try {
+                    int testScore = Integer.parseInt(input.getText().toString());
+                    if (testScore < 0 || testScore > 100) {
+                        Toast.makeText(this, "Score must be 0-100", Toast.LENGTH_SHORT).show();
+                        return;
+                    }
+
+                    CloudSyncManager.uploadScoreToLeaderboard(user, testScore, this);
+                } catch (NumberFormatException e) {
+                    Toast.makeText(this, "Invalid score", Toast.LENGTH_SHORT).show();
+                }
             })
             .setNegativeButton("Cancel", null)
             .show();

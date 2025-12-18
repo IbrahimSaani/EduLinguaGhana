@@ -192,27 +192,43 @@ public class CloudSyncManager {
         }
 
         String userId = getUserId();
-        if (userId == null) {
+        FirebaseUser user = auth.getCurrentUser();
+        if (userId == null || user == null) {
             callback.onSyncComplete(false, "User not authenticated");
             return;
         }
 
+        // Get username - prioritize parameter, then Firebase display name, then email, then Anonymous
+        String finalUserName = userName;
+        if (finalUserName == null || finalUserName.isEmpty() || finalUserName.equals("Anonymous")) {
+            if (user.getDisplayName() != null && !user.getDisplayName().isEmpty()) {
+                finalUserName = user.getDisplayName();
+            } else if (user.getEmail() != null) {
+                // Use email prefix (before @)
+                finalUserName = user.getEmail().split("@")[0];
+            } else {
+                finalUserName = "User" + userId.substring(0, Math.min(6, userId.length()));
+            }
+        }
+
         Map<String, Object> leaderboardEntry = new HashMap<>();
         leaderboardEntry.put("userId", userId);
-        leaderboardEntry.put("userName", userName);
+        leaderboardEntry.put("userName", finalUserName);
         leaderboardEntry.put("score", score);
         leaderboardEntry.put("timestamp", System.currentTimeMillis());
+
+        Log.d(TAG, "Uploading score to leaderboard - User: " + finalUserName + ", Score: " + score);
 
         // Upload to leaderboard
         databaseRef.child("leaderboard").child(userId)
             .setValue(leaderboardEntry)
             .addOnSuccessListener(aVoid -> {
-                Log.d(TAG, "Score uploaded to leaderboard");
+                Log.d(TAG, "Score uploaded to leaderboard successfully");
                 callback.onSyncComplete(true, "Score submitted!");
             })
             .addOnFailureListener(e -> {
-                Log.e(TAG, "Failed to upload score", e);
-                callback.onSyncComplete(false, "Upload failed");
+                Log.e(TAG, "Failed to upload score: " + e.getMessage(), e);
+                callback.onSyncComplete(false, "Upload failed: " + e.getMessage());
             });
     }
 
@@ -255,6 +271,41 @@ public class CloudSyncManager {
         } else {
             return days + " days ago";
         }
+    }
+
+    /**
+     * Static helper method to upload score from anywhere in the app
+     * @param user Firebase user (must be logged in)
+     * @param score Quiz score to upload
+     * @param context Application context
+     */
+    public static void uploadScoreToLeaderboard(FirebaseUser user, int score, Context context) {
+        if (user == null) {
+            android.widget.Toast.makeText(context, "Please log in to upload scores", android.widget.Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        CloudSyncManager manager = new CloudSyncManager(context);
+        if (!manager.canSync()) {
+            android.widget.Toast.makeText(context, "Internet connection required", android.widget.Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        // Get username
+        String userName = user.getDisplayName();
+        if (userName == null || userName.isEmpty()) {
+            SharedPreferences prefs = context.getSharedPreferences("UserPrefs", Context.MODE_PRIVATE);
+            userName = prefs.getString("USER_NAME", "Anonymous");
+        }
+
+        final String finalUserName = userName;
+        manager.uploadToLeaderboard(userName, score, (success, message) -> {
+            if (success) {
+                android.widget.Toast.makeText(context, "Score " + score + " uploaded to leaderboard!", android.widget.Toast.LENGTH_SHORT).show();
+            } else {
+                android.widget.Toast.makeText(context, "Upload failed: " + message, android.widget.Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 }
 
