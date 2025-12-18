@@ -8,7 +8,7 @@
     <com.google.android.material.appbar.AppBarLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:elevation="4dp"
+        android:elevation="8dp"
         android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar">
 
         <androidx.appcompat.widget.Toolbar
@@ -39,45 +39,82 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
-                app:cardCornerRadius="20dp"
-                app:cardElevation="6dp"
+                app:cardCornerRadius="24dp"
+                app:cardElevation="12dp"
                 app:cardBackgroundColor="@color/cardBackground">
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="vertical"
-                    android:padding="24dp"
+                    android:padding="28dp"
                     android:gravity="center">
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="✨ Your Avatar"
-                        android:textSize="22sp"
+                        android:text="✨ Your Avatar ✨"
+                        android:textSize="24sp"
                         android:textStyle="bold"
                         android:fontFamily="@font/agbalumo"
                         android:textColor="@color/colorPrimary"
-                        android:letterSpacing="0.02" />
+                        android:letterSpacing="0.03"
+                        android:shadowColor="#80000000"
+                        android:shadowDx="2"
+                        android:shadowDy="2"
+                        android:shadowRadius="4" />
 
-                    <com.edulinguaghana.AvatarView
-                        android:id="@+id/avatarPreview"
-                        android:layout_width="200dp"
-                        android:layout_height="200dp"
-                        android:layout_marginTop="16dp"
-                        android:layout_marginBottom="16dp"
-                        android:scaleType="fitCenter" />
+                    <com.google.android.material.card.MaterialCardView
+                        android:layout_width="240dp"
+                        android:layout_height="240dp"
+                        android:layout_marginTop="20dp"
+                        android:layout_marginBottom="20dp"
+                        app:cardCornerRadius="120dp"
+                        app:cardElevation="8dp"
+                        app:strokeWidth="4dp"
+                        app:strokeColor="@color/colorPrimary">
 
-                    <com.google.android.material.button.MaterialButton
-                        android:id="@+id/btnRandomAvatar"
+                        <com.edulinguaghana.AvatarView
+                            android:id="@+id/avatarPreview"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:scaleType="fitCenter" />
+
+                    </com.google.android.material.card.MaterialCardView>
+
+                    <LinearLayout
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="🎲 Randomize"
-                        android:textSize="14sp"
-                        style="@style/Widget.MaterialComponents.Button.OutlinedButton"
-                        app:cornerRadius="20dp"
-                        app:strokeWidth="2dp"
-                        app:strokeColor="@color/colorPrimary" />
+                        android:orientation="horizontal"
+                        android:gravity="center">
+
+                        <com.google.android.material.button.MaterialButton
+                            android:id="@+id/btnRandomAvatar"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="🎲 Randomize"
+                            android:textSize="15sp"
+                            android:textStyle="bold"
+                            android:layout_marginEnd="8dp"
+                            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                            app:cornerRadius="24dp"
+                            app:strokeWidth="2dp"
+                            app:strokeColor="@color/colorPrimary" />
+
+                        <com.google.android.material.button.MaterialButton
+                            android:id="@+id/btnChangeBackground"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="🎨 Background"
+                            android:textSize="15sp"
+                            android:textStyle="bold"
+                            android:layout_marginStart="8dp"
+                            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                            app:cornerRadius="24dp"
+                            app:strokeWidth="2dp"
+                            app:strokeColor="@color/colorPrimary" />
+
+                    </LinearLayout>
 
                 </LinearLayout>
 
@@ -88,8 +125,8 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="20dp"
-                app:cardCornerRadius="20dp"
-                app:cardElevation="6dp"
+                app:cardCornerRadius="24dp"
+                app:cardElevation="8dp"
                 app:cardBackgroundColor="@color/cardBackground">
 
                 <LinearLayout
@@ -102,59 +139,206 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="🎨 Skin Tone"
-                        android:textSize="18sp"
+                        android:textSize="20sp"
                         android:textStyle="bold"
+                        android:fontFamily="@font/agbalumo"
                         android:textColor="@color/colorPrimary" />
 
-                    <RadioGroup
-                        android:id="@+id/rgSkinTone"
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Tap to select your skin tone"
+                        android:textSize="13sp"
+                        android:textColor="@color/textColorSecondary"
+                        android:layout_marginTop="4dp"
+                        android:layout_marginBottom="12dp" />
+
+                    <HorizontalScrollView
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="12dp"
-                        android:orientation="horizontal">
+                        android:scrollbars="none">
 
-                        <RadioButton
-                            android:id="@+id/rbSkinLight"
-                            android:layout_width="0dp"
+                        <RadioGroup
+                            android:id="@+id/rgSkinTone"
+                            android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:text="Light"
-                            android:textSize="12sp" />
+                            android:orientation="horizontal"
+                            android:gravity="center">
 
-                        <RadioButton
-                            android:id="@+id/rbSkinMedium"
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:text="Medium"
-                            android:textSize="12sp"
-                            android:checked="true" />
+                            <LinearLayout
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:orientation="vertical"
+                                android:gravity="center"
+                                android:padding="8dp">
 
-                        <RadioButton
-                            android:id="@+id/rbSkinTan"
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:text="Tan"
-                            android:textSize="12sp" />
+                                <com.google.android.material.card.MaterialCardView
+                                    android:id="@+id/cardSkinLight"
+                                    android:layout_width="60dp"
+                                    android:layout_height="60dp"
+                                    app:cardCornerRadius="30dp"
+                                    app:cardElevation="4dp"
+                                    app:cardBackgroundColor="#FFE0BD"
+                                    app:strokeWidth="0dp">
 
-                        <RadioButton
-                            android:id="@+id/rbSkinBrown"
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:text="Brown"
-                            android:textSize="12sp" />
+                                    <RadioButton
+                                        android:id="@+id/rbSkinLight"
+                                        android:layout_width="match_parent"
+                                        android:layout_height="match_parent"
+                                        android:button="@null"
+                                        android:background="@android:color/transparent" />
 
-                        <RadioButton
-                            android:id="@+id/rbSkinDark"
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:text="Dark"
-                            android:textSize="12sp" />
+                                </com.google.android.material.card.MaterialCardView>
 
-                    </RadioGroup>
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="Light"
+                                    android:textSize="11sp"
+                                    android:layout_marginTop="6dp" />
+
+                            </LinearLayout>
+
+                            <LinearLayout
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:orientation="vertical"
+                                android:gravity="center"
+                                android:padding="8dp">
+
+                                <com.google.android.material.card.MaterialCardView
+                                    android:id="@+id/cardSkinMedium"
+                                    android:layout_width="60dp"
+                                    android:layout_height="60dp"
+                                    app:cardCornerRadius="30dp"
+                                    app:cardElevation="4dp"
+                                    app:cardBackgroundColor="#F1C27D"
+                                    app:strokeWidth="0dp">
+
+                                    <RadioButton
+                                        android:id="@+id/rbSkinMedium"
+                                        android:layout_width="match_parent"
+                                        android:layout_height="match_parent"
+                                        android:button="@null"
+                                        android:checked="true"
+                                        android:background="@android:color/transparent" />
+
+                                </com.google.android.material.card.MaterialCardView>
+
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="Medium"
+                                    android:textSize="11sp"
+                                    android:layout_marginTop="6dp" />
+
+                            </LinearLayout>
+
+                            <LinearLayout
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:orientation="vertical"
+                                android:gravity="center"
+                                android:padding="8dp">
+
+                                <com.google.android.material.card.MaterialCardView
+                                    android:id="@+id/cardSkinTan"
+                                    android:layout_width="60dp"
+                                    android:layout_height="60dp"
+                                    app:cardCornerRadius="30dp"
+                                    app:cardElevation="4dp"
+                                    app:cardBackgroundColor="#C68642"
+                                    app:strokeWidth="0dp">
+
+                                    <RadioButton
+                                        android:id="@+id/rbSkinTan"
+                                        android:layout_width="match_parent"
+                                        android:layout_height="match_parent"
+                                        android:button="@null"
+                                        android:background="@android:color/transparent" />
+
+                                </com.google.android.material.card.MaterialCardView>
+
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="Tan"
+                                    android:textSize="11sp"
+                                    android:layout_marginTop="6dp" />
+
+                            </LinearLayout>
+
+                            <LinearLayout
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:orientation="vertical"
+                                android:gravity="center"
+                                android:padding="8dp">
+
+                                <com.google.android.material.card.MaterialCardView
+                                    android:id="@+id/cardSkinBrown"
+                                    android:layout_width="60dp"
+                                    android:layout_height="60dp"
+                                    app:cardCornerRadius="30dp"
+                                    app:cardElevation="4dp"
+                                    app:cardBackgroundColor="#8D5524"
+                                    app:strokeWidth="0dp">
+
+                                    <RadioButton
+                                        android:id="@+id/rbSkinBrown"
+                                        android:layout_width="match_parent"
+                                        android:layout_height="match_parent"
+                                        android:button="@null"
+                                        android:background="@android:color/transparent" />
+
+                                </com.google.android.material.card.MaterialCardView>
+
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="Brown"
+                                    android:textSize="11sp"
+                                    android:layout_marginTop="6dp" />
+
+                            </LinearLayout>
+
+                            <LinearLayout
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:orientation="vertical"
+                                android:gravity="center"
+                                android:padding="8dp">
+
+                                <com.google.android.material.card.MaterialCardView
+                                    android:id="@+id/cardSkinDark"
+                                    android:layout_width="60dp"
+                                    android:layout_height="60dp"
+                                    app:cardCornerRadius="30dp"
+                                    app:cardElevation="4dp"
+                                    app:cardBackgroundColor="#5D4037"
+                                    app:strokeWidth="0dp">
+
+                                    <RadioButton
+                                        android:id="@+id/rbSkinDark"
+                                        android:layout_width="match_parent"
+                                        android:layout_height="match_parent"
+                                        android:button="@null"
+                                        android:background="@android:color/transparent" />
+
+                                </com.google.android.material.card.MaterialCardView>
+
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="Dark"
+                                    android:textSize="11sp"
+                                    android:layout_marginTop="6dp" />
+
+                            </LinearLayout>
+
+                        </RadioGroup>
+
+                    </HorizontalScrollView>
 
                 </LinearLayout>
 
@@ -165,8 +349,8 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
-                app:cardCornerRadius="20dp"
-                app:cardElevation="6dp"
+                app:cardCornerRadius="24dp"
+                app:cardElevation="8dp"
                 app:cardBackgroundColor="@color/cardBackground">
 
                 <LinearLayout
@@ -179,34 +363,58 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="💇 Hair Style"
-                        android:textSize="18sp"
+                        android:textSize="20sp"
                         android:textStyle="bold"
+                        android:fontFamily="@font/agbalumo"
                         android:textColor="@color/colorPrimary" />
 
-                    <Spinner
-                        android:id="@+id/spinnerHairStyle"
+                    <com.google.android.material.card.MaterialCardView
                         android:layout_width="match_parent"
-                        android:layout_height="50dp"
+                        android:layout_height="wrap_content"
                         android:layout_marginTop="12dp"
-                        android:background="@drawable/bg_mode_quiz"
-                        android:padding="12dp" />
+                        app:cardCornerRadius="16dp"
+                        app:cardElevation="2dp"
+                        app:strokeWidth="1dp"
+                        app:strokeColor="@color/colorPrimary">
+
+                        <Spinner
+                            android:id="@+id/spinnerHairStyle"
+                            android:layout_width="match_parent"
+                            android:layout_height="56dp"
+                            android:background="@android:color/transparent"
+                            android:paddingStart="16dp"
+                            android:paddingEnd="16dp" />
+
+                    </com.google.android.material.card.MaterialCardView>
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="16dp"
+                        android:layout_marginTop="20dp"
                         android:text="🎨 Hair Color"
-                        android:textSize="18sp"
+                        android:textSize="20sp"
                         android:textStyle="bold"
+                        android:fontFamily="@font/agbalumo"
                         android:textColor="@color/colorPrimary" />
 
-                    <Spinner
-                        android:id="@+id/spinnerHairColor"
+                    <com.google.android.material.card.MaterialCardView
                         android:layout_width="match_parent"
-                        android:layout_height="50dp"
+                        android:layout_height="wrap_content"
                         android:layout_marginTop="12dp"
-                        android:background="@drawable/bg_mode_quiz"
-                        android:padding="12dp" />
+                        app:cardCornerRadius="16dp"
+                        app:cardElevation="2dp"
+                        app:strokeWidth="1dp"
+                        app:strokeColor="@color/colorPrimary">
+
+                        <Spinner
+                            android:id="@+id/spinnerHairColor"
+                            android:layout_width="match_parent"
+                            android:layout_height="56dp"
+                            android:background="@android:color/transparent"
+                            android:paddingStart="16dp"
+                            android:paddingEnd="16dp" />
+
+                    </com.google.android.material.card.MaterialCardView>
 
                 </LinearLayout>
 
@@ -217,8 +425,8 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
-                app:cardCornerRadius="20dp"
-                app:cardElevation="6dp"
+                app:cardCornerRadius="24dp"
+                app:cardElevation="8dp"
                 app:cardBackgroundColor="@color/cardBackground">
 
                 <LinearLayout
@@ -231,34 +439,58 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="👀 Eye Style"
-                        android:textSize="18sp"
+                        android:textSize="20sp"
                         android:textStyle="bold"
+                        android:fontFamily="@font/agbalumo"
                         android:textColor="@color/colorPrimary" />
 
-                    <Spinner
-                        android:id="@+id/spinnerEyeStyle"
+                    <com.google.android.material.card.MaterialCardView
                         android:layout_width="match_parent"
-                        android:layout_height="50dp"
+                        android:layout_height="wrap_content"
                         android:layout_marginTop="12dp"
-                        android:background="@drawable/bg_mode_quiz"
-                        android:padding="12dp" />
+                        app:cardCornerRadius="16dp"
+                        app:cardElevation="2dp"
+                        app:strokeWidth="1dp"
+                        app:strokeColor="@color/colorPrimary">
+
+                        <Spinner
+                            android:id="@+id/spinnerEyeStyle"
+                            android:layout_width="match_parent"
+                            android:layout_height="56dp"
+                            android:background="@android:color/transparent"
+                            android:paddingStart="16dp"
+                            android:paddingEnd="16dp" />
+
+                    </com.google.android.material.card.MaterialCardView>
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="16dp"
+                        android:layout_marginTop="20dp"
                         android:text="😊 Mouth Style"
-                        android:textSize="18sp"
+                        android:textSize="20sp"
                         android:textStyle="bold"
+                        android:fontFamily="@font/agbalumo"
                         android:textColor="@color/colorPrimary" />
 
-                    <Spinner
-                        android:id="@+id/spinnerMouthStyle"
+                    <com.google.android.material.card.MaterialCardView
                         android:layout_width="match_parent"
-                        android:layout_height="50dp"
+                        android:layout_height="wrap_content"
                         android:layout_marginTop="12dp"
-                        android:background="@drawable/bg_mode_quiz"
-                        android:padding="12dp" />
+                        app:cardCornerRadius="16dp"
+                        app:cardElevation="2dp"
+                        app:strokeWidth="1dp"
+                        app:strokeColor="@color/colorPrimary">
+
+                        <Spinner
+                            android:id="@+id/spinnerMouthStyle"
+                            android:layout_width="match_parent"
+                            android:layout_height="56dp"
+                            android:background="@android:color/transparent"
+                            android:paddingStart="16dp"
+                            android:paddingEnd="16dp" />
+
+                    </com.google.android.material.card.MaterialCardView>
 
                 </LinearLayout>
 
@@ -269,8 +501,8 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
-                app:cardCornerRadius="20dp"
-                app:cardElevation="6dp"
+                app:cardCornerRadius="24dp"
+                app:cardElevation="8dp"
                 app:cardBackgroundColor="@color/cardBackground">
 
                 <LinearLayout
@@ -283,17 +515,29 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="👑 Accessory"
-                        android:textSize="18sp"
+                        android:textSize="20sp"
                         android:textStyle="bold"
+                        android:fontFamily="@font/agbalumo"
                         android:textColor="@color/colorPrimary" />
 
-                    <Spinner
-                        android:id="@+id/spinnerAccessory"
+                    <com.google.android.material.card.MaterialCardView
                         android:layout_width="match_parent"
-                        android:layout_height="50dp"
+                        android:layout_height="wrap_content"
                         android:layout_marginTop="12dp"
-                        android:background="@drawable/bg_mode_quiz"
-                        android:padding="12dp" />
+                        app:cardCornerRadius="16dp"
+                        app:cardElevation="2dp"
+                        app:strokeWidth="1dp"
+                        app:strokeColor="@color/colorPrimary">
+
+                        <Spinner
+                            android:id="@+id/spinnerAccessory"
+                            android:layout_width="match_parent"
+                            android:layout_height="56dp"
+                            android:background="@android:color/transparent"
+                            android:paddingStart="16dp"
+                            android:paddingEnd="16dp" />
+
+                    </com.google.android.material.card.MaterialCardView>
 
                 </LinearLayout>
 
@@ -303,7 +547,7 @@
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/btnSaveAvatar"
                 android:layout_width="match_parent"
-                android:layout_height="56dp"
+                android:layout_height="64dp"
                 android:layout_marginTop="24dp"
                 android:layout_marginBottom="32dp"
                 android:text="💾 Save Avatar"
@@ -311,7 +555,8 @@
                 android:textStyle="bold"
                 android:textColor="@color/white"
                 android:backgroundTint="@color/colorPrimary"
-                app:cornerRadius="28dp" />
+                app:cornerRadius="32dp"
+                app:elevation="8dp" />
 
         </LinearLayout>
 
