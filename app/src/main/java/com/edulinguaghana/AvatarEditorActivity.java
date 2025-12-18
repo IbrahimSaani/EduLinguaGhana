@@ -26,6 +26,7 @@ public class AvatarEditorActivity extends AppCompatActivity {
     private AvatarView avatarPreview;
     private RadioGroup rgSkinTone;
     private Spinner spinnerHairStyle, spinnerHairColor, spinnerEyeStyle, spinnerMouthStyle, spinnerAccessory;
+    private Spinner spinnerClothingStyle, spinnerClothingColor, spinnerExpression;
     private MaterialButton btnSaveAvatar, btnRandomAvatar, btnChangeBackground;
     private MaterialCardView cardSkinLight, cardSkinMedium, cardSkinTan, cardSkinBrown, cardSkinDark;
 
@@ -68,6 +69,9 @@ public class AvatarEditorActivity extends AppCompatActivity {
         spinnerEyeStyle = findViewById(R.id.spinnerEyeStyle);
         spinnerMouthStyle = findViewById(R.id.spinnerMouthStyle);
         spinnerAccessory = findViewById(R.id.spinnerAccessory);
+        spinnerClothingStyle = findViewById(R.id.spinnerClothingStyle);
+        spinnerClothingColor = findViewById(R.id.spinnerClothingColor);
+        spinnerExpression = findViewById(R.id.spinnerExpression);
         btnSaveAvatar = findViewById(R.id.btnSaveAvatar);
         btnRandomAvatar = findViewById(R.id.btnRandomAvatar);
         btnChangeBackground = findViewById(R.id.btnChangeBackground);
@@ -85,6 +89,23 @@ public class AvatarEditorActivity extends AppCompatActivity {
         builder = new AvatarBuilder(this, config);
         updateAvatarPreview();
         updateUIFromConfig();
+
+        // Add pulse animation on load
+        avatarPreview.postDelayed(() -> {
+            avatarPreview.setScaleX(0.95f);
+            avatarPreview.setScaleY(0.95f);
+            avatarPreview.animate()
+                .scaleX(1.05f)
+                .scaleY(1.05f)
+                .setDuration(300)
+                .withEndAction(() -> {
+                    avatarPreview.animate()
+                        .scaleX(1f)
+                        .scaleY(1f)
+                        .setDuration(300)
+                        .start();
+                }).start();
+        }, 200);
     }
 
     private void setupSpinners() {
@@ -123,6 +144,27 @@ public class AvatarEditorActivity extends AppCompatActivity {
                 android.R.layout.simple_spinner_item, accessories);
         accessoryAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinnerAccessory.setAdapter(accessoryAdapter);
+
+        // Clothing Style
+        String[] clothingStyles = {"T-Shirt", "Hoodie", "Dress", "Suit", "Casual", "Traditional"};
+        ArrayAdapter<String> clothingStyleAdapter = new ArrayAdapter<>(this,
+                android.R.layout.simple_spinner_item, clothingStyles);
+        clothingStyleAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spinnerClothingStyle.setAdapter(clothingStyleAdapter);
+
+        // Clothing Color
+        String[] clothingColors = {"Red", "Blue", "Green", "Yellow", "Purple", "Orange", "Pink", "Black", "White"};
+        ArrayAdapter<String> clothingColorAdapter = new ArrayAdapter<>(this,
+                android.R.layout.simple_spinner_item, clothingColors);
+        clothingColorAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spinnerClothingColor.setAdapter(clothingColorAdapter);
+
+        // Facial Expression
+        String[] expressions = {"Neutral", "Happy", "Excited", "Cool", "Surprised", "Shy"};
+        ArrayAdapter<String> expressionAdapter = new ArrayAdapter<>(this,
+                android.R.layout.simple_spinner_item, expressions);
+        expressionAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spinnerExpression.setAdapter(expressionAdapter);
     }
 
     private void setupListeners() {
@@ -207,11 +249,70 @@ public class AvatarEditorActivity extends AppCompatActivity {
             public void onNothingSelected(AdapterView<?> parent) {}
         });
 
+        // Clothing Style
+        spinnerClothingStyle.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                config.clothingStyle = AvatarBuilder.ClothingStyle.values()[position];
+                updateAvatarPreviewWithAnimation();
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {}
+        });
+
+        // Clothing Color
+        spinnerClothingColor.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                config.clothingColor = AvatarBuilder.ClothingColor.values()[position];
+                updateAvatarPreviewWithAnimation();
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {}
+        });
+
+        // Facial Expression
+        spinnerExpression.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                config.facialExpression = AvatarBuilder.FacialExpression.values()[position];
+                updateAvatarPreviewWithAnimation();
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {}
+        });
+
         // Random Avatar Button
         btnRandomAvatar.setOnClickListener(v -> {
-            config = AvatarBuilder.generateRandom();
-            updateUIFromConfig();
-            updateAvatarPreview();
+            // Rotate and bounce animation
+            avatarPreview.animate()
+                .rotationBy(360f)
+                .scaleX(0.8f)
+                .scaleY(0.8f)
+                .setDuration(300)
+                .withEndAction(() -> {
+                    config = AvatarBuilder.generateRandom();
+                    updateUIFromConfig();
+                    builder.setConfig(config);
+                    avatarPreview.setAvatarConfig(config);
+
+                    // Bounce back
+                    avatarPreview.animate()
+                        .scaleX(1.1f)
+                        .scaleY(1.1f)
+                        .setDuration(200)
+                        .withEndAction(() -> {
+                            avatarPreview.animate()
+                                .scaleX(1f)
+                                .scaleY(1f)
+                                .setDuration(200)
+                                .start();
+                        }).start();
+                }).start();
+
             Toast.makeText(this, "Random avatar generated! 🎲", Toast.LENGTH_SHORT).show();
         });
 
@@ -281,6 +382,9 @@ public class AvatarEditorActivity extends AppCompatActivity {
         spinnerEyeStyle.setSelection(config.eyeStyle.ordinal());
         spinnerMouthStyle.setSelection(config.mouthStyle.ordinal());
         spinnerAccessory.setSelection(config.accessory.ordinal());
+        spinnerClothingStyle.setSelection(config.clothingStyle.ordinal());
+        spinnerClothingColor.setSelection(config.clothingColor.ordinal());
+        spinnerExpression.setSelection(config.facialExpression.ordinal());
     }
 
     private void updateAvatarPreview() {
@@ -288,10 +392,49 @@ public class AvatarEditorActivity extends AppCompatActivity {
         avatarPreview.setAvatarConfig(config);
     }
 
+    private void updateAvatarPreviewWithAnimation() {
+        // Fade out
+        avatarPreview.animate()
+            .alpha(0f)
+            .setDuration(150)
+            .withEndAction(() -> {
+                // Update avatar
+                builder.setConfig(config);
+                avatarPreview.setAvatarConfig(config);
+
+                // Fade in with scale animation
+                avatarPreview.setScaleX(0.9f);
+                avatarPreview.setScaleY(0.9f);
+                avatarPreview.animate()
+                    .alpha(1f)
+                    .scaleX(1f)
+                    .scaleY(1f)
+                    .setDuration(200)
+                    .start();
+            }).start();
+    }
+
     private void saveAvatar() {
+        // Success animation
+        avatarPreview.animate()
+            .scaleX(1.15f)
+            .scaleY(1.15f)
+            .alpha(0.7f)
+            .setDuration(150)
+            .withEndAction(() -> {
+                avatarPreview.animate()
+                    .scaleX(1f)
+                    .scaleY(1f)
+                    .alpha(1f)
+                    .setDuration(150)
+                    .start();
+            }).start();
+
         builder.saveConfig(this);
         Toast.makeText(this, "Avatar saved successfully! ✨", Toast.LENGTH_SHORT).show();
-        finish();
+
+        // Delay finish to show animation
+        avatarPreview.postDelayed(this::finish, 500);
     }
 
     @Override
