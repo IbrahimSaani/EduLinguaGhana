@@ -66,5 +66,7 @@
         <activity android:name=".SignUpActivity" android:exported="false"/>
         <!--  AccountManagementActivity  -->
         <activity android:name=".AccountManagementActivity" android:exported="false"/>
+        <!--  AvatarEditorActivity  -->
+        <activity android:name=".AvatarEditorActivity" android:exported="false"/>
     </application>
 </manifest>

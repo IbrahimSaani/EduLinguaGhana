@@ -1,5 +1,6 @@
 package com.edulinguaghana;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.MenuItem;
@@ -25,6 +26,8 @@ public class AccountManagementActivity extends AppCompatActivity {
     private FirebaseAuth mAuth;
     private FirebaseUser currentUser;
 
+    private AvatarView avatarView;
+    private MaterialButton btnEditAvatar;
     private TextInputEditText etDisplayName, etCurrentPassword, etNewPassword, etConfirmPassword;
     private TextView tvEmail;
     private MaterialButton btnUpdateProfile, btnChangePassword, btnSendVerificationEmail, btnDeleteAccount;
@@ -52,6 +55,8 @@ public class AccountManagementActivity extends AppCompatActivity {
     }
 
     private void initViews() {
+        avatarView = findViewById(R.id.avatarView);
+        btnEditAvatar = findViewById(R.id.btnEditAvatar);
         etDisplayName = findViewById(R.id.etDisplayName);
         etCurrentPassword = findViewById(R.id.etCurrentPassword);
         etNewPassword = findViewById(R.id.etNewPassword);
@@ -99,6 +104,11 @@ public class AccountManagementActivity extends AppCompatActivity {
     }
 
     private void setupListeners() {
+        btnEditAvatar.setOnClickListener(v -> {
+            Intent intent = new Intent(AccountManagementActivity.this, AvatarEditorActivity.class);
+            startActivity(intent);
+        });
+
         btnUpdateProfile.setOnClickListener(v -> updateProfile());
         btnChangePassword.setOnClickListener(v -> changePassword());
         btnSendVerificationEmail.setOnClickListener(v -> sendVerificationEmail());
@@ -277,6 +287,15 @@ public class AccountManagementActivity extends AppCompatActivity {
 
     private void showProgress(boolean show) {
         progressOverlay.setVisibility(show ? View.VISIBLE : View.GONE);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        // Reload avatar when returning from editor
+        if (avatarView != null) {
+            avatarView.updateAvatar();
+        }
     }
 
     @Override
