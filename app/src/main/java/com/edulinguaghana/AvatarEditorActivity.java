@@ -82,6 +82,31 @@ public class AvatarEditorActivity extends AppCompatActivity {
         cardSkinTan = findViewById(R.id.cardSkinTan);
         cardSkinBrown = findViewById(R.id.cardSkinBrown);
         cardSkinDark = findViewById(R.id.cardSkinDark);
+
+        // Make cards clickable to select skin tone
+        setupSkinToneCardClicks();
+    }
+
+    private void setupSkinToneCardClicks() {
+        cardSkinLight.setOnClickListener(v -> {
+            ((RadioButton) findViewById(R.id.rbSkinLight)).setChecked(true);
+        });
+
+        cardSkinMedium.setOnClickListener(v -> {
+            ((RadioButton) findViewById(R.id.rbSkinMedium)).setChecked(true);
+        });
+
+        cardSkinTan.setOnClickListener(v -> {
+            ((RadioButton) findViewById(R.id.rbSkinTan)).setChecked(true);
+        });
+
+        cardSkinBrown.setOnClickListener(v -> {
+            ((RadioButton) findViewById(R.id.rbSkinBrown)).setChecked(true);
+        });
+
+        cardSkinDark.setOnClickListener(v -> {
+            ((RadioButton) findViewById(R.id.rbSkinDark)).setChecked(true);
+        });
     }
 
     private void loadCurrentAvatar() {

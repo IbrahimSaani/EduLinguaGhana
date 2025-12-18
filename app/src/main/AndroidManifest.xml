@@ -68,5 +68,7 @@
         <activity android:name=".AccountManagementActivity" android:exported="false"/>
         <!--  AvatarEditorActivity  -->
         <activity android:name=".AvatarEditorActivity" android:exported="false"/>
+        <!--  AnimatedAvatarDemoActivity  -->
+        <activity android:name=".AnimatedAvatarDemoActivity" android:exported="false"/>
     </application>
 </manifest>
