@@ -266,7 +266,7 @@
                         app:cardCornerRadius="110dp"
                         app:cardElevation="4dp"
                         app:strokeWidth="3dp"
-                        app:strokeColor="#4CAF50">
+                        app:strokeColor="@color/random_avatar_stroke_color">
 
                         <com.edulinguaghana.AnimatedAvatarView
                             android:id="@+id/animatedAvatar3"
@@ -286,7 +286,7 @@
                         style="@style/Widget.MaterialComponents.Button.OutlinedButton"
                         app:cornerRadius="20dp"
                         app:strokeWidth="2dp"
-                        app:strokeColor="#4CAF50" />
+                        app:strokeColor="@color/random_avatar_stroke_color" />
 
                 </LinearLayout>
 
@@ -368,4 +368,3 @@
     </androidx.core.widget.NestedScrollView>
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>
-

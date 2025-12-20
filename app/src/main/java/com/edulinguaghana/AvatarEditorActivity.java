@@ -14,6 +14,7 @@ import android.widget.Toast;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+import androidx.core.content.ContextCompat;
 
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.card.MaterialCardView;
@@ -88,25 +89,11 @@ public class AvatarEditorActivity extends AppCompatActivity {
     }
 
     private void setupSkinToneCardClicks() {
-        cardSkinLight.setOnClickListener(v -> {
-            ((RadioButton) findViewById(R.id.rbSkinLight)).setChecked(true);
-        });
-
-        cardSkinMedium.setOnClickListener(v -> {
-            ((RadioButton) findViewById(R.id.rbSkinMedium)).setChecked(true);
-        });
-
-        cardSkinTan.setOnClickListener(v -> {
-            ((RadioButton) findViewById(R.id.rbSkinTan)).setChecked(true);
-        });
-
-        cardSkinBrown.setOnClickListener(v -> {
-            ((RadioButton) findViewById(R.id.rbSkinBrown)).setChecked(true);
-        });
-
-        cardSkinDark.setOnClickListener(v -> {
-            ((RadioButton) findViewById(R.id.rbSkinDark)).setChecked(true);
-        });
+        cardSkinLight.setOnClickListener(v -> rgSkinTone.check(R.id.rbSkinLight));
+        cardSkinMedium.setOnClickListener(v -> rgSkinTone.check(R.id.rbSkinMedium));
+        cardSkinTan.setOnClickListener(v -> rgSkinTone.check(R.id.rbSkinTan));
+        cardSkinBrown.setOnClickListener(v -> rgSkinTone.check(R.id.rbSkinBrown));
+        cardSkinDark.setOnClickListener(v -> rgSkinTone.check(R.id.rbSkinDark));
     }
 
     private void loadCurrentAvatar() {
@@ -358,7 +345,7 @@ public class AvatarEditorActivity extends AppCompatActivity {
 
         // Highlight selected card
         selectedCard.setStrokeWidth(8);
-        selectedCard.setStrokeColor(Color.parseColor("#4CAF50"));
+        selectedCard.setStrokeColor(ContextCompat.getColor(this, R.color.colorAccent));
     }
 
     private void showBackgroundColorPicker() {
@@ -380,24 +367,19 @@ public class AvatarEditorActivity extends AppCompatActivity {
         // Update skin tone radio buttons
         switch (config.skinTone) {
             case LIGHT:
-                ((android.widget.RadioButton) findViewById(R.id.rbSkinLight)).setChecked(true);
-                updateSkinToneCardSelection(cardSkinLight);
+                rgSkinTone.check(R.id.rbSkinLight);
                 break;
             case MEDIUM:
-                ((android.widget.RadioButton) findViewById(R.id.rbSkinMedium)).setChecked(true);
-                updateSkinToneCardSelection(cardSkinMedium);
+                rgSkinTone.check(R.id.rbSkinMedium);
                 break;
             case TAN:
-                ((android.widget.RadioButton) findViewById(R.id.rbSkinTan)).setChecked(true);
-                updateSkinToneCardSelection(cardSkinTan);
+                rgSkinTone.check(R.id.rbSkinTan);
                 break;
             case BROWN:
-                ((android.widget.RadioButton) findViewById(R.id.rbSkinBrown)).setChecked(true);
-                updateSkinToneCardSelection(cardSkinBrown);
+                rgSkinTone.check(R.id.rbSkinBrown);
                 break;
             case DARK:
-                ((android.widget.RadioButton) findViewById(R.id.rbSkinDark)).setChecked(true);
-                updateSkinToneCardSelection(cardSkinDark);
+                rgSkinTone.check(R.id.rbSkinDark);
                 break;
         }
 
@@ -471,4 +453,3 @@ public class AvatarEditorActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 }
-

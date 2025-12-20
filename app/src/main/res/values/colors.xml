@@ -68,4 +68,5 @@
     <color name="notification_streak_bg">#FFEBEE</color>
     <color name="notification_motivational_bg">#F3E5F5</color>
     <color name="notification_reminder_bg">#E8F5E9</color>
+    <color name="random_avatar_stroke_color">#4CAF50</color>
 </resources>
