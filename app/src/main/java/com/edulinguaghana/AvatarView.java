@@ -37,8 +37,10 @@ public class AvatarView extends androidx.appcompat.widget.AppCompatImageView {
 
     public void setAvatarConfig(AvatarBuilder.AvatarConfig config) {
         this.config = config;
-        this.builder = new AvatarBuilder(getContext(), config);
-        updateAvatar();
+        if (config != null) {
+            this.builder = new AvatarBuilder(getContext(), config);
+            updateAvatar();
+        }
     }
 
     public AvatarBuilder.AvatarConfig getAvatarConfig() {
@@ -46,7 +48,9 @@ public class AvatarView extends androidx.appcompat.widget.AppCompatImageView {
     }
 
     public void updateAvatar() {
+        if (config == null) return;
         post(() -> {
+            if (config == null) return;
             int size = Math.max(getWidth(), getHeight());
             if (size == 0) size = 200; // Default size
 

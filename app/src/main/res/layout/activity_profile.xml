@@ -66,10 +66,10 @@
                     android:gravity="center"
                     android:padding="40dp">
 
-                    <ImageView
+                    <com.edulinguaghana.AvatarView
+                        android:id="@+id/avatarNotSignedIn"
                         android:layout_width="140dp"
                         android:layout_height="140dp"
-                        android:src="@drawable/ic_graduation_cap"
                         android:contentDescription="App Icon"
                         android:scaleType="centerInside" />
 
@@ -131,11 +131,10 @@
                     app:strokeWidth="3dp"
                     app:strokeColor="@color/colorPrimary">
 
-                    <ImageView
+                    <com.edulinguaghana.AvatarView
                         android:id="@+id/profileImage"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
-                        android:src="@drawable/ic_graduation_cap"
                         android:scaleType="centerInside"
                         android:contentDescription="Profile Picture" />
 

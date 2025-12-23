@@ -21,6 +21,7 @@ public class ProfileActivity extends AppCompatActivity {
     private View notSignedInLayout, signedInLayout;
     private MaterialButton btnGoToLogin, btnManageAccount, btnSignOut;
     private TextView tvUserName, tvUserEmail, tvProfileStreak, tvTotalLessons, tvBestScore, tvFavoriteLanguage;
+    private AvatarView profileImage, avatarNotSignedIn;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -53,6 +54,8 @@ public class ProfileActivity extends AppCompatActivity {
         tvTotalLessons = findViewById(R.id.tvTotalLessons);
         tvBestScore = findViewById(R.id.tvBestScore);
         tvFavoriteLanguage = findViewById(R.id.tvFavoriteLanguage);
+        profileImage = findViewById(R.id.profileImage);
+        avatarNotSignedIn = findViewById(R.id.avatarNotSignedIn);
     }
 
     private void setupProfile() {
@@ -62,6 +65,10 @@ public class ProfileActivity extends AppCompatActivity {
             // User is signed in
             notSignedInLayout.setVisibility(View.GONE);
             signedInLayout.setVisibility(View.VISIBLE);
+
+            // Load saved avatar config for signed-in user
+            AvatarBuilder.AvatarConfig config = AvatarBuilder.loadConfig(this);
+            profileImage.setAvatarConfig(config);
 
             // Display user info
             String displayName = currentUser.getDisplayName();
@@ -88,6 +95,10 @@ public class ProfileActivity extends AppCompatActivity {
             // User is not signed in
             notSignedInLayout.setVisibility(View.VISIBLE);
             signedInLayout.setVisibility(View.GONE);
+
+            // Use placeholder icon for signed-out state
+            avatarNotSignedIn.setImageResource(R.drawable.ic_graduation_cap);
+            avatarNotSignedIn.setAvatarConfig(null); // Clear any config if needed
         }
     }
 
@@ -103,6 +114,16 @@ public class ProfileActivity extends AppCompatActivity {
         });
 
         btnSignOut.setOnClickListener(v -> showSignOutDialog());
+
+        // Allow clicking the profile image to edit avatar
+        profileImage.setOnClickListener(v -> {
+            Intent intent = new Intent(ProfileActivity.this, AvatarEditorActivity.class);
+            startActivity(intent);
+        });
+        avatarNotSignedIn.setOnClickListener(v -> {
+            Intent intent = new Intent(ProfileActivity.this, AvatarEditorActivity.class);
+            startActivity(intent);
+        });
     }
 
     private void showSignOutDialog() {
