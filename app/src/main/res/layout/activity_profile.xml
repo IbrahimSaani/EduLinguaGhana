@@ -8,25 +8,24 @@
     <com.google.android.material.appbar.AppBarLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:elevation="4dp"
-        android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar">
+        android:background="@android:color/transparent"
+        app:elevation="0dp"
+        android:theme="@style/ThemeOverlay.AppCompat.DayNight.ActionBar">
 
         <androidx.appcompat.widget.Toolbar
             android:id="@+id/toolbar"
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
-            android:background="?attr/colorPrimary"
-            android:elevation="0dp"
-            app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
-            app:titleTextColor="@color/white">
+            android:background="@android:color/transparent"
+            app:popupTheme="@style/ThemeOverlay.AppCompat.Light">
 
             <TextView
                 android:id="@+id/toolbarTitle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Profile"
+                android:text="My Profile"
                 android:textSize="20sp"
-                android:textColor="@color/white"
+                android:textColor="@color/colorPrimary"
                 android:fontFamily="@font/agbalumo"
                 android:textStyle="bold" />
 
@@ -37,8 +36,6 @@
     <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:padding="20dp"
-        android:paddingBottom="24dp"
         android:clipToPadding="false"
         app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
@@ -46,6 +43,8 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
+            android:padding="20dp"
+            android:paddingTop="8dp"
             android:gravity="center_horizontal">
 
             <!-- Not Signed In State -->
@@ -53,31 +52,45 @@
                 android:id="@+id/notSignedInLayout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="32dp"
+                android:layout_marginTop="16dp"
                 android:visibility="gone"
-                app:cardCornerRadius="20dp"
-                app:cardElevation="8dp"
-                app:cardBackgroundColor="@color/cardBackground">
+                app:cardCornerRadius="28dp"
+                app:cardElevation="4dp"
+                app:strokeWidth="1dp"
+                app:strokeColor="#1A000000"
+                app:cardBackgroundColor="#CCFFFFFF">
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="vertical"
                     android:gravity="center"
-                    android:padding="40dp">
+                    android:padding="32dp">
 
-                    <com.edulinguaghana.AvatarView
-                        android:id="@+id/avatarNotSignedIn"
+                    <com.google.android.material.card.MaterialCardView
                         android:layout_width="140dp"
                         android:layout_height="140dp"
-                        android:contentDescription="App Icon"
-                        android:scaleType="centerInside" />
+                        app:cardCornerRadius="70dp"
+                        app:cardElevation="6dp"
+                        app:strokeWidth="4dp"
+                        app:strokeColor="@color/white"
+                        app:cardBackgroundColor="@color/white">
+
+                        <com.edulinguaghana.AvatarView
+                            android:id="@+id/avatarNotSignedIn"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:padding="16dp"
+                            android:contentDescription="App Icon"
+                            android:scaleType="centerInside" />
+
+                    </com.google.android.material.card.MaterialCardView>
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="28dp"
-                        android:text="Sign in to track your progress"
+                        android:layout_marginTop="24dp"
+                        android:text="Join the Adventure!"
                         android:textSize="24sp"
                         android:textStyle="bold"
                         android:fontFamily="@font/agbalumo"
@@ -89,7 +102,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="12dp"
-                        android:text="Create an account to save your learning progress, earn achievements, and sync across devices!"
+                        android:text="Sign in to save your progress, earn cool badges, and see your custom avatar everywhere!"
                         android:textSize="16sp"
                         android:textColor="@color/textColorSecondary"
                         android:gravity="center"
@@ -98,15 +111,16 @@
                     <com.google.android.material.button.MaterialButton
                         android:id="@+id/btnGoToLogin"
                         android:layout_width="match_parent"
-                        android:layout_height="58dp"
+                        android:layout_height="64dp"
                         android:layout_marginTop="32dp"
-                        android:text="Sign In / Sign Up"
+                        android:text="Let's Sign In! 🚀"
                         android:textSize="18sp"
                         android:textStyle="bold"
+                        android:fontFamily="@font/agbalumo"
                         android:textColor="@color/white"
                         android:backgroundTint="@color/colorPrimary"
-                        app:cornerRadius="29dp"
-                        app:elevation="4dp" />
+                        app:cornerRadius="32dp"
+                        app:elevation="8dp" />
 
                 </LinearLayout>
 
@@ -121,92 +135,112 @@
                 android:gravity="center_horizontal"
                 android:visibility="visible">
 
-                <!-- Profile Picture Card -->
-                <com.google.android.material.card.MaterialCardView
-                    android:layout_width="140dp"
-                    android:layout_height="140dp"
-                    android:layout_marginTop="32dp"
-                    app:cardCornerRadius="70dp"
-                    app:cardElevation="8dp"
-                    app:strokeWidth="3dp"
-                    app:strokeColor="@color/colorPrimary">
-
-                    <com.edulinguaghana.AvatarView
-                        android:id="@+id/profileImage"
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:scaleType="centerInside"
-                        android:contentDescription="Profile Picture" />
-
-                </com.google.android.material.card.MaterialCardView>
-
-                <!-- User Name -->
-                <TextView
-                    android:id="@+id/tvUserName"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="20dp"
-                    android:text="Young Learner"
-                    android:textSize="28sp"
-                    android:textStyle="bold"
-                    android:fontFamily="@font/agbalumo"
-                    android:textColor="@color/colorPrimary"
-                    android:letterSpacing="0.02" />
-
-                <!-- User Email (optional display) -->
-                <TextView
-                    android:id="@+id/tvUserEmail"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="8dp"
-                    android:text="user@example.com"
-                    android:textSize="15sp"
-                    android:textColor="@color/textColorSecondary"
-                    android:alpha="0.8" />
-
-                <!-- Learning Progress Card -->
+                <!-- Profile Header Card -->
                 <com.google.android.material.card.MaterialCardView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="32dp"
-                    app:cardCornerRadius="20dp"
-                    app:cardElevation="6dp"
-                    app:cardBackgroundColor="@color/cardBackground">
+                    android:layout_marginTop="8dp"
+                    app:cardCornerRadius="28dp"
+                    app:cardElevation="4dp"
+                    app:strokeWidth="1dp"
+                    app:strokeColor="#1A000000"
+                    app:cardBackgroundColor="#CCFFFFFF">
 
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:orientation="vertical"
-                        android:padding="24dp">
+                        android:padding="24dp"
+                        android:gravity="center">
 
+                        <!-- Profile Picture Card -->
+                        <com.google.android.material.card.MaterialCardView
+                            android:layout_width="140dp"
+                            android:layout_height="140dp"
+                            app:cardCornerRadius="70dp"
+                            app:cardElevation="6dp"
+                            app:strokeWidth="4dp"
+                            app:strokeColor="@color/white"
+                            app:cardBackgroundColor="@color/white">
+
+                            <com.edulinguaghana.AvatarView
+                                android:id="@+id/profileImage"
+                                android:layout_width="match_parent"
+                                android:layout_height="match_parent"
+                                android:padding="4dp"
+                                android:scaleType="centerInside"
+                                android:contentDescription="Profile Picture" />
+
+                        </com.google.android.material.card.MaterialCardView>
+
+                        <!-- User Name -->
                         <TextView
+                            android:id="@+id/tvUserName"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="📊 Learning Progress"
-                            android:textSize="22sp"
+                            android:layout_marginTop="16dp"
+                            android:text="Young Learner"
+                            android:textSize="28sp"
                             android:textStyle="bold"
                             android:fontFamily="@font/agbalumo"
                             android:textColor="@color/colorPrimary"
                             android:letterSpacing="0.02" />
 
-                        <!-- Streak Section -->
+                        <!-- User Email -->
+                        <TextView
+                            android:id="@+id/tvUserEmail"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="4dp"
+                            android:text="user@example.com"
+                            android:textSize="15sp"
+                            android:textColor="@color/textColorSecondary"
+                            android:alpha="0.8" />
+
+                        <com.google.android.material.button.MaterialButton
+                            android:id="@+id/btnEditAvatar"
+                            style="@style/Widget.Material3.Button.TonalButton"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="16dp"
+                            android:text="Edit Avatar"
+                            app:icon="@android:drawable/ic_menu_edit"
+                            android:textSize="12sp"
+                            app:cornerRadius="20dp" />
+
+                    </LinearLayout>
+
+                </com.google.android.material.card.MaterialCardView>
+
+                <!-- Stats Grid -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
+                    android:orientation="horizontal">
+
+                    <!-- Streak Stat -->
+                    <com.google.android.material.card.MaterialCardView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:layout_marginEnd="8dp"
+                        app:cardCornerRadius="24dp"
+                        app:cardElevation="3dp"
+                        app:cardBackgroundColor="#EEFFFFFF">
+
                         <LinearLayout
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:layout_marginTop="20dp"
-                            android:orientation="horizontal"
-                            android:gravity="center_vertical"
+                            android:orientation="vertical"
                             android:padding="16dp"
-                            android:background="@drawable/bg_mode_quiz">
+                            android:gravity="center">
 
                             <TextView
-                                android:layout_width="0dp"
+                                android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:layout_weight="1"
-                                android:text="🔥 Learning Streak"
-                                android:textSize="17sp"
-                                android:textStyle="bold"
-                                android:textColor="@color/textColorPrimary" />
+                                android:text="🔥"
+                                android:textSize="24sp" />
 
                             <TextView
                                 android:id="@+id/tvProfileStreak"
@@ -215,58 +249,42 @@
                                 android:text="0 days"
                                 android:textSize="18sp"
                                 android:textStyle="bold"
+                                android:fontFamily="@font/agbalumo"
                                 android:textColor="@color/colorPrimary" />
 
-                        </LinearLayout>
-
-                        <!-- Total Lessons Section -->
-                        <LinearLayout
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:layout_marginTop="12dp"
-                            android:orientation="horizontal"
-                            android:gravity="center_vertical"
-                            android:padding="16dp"
-                            android:background="@drawable/bg_mode_practice">
-
                             <TextView
-                                android:layout_width="0dp"
-                                android:layout_height="wrap_content"
-                                android:layout_weight="1"
-                                android:text="📚 Total Lessons"
-                                android:textSize="17sp"
-                                android:textStyle="bold"
-                                android:textColor="@color/textColorPrimary" />
-
-                            <TextView
-                                android:id="@+id/tvTotalLessons"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="0"
-                                android:textSize="18sp"
-                                android:textStyle="bold"
-                                android:textColor="@color/colorPrimary" />
+                                android:text="Streak"
+                                android:textSize="12sp"
+                                android:textColor="@color/textColorSecondary" />
 
                         </LinearLayout>
 
-                        <!-- Best Score Section -->
+                    </com.google.android.material.card.MaterialCardView>
+
+                    <!-- Best Score Stat -->
+                    <com.google.android.material.card.MaterialCardView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:layout_marginStart="8dp"
+                        app:cardCornerRadius="24dp"
+                        app:cardElevation="3dp"
+                        app:cardBackgroundColor="#EEFFFFFF">
+
                         <LinearLayout
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:layout_marginTop="12dp"
-                            android:orientation="horizontal"
-                            android:gravity="center_vertical"
+                            android:orientation="vertical"
                             android:padding="16dp"
-                            android:background="@drawable/bg_mode_progress">
+                            android:gravity="center">
 
                             <TextView
-                                android:layout_width="0dp"
+                                android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:layout_weight="1"
-                                android:text="🏆 Best Quiz Score"
-                                android:textSize="17sp"
-                                android:textStyle="bold"
-                                android:textColor="@color/textColorPrimary" />
+                                android:text="🏆"
+                                android:textSize="24sp" />
 
                             <TextView
                                 android:id="@+id/tvBestScore"
@@ -275,7 +293,139 @@
                                 android:text="0 / 10"
                                 android:textSize="18sp"
                                 android:textStyle="bold"
+                                android:fontFamily="@font/agbalumo"
                                 android:textColor="@color/colorPrimary" />
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Best Score"
+                                android:textSize="12sp"
+                                android:textColor="@color/textColorSecondary" />
+
+                        </LinearLayout>
+
+                    </com.google.android.material.card.MaterialCardView>
+
+                </LinearLayout>
+
+                <!-- Learning Progress Card -->
+                <com.google.android.material.card.MaterialCardView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
+                    app:cardCornerRadius="24dp"
+                    app:cardElevation="3dp"
+                    app:cardBackgroundColor="#EEFFFFFF">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:padding="20dp">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="📊 Learning Stats"
+                            android:textSize="18sp"
+                            android:textStyle="bold"
+                            android:fontFamily="@font/agbalumo"
+                            android:textColor="@color/colorPrimary" />
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="16dp"
+                            android:orientation="horizontal"
+                            android:gravity="center_vertical">
+
+                            <View
+                                android:layout_width="48dp"
+                                android:layout_height="48dp"
+                                android:background="@drawable/bg_mode_practice"
+                                android:padding="10dp" />
+
+                            <LinearLayout
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:layout_marginStart="16dp"
+                                android:orientation="vertical">
+
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="Total Lessons"
+                                    android:textSize="14sp"
+                                    android:textColor="@color/textColorSecondary" />
+
+                                <TextView
+                                    android:id="@+id/tvTotalLessons"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="0"
+                                    android:textSize="18sp"
+                                    android:textStyle="bold"
+                                    android:textColor="@color/textColorPrimary" />
+                            </LinearLayout>
+
+                            <ImageView
+                                android:layout_width="24dp"
+                                android:layout_height="24dp"
+                                android:src="@drawable/ic_arrow_forward"
+                                app:tint="@color/textColorSecondary" />
+
+                        </LinearLayout>
+
+                        <View
+                            android:layout_width="match_parent"
+                            android:layout_height="1dp"
+                            android:layout_marginTop="12dp"
+                            android:layout_marginBottom="12dp"
+                            android:background="#1A000000" />
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal"
+                            android:gravity="center_vertical">
+
+                            <View
+                                android:layout_width="48dp"
+                                android:layout_height="48dp"
+                                android:background="@drawable/bg_language_card"
+                                android:padding="10dp" />
+
+                            <LinearLayout
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:layout_marginStart="16dp"
+                                android:orientation="vertical">
+
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="Favorite Language"
+                                    android:textSize="14sp"
+                                    android:textColor="@color/textColorSecondary" />
+
+                                <TextView
+                                    android:id="@+id/tvFavoriteLanguage"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="Not set yet"
+                                    android:textSize="18sp"
+                                    android:textStyle="bold"
+                                    android:textColor="@color/textColorPrimary" />
+                            </LinearLayout>
+
+                            <ImageView
+                                android:layout_width="24dp"
+                                android:layout_height="24dp"
+                                android:src="@drawable/ic_arrow_forward"
+                                app:tint="@color/textColorSecondary" />
 
                         </LinearLayout>
 
@@ -287,90 +437,66 @@
                 <com.google.android.material.card.MaterialCardView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="20dp"
-                    app:cardCornerRadius="20dp"
-                    app:cardElevation="6dp"
-                    app:cardBackgroundColor="@color/cardBackground">
+                    android:layout_marginTop="16dp"
+                    app:cardCornerRadius="24dp"
+                    app:cardElevation="3dp"
+                    app:cardBackgroundColor="#EEFFFFFF">
 
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:orientation="vertical"
-                        android:padding="24dp">
+                        android:padding="20dp">
 
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="🌟 Achievements"
-                            android:textSize="22sp"
+                            android:textSize="18sp"
                             android:textStyle="bold"
                             android:fontFamily="@font/agbalumo"
-                            android:textColor="@color/colorPrimary"
-                            android:letterSpacing="0.02" />
+                            android:textColor="@color/colorPrimary" />
 
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_marginTop="12dp"
-                            android:text="Complete lessons to unlock achievements!"
-                            android:textSize="15sp"
-                            android:textColor="@color/textColorSecondary"
-                            android:lineSpacingExtra="2dp" />
+                            android:layout_marginTop="8dp"
+                            android:text="Keep learning to unlock awesome badges!"
+                            android:textSize="14sp"
+                            android:textColor="@color/textColorSecondary" />
 
                         <LinearLayout
                             android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:layout_marginTop="24dp"
+                            android:layout_height="100dp"
+                            android:layout_marginTop="16dp"
                             android:orientation="horizontal"
                             android:gravity="center"
-                            android:padding="20dp"
                             android:background="@drawable/bg_mode_recital">
 
                             <TextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="⭐ ⭐ ⭐"
-                                android:textSize="40sp" />
+                                android:text="🏆"
+                                android:textSize="48sp"
+                                android:alpha="0.3" />
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginStart="24dp"
+                                android:layout_marginEnd="24dp"
+                                android:text="🏅"
+                                android:textSize="48sp"
+                                android:alpha="0.3" />
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="⭐"
+                                android:textSize="48sp"
+                                android:alpha="0.3" />
 
                         </LinearLayout>
-
-                    </LinearLayout>
-
-                </com.google.android.material.card.MaterialCardView>
-
-                <!-- Favorite Language Card -->
-                <com.google.android.material.card.MaterialCardView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="20dp"
-                    app:cardCornerRadius="20dp"
-                    app:cardElevation="6dp"
-                    app:cardBackgroundColor="@color/cardBackground">
-
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:orientation="vertical"
-                        android:padding="24dp">
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="🌍 Favorite Language"
-                            android:textSize="22sp"
-                            android:textStyle="bold"
-                            android:fontFamily="@font/agbalumo"
-                            android:textColor="@color/colorPrimary"
-                            android:letterSpacing="0.02" />
-
-                        <TextView
-                            android:id="@+id/tvFavoriteLanguage"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginTop="12dp"
-                            android:text="Not set yet"
-                            android:textSize="17sp"
-                            android:textColor="@color/textColorSecondary" />
 
                     </LinearLayout>
 
@@ -380,51 +506,49 @@
                 <com.google.android.material.card.MaterialCardView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="20dp"
+                    android:layout_marginTop="16dp"
                     android:layout_marginBottom="32dp"
-                    app:cardCornerRadius="20dp"
-                    app:cardElevation="6dp"
-                    app:cardBackgroundColor="@color/cardBackground">
+                    app:cardCornerRadius="24dp"
+                    app:cardElevation="3dp"
+                    app:cardBackgroundColor="#EEFFFFFF">
 
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:orientation="vertical"
-                        android:padding="24dp">
+                        android:padding="20dp">
 
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="⚙️ Account Settings"
-                            android:textSize="22sp"
+                            android:text="⚙️ Settings"
+                            android:textSize="18sp"
                             android:textStyle="bold"
                             android:fontFamily="@font/agbalumo"
-                            android:textColor="@color/colorPrimary"
-                            android:letterSpacing="0.02" />
+                            android:textColor="@color/colorPrimary" />
 
                         <com.google.android.material.button.MaterialButton
                             android:id="@+id/btnManageAccount"
+                            style="@style/Widget.Material3.Button.TonalButton"
                             android:layout_width="match_parent"
                             android:layout_height="56dp"
-                            android:layout_marginTop="20dp"
+                            android:layout_marginTop="16dp"
                             android:text="Manage Account"
-                            android:textSize="16sp"
-                            android:textStyle="bold"
-                            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                            android:textSize="14sp"
+                            android:fontFamily="@font/agbalumo"
                             app:cornerRadius="28dp"
-                            app:strokeWidth="2dp"
-                            app:strokeColor="@color/colorPrimary" />
+                            app:icon="@drawable/ic_settings" />
 
                         <com.google.android.material.button.MaterialButton
                             android:id="@+id/btnSignOut"
+                            style="@style/Widget.Material3.Button.TextButton"
                             android:layout_width="match_parent"
                             android:layout_height="56dp"
-                            android:layout_marginTop="12dp"
+                            android:layout_marginTop="8dp"
                             android:text="Sign Out"
-                            android:textSize="16sp"
-                            android:textStyle="bold"
+                            android:textSize="14sp"
                             android:textColor="@android:color/holo_red_dark"
-                            style="@style/Widget.MaterialComponents.Button.TextButton"
+                            android:fontFamily="@font/agbalumo"
                             app:cornerRadius="28dp" />
 
                     </LinearLayout>

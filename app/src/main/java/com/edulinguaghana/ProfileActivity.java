@@ -19,7 +19,7 @@ public class ProfileActivity extends AppCompatActivity {
 
     private FirebaseAuth mAuth;
     private View notSignedInLayout, signedInLayout;
-    private MaterialButton btnGoToLogin, btnManageAccount, btnSignOut;
+    private MaterialButton btnGoToLogin, btnManageAccount, btnSignOut, btnEditAvatar;
     private TextView tvUserName, tvUserEmail, tvProfileStreak, tvTotalLessons, tvBestScore, tvFavoriteLanguage;
     private AvatarView profileImage, avatarNotSignedIn;
 
@@ -35,6 +35,8 @@ public class ProfileActivity extends AppCompatActivity {
         if (getSupportActionBar() != null) {
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
             getSupportActionBar().setDisplayShowTitleEnabled(false);
+            // Ensure back button is primary color
+            toolbar.getNavigationIcon().setTint(getResources().getColor(R.color.colorPrimary));
         }
 
         initViews();
@@ -48,6 +50,7 @@ public class ProfileActivity extends AppCompatActivity {
         btnGoToLogin = findViewById(R.id.btnGoToLogin);
         btnManageAccount = findViewById(R.id.btnManageAccount);
         btnSignOut = findViewById(R.id.btnSignOut);
+        btnEditAvatar = findViewById(R.id.btnEditAvatar);
         tvUserName = findViewById(R.id.tvUserName);
         tvUserEmail = findViewById(R.id.tvUserEmail);
         tvProfileStreak = findViewById(R.id.tvProfileStreak);
@@ -114,6 +117,13 @@ public class ProfileActivity extends AppCompatActivity {
         });
 
         btnSignOut.setOnClickListener(v -> showSignOutDialog());
+        
+        if (btnEditAvatar != null) {
+            btnEditAvatar.setOnClickListener(v -> {
+                Intent intent = new Intent(ProfileActivity.this, AvatarEditorActivity.class);
+                startActivity(intent);
+            });
+        }
 
         // Allow clicking the profile image to edit avatar
         profileImage.setOnClickListener(v -> {
