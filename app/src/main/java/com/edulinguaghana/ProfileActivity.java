@@ -15,6 +15,9 @@ import com.google.android.material.button.MaterialButton;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
+import androidx.core.content.ContextCompat;
+import java.util.Calendar;
+
 public class ProfileActivity extends AppCompatActivity {
 
     private FirebaseAuth mAuth;
@@ -22,6 +25,7 @@ public class ProfileActivity extends AppCompatActivity {
     private MaterialButton btnGoToLogin, btnManageAccount, btnSignOut, btnEditAvatar;
     private TextView tvUserName, tvUserEmail, tvProfileStreak, tvTotalLessons, tvBestScore, tvFavoriteLanguage;
     private AvatarView profileImage, avatarNotSignedIn;
+    private DynamicBackgroundView dynamicBackground;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -40,8 +44,32 @@ public class ProfileActivity extends AppCompatActivity {
         }
 
         initViews();
+        setupDynamicBackground();
         setupProfile();
         setupListeners();
+    }
+
+    private void setupDynamicBackground() {
+        if (dynamicBackground == null) return;
+
+        int hour = Calendar.getInstance().get(Calendar.HOUR_OF_DAY);
+        int colorStart, colorMid, colorEnd;
+
+        if (hour >= 5 && hour < 11) {
+            colorStart = ContextCompat.getColor(this, R.color.bgMorningStart);
+            colorMid = ContextCompat.getColor(this, R.color.bgMorningMid);
+            colorEnd = ContextCompat.getColor(this, R.color.bgMorningEnd);
+        } else if (hour >= 11 && hour < 17) {
+            colorStart = ContextCompat.getColor(this, R.color.bgDayStart);
+            colorMid = ContextCompat.getColor(this, R.color.bgDayMid);
+            colorEnd = ContextCompat.getColor(this, R.color.bgDayEnd);
+        } else {
+            colorStart = ContextCompat.getColor(this, R.color.bgNightStart);
+            colorMid = ContextCompat.getColor(this, R.color.bgNightMid);
+            colorEnd = ContextCompat.getColor(this, R.color.bgNightEnd);
+        }
+
+        dynamicBackground.setColors(colorStart, colorMid, colorEnd);
     }
 
     private void initViews() {
@@ -59,6 +87,7 @@ public class ProfileActivity extends AppCompatActivity {
         tvFavoriteLanguage = findViewById(R.id.tvFavoriteLanguage);
         profileImage = findViewById(R.id.profileImage);
         avatarNotSignedIn = findViewById(R.id.avatarNotSignedIn);
+        dynamicBackground = findViewById(R.id.dynamicBackground);
     }
 
     private void setupProfile() {

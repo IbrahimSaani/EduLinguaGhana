@@ -42,6 +42,7 @@ public class MainActivity extends AppCompatActivity {
 
     private CoordinatorLayout rootCoordinator;
     private ImageView dynamicBackgroundOverlay;
+    private DynamicBackgroundView dynamicBackground;
     private ChipGroup languageChipGroup;
     private MaterialCardView btnRecitalMode, btnPracticeMode, btnQuizMode, btnProgressMode;
     private MaterialCardView heroCard;
@@ -120,6 +121,7 @@ public class MainActivity extends AppCompatActivity {
         mascotView = findViewById(R.id.mascotView);
         nestedScrollView = findViewById(R.id.nestedScrollView);
         bottomNavigation = findViewById(R.id.bottomNavigation);
+        dynamicBackground = findViewById(R.id.dynamicBackground);
 
         setupDynamicBackground();
         setupMascot();
@@ -1070,22 +1072,35 @@ public class MainActivity extends AppCompatActivity {
         int backgroundRes;
         int overlayTintRes;
         float targetAlpha;
+        int colorStart, colorMid, colorEnd;
 
         if (hour >= 5 && hour < 11) {
             backgroundRes = R.drawable.bg_main_morning;
             overlayTintRes = R.color.sparkleHalo;
             targetAlpha = 0.45f;
+            colorStart = ContextCompat.getColor(this, R.color.bgMorningStart);
+            colorMid = ContextCompat.getColor(this, R.color.bgMorningMid);
+            colorEnd = ContextCompat.getColor(this, R.color.bgMorningEnd);
         } else if (hour >= 11 && hour < 17) {
             backgroundRes = R.drawable.bg_main_day;
             overlayTintRes = R.color.sparkleHaloSecondary;
             targetAlpha = 0.4f;
+            colorStart = ContextCompat.getColor(this, R.color.bgDayStart);
+            colorMid = ContextCompat.getColor(this, R.color.bgDayMid);
+            colorEnd = ContextCompat.getColor(this, R.color.bgDayEnd);
         } else {
             backgroundRes = R.drawable.bg_main_night;
             overlayTintRes = R.color.sparkleCore;
             targetAlpha = 0.6f;
+            colorStart = ContextCompat.getColor(this, R.color.bgNightStart);
+            colorMid = ContextCompat.getColor(this, R.color.bgNightMid);
+            colorEnd = ContextCompat.getColor(this, R.color.bgNightEnd);
         }
 
         rootCoordinator.setBackgroundResource(backgroundRes);
+        if (dynamicBackground != null) {
+            dynamicBackground.setColors(colorStart, colorMid, colorEnd);
+        }
         dynamicBackgroundOverlay.setImageResource(R.drawable.bg_dynamic_sparkle);
         ImageViewCompat.setImageTintList(dynamicBackgroundOverlay,
                 ColorStateList.valueOf(ContextCompat.getColor(this, overlayTintRes)));

@@ -6,8 +6,12 @@
     android:id="@+id/rootCoordinator"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/bg_main_day"
     tools:context=".MainActivity">
+
+    <com.edulinguaghana.DynamicBackgroundView
+        android:id="@+id/dynamicBackground"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
 
     <ImageView
         android:id="@+id/dynamicBackgroundOverlay"

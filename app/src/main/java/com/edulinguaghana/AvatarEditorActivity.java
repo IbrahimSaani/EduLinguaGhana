@@ -16,12 +16,16 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.tabs.TabLayout;
 import com.google.android.material.tabs.TabLayoutMediator;
 
+import androidx.core.content.ContextCompat;
+import java.util.Calendar;
+
 public class AvatarEditorActivity extends AppCompatActivity {
 
     private AvatarView avatarPreview;
     private ViewPager2 viewPager;
     private TabLayout tabLayout;
     private MaterialButton btnSaveAvatar, btnRandomAvatar, btnChangeBackground;
+    private DynamicBackgroundView dynamicBackground;
 
     private AvatarBuilder.AvatarConfig config;
     private AvatarBuilder builder;
@@ -49,9 +53,33 @@ public class AvatarEditorActivity extends AppCompatActivity {
         }
 
         initViews();
+        setupDynamicBackground();
         loadCurrentAvatar();
         setupViewPager();
         setupListeners();
+    }
+
+    private void setupDynamicBackground() {
+        if (dynamicBackground == null) return;
+
+        int hour = Calendar.getInstance().get(Calendar.HOUR_OF_DAY);
+        int colorStart, colorMid, colorEnd;
+
+        if (hour >= 5 && hour < 11) {
+            colorStart = ContextCompat.getColor(this, R.color.bgMorningStart);
+            colorMid = ContextCompat.getColor(this, R.color.bgMorningMid);
+            colorEnd = ContextCompat.getColor(this, R.color.bgMorningEnd);
+        } else if (hour >= 11 && hour < 17) {
+            colorStart = ContextCompat.getColor(this, R.color.bgDayStart);
+            colorMid = ContextCompat.getColor(this, R.color.bgDayMid);
+            colorEnd = ContextCompat.getColor(this, R.color.bgDayEnd);
+        } else {
+            colorStart = ContextCompat.getColor(this, R.color.bgNightStart);
+            colorMid = ContextCompat.getColor(this, R.color.bgNightMid);
+            colorEnd = ContextCompat.getColor(this, R.color.bgNightEnd);
+        }
+
+        dynamicBackground.setColors(colorStart, colorMid, colorEnd);
     }
 
     private void initViews() {
@@ -61,6 +89,7 @@ public class AvatarEditorActivity extends AppCompatActivity {
         btnSaveAvatar = findViewById(R.id.btnSaveAvatar);
         btnRandomAvatar = findViewById(R.id.btnRandomAvatar);
         btnChangeBackground = findViewById(R.id.btnChangeBackground);
+        dynamicBackground = findViewById(R.id.dynamicBackground);
     }
 
     private void loadCurrentAvatar() {
