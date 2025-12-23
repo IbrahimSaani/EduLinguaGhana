@@ -4,17 +4,17 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
-import android.widget.Spinner;
-
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.RecyclerView;
+
+import java.util.Arrays;
 
 public class AvatarEyesMouthFragment extends Fragment {
 
-    private Spinner spinnerEyeStyle, spinnerMouthStyle;
+    private RecyclerView rvEyeStyle, rvMouthStyle;
+    private AvatarSelectionAdapter eyeStyleAdapter, mouthStyleAdapter;
     private AvatarEditorActivity activity;
 
     @Nullable
@@ -23,61 +23,40 @@ public class AvatarEyesMouthFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_avatar_eyes_mouth, container, false);
 
         activity = (AvatarEditorActivity) getActivity();
-        spinnerEyeStyle = view.findViewById(R.id.spinnerEyeStyle);
-        spinnerMouthStyle = view.findViewById(R.id.spinnerMouthStyle);
+        rvEyeStyle = view.findViewById(R.id.rvEyeStyle);
+        rvMouthStyle = view.findViewById(R.id.rvMouthStyle);
 
-        setupSpinners();
-        setupListeners();
+        setupRecyclerViews();
         updateUIFromConfig();
 
         return view;
     }
 
-    private void setupSpinners() {
+    private void setupRecyclerViews() {
         // Eye Style
         String[] eyeStyles = {"Normal", "Happy", "Wink", "Glasses", "Sunglasses", "Starry", "Sleepy", "Heart"};
-        ArrayAdapter<String> eyeStyleAdapter = new ArrayAdapter<>(getContext(),
-                android.R.layout.simple_spinner_item, eyeStyles);
-        eyeStyleAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        spinnerEyeStyle.setAdapter(eyeStyleAdapter);
+        eyeStyleAdapter = new AvatarSelectionAdapter(Arrays.asList(eyeStyles),
+            activity.getAvatarConfig().eyeStyle.ordinal(),
+            position -> {
+                activity.getAvatarConfig().eyeStyle = AvatarBuilder.EyeStyle.values()[position];
+                activity.updateAvatar();
+            });
+        rvEyeStyle.setAdapter(eyeStyleAdapter);
 
         // Mouth Style
         String[] mouthStyles = {"Smile", "Laugh", "Neutral", "Smirk", "Surprised", "Tongue Out", "Whistling"};
-        ArrayAdapter<String> mouthStyleAdapter = new ArrayAdapter<>(getContext(),
-                android.R.layout.simple_spinner_item, mouthStyles);
-        mouthStyleAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        spinnerMouthStyle.setAdapter(mouthStyleAdapter);
-    }
-
-    private void setupListeners() {
-        // Eye Style
-        spinnerEyeStyle.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                activity.getAvatarConfig().eyeStyle = AvatarBuilder.EyeStyle.values()[position];
-                activity.updateAvatar();
-            }
-
-            @Override
-            public void onNothingSelected(AdapterView<?> parent) {}
-        });
-
-        // Mouth Style
-        spinnerMouthStyle.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+        mouthStyleAdapter = new AvatarSelectionAdapter(Arrays.asList(mouthStyles),
+            activity.getAvatarConfig().mouthStyle.ordinal(),
+            position -> {
                 activity.getAvatarConfig().mouthStyle = AvatarBuilder.MouthStyle.values()[position];
                 activity.updateAvatar();
-            }
-
-            @Override
-            public void onNothingSelected(AdapterView<?> parent) {}
-        });
+            });
+        rvMouthStyle.setAdapter(mouthStyleAdapter);
     }
 
     public void updateUIFromConfig() {
-        if (spinnerEyeStyle == null) return;
-        spinnerEyeStyle.setSelection(activity.getAvatarConfig().eyeStyle.ordinal());
-        spinnerMouthStyle.setSelection(activity.getAvatarConfig().mouthStyle.ordinal());
+        if (eyeStyleAdapter == null) return;
+        eyeStyleAdapter.setSelectedPosition(activity.getAvatarConfig().eyeStyle.ordinal());
+        mouthStyleAdapter.setSelectedPosition(activity.getAvatarConfig().mouthStyle.ordinal());
     }
 }

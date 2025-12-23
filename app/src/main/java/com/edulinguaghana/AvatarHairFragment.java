@@ -4,17 +4,17 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
-import android.widget.Spinner;
-
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.RecyclerView;
+
+import java.util.Arrays;
 
 public class AvatarHairFragment extends Fragment {
 
-    private Spinner spinnerHairStyle, spinnerHairColor;
+    private RecyclerView rvHairStyle, rvHairColor;
+    private AvatarSelectionAdapter hairStyleAdapter, hairColorAdapter;
     private AvatarEditorActivity activity;
 
     @Nullable
@@ -23,62 +23,41 @@ public class AvatarHairFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_avatar_hair, container, false);
 
         activity = (AvatarEditorActivity) getActivity();
-        spinnerHairStyle = view.findViewById(R.id.spinnerHairStyle);
-        spinnerHairColor = view.findViewById(R.id.spinnerHairColor);
+        rvHairStyle = view.findViewById(R.id.rvHairStyle);
+        rvHairColor = view.findViewById(R.id.rvHairColor);
 
-        setupSpinners();
-        setupListeners();
+        setupRecyclerViews();
         updateUIFromConfig();
 
         return view;
     }
 
-    private void setupSpinners() {
+    private void setupRecyclerViews() {
         // Hair Style
         String[] hairStyles = {"Short", "Long", "Curly", "Bald", "Afro", "Braids", "Ponytail",
             "Dreadlocks", "Mohawk", "Bun", "Side Part"};
-        ArrayAdapter<String> hairStyleAdapter = new ArrayAdapter<>(getContext(),
-                android.R.layout.simple_spinner_item, hairStyles);
-        hairStyleAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        spinnerHairStyle.setAdapter(hairStyleAdapter);
+        hairStyleAdapter = new AvatarSelectionAdapter(Arrays.asList(hairStyles), 
+            activity.getAvatarConfig().hairStyle.ordinal(), 
+            position -> {
+                activity.getAvatarConfig().hairStyle = AvatarBuilder.HairStyle.values()[position];
+                activity.updateAvatar();
+            });
+        rvHairStyle.setAdapter(hairStyleAdapter);
 
         // Hair Color
         String[] hairColors = {"Black", "Brown", "Blonde", "Red", "Gray", "Purple", "Blue", "Pink"};
-        ArrayAdapter<String> hairColorAdapter = new ArrayAdapter<>(getContext(),
-                android.R.layout.simple_spinner_item, hairColors);
-        hairColorAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        spinnerHairColor.setAdapter(hairColorAdapter);
-    }
-
-    private void setupListeners() {
-        // Hair Style
-        spinnerHairStyle.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                activity.getAvatarConfig().hairStyle = AvatarBuilder.HairStyle.values()[position];
-                activity.updateAvatar();
-            }
-
-            @Override
-            public void onNothingSelected(AdapterView<?> parent) {}
-        });
-
-        // Hair Color
-        spinnerHairColor.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+        hairColorAdapter = new AvatarSelectionAdapter(Arrays.asList(hairColors), 
+            activity.getAvatarConfig().hairColor.ordinal(), 
+            position -> {
                 activity.getAvatarConfig().hairColor = AvatarBuilder.HairColor.values()[position];
                 activity.updateAvatar();
-            }
-
-            @Override
-            public void onNothingSelected(AdapterView<?> parent) {}
-        });
+            });
+        rvHairColor.setAdapter(hairColorAdapter);
     }
 
     public void updateUIFromConfig() {
-        if (spinnerHairStyle == null) return;
-        spinnerHairStyle.setSelection(activity.getAvatarConfig().hairStyle.ordinal());
-        spinnerHairColor.setSelection(activity.getAvatarConfig().hairColor.ordinal());
+        if (hairStyleAdapter == null) return;
+        hairStyleAdapter.setSelectedPosition(activity.getAvatarConfig().hairStyle.ordinal());
+        hairColorAdapter.setSelectedPosition(activity.getAvatarConfig().hairColor.ordinal());
     }
 }

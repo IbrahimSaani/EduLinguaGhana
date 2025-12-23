@@ -35,9 +35,9 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="20dp"
             android:layout_marginEnd="20dp"
-            android:layout_marginBottom="16dp"
+            android:layout_marginBottom="12dp"
             app:cardCornerRadius="28dp"
-            app:cardElevation="0dp"
+            app:cardElevation="2dp"
             app:strokeWidth="1dp"
             app:strokeColor="#1A000000"
             app:cardBackgroundColor="#CCFFFFFF">
@@ -46,26 +46,26 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
-                android:padding="24dp"
+                android:padding="16dp"
                 android:gravity="center">
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Customize Your Look"
-                    android:textSize="20sp"
+                    android:textSize="18sp"
                     android:textStyle="bold"
                     android:fontFamily="@font/agbalumo"
                     android:textColor="@color/colorPrimary"
                     android:letterSpacing="0.02" />
 
                 <com.google.android.material.card.MaterialCardView
-                    android:layout_width="220dp"
-                    android:layout_height="220dp"
-                    android:layout_marginTop="20dp"
-                    app:cardCornerRadius="110dp"
+                    android:layout_width="160dp"
+                    android:layout_height="160dp"
+                    android:layout_marginTop="12dp"
+                    app:cardCornerRadius="80dp"
                     app:cardElevation="4dp"
-                    app:strokeWidth="6dp"
+                    app:strokeWidth="4dp"
                     app:strokeColor="@color/white"
                     app:cardBackgroundColor="@color/white">
 
@@ -83,7 +83,7 @@
                     android:layout_height="wrap_content"
                     android:orientation="horizontal"
                     android:gravity="center"
-                    android:layout_marginTop="16dp"
+                    android:layout_marginTop="12dp"
                     android:clipChildren="false"
                     android:clipToPadding="false">
 
@@ -91,27 +91,31 @@
                         android:id="@+id/btnChangeBackground"
                         style="@style/Widget.Material3.Button.TonalButton"
                         android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
+                        android:layout_height="40dp"
                         android:layout_marginEnd="8dp"
                         android:text="Background"
                         app:icon="@android:drawable/ic_menu_gallery"
-                        app:iconSize="18dp"
-                        android:textSize="12sp"
+                        app:iconSize="16dp"
+                        android:textSize="11sp"
                         android:textColor="@color/colorAccent"
-                        app:iconTint="@color/colorAccent" />
+                        app:iconTint="@color/colorAccent"
+                        android:paddingLeft="12dp"
+                        android:paddingRight="12dp" />
 
                     <com.google.android.material.button.MaterialButton
                         android:id="@+id/btnRandomAvatar"
                         style="@style/Widget.Material3.Button.TonalButton"
                         android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
+                        android:layout_height="40dp"
                         android:layout_marginStart="8dp"
                         android:text="Randomize"
                         app:icon="@android:drawable/ic_menu_rotate"
-                        app:iconSize="18dp"
-                        android:textSize="12sp"
+                        app:iconSize="16dp"
+                        android:textSize="11sp"
                         android:textColor="@color/colorPrimary"
-                        app:iconTint="@color/colorPrimary" />
+                        app:iconTint="@color/colorPrimary"
+                        android:paddingLeft="12dp"
+                        android:paddingRight="12dp" />
 
                 </LinearLayout>
 
@@ -122,11 +126,11 @@
         <com.google.android.material.card.MaterialCardView
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:layout_weight="1"
+            android:layout_weight="1.5"
             android:layout_marginStart="16dp"
             android:layout_marginEnd="16dp"
             app:cardCornerRadius="28dp"
-            app:cardElevation="0dp"
+            app:cardElevation="4dp"
             app:cardBackgroundColor="#EEFFFFFF">
 
             <LinearLayout
@@ -166,23 +170,26 @@
         <com.google.android.material.button.MaterialButton
             android:id="@+id/btnSaveAvatar"
             android:layout_width="match_parent"
-            android:layout_height="64dp"
+            android:layout_height="72dp"
             android:layout_marginStart="24dp"
             android:layout_marginEnd="24dp"
-            android:layout_marginTop="16dp"
-            android:layout_marginBottom="24dp"
-            android:text="Save My Avatar"
-            android:textSize="18sp"
+            android:layout_marginTop="12dp"
+            android:layout_marginBottom="20dp"
+            android:text="Save My Avatar!"
+            android:textSize="20sp"
             android:textStyle="bold"
+            android:fontFamily="@font/agbalumo"
             android:textAllCaps="false"
             android:textColor="@color/white"
             android:backgroundTint="@color/colorPrimary"
-            app:cornerRadius="32dp"
-            app:elevation="8dp"
+            app:cornerRadius="36dp"
+            app:elevation="12dp"
             app:icon="@android:drawable/ic_menu_save"
             app:iconGravity="textStart"
-            app:iconPadding="12dp"
-            app:iconTint="@color/white" />
+            app:iconPadding="16dp"
+            app:iconSize="28dp"
+            app:iconTint="@color/white"
+            app:rippleColor="@color/colorAccent" />
 
     </LinearLayout>
 

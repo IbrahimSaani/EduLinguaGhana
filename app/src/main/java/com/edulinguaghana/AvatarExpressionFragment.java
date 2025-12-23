@@ -4,17 +4,17 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
-import android.widget.Spinner;
-
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.RecyclerView;
+
+import java.util.Arrays;
 
 public class AvatarExpressionFragment extends Fragment {
 
-    private Spinner spinnerExpression;
+    private RecyclerView rvExpression;
+    private AvatarSelectionAdapter adapter;
     private AvatarEditorActivity activity;
 
     @Nullable
@@ -23,40 +23,28 @@ public class AvatarExpressionFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_avatar_expression, container, false);
 
         activity = (AvatarEditorActivity) getActivity();
-        spinnerExpression = view.findViewById(R.id.spinnerExpression);
+        rvExpression = view.findViewById(R.id.rvExpression);
 
-        setupSpinners();
-        setupListeners();
+        setupRecyclerView();
         updateUIFromConfig();
 
         return view;
     }
 
-    private void setupSpinners() {
+    private void setupRecyclerView() {
         // Facial Expression
         String[] expressions = {"Neutral", "Happy", "Excited", "Cool", "Surprised", "Shy"};
-        ArrayAdapter<String> expressionAdapter = new ArrayAdapter<>(getContext(),
-                android.R.layout.simple_spinner_item, expressions);
-        expressionAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        spinnerExpression.setAdapter(expressionAdapter);
-    }
-
-    private void setupListeners() {
-        // Facial Expression
-        spinnerExpression.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+        adapter = new AvatarSelectionAdapter(Arrays.asList(expressions),
+            activity.getAvatarConfig().facialExpression.ordinal(),
+            position -> {
                 activity.getAvatarConfig().facialExpression = AvatarBuilder.FacialExpression.values()[position];
                 activity.updateAvatar();
-            }
-
-            @Override
-            public void onNothingSelected(AdapterView<?> parent) {}
-        });
+            });
+        rvExpression.setAdapter(adapter);
     }
 
     public void updateUIFromConfig() {
-        if (spinnerExpression == null) return;
-        spinnerExpression.setSelection(activity.getAvatarConfig().facialExpression.ordinal());
+        if (adapter == null) return;
+        adapter.setSelectedPosition(activity.getAvatarConfig().facialExpression.ordinal());
     }
 }

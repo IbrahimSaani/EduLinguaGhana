@@ -49,11 +49,11 @@
 
                     <com.google.android.material.card.MaterialCardView
                         android:id="@+id/cardSkinLight"
-                        android:layout_width="60dp"
-                        android:layout_height="60dp"
+                        android:layout_width="70dp"
+                        android:layout_height="70dp"
                         android:clickable="true"
                         android:focusable="true"
-                        app:cardCornerRadius="30dp"
+                        app:cardCornerRadius="35dp"
                         app:cardElevation="4dp"
                         app:cardBackgroundColor="#FFE0BD"
                         app:strokeWidth="0dp">
@@ -87,11 +87,11 @@
 
                     <com.google.android.material.card.MaterialCardView
                         android:id="@+id/cardSkinMedium"
-                        android:layout_width="60dp"
-                        android:layout_height="60dp"
+                        android:layout_width="70dp"
+                        android:layout_height="70dp"
                         android:clickable="true"
                         android:focusable="true"
-                        app:cardCornerRadius="30dp"
+                        app:cardCornerRadius="35dp"
                         app:cardElevation="4dp"
                         app:cardBackgroundColor="#F1C27D"
                         app:strokeWidth="0dp">
@@ -126,11 +126,11 @@
 
                     <com.google.android.material.card.MaterialCardView
                         android:id="@+id/cardSkinTan"
-                        android:layout_width="60dp"
-                        android:layout_height="60dp"
+                        android:layout_width="70dp"
+                        android:layout_height="70dp"
                         android:clickable="true"
                         android:focusable="true"
-                        app:cardCornerRadius="30dp"
+                        app:cardCornerRadius="35dp"
                         app:cardElevation="4dp"
                         app:cardBackgroundColor="#C68642"
                         app:strokeWidth="0dp">
@@ -164,11 +164,11 @@
 
                     <com.google.android.material.card.MaterialCardView
                         android:id="@+id/cardSkinBrown"
-                        android:layout_width="60dp"
-                        android:layout_height="60dp"
+                        android:layout_width="70dp"
+                        android:layout_height="70dp"
                         android:clickable="true"
                         android:focusable="true"
-                        app:cardCornerRadius="30dp"
+                        app:cardCornerRadius="35dp"
                         app:cardElevation="4dp"
                         app:cardBackgroundColor="#8D5524"
                         app:strokeWidth="0dp">
@@ -202,11 +202,11 @@
 
                     <com.google.android.material.card.MaterialCardView
                         android:id="@+id/cardSkinDark"
-                        android:layout_width="60dp"
-                        android:layout_height="60dp"
+                        android:layout_width="70dp"
+                        android:layout_height="70dp"
                         android:clickable="true"
                         android:focusable="true"
-                        app:cardCornerRadius="30dp"
+                        app:cardCornerRadius="35dp"
                         app:cardElevation="4dp"
                         app:cardBackgroundColor="#5D4037"
                         app:strokeWidth="0dp">
