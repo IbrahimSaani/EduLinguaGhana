@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="24dp">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="👀 Eye Style"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            android:fontFamily="@font/agbalumo"
+            android:textColor="@color/colorPrimary" />
+
+        <com.google.android.material.card.MaterialCardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            app:cardCornerRadius="16dp"
+            app:cardElevation="2dp"
+            app:strokeWidth="1dp"
+            app:strokeColor="@color/colorPrimary">
+
+            <Spinner
+                android:id="@+id/spinnerEyeStyle"
+                android:layout_width="match_parent"
+                android:layout_height="56dp"
+                android:background="@android:color/transparent"
+                android:paddingStart="16dp"
+                android:paddingEnd="16dp" />
+
+        </com.google.android.material.card.MaterialCardView>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:text="😊 Mouth Style"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            android:fontFamily="@font/agbalumo"
+            android:textColor="@color/colorPrimary" />
+
+        <com.google.android.material.card.MaterialCardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            app:cardCornerRadius="16dp"
+            app:cardElevation="2dp"
+            app:strokeWidth="1dp"
+            app:strokeColor="@color/colorPrimary">
+
+            <Spinner
+                android:id="@+id/spinnerMouthStyle"
+                android:layout_width="match_parent"
+                android:layout_height="56dp"
+                android:background="@android:color/transparent"
+                android:paddingStart="16dp"
+                android:paddingEnd="16dp" />
+
+        </com.google.android.material.card.MaterialCardView>
+
+    </LinearLayout>
+
+</androidx.core.widget.NestedScrollView>

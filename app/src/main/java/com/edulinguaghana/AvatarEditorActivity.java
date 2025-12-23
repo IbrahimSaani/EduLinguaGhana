@@ -3,33 +3,25 @@ package com.edulinguaghana;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.view.MenuItem;
-import android.view.View;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
-import android.widget.RadioButton;
-import android.widget.RadioGroup;
-import android.widget.Spinner;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
-import androidx.core.content.ContextCompat;
+import androidx.viewpager2.widget.ViewPager2;
 
 import com.google.android.material.button.MaterialButton;
-import com.google.android.material.card.MaterialCardView;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.android.material.tabs.TabLayout;
+import com.google.android.material.tabs.TabLayoutMediator;
 
-/**
- * Avatar Editor Activity - Allows users to create and customize their avatar
- */
 public class AvatarEditorActivity extends AppCompatActivity {
 
     private AvatarView avatarPreview;
-    private RadioGroup rgSkinTone;
-    private Spinner spinnerHairStyle, spinnerHairColor, spinnerEyeStyle, spinnerMouthStyle, spinnerAccessory;
-    private Spinner spinnerClothingStyle, spinnerClothingColor, spinnerExpression;
+    private ViewPager2 viewPager;
+    private TabLayout tabLayout;
     private MaterialButton btnSaveAvatar, btnRandomAvatar, btnChangeBackground;
-    private MaterialCardView cardSkinLight, cardSkinMedium, cardSkinTan, cardSkinBrown, cardSkinDark;
 
     private AvatarBuilder.AvatarConfig config;
     private AvatarBuilder builder;
@@ -58,49 +50,23 @@ public class AvatarEditorActivity extends AppCompatActivity {
 
         initViews();
         loadCurrentAvatar();
-        setupSpinners();
+        setupViewPager();
         setupListeners();
     }
 
     private void initViews() {
         avatarPreview = findViewById(R.id.avatarPreview);
-        rgSkinTone = findViewById(R.id.rgSkinTone);
-        spinnerHairStyle = findViewById(R.id.spinnerHairStyle);
-        spinnerHairColor = findViewById(R.id.spinnerHairColor);
-        spinnerEyeStyle = findViewById(R.id.spinnerEyeStyle);
-        spinnerMouthStyle = findViewById(R.id.spinnerMouthStyle);
-        spinnerAccessory = findViewById(R.id.spinnerAccessory);
-        spinnerClothingStyle = findViewById(R.id.spinnerClothingStyle);
-        spinnerClothingColor = findViewById(R.id.spinnerClothingColor);
-        spinnerExpression = findViewById(R.id.spinnerExpression);
+        viewPager = findViewById(R.id.viewPager);
+        tabLayout = findViewById(R.id.tabLayout);
         btnSaveAvatar = findViewById(R.id.btnSaveAvatar);
         btnRandomAvatar = findViewById(R.id.btnRandomAvatar);
         btnChangeBackground = findViewById(R.id.btnChangeBackground);
-
-        // Get skin tone cards
-        cardSkinLight = findViewById(R.id.cardSkinLight);
-        cardSkinMedium = findViewById(R.id.cardSkinMedium);
-        cardSkinTan = findViewById(R.id.cardSkinTan);
-        cardSkinBrown = findViewById(R.id.cardSkinBrown);
-        cardSkinDark = findViewById(R.id.cardSkinDark);
-
-        // Make cards clickable to select skin tone
-        setupSkinToneCardClicks();
-    }
-
-    private void setupSkinToneCardClicks() {
-        cardSkinLight.setOnClickListener(v -> rgSkinTone.check(R.id.rbSkinLight));
-        cardSkinMedium.setOnClickListener(v -> rgSkinTone.check(R.id.rbSkinMedium));
-        cardSkinTan.setOnClickListener(v -> rgSkinTone.check(R.id.rbSkinTan));
-        cardSkinBrown.setOnClickListener(v -> rgSkinTone.check(R.id.rbSkinBrown));
-        cardSkinDark.setOnClickListener(v -> rgSkinTone.check(R.id.rbSkinDark));
     }
 
     private void loadCurrentAvatar() {
         config = AvatarBuilder.loadConfig(this);
         builder = new AvatarBuilder(this, config);
         updateAvatarPreview();
-        updateUIFromConfig();
 
         // Add pulse animation on load
         avatarPreview.postDelayed(() -> {
@@ -120,183 +86,63 @@ public class AvatarEditorActivity extends AppCompatActivity {
         }, 200);
     }
 
-    private void setupSpinners() {
-        // Hair Style
-        String[] hairStyles = {"Short", "Long", "Curly", "Bald", "Afro", "Braids", "Ponytail",
-            "Dreadlocks", "Mohawk", "Bun", "Side Part"};
-        ArrayAdapter<String> hairStyleAdapter = new ArrayAdapter<>(this,
-                android.R.layout.simple_spinner_item, hairStyles);
-        hairStyleAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        spinnerHairStyle.setAdapter(hairStyleAdapter);
+    private void setupViewPager() {
+        AvatarPagerAdapter adapter = new AvatarPagerAdapter(this);
+        viewPager.setAdapter(adapter);
 
-        // Hair Color
-        String[] hairColors = {"Black", "Brown", "Blonde", "Red", "Gray", "Purple", "Blue", "Pink"};
-        ArrayAdapter<String> hairColorAdapter = new ArrayAdapter<>(this,
-                android.R.layout.simple_spinner_item, hairColors);
-        hairColorAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        spinnerHairColor.setAdapter(hairColorAdapter);
+        new TabLayoutMediator(tabLayout, viewPager, (tab, position) -> {
+            switch (position) {
+                case 0:
+                    tab.setText("Skin");
+                    tab.setContentDescription("Skin tone tab");
+                    break;
+                case 1:
+                    tab.setText("Hair");
+                    tab.setContentDescription("Hair style and color tab");
+                    break;
+                case 2:
+                    tab.setText("Eyes/Mouth");
+                    tab.setContentDescription("Eye and mouth style tab");
+                    break;
+                case 3:
+                    tab.setText("Accessory");
+                    tab.setContentDescription("Accessory tab");
+                    break;
+                case 4:
+                    tab.setText("Clothing");
+                    tab.setContentDescription("Clothing tab");
+                    break;
+                case 5:
+                    tab.setText("Expression");
+                    tab.setContentDescription("Expression tab");
+                    break;
+            }
+        }).attach();
+    }
 
-        // Eye Style
-        String[] eyeStyles = {"Normal", "Happy", "Wink", "Glasses", "Sunglasses", "Starry", "Sleepy", "Heart"};
-        ArrayAdapter<String> eyeStyleAdapter = new ArrayAdapter<>(this,
-                android.R.layout.simple_spinner_item, eyeStyles);
-        eyeStyleAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        spinnerEyeStyle.setAdapter(eyeStyleAdapter);
-
-        // Mouth Style
-        String[] mouthStyles = {"Smile", "Laugh", "Neutral", "Smirk", "Surprised", "Tongue Out", "Whistling"};
-        ArrayAdapter<String> mouthStyleAdapter = new ArrayAdapter<>(this,
-                android.R.layout.simple_spinner_item, mouthStyles);
-        mouthStyleAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        spinnerMouthStyle.setAdapter(mouthStyleAdapter);
-
-        // Accessory
-        String[] accessories = {"None", "Hat", "Crown", "Headband", "Earrings", "Necklace", "Bow Tie", "Scarf", "Flower", "Mask"};
-        ArrayAdapter<String> accessoryAdapter = new ArrayAdapter<>(this,
-                android.R.layout.simple_spinner_item, accessories);
-        accessoryAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        spinnerAccessory.setAdapter(accessoryAdapter);
-
-        // Clothing Style
-        String[] clothingStyles = {"T-Shirt", "Hoodie", "Dress", "Suit", "Casual", "Traditional"};
-        ArrayAdapter<String> clothingStyleAdapter = new ArrayAdapter<>(this,
-                android.R.layout.simple_spinner_item, clothingStyles);
-        clothingStyleAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        spinnerClothingStyle.setAdapter(clothingStyleAdapter);
-
-        // Clothing Color
-        String[] clothingColors = {"Red", "Blue", "Green", "Yellow", "Purple", "Orange", "Pink", "Black", "White"};
-        ArrayAdapter<String> clothingColorAdapter = new ArrayAdapter<>(this,
-                android.R.layout.simple_spinner_item, clothingColors);
-        clothingColorAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        spinnerClothingColor.setAdapter(clothingColorAdapter);
-
-        // Facial Expression
-        String[] expressions = {"Neutral", "Happy", "Excited", "Cool", "Surprised", "Shy"};
-        ArrayAdapter<String> expressionAdapter = new ArrayAdapter<>(this,
-                android.R.layout.simple_spinner_item, expressions);
-        expressionAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        spinnerExpression.setAdapter(expressionAdapter);
+    private void updateUIFromConfig() {
+        // Notify all fragments to update their UI
+        // We can use the ViewPager2 to find fragments or just rely on them being updated when shown
+        // To be safe, we can try to find them if they're currently active
+        for (int i = 0; i < 6; i++) {
+            androidx.fragment.app.Fragment fragment = getSupportFragmentManager().findFragmentByTag("f" + i);
+            if (fragment instanceof AvatarSkinToneFragment) {
+                ((AvatarSkinToneFragment) fragment).updateUIFromConfig();
+            } else if (fragment instanceof AvatarHairFragment) {
+                ((AvatarHairFragment) fragment).updateUIFromConfig();
+            } else if (fragment instanceof AvatarEyesMouthFragment) {
+                ((AvatarEyesMouthFragment) fragment).updateUIFromConfig();
+            } else if (fragment instanceof AvatarAccessoryFragment) {
+                ((AvatarAccessoryFragment) fragment).updateUIFromConfig();
+            } else if (fragment instanceof AvatarClothingFragment) {
+                ((AvatarClothingFragment) fragment).updateUIFromConfig();
+            } else if (fragment instanceof AvatarExpressionFragment) {
+                ((AvatarExpressionFragment) fragment).updateUIFromConfig();
+            }
+        }
     }
 
     private void setupListeners() {
-        // Skin Tone
-        rgSkinTone.setOnCheckedChangeListener((group, checkedId) -> {
-            if (checkedId == R.id.rbSkinLight) {
-                config.skinTone = AvatarBuilder.SkinTone.LIGHT;
-                updateSkinToneCardSelection(cardSkinLight);
-            } else if (checkedId == R.id.rbSkinMedium) {
-                config.skinTone = AvatarBuilder.SkinTone.MEDIUM;
-                updateSkinToneCardSelection(cardSkinMedium);
-            } else if (checkedId == R.id.rbSkinTan) {
-                config.skinTone = AvatarBuilder.SkinTone.TAN;
-                updateSkinToneCardSelection(cardSkinTan);
-            } else if (checkedId == R.id.rbSkinBrown) {
-                config.skinTone = AvatarBuilder.SkinTone.BROWN;
-                updateSkinToneCardSelection(cardSkinBrown);
-            } else if (checkedId == R.id.rbSkinDark) {
-                config.skinTone = AvatarBuilder.SkinTone.DARK;
-                updateSkinToneCardSelection(cardSkinDark);
-            }
-            updateAvatarPreview();
-        });
-
-        // Hair Style
-        spinnerHairStyle.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                config.hairStyle = AvatarBuilder.HairStyle.values()[position];
-                updateAvatarPreview();
-            }
-
-            @Override
-            public void onNothingSelected(AdapterView<?> parent) {}
-        });
-
-        // Hair Color
-        spinnerHairColor.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                config.hairColor = AvatarBuilder.HairColor.values()[position];
-                updateAvatarPreview();
-            }
-
-            @Override
-            public void onNothingSelected(AdapterView<?> parent) {}
-        });
-
-        // Eye Style
-        spinnerEyeStyle.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                config.eyeStyle = AvatarBuilder.EyeStyle.values()[position];
-                updateAvatarPreview();
-            }
-
-            @Override
-            public void onNothingSelected(AdapterView<?> parent) {}
-        });
-
-        // Mouth Style
-        spinnerMouthStyle.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                config.mouthStyle = AvatarBuilder.MouthStyle.values()[position];
-                updateAvatarPreview();
-            }
-
-            @Override
-            public void onNothingSelected(AdapterView<?> parent) {}
-        });
-
-        // Accessory
-        spinnerAccessory.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                config.accessory = AvatarBuilder.Accessory.values()[position];
-                updateAvatarPreview();
-            }
-
-            @Override
-            public void onNothingSelected(AdapterView<?> parent) {}
-        });
-
-        // Clothing Style
-        spinnerClothingStyle.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                config.clothingStyle = AvatarBuilder.ClothingStyle.values()[position];
-                updateAvatarPreviewWithAnimation();
-            }
-
-            @Override
-            public void onNothingSelected(AdapterView<?> parent) {}
-        });
-
-        // Clothing Color
-        spinnerClothingColor.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                config.clothingColor = AvatarBuilder.ClothingColor.values()[position];
-                updateAvatarPreviewWithAnimation();
-            }
-
-            @Override
-            public void onNothingSelected(AdapterView<?> parent) {}
-        });
-
-        // Facial Expression
-        spinnerExpression.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                config.facialExpression = AvatarBuilder.FacialExpression.values()[position];
-                updateAvatarPreviewWithAnimation();
-            }
-
-            @Override
-            public void onNothingSelected(AdapterView<?> parent) {}
-        });
-
         // Random Avatar Button
         btnRandomAvatar.setOnClickListener(v -> {
             // Rotate and bounce animation
@@ -307,7 +153,7 @@ public class AvatarEditorActivity extends AppCompatActivity {
                 .setDuration(300)
                 .withEndAction(() -> {
                     config = AvatarBuilder.generateRandom();
-                    updateUIFromConfig();
+                    updateUIFromConfig(); 
                     builder.setConfig(config);
                     avatarPreview.setAvatarConfig(config);
 
@@ -335,19 +181,6 @@ public class AvatarEditorActivity extends AppCompatActivity {
         btnSaveAvatar.setOnClickListener(v -> saveAvatar());
     }
 
-    private void updateSkinToneCardSelection(MaterialCardView selectedCard) {
-        // Reset all cards
-        cardSkinLight.setStrokeWidth(0);
-        cardSkinMedium.setStrokeWidth(0);
-        cardSkinTan.setStrokeWidth(0);
-        cardSkinBrown.setStrokeWidth(0);
-        cardSkinDark.setStrokeWidth(0);
-
-        // Highlight selected card
-        selectedCard.setStrokeWidth(8);
-        selectedCard.setStrokeColor(ContextCompat.getColor(this, R.color.colorAccent));
-    }
-
     private void showBackgroundColorPicker() {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle("🎨 Choose Background Color");
@@ -363,62 +196,9 @@ public class AvatarEditorActivity extends AppCompatActivity {
         builder.show();
     }
 
-    private void updateUIFromConfig() {
-        // Update skin tone radio buttons
-        switch (config.skinTone) {
-            case LIGHT:
-                rgSkinTone.check(R.id.rbSkinLight);
-                break;
-            case MEDIUM:
-                rgSkinTone.check(R.id.rbSkinMedium);
-                break;
-            case TAN:
-                rgSkinTone.check(R.id.rbSkinTan);
-                break;
-            case BROWN:
-                rgSkinTone.check(R.id.rbSkinBrown);
-                break;
-            case DARK:
-                rgSkinTone.check(R.id.rbSkinDark);
-                break;
-        }
-
-        // Update spinners
-        spinnerHairStyle.setSelection(config.hairStyle.ordinal());
-        spinnerHairColor.setSelection(config.hairColor.ordinal());
-        spinnerEyeStyle.setSelection(config.eyeStyle.ordinal());
-        spinnerMouthStyle.setSelection(config.mouthStyle.ordinal());
-        spinnerAccessory.setSelection(config.accessory.ordinal());
-        spinnerClothingStyle.setSelection(config.clothingStyle.ordinal());
-        spinnerClothingColor.setSelection(config.clothingColor.ordinal());
-        spinnerExpression.setSelection(config.facialExpression.ordinal());
-    }
-
     private void updateAvatarPreview() {
         builder.setConfig(config);
         avatarPreview.setAvatarConfig(config);
-    }
-
-    private void updateAvatarPreviewWithAnimation() {
-        // Fade out
-        avatarPreview.animate()
-            .alpha(0f)
-            .setDuration(150)
-            .withEndAction(() -> {
-                // Update avatar
-                builder.setConfig(config);
-                avatarPreview.setAvatarConfig(config);
-
-                // Fade in with scale animation
-                avatarPreview.setScaleX(0.9f);
-                avatarPreview.setScaleY(0.9f);
-                avatarPreview.animate()
-                    .alpha(1f)
-                    .scaleX(1f)
-                    .scaleY(1f)
-                    .setDuration(200)
-                    .start();
-            }).start();
     }
 
     private void saveAvatar() {
@@ -451,5 +231,15 @@ public class AvatarEditorActivity extends AppCompatActivity {
             return true;
         }
         return super.onOptionsItemSelected(item);
+    }
+    
+    // Getter for the AvatarConfig
+    public AvatarBuilder.AvatarConfig getAvatarConfig() {
+        return config;
+    }
+
+    // Method to update the avatar preview from fragments
+    public void updateAvatar() {
+        updateAvatarPreview();
     }
 }

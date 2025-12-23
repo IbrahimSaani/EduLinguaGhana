@@ -1,0 +1,240 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="24dp">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="🎨 Skin Tone"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            android:fontFamily="@font/agbalumo"
+            android:textColor="@color/colorPrimary" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Tap to select your skin tone"
+            android:textSize="13sp"
+            android:textColor="@color/textColorSecondary"
+            android:layout_marginTop="4dp"
+            android:layout_marginBottom="12dp" />
+
+        <HorizontalScrollView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:scrollbars="none">
+
+            <RadioGroup
+                android:id="@+id/rgSkinTone"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center">
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:gravity="center"
+                    android:padding="8dp">
+
+                    <com.google.android.material.card.MaterialCardView
+                        android:id="@+id/cardSkinLight"
+                        android:layout_width="60dp"
+                        android:layout_height="60dp"
+                        android:clickable="true"
+                        android:focusable="true"
+                        app:cardCornerRadius="30dp"
+                        app:cardElevation="4dp"
+                        app:cardBackgroundColor="#FFE0BD"
+                        app:strokeWidth="0dp">
+
+                        <RadioButton
+                            android:id="@+id/rbSkinLight"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:button="@null"
+                            android:clickable="false"
+                            android:focusable="false"
+                            android:background="@android:color/transparent" />
+
+                    </com.google.android.material.card.MaterialCardView>
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Light"
+                        android:textSize="11sp"
+                        android:layout_marginTop="6dp" />
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:gravity="center"
+                    android:padding="8dp">
+
+                    <com.google.android.material.card.MaterialCardView
+                        android:id="@+id/cardSkinMedium"
+                        android:layout_width="60dp"
+                        android:layout_height="60dp"
+                        android:clickable="true"
+                        android:focusable="true"
+                        app:cardCornerRadius="30dp"
+                        app:cardElevation="4dp"
+                        app:cardBackgroundColor="#F1C27D"
+                        app:strokeWidth="0dp">
+
+                        <RadioButton
+                            android:id="@+id/rbSkinMedium"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:button="@null"
+                            android:checked="true"
+                            android:clickable="false"
+                            android:focusable="false"
+                            android:background="@android:color/transparent" />
+
+                    </com.google.android.material.card.MaterialCardView>
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Medium"
+                        android:textSize="11sp"
+                        android:layout_marginTop="6dp" />
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:gravity="center"
+                    android:padding="8dp">
+
+                    <com.google.android.material.card.MaterialCardView
+                        android:id="@+id/cardSkinTan"
+                        android:layout_width="60dp"
+                        android:layout_height="60dp"
+                        android:clickable="true"
+                        android:focusable="true"
+                        app:cardCornerRadius="30dp"
+                        app:cardElevation="4dp"
+                        app:cardBackgroundColor="#C68642"
+                        app:strokeWidth="0dp">
+
+                        <RadioButton
+                            android:id="@+id/rbSkinTan"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:button="@null"
+                            android:clickable="false"
+                            android:focusable="false"
+                            android:background="@android:color/transparent" />
+
+                    </com.google.android.material.card.MaterialCardView>
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Tan"
+                        android:textSize="11sp"
+                        android:layout_marginTop="6dp" />
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:gravity="center"
+                    android:padding="8dp">
+
+                    <com.google.android.material.card.MaterialCardView
+                        android:id="@+id/cardSkinBrown"
+                        android:layout_width="60dp"
+                        android:layout_height="60dp"
+                        android:clickable="true"
+                        android:focusable="true"
+                        app:cardCornerRadius="30dp"
+                        app:cardElevation="4dp"
+                        app:cardBackgroundColor="#8D5524"
+                        app:strokeWidth="0dp">
+
+                        <RadioButton
+                            android:id="@+id/rbSkinBrown"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:button="@null"
+                            android:clickable="false"
+                            android:focusable="false"
+                            android:background="@android:color/transparent" />
+
+                    </com.google.android.material.card.MaterialCardView>
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Brown"
+                        android:textSize="11sp"
+                        android:layout_marginTop="6dp" />
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:gravity="center"
+                    android:padding="8dp">
+
+                    <com.google.android.material.card.MaterialCardView
+                        android:id="@+id/cardSkinDark"
+                        android:layout_width="60dp"
+                        android:layout_height="60dp"
+                        android:clickable="true"
+                        android:focusable="true"
+                        app:cardCornerRadius="30dp"
+                        app:cardElevation="4dp"
+                        app:cardBackgroundColor="#5D4037"
+                        app:strokeWidth="0dp">
+
+                        <RadioButton
+                            android:id="@+id/rbSkinDark"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:button="@null"
+                            android:clickable="false"
+                            android:focusable="false"
+                            android:background="@android:color/transparent" />
+
+                    </com.google.android.material.card.MaterialCardView>
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Dark"
+                        android:textSize="11sp"
+                        android:layout_marginTop="6dp" />
+
+                </LinearLayout>
+
+            </RadioGroup>
+
+        </HorizontalScrollView>
+
+    </LinearLayout>
+
+</androidx.core.widget.NestedScrollView>
