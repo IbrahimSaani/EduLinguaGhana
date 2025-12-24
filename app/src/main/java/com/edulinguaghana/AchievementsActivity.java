@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.LinearLayout;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -23,6 +24,8 @@ public class AchievementsActivity extends AppCompatActivity {
     private LinearLayout loginRequiredLayout;
     private TextView tvUnlockedCount;
     private TextView tvTotalCount;
+    private TextView tvProgressPercent;
+    private ProgressBar overallProgressBar;
     private OfflineManager offlineManager;
     private AchievementManager achievementManager;
 
@@ -44,6 +47,8 @@ public class AchievementsActivity extends AppCompatActivity {
         loginRequiredLayout = findViewById(R.id.loginRequiredLayout);
         tvUnlockedCount = findViewById(R.id.tvUnlockedCount);
         tvTotalCount = findViewById(R.id.tvTotalCount);
+        tvProgressPercent = findViewById(R.id.tvProgressPercent);
+        overallProgressBar = findViewById(R.id.overallProgressBar);
 
         // Initialize managers
         offlineManager = new OfflineManager(this);
@@ -106,6 +111,17 @@ public class AchievementsActivity extends AppCompatActivity {
         }
         if (tvTotalCount != null) {
             tvTotalCount.setText(String.valueOf(totalCount));
+        }
+
+        // Update Progress Bar
+        if (totalCount > 0) {
+            int percentage = (unlockedCount * 100) / totalCount;
+            if (overallProgressBar != null) {
+                overallProgressBar.setProgress(percentage);
+            }
+            if (tvProgressPercent != null) {
+                tvProgressPercent.setText(percentage + "%");
+            }
         }
 
         if (achievements.isEmpty()) {

@@ -32,6 +32,24 @@ public class AchievementManager {
         if (json != null) {
             Type type = new TypeToken<List<Achievement>>() {}.getType();
             achievements = gson.fromJson(json, type);
+
+            // Update icons for existing achievements to use new professional icons
+            boolean updated = false;
+            List<Achievement> defaults = createDefaultAchievements();
+            for (Achievement a : achievements) {
+                for (Achievement def : defaults) {
+                    if (def.getId().equals(a.getId())) {
+                        if (a.getIconName() == null || !a.getIconName().equals(def.getIconName())) {
+                            a.setIconName(def.getIconName());
+                            updated = true;
+                        }
+                        break;
+                    }
+                }
+            }
+            if (updated) {
+                saveAchievements();
+            }
         } else {
             // Create default achievements
             achievements = createDefaultAchievements();
@@ -43,32 +61,32 @@ public class AchievementManager {
         List<Achievement> list = new ArrayList<>();
 
         // Quiz Count Achievements
-        list.add(new Achievement("first_quiz", "First Steps", "Complete your first quiz", "🎯", Achievement.AchievementType.QUIZ_COUNT, 1));
-        list.add(new Achievement("quiz_5", "Getting Started", "Complete 5 quizzes", "⭐", Achievement.AchievementType.QUIZ_COUNT, 5));
-        list.add(new Achievement("quiz_10", "Dedicated Learner", "Complete 10 quizzes", "🌟", Achievement.AchievementType.QUIZ_COUNT, 10));
-        list.add(new Achievement("quiz_25", "Quarter Century", "Complete 25 quizzes", "🏆", Achievement.AchievementType.QUIZ_COUNT, 25));
-        list.add(new Achievement("quiz_50", "Half Century", "Complete 50 quizzes", "🎖️", Achievement.AchievementType.QUIZ_COUNT, 50));
-        list.add(new Achievement("quiz_100", "Century Club", "Complete 100 quizzes", "👑", Achievement.AchievementType.QUIZ_COUNT, 100));
+        list.add(new Achievement("first_quiz", "First Steps", "Complete your first quiz", "🎯", "ic_achievement_star_bronze", Achievement.AchievementType.QUIZ_COUNT, 1));
+        list.add(new Achievement("quiz_5", "Getting Started", "Complete 5 quizzes", "⭐", "ic_achievement_book", Achievement.AchievementType.QUIZ_COUNT, 5));
+        list.add(new Achievement("quiz_10", "Dedicated Learner", "Complete 10 quizzes", "🌟", "ic_achievement_star_silver", Achievement.AchievementType.QUIZ_COUNT, 10));
+        list.add(new Achievement("quiz_25", "Quarter Century", "Complete 25 quizzes", "🏆", "ic_achievement_trophy", Achievement.AchievementType.QUIZ_COUNT, 25));
+        list.add(new Achievement("quiz_50", "Half Century", "Complete 50 quizzes", "🎖️", "ic_achievement_medal", Achievement.AchievementType.QUIZ_COUNT, 50));
+        list.add(new Achievement("quiz_100", "Century Club", "Complete 100 quizzes", "👑", "ic_achievement_crown", Achievement.AchievementType.QUIZ_COUNT, 100));
 
         // High Score Achievements
-        list.add(new Achievement("score_50", "Half Way There", "Score 50 or more points", "💪", Achievement.AchievementType.HIGH_SCORE, 50));
-        list.add(new Achievement("score_75", "Outstanding", "Score 75 or more points", "⚡", Achievement.AchievementType.HIGH_SCORE, 75));
-        list.add(new Achievement("score_90", "Almost Perfect", "Score 90 or more points", "💎", Achievement.AchievementType.HIGH_SCORE, 90));
+        list.add(new Achievement("score_50", "Half Way There", "Score 50 or more points", "💪", "ic_achievement_bolt_bronze", Achievement.AchievementType.HIGH_SCORE, 50));
+        list.add(new Achievement("score_75", "Outstanding", "Score 75 or more points", "⚡", "ic_achievement_bolt_silver", Achievement.AchievementType.HIGH_SCORE, 75));
+        list.add(new Achievement("score_90", "Almost Perfect", "Score 90 or more points", "💎", "ic_achievement_diamond", Achievement.AchievementType.HIGH_SCORE, 90));
 
         // Perfect Score Achievements
-        list.add(new Achievement("perfect_1", "Perfectionist", "Get your first perfect score", "✨", Achievement.AchievementType.PERFECT_SCORE, 1));
-        list.add(new Achievement("perfect_5", "Master", "Get 5 perfect scores", "🏅", Achievement.AchievementType.PERFECT_SCORE, 5));
+        list.add(new Achievement("perfect_1", "Perfectionist", "Get your first perfect score", "✨", "ic_achievement_medal_silver", Achievement.AchievementType.PERFECT_SCORE, 1));
+        list.add(new Achievement("perfect_5", "Master", "Get 5 perfect scores", "🏅", "ic_achievement_medal", Achievement.AchievementType.PERFECT_SCORE, 5));
 
         // Streak Achievements
-        list.add(new Achievement("streak_3", "Consistent", "Maintain a 3-day streak", "🔥", Achievement.AchievementType.STREAK, 3));
-        list.add(new Achievement("streak_7", "Week Warrior", "Maintain a 7-day streak", "🔥🔥", Achievement.AchievementType.STREAK, 7));
-        list.add(new Achievement("streak_14", "Two Week Hero", "Maintain a 14-day streak", "🔥🔥🔥", Achievement.AchievementType.STREAK, 14));
-        list.add(new Achievement("streak_30", "Month Master", "Maintain a 30-day streak", "🏆🔥", Achievement.AchievementType.STREAK, 30));
+        list.add(new Achievement("streak_3", "Consistent", "Maintain a 3-day streak", "🔥", "ic_achievement_fire_bronze", Achievement.AchievementType.STREAK, 3));
+        list.add(new Achievement("streak_7", "Week Warrior", "Maintain a 7-day streak", "🔥🔥", "ic_achievement_fire_silver", Achievement.AchievementType.STREAK, 7));
+        list.add(new Achievement("streak_14", "Two Week Hero", "Maintain a 14-day streak", "🔥🔥🔥", "ic_achievement_fire", Achievement.AchievementType.STREAK, 14));
+        list.add(new Achievement("streak_30", "Month Master", "Maintain a 30-day streak", "🏆🔥", "ic_achievement_shield", Achievement.AchievementType.STREAK, 30));
 
         // Accuracy Achievements
-        list.add(new Achievement("accuracy_75", "Accurate", "Reach 75% accuracy", "🎯", Achievement.AchievementType.ACCURACY, 75));
-        list.add(new Achievement("accuracy_85", "Sharpshooter", "Reach 85% accuracy", "🎯🎯", Achievement.AchievementType.ACCURACY, 85));
-        list.add(new Achievement("accuracy_95", "Sniper", "Reach 95% accuracy", "🎯🎯🎯", Achievement.AchievementType.ACCURACY, 95));
+        list.add(new Achievement("accuracy_75", "Accurate", "Reach 75% accuracy", "🎯", "ic_achievement_target_bronze", Achievement.AchievementType.ACCURACY, 75));
+        list.add(new Achievement("accuracy_85", "Sharpshooter", "Reach 85% accuracy", "🎯🎯", "ic_achievement_target_silver", Achievement.AchievementType.ACCURACY, 85));
+        list.add(new Achievement("accuracy_95", "Sniper", "Reach 95% accuracy", "🎯🎯🎯", "ic_achievement_target", Achievement.AchievementType.ACCURACY, 95));
 
         return list;
     }

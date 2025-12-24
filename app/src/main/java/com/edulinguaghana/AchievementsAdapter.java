@@ -4,6 +4,7 @@ import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -39,7 +40,24 @@ public class AchievementsAdapter extends RecyclerView.Adapter<AchievementsAdapte
     public void onBindViewHolder(@NonNull AchievementViewHolder holder, int position) {
         Achievement achievement = achievements.get(position);
 
-        holder.tvEmoji.setText(achievement.getEmoji());
+        // Set Icon
+        if (achievement.getIconName() != null) {
+            int resId = context.getResources().getIdentifier(achievement.getIconName(), "drawable", context.getPackageName());
+            if (resId != 0) {
+                holder.ivBadge.setImageResource(resId);
+                holder.ivBadge.setVisibility(View.VISIBLE);
+                holder.tvEmoji.setVisibility(View.GONE);
+            } else {
+                holder.tvEmoji.setText(achievement.getEmoji());
+                holder.tvEmoji.setVisibility(View.VISIBLE);
+                holder.ivBadge.setVisibility(View.GONE);
+            }
+        } else {
+            holder.tvEmoji.setText(achievement.getEmoji());
+            holder.tvEmoji.setVisibility(View.VISIBLE);
+            holder.ivBadge.setVisibility(View.GONE);
+        }
+
         holder.tvTitle.setText(achievement.getTitle());
         holder.tvDescription.setText(achievement.getDescription());
 
@@ -47,6 +65,7 @@ public class AchievementsAdapter extends RecyclerView.Adapter<AchievementsAdapte
             // Unlocked state
             holder.cardView.setCardBackgroundColor(ContextCompat.getColor(context, R.color.notification_achievement_bg));
             holder.cardView.setAlpha(1.0f);
+            holder.ivBadge.setAlpha(1.0f);
             holder.tvEmoji.setAlpha(1.0f);
             holder.tvTitle.setAlpha(1.0f);
             holder.tvDescription.setAlpha(1.0f);
@@ -62,6 +81,7 @@ public class AchievementsAdapter extends RecyclerView.Adapter<AchievementsAdapte
             // Locked state
             holder.cardView.setCardBackgroundColor(ContextCompat.getColor(context, android.R.color.darker_gray));
             holder.cardView.setAlpha(0.5f);
+            holder.ivBadge.setAlpha(0.3f);
             holder.tvEmoji.setAlpha(0.3f);
             holder.tvTitle.setAlpha(0.6f);
             holder.tvDescription.setAlpha(0.6f);
@@ -76,6 +96,7 @@ public class AchievementsAdapter extends RecyclerView.Adapter<AchievementsAdapte
 
     static class AchievementViewHolder extends RecyclerView.ViewHolder {
         MaterialCardView cardView;
+        ImageView ivBadge;
         TextView tvEmoji;
         TextView tvTitle;
         TextView tvDescription;
@@ -84,6 +105,7 @@ public class AchievementsAdapter extends RecyclerView.Adapter<AchievementsAdapte
         public AchievementViewHolder(@NonNull View itemView) {
             super(itemView);
             cardView = (MaterialCardView) itemView;
+            ivBadge = itemView.findViewById(R.id.ivBadge);
             tvEmoji = itemView.findViewById(R.id.tvEmoji);
             tvTitle = itemView.findViewById(R.id.tvTitle);
             tvDescription = itemView.findViewById(R.id.tvDescription);

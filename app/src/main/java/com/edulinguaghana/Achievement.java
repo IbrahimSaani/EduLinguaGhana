@@ -5,6 +5,7 @@ public class Achievement {
     private String title;
     private String description;
     private String emoji;
+    private String iconName;
     private AchievementType type;
     private int requiredValue;
     private boolean isUnlocked;
@@ -23,16 +24,23 @@ public class Achievement {
         // Required for Firebase
     }
 
-    public Achievement(String id, String title, String description, String emoji,
+    public Achievement(String id, String title, String description, String emoji, String iconName,
                       AchievementType type, int requiredValue) {
         this.id = id;
         this.title = title;
         this.description = description;
         this.emoji = emoji;
+        this.iconName = iconName;
         this.type = type;
         this.requiredValue = requiredValue;
         this.isUnlocked = false;
         this.unlockedTimestamp = 0;
+    }
+
+    // Keep old constructor for compatibility if needed, or update it
+    public Achievement(String id, String title, String description, String emoji,
+                      AchievementType type, int requiredValue) {
+        this(id, title, description, emoji, null, type, requiredValue);
     }
 
     // Getters
@@ -40,6 +48,7 @@ public class Achievement {
     public String getTitle() { return title; }
     public String getDescription() { return description; }
     public String getEmoji() { return emoji; }
+    public String getIconName() { return iconName; }
     public AchievementType getType() { return type; }
     public int getRequiredValue() { return requiredValue; }
     public boolean isUnlocked() { return isUnlocked; }
@@ -50,6 +59,7 @@ public class Achievement {
     public void setTitle(String title) { this.title = title; }
     public void setDescription(String description) { this.description = description; }
     public void setEmoji(String emoji) { this.emoji = emoji; }
+    public void setIconName(String iconName) { this.iconName = iconName; }
     public void setType(AchievementType type) { this.type = type; }
     public void setRequiredValue(int requiredValue) { this.requiredValue = requiredValue; }
     public void setUnlocked(boolean unlocked) { isUnlocked = unlocked; }
