@@ -39,7 +39,7 @@ public class SignUpActivity extends AppCompatActivity {
 
     private TextInputEditText etName, etEmail, etPassword, etConfirmPassword;
     private MaterialButton btnSignUp, btnGoogleSignUp, btnFacebookSignUp;
-    private TextView tvLogin;
+    private TextView tvLogin, tvSkip;
 
     private FirebaseAuth mAuth;
     private GoogleSignInClient mGoogleSignInClient;
@@ -94,6 +94,7 @@ public class SignUpActivity extends AppCompatActivity {
         btnGoogleSignUp = findViewById(R.id.btnGoogleSignUp);
         btnFacebookSignUp = findViewById(R.id.btnFacebookSignUp);
         tvLogin = findViewById(R.id.tvLogin);
+        tvSkip = findViewById(R.id.tvSkip);
     }
 
     private void setupListeners() {
@@ -105,6 +106,10 @@ public class SignUpActivity extends AppCompatActivity {
             startActivity(new Intent(SignUpActivity.this, LoginActivity.class));
             finish();
         });
+
+        if (tvSkip != null) {
+            tvSkip.setOnClickListener(v -> navigateToMain());
+        }
     }
 
     private void signUpWithEmail() {
@@ -288,4 +293,3 @@ public class SignUpActivity extends AppCompatActivity {
         finish();
     }
 }
-

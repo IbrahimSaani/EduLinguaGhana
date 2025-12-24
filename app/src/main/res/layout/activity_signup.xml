@@ -16,8 +16,8 @@
         <!-- App Icon -->
         <ImageView
             android:id="@+id/ivLogo"
-            android:layout_width="120dp"
-            android:layout_height="120dp"
+            android:layout_width="140dp"
+            android:layout_height="140dp"
             android:src="@drawable/ic_graduation_cap"
             android:contentDescription="App Logo"
             android:scaleType="centerInside"
@@ -311,7 +311,6 @@
             android:layout_width="0dp"
             android:layout_height="58dp"
             android:layout_marginTop="16dp"
-            android:layout_marginBottom="32dp"
             android:text="Sign up with Facebook"
             android:textSize="16sp"
             android:textColor="@color/textColorPrimary"
@@ -327,8 +326,47 @@
             app:elevation="2dp"
             app:layout_constraintTop_toBottomOf="@id/btnGoogleSignUp"
             app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent" />
+
+        <!-- Skip Button -->
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="32dp"
+            android:layout_marginBottom="24dp"
+            android:orientation="horizontal"
+            android:gravity="center"
+            app:layout_constraintTop_toBottomOf="@id/btnFacebookSignUp"
+            app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintBottom_toBottomOf="parent" />
+            app:layout_constraintBottom_toBottomOf="parent">
+
+            <ImageView
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:src="@android:drawable/ic_media_play"
+                app:tint="@color/textColorSecondary"
+                android:layout_marginEnd="8dp"
+                android:contentDescription="Skip icon" />
+
+            <TextView
+                android:id="@+id/tvSkip"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Skip for now"
+                android:textColor="@color/textColorSecondary"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                android:clickable="true"
+                android:focusable="true"
+                android:paddingStart="12dp"
+                android:paddingEnd="12dp"
+                android:paddingTop="12dp"
+                android:paddingBottom="12dp"
+                android:minHeight="48dp"
+                android:background="?attr/selectableItemBackground" />
+
+        </LinearLayout>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
