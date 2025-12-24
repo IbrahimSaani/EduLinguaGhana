@@ -1,6 +1,7 @@
 package com.edulinguaghana;
 
 import android.content.Context;
+import android.graphics.Color;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -36,22 +37,34 @@ public class LeaderboardAdapter extends RecyclerView.Adapter<LeaderboardAdapter.
         LeaderboardEntry entry = leaderboardList.get(position);
 
         int rank = entry.getRank();
-        holder.tvRank.setText(String.valueOf(rank));
         holder.tvUserName.setText(entry.getUserName());
         holder.tvScore.setText(String.valueOf(entry.getScore()));
 
         // Special styling for top 3
         if (rank == 1) {
             holder.tvRank.setText("🥇");
+            holder.rankBackground.setVisibility(View.GONE);
             holder.cardView.setCardBackgroundColor(ContextCompat.getColor(context, R.color.notification_achievement_bg));
+            holder.cardView.setStrokeWidth(4);
+            holder.cardView.setStrokeColor(ContextCompat.getColor(context, R.color.colorAccent));
         } else if (rank == 2) {
             holder.tvRank.setText("🥈");
+            holder.rankBackground.setVisibility(View.GONE);
             holder.cardView.setCardBackgroundColor(ContextCompat.getColor(context, R.color.notification_milestone_bg));
+            holder.cardView.setStrokeWidth(2);
+            holder.cardView.setStrokeColor(ContextCompat.getColor(context, R.color.colorPrimary));
         } else if (rank == 3) {
             holder.tvRank.setText("🥉");
+            holder.rankBackground.setVisibility(View.GONE);
             holder.cardView.setCardBackgroundColor(ContextCompat.getColor(context, R.color.notification_motivational_bg));
+            holder.cardView.setStrokeWidth(2);
+            holder.cardView.setStrokeColor(ContextCompat.getColor(context, R.color.colorPrimary));
         } else {
+            holder.tvRank.setText(String.valueOf(rank));
+            holder.rankBackground.setVisibility(View.VISIBLE);
             holder.cardView.setCardBackgroundColor(ContextCompat.getColor(context, android.R.color.white));
+            holder.cardView.setStrokeWidth(2);
+            holder.cardView.setStrokeColor(Color.parseColor("#EEEEEE"));
         }
     }
 
@@ -65,6 +78,7 @@ public class LeaderboardAdapter extends RecyclerView.Adapter<LeaderboardAdapter.
         TextView tvRank;
         TextView tvUserName;
         TextView tvScore;
+        View rankBackground;
 
         public LeaderboardViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -72,6 +86,7 @@ public class LeaderboardAdapter extends RecyclerView.Adapter<LeaderboardAdapter.
             tvRank = itemView.findViewById(R.id.tvRank);
             tvUserName = itemView.findViewById(R.id.tvUserName);
             tvScore = itemView.findViewById(R.id.tvScore);
+            rankBackground = itemView.findViewById(R.id.rankBackground);
         }
     }
 }

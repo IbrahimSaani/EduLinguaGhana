@@ -9,14 +9,15 @@
     <com.google.android.material.appbar.AppBarLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:elevation="4dp"
-        android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar">
+        android:elevation="0dp"
+        android:background="@android:color/transparent"
+        android:theme="@style/ThemeOverlay.AppCompat.Light">
 
         <androidx.appcompat.widget.Toolbar
             android:id="@+id/toolbar"
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
-            android:background="?attr/colorPrimary"
+            android:background="@android:color/transparent"
             app:popupTheme="@style/ThemeOverlay.AppCompat.Light">
 
             <LinearLayout
@@ -26,22 +27,22 @@
                 android:gravity="center_vertical">
 
                 <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="🏆"
-                    android:textSize="24sp"
-                    android:layout_marginEnd="8dp" />
-
-                <TextView
                     android:id="@+id/toolbarTitle"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:text="Leaderboard"
-                    android:textSize="20sp"
-                    android:textColor="@color/white"
+                    android:textSize="22sp"
+                    android:textColor="@color/colorPrimary"
                     android:fontFamily="@font/agbalumo"
                     android:textStyle="bold" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="🏆"
+                    android:textSize="24sp"
+                    android:layout_marginEnd="16dp" />
 
             </LinearLayout>
 
@@ -150,34 +151,28 @@
 
         </LinearLayout>
 
-        <!-- Loading -->
-        <ProgressBar
-            android:id="@+id/progressBar"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:visibility="gone" />
-
         <!-- Main Content -->
         <LinearLayout
+            android:id="@+id/mainContentLayout"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:orientation="vertical">
 
-            <!-- Your Rank Card -->
+            <!-- Hero Section -->
             <com.google.android.material.card.MaterialCardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_margin="16dp"
-                app:cardCornerRadius="16dp"
-                app:cardElevation="4dp"
-                app:cardBackgroundColor="#E8EAF6">
+                app:cardCornerRadius="24dp"
+                app:cardElevation="8dp"
+                app:strokeWidth="0dp">
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:background="@drawable/bg_leaderboard_rank_card"
                     android:orientation="horizontal"
-                    android:padding="16dp"
+                    android:padding="24dp"
                     android:gravity="center_vertical">
 
                     <LinearLayout
@@ -189,9 +184,10 @@
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Your Rank"
+                            android:text="YOUR RANK"
                             android:textSize="12sp"
-                            android:textColor="@color/textColorSecondary"
+                            android:textColor="#BDBDBD"
+                            android:letterSpacing="0.1"
                             android:textStyle="bold" />
 
                         <TextView
@@ -200,20 +196,20 @@
                             android:layout_height="wrap_content"
                             android:layout_marginTop="4dp"
                             android:text="#--"
-                            android:textSize="24sp"
+                            android:textSize="36sp"
                             android:textStyle="bold"
-                            android:textColor="@color/colorPrimary"
+                            android:textColor="@color/white"
                             android:fontFamily="@font/agbalumo" />
 
                     </LinearLayout>
 
                     <View
                         android:layout_width="1dp"
-                        android:layout_height="40dp"
-                        android:background="@color/textColorSecondary"
-                        android:alpha="0.3"
-                        android:layout_marginStart="16dp"
-                        android:layout_marginEnd="16dp" />
+                        android:layout_height="60dp"
+                        android:background="@color/white"
+                        android:alpha="0.2"
+                        android:layout_marginStart="24dp"
+                        android:layout_marginEnd="24dp" />
 
                     <LinearLayout
                         android:layout_width="0dp"
@@ -224,9 +220,10 @@
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Your Score"
+                            android:text="TOTAL SCORE"
                             android:textSize="12sp"
-                            android:textColor="@color/textColorSecondary"
+                            android:textColor="#BDBDBD"
+                            android:letterSpacing="0.1"
                             android:textStyle="bold" />
 
                         <TextView
@@ -235,7 +232,7 @@
                             android:layout_height="wrap_content"
                             android:layout_marginTop="4dp"
                             android:text="0"
-                            android:textSize="24sp"
+                            android:textSize="36sp"
                             android:textStyle="bold"
                             android:textColor="@color/colorAccent"
                             android:fontFamily="@font/agbalumo" />
@@ -246,18 +243,37 @@
 
             </com.google.android.material.card.MaterialCardView>
 
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="24dp"
+                android:layout_marginBottom="12dp"
+                android:text="Global Rankings"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                android:textColor="@color/textColorPrimary"
+                android:fontFamily="@font/agbalumo" />
+
             <!-- Leaderboard List -->
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/leaderboardRecyclerView"
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
                 android:layout_weight="1"
-                android:paddingStart="16dp"
-                android:paddingEnd="16dp"
+                android:paddingStart="8dp"
+                android:paddingEnd="8dp"
                 android:paddingBottom="16dp"
                 android:clipToPadding="false" />
 
         </LinearLayout>
+
+        <!-- Loading -->
+        <ProgressBar
+            android:id="@+id/progressBar"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:visibility="gone" />
 
     </FrameLayout>
 

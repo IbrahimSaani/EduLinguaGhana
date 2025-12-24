@@ -34,6 +34,7 @@ public class LeaderboardActivity extends AppCompatActivity {
     private RecyclerView leaderboardRecyclerView;
     private LinearLayout emptyStateLayout;
     private LinearLayout loginRequiredLayout;
+    private LinearLayout mainContentLayout;
     private ProgressBar progressBar;
     private TextView tvYourRank;
     private TextView tvYourScore;
@@ -60,6 +61,7 @@ public class LeaderboardActivity extends AppCompatActivity {
         leaderboardRecyclerView = findViewById(R.id.leaderboardRecyclerView);
         emptyStateLayout = findViewById(R.id.emptyStateLayout);
         loginRequiredLayout = findViewById(R.id.loginRequiredLayout);
+        mainContentLayout = findViewById(R.id.mainContentLayout);
         progressBar = findViewById(R.id.progressBar);
         tvYourRank = findViewById(R.id.tvYourRank);
         tvYourScore = findViewById(R.id.tvYourScore);
@@ -90,7 +92,7 @@ public class LeaderboardActivity extends AppCompatActivity {
     }
 
     private void showLoginRequired() {
-        leaderboardRecyclerView.setVisibility(View.GONE);
+        mainContentLayout.setVisibility(View.GONE);
         emptyStateLayout.setVisibility(View.GONE);
         progressBar.setVisibility(View.GONE);
         loginRequiredLayout.setVisibility(View.VISIBLE);
@@ -120,6 +122,7 @@ public class LeaderboardActivity extends AppCompatActivity {
 
     private void loadLeaderboard() {
         progressBar.setVisibility(View.VISIBLE);
+        mainContentLayout.setVisibility(View.GONE);
 
         // Query top 100 scores ordered by score
         Query leaderboardQuery = leaderboardRef.orderByChild("score").limitToLast(100);
@@ -133,9 +136,9 @@ public class LeaderboardActivity extends AppCompatActivity {
                     // No data yet - show empty state
                     progressBar.setVisibility(View.GONE);
                     emptyStateLayout.setVisibility(View.VISIBLE);
-                    leaderboardRecyclerView.setVisibility(View.GONE);
-                    tvYourRank.setText("Your Rank: Not ranked yet");
-                    tvYourScore.setText("Your Score: Complete a quiz to rank!");
+                    mainContentLayout.setVisibility(View.GONE);
+                    tvYourRank.setText("#--");
+                    tvYourScore.setText("0");
                     return;
                 }
 
@@ -158,12 +161,12 @@ public class LeaderboardActivity extends AppCompatActivity {
 
                 if (leaderboardList.isEmpty()) {
                     emptyStateLayout.setVisibility(View.VISIBLE);
-                    leaderboardRecyclerView.setVisibility(View.GONE);
-                    tvYourRank.setText("Your Rank: Not ranked yet");
-                    tvYourScore.setText("Your Score: Complete a quiz to rank!");
+                    mainContentLayout.setVisibility(View.GONE);
+                    tvYourRank.setText("#--");
+                    tvYourScore.setText("0");
                 } else {
                     emptyStateLayout.setVisibility(View.GONE);
-                    leaderboardRecyclerView.setVisibility(View.VISIBLE);
+                    mainContentLayout.setVisibility(View.VISIBLE);
                     adapter.notifyDataSetChanged();
 
                     // Update user's rank and score
@@ -183,8 +186,8 @@ public class LeaderboardActivity extends AppCompatActivity {
 
     private void updateUserRank() {
         if (currentUser == null) {
-            tvYourRank.setText("Your Rank: Not logged in");
-            tvYourScore.setText("Your Score: --");
+            tvYourRank.setText("#--");
+            tvYourScore.setText("0");
             return;
         }
 
@@ -202,11 +205,11 @@ public class LeaderboardActivity extends AppCompatActivity {
         }
 
         if (rank > 0) {
-            tvYourRank.setText("Your Rank: #" + rank);
-            tvYourScore.setText("Your Score: " + userScore);
+            tvYourRank.setText("#" + rank);
+            tvYourScore.setText(String.valueOf(userScore));
         } else {
-            tvYourRank.setText("Your Rank: Not ranked yet");
-            tvYourScore.setText("Your Score: Complete a quiz to rank!");
+            tvYourRank.setText("#--");
+            tvYourScore.setText("0");
         }
     }
 
