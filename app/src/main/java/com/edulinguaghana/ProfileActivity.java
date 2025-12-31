@@ -39,8 +39,19 @@ public class ProfileActivity extends AppCompatActivity {
         if (getSupportActionBar() != null) {
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
             getSupportActionBar().setDisplayShowTitleEnabled(false);
-            // Ensure back button is primary color
-            toolbar.getNavigationIcon().setTint(getResources().getColor(R.color.colorPrimary));
+            // Ensure back button is visible: tint with on-primary (use white from colors for contrast)
+            if (toolbar.getNavigationIcon() != null) {
+                toolbar.getNavigationIcon().setTint(ContextCompat.getColor(this, R.color.white));
+            }
+        }
+
+        // Settings button opens SettingsActivity
+        androidx.appcompat.widget.AppCompatImageButton settingsBtn = findViewById(R.id.btn_profile_settings);
+        if (settingsBtn != null) {
+            settingsBtn.setOnClickListener(v -> {
+                Intent intent = new Intent(ProfileActivity.this, SettingsActivity.class);
+                startActivity(intent);
+            });
         }
 
         initViews();
@@ -193,4 +204,3 @@ public class ProfileActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 }
-
