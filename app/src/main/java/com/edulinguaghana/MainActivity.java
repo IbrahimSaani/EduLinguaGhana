@@ -1157,8 +1157,8 @@ public class MainActivity extends AppCompatActivity {
             } else if (itemId == R.id.nav_profile) {
                 openProfileScreen();
                 return true;
-            } else if (itemId == R.id.nav_settings) {
-                Intent intent = new Intent(MainActivity.this, SettingsActivity.class);
+            } else if (itemId == R.id.nav_challenges) {
+                Intent intent = new Intent(MainActivity.this, ChallengesActivity.class);
                 startActivity(intent);
                 return true;
             } else if (itemId == R.id.nav_notifications) {

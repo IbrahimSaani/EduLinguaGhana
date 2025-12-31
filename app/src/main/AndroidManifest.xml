@@ -70,5 +70,7 @@
         <activity android:name=".AvatarEditorActivity" android:exported="false"/>
         <!--  AnimatedAvatarDemoActivity  -->
         <activity android:name=".AnimatedAvatarDemoActivity" android:exported="false"/>
+        <!--  ChallengesActivity  -->
+        <activity android:name=".ChallengesActivity" android:exported="false"/>
     </application>
 </manifest>
