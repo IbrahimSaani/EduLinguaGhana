@@ -38,6 +38,7 @@ public class LeaderboardActivity extends AppCompatActivity {
     private ProgressBar progressBar;
     private TextView tvYourRank;
     private TextView tvYourScore;
+    private androidx.swiperefreshlayout.widget.SwipeRefreshLayout swipeRefreshLayout;
 
     private OfflineManager offlineManager;
     private DatabaseReference leaderboardRef;
@@ -65,6 +66,7 @@ public class LeaderboardActivity extends AppCompatActivity {
         progressBar = findViewById(R.id.progressBar);
         tvYourRank = findViewById(R.id.tvYourRank);
         tvYourScore = findViewById(R.id.tvYourScore);
+        swipeRefreshLayout = findViewById(R.id.swipeRefreshLayout);
 
         // Initialize managers
         offlineManager = new OfflineManager(this);
@@ -86,6 +88,16 @@ public class LeaderboardActivity extends AppCompatActivity {
 
         // Setup RecyclerView
         setupRecyclerView();
+
+        // Setup Swipe to Refresh
+        if (swipeRefreshLayout != null) {
+            swipeRefreshLayout.setOnRefreshListener(() -> {
+                // When user pulls to refresh, reload leaderboard
+                loadLeaderboard();
+            });
+            // Use same color as accent for the refresh spinner
+            swipeRefreshLayout.setColorSchemeResources(R.color.colorAccent);
+        }
 
         // Load leaderboard
         loadLeaderboard();
@@ -135,6 +147,9 @@ public class LeaderboardActivity extends AppCompatActivity {
                 if (!snapshot.exists()) {
                     // No data yet - show empty state
                     progressBar.setVisibility(View.GONE);
+                    if (swipeRefreshLayout != null && swipeRefreshLayout.isRefreshing()) {
+                        swipeRefreshLayout.setRefreshing(false);
+                    }
                     emptyStateLayout.setVisibility(View.VISIBLE);
                     mainContentLayout.setVisibility(View.GONE);
                     tvYourRank.setText("#--");
@@ -158,6 +173,9 @@ public class LeaderboardActivity extends AppCompatActivity {
                 }
 
                 progressBar.setVisibility(View.GONE);
+                if (swipeRefreshLayout != null && swipeRefreshLayout.isRefreshing()) {
+                    swipeRefreshLayout.setRefreshing(false);
+                }
 
                 if (leaderboardList.isEmpty()) {
                     emptyStateLayout.setVisibility(View.VISIBLE);
@@ -177,6 +195,9 @@ public class LeaderboardActivity extends AppCompatActivity {
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
                 progressBar.setVisibility(View.GONE);
+                if (swipeRefreshLayout != null && swipeRefreshLayout.isRefreshing()) {
+                    swipeRefreshLayout.setRefreshing(false);
+                }
                 Toast.makeText(LeaderboardActivity.this,
                         "Failed to load leaderboard: " + error.getMessage(),
                         Toast.LENGTH_SHORT).show();
