@@ -536,6 +536,50 @@ public class QuizActivity extends AppCompatActivity {
             );
         }
 
+        // --- Social: post leaderboard and resolve challenges ---
+        try {
+            com.edulinguaghana.social.SocialRepository social = com.edulinguaghana.social.SocialProvider.get();
+            if (social != null) {
+                // Post to Firebase leaderboard (Realtime DB path "leaderboard")
+                com.edulinguaghana.LeaderboardEntry entry = new com.edulinguaghana.LeaderboardEntry();
+                String uid = com.google.firebase.auth.FirebaseAuth.getInstance().getCurrentUser() != null ? com.google.firebase.auth.FirebaseAuth.getInstance().getCurrentUser().getUid() : "anonymous";
+                entry.setUserId(uid);
+                entry.setUserName(uid); // ideally use displayName
+                entry.setScore(score);
+                entry.setTimestamp(System.currentTimeMillis());
+                // If the SocialRepository is a FirebaseSocialRepository it will push achievement shares and challenges.
+                // For leaderboard we still use the app's existing Firebase Database reference directly for compatibility:
+                com.google.firebase.database.FirebaseDatabase.getInstance().getReference("leaderboard").child(entry.getUserId()).setValue(entry);
+
+                // Resolve pending challenges for this user: fetch challenges where challengedId==uid
+                // FirebaseSocialRepository does not provide a synchronous get, so we update via DB query
+                com.google.firebase.database.DatabaseReference challengesRef = com.google.firebase.database.FirebaseDatabase.getInstance().getReference("challenges");
+                challengesRef.addListenerForSingleValueEvent(new com.google.firebase.database.ValueEventListener() {
+                    @Override
+                    public void onDataChange(com.google.firebase.database.DataSnapshot snapshot) {
+                        for (com.google.firebase.database.DataSnapshot child : snapshot.getChildren()) {
+                            com.edulinguaghana.social.Challenge c = child.getValue(com.edulinguaghana.social.Challenge.class);
+                            if (c != null && c.challengedId != null && c.challengedId.equals(uid) && (c.state == com.edulinguaghana.social.Challenge.State.PENDING || c.state == com.edulinguaghana.social.Challenge.State.ONGOING)) {
+                                // record result
+                                if (c.results == null) c.results = new java.util.HashMap<>();
+                                c.results.put(uid, score);
+                                // Mark completed if challenger also has a result (simple two-player model)
+                                if (c.results.containsKey(c.challengerId)) {
+                                    c.state = com.edulinguaghana.social.Challenge.State.COMPLETED;
+                                } else {
+                                    c.state = com.edulinguaghana.social.Challenge.State.ONGOING;
+                                }
+                                child.getRef().setValue(c);
+                            }
+                        }
+                    }
+
+                    @Override
+                    public void onCancelled(com.google.firebase.database.DatabaseError error) { }
+                });
+            }
+        } catch (Exception ignored) {}
+
         // Show end screen
         Animation fadeIn = AnimationUtils.loadAnimation(this, R.anim.fade_in);
         quizContentContainer.setVisibility(View.GONE);

@@ -3,6 +3,10 @@ package com.edulinguaghana;
 import android.content.Context;
 import android.content.SharedPreferences;
 
+import com.edulinguaghana.gamification.XPManager;
+import com.edulinguaghana.gamification.QuestManager;
+import com.edulinguaghana.gamification.BadgeManager;
+
 import java.util.Calendar;
 
 public class StreakManager {
@@ -75,6 +79,17 @@ public class StreakManager {
         editor.putInt(KEY_TOTAL_PRACTICE_DAYS, totalPracticeDays);
         editor.apply();
 
+        // --- Gamification: award XP and progress quests ---
+        try {
+            // award small xp for practicing
+            XPManager.awardXP(context, 10, "daily_practice");
+            QuestManager.progressQuest(context, "daily_practice", 1);
+            // unlock first practice badge if this is the first practice
+            if (totalPracticeDays == 1) {
+                BadgeManager.unlockBadge(context, "first_practice");
+            }
+        } catch (Exception ignored) { }
+
         // Send notification for streak milestones
         if (currentStreak % 7 == 0 && currentStreak > 0) {
             NotificationManager notificationManager = new NotificationManager(context);
@@ -145,4 +160,3 @@ public class StreakManager {
             .apply();
     }
 }
-

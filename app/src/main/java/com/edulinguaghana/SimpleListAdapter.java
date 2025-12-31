@@ -30,6 +30,13 @@ public class SimpleListAdapter extends RecyclerView.Adapter<SimpleListAdapter.Vi
         this.items = items;
     }
 
+    // Allow external updates to items safely
+    public void updateItem(int position, Item newItem) {
+        if (position < 0 || position >= items.size()) return;
+        items.set(position, newItem);
+        notifyItemChanged(position);
+    }
+
     @NonNull
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
@@ -62,4 +69,3 @@ public class SimpleListAdapter extends RecyclerView.Adapter<SimpleListAdapter.Vi
         }
     }
 }
-

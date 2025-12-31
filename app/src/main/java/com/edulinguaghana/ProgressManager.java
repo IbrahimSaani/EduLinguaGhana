@@ -4,6 +4,9 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.widget.Toast;
 
+import com.edulinguaghana.gamification.XPManager;
+import com.edulinguaghana.gamification.QuestManager;
+
 public class ProgressManager {
 
     private static final String PREF_NAME = "EduLinguaPrefs";
@@ -29,6 +32,14 @@ public class ProgressManager {
         editor.putInt(KEY_TOTAL_QUIZZES, totalQuizzes + 1);
         editor.putInt(KEY_TOTAL_CORRECT, totalCorrect + correctCount);
         editor.apply();
+
+        // --- Gamification: award XP and progress quests ---
+        try {
+            int xpAward = Math.max(5, correctCount * 2 + score / 5); // conservative formula
+            XPManager.awardXP(context, xpAward, "quiz_complete");
+            // progress the daily_quiz quest by 1
+            QuestManager.progressQuest(context, "daily_quiz", 1);
+        } catch (Exception ignored) { }
     }
 
     // Get total quizzes taken

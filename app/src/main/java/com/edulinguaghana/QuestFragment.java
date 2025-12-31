@@ -10,6 +10,9 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.edulinguaghana.gamification.Quest;
+import com.edulinguaghana.gamification.QuestManager;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -23,13 +26,25 @@ public class QuestFragment extends Fragment {
         RecyclerView rv = root.findViewById(R.id.rv_daily_quests);
         rv.setLayoutManager(new LinearLayoutManager(getContext()));
 
-        List<SimpleListAdapter.Item> items = new ArrayList<>();
-        items.add(new SimpleListAdapter.Item(R.drawable.ic_achievement_bolt, "Daily Practice", "Complete 10 questions"));
-        items.add(new SimpleListAdapter.Item(R.drawable.ic_achievement_book, "Word Builder", "Learn 5 new words"));
-        items.add(new SimpleListAdapter.Item(R.drawable.ic_achievement_target, "Accuracy Boost", "Score 80% or higher"));
+        final List<SimpleListAdapter.Item> items = new ArrayList<>();
+        final List<Quest> quests = QuestManager.getDailyQuests(getContext());
+        for (Quest q : quests) {
+            String subtitle = q.description + (q.completed ? " (Completed)" : "");
+            items.add(new SimpleListAdapter.Item(R.drawable.ic_achievement_bolt, q.title, subtitle));
+        }
 
-        SimpleListAdapter adapter = new SimpleListAdapter(items);
+        final SimpleListAdapter adapter = new SimpleListAdapter(items);
         rv.setAdapter(adapter);
+
+        // Allow tapping items to complete them
+        rv.addOnItemTouchListener(new RecyclerItemClickListener(getContext(), rv, (view, position) -> {
+            Quest q = quests.get(position);
+            if (!q.completed) {
+                QuestManager.completeQuest(getContext(), q.id);
+                // update subtitle
+                adapter.updateItem(position, new SimpleListAdapter.Item(R.drawable.ic_achievement_bolt, q.title, q.description + " (Completed)"));
+            }
+        }));
 
         return root;
     }
