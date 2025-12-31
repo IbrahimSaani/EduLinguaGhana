@@ -16,6 +16,7 @@ import androidx.appcompat.widget.Toolbar;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
@@ -133,8 +134,15 @@ public class LeaderboardActivity extends AppCompatActivity {
     }
 
     private void loadLeaderboard() {
-        progressBar.setVisibility(View.VISIBLE);
-        mainContentLayout.setVisibility(View.GONE);
+        // Detect whether this load was triggered by swipe-to-refresh so we can show a small indicator
+        final boolean swipeTriggered = (swipeRefreshLayout != null && swipeRefreshLayout.isRefreshing());
+
+        // If this was not triggered by swipe-refresh, show the central progress indicator;
+        // otherwise keep the current content visible and let the swipe spinner show progress.
+        if (!swipeTriggered) {
+            progressBar.setVisibility(View.VISIBLE);
+            mainContentLayout.setVisibility(View.GONE);
+        }
 
         // Query top 100 scores ordered by score
         Query leaderboardQuery = leaderboardRef.orderByChild("score").limitToLast(100);
@@ -154,6 +162,9 @@ public class LeaderboardActivity extends AppCompatActivity {
                     mainContentLayout.setVisibility(View.GONE);
                     tvYourRank.setText("#--");
                     tvYourScore.setText("0");
+                    if (swipeTriggered) {
+                        Snackbar.make(findViewById(android.R.id.content), "No rankings yet", Snackbar.LENGTH_SHORT).show();
+                    }
                     return;
                 }
 
@@ -182,6 +193,9 @@ public class LeaderboardActivity extends AppCompatActivity {
                     mainContentLayout.setVisibility(View.GONE);
                     tvYourRank.setText("#--");
                     tvYourScore.setText("0");
+                    if (swipeTriggered) {
+                        Snackbar.make(findViewById(android.R.id.content), "No rankings yet", Snackbar.LENGTH_SHORT).show();
+                    }
                 } else {
                     emptyStateLayout.setVisibility(View.GONE);
                     mainContentLayout.setVisibility(View.VISIBLE);
@@ -189,6 +203,10 @@ public class LeaderboardActivity extends AppCompatActivity {
 
                     // Update user's rank and score
                     updateUserRank();
+
+                    if (swipeTriggered) {
+                        Snackbar.make(findViewById(android.R.id.content), "Leaderboard updated", Snackbar.LENGTH_SHORT).show();
+                    }
                 }
             }
 
@@ -197,6 +215,9 @@ public class LeaderboardActivity extends AppCompatActivity {
                 progressBar.setVisibility(View.GONE);
                 if (swipeRefreshLayout != null && swipeRefreshLayout.isRefreshing()) {
                     swipeRefreshLayout.setRefreshing(false);
+                }
+                if (swipeTriggered) {
+                    Snackbar.make(findViewById(android.R.id.content), "Failed to refresh: " + error.getMessage(), Snackbar.LENGTH_LONG).show();
                 }
                 Toast.makeText(LeaderboardActivity.this,
                         "Failed to load leaderboard: " + error.getMessage(),
