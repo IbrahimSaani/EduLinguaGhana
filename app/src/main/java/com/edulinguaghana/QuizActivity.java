@@ -1,5 +1,6 @@
 package com.edulinguaghana;
 
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.ColorStateList;
 import android.media.MediaPlayer;
@@ -13,6 +14,7 @@ import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
@@ -66,6 +68,10 @@ public class QuizActivity extends AppCompatActivity {
     private CountDownTimer countDownTimer;
     private long remainingTime;
 
+    // Challenge mode
+    private boolean isChallengeMode = false;
+    private String challengeId;
+
     private TextToSpeech tts;
     private boolean ttsReady = false;
     private String currentCorrectAnswer;
@@ -84,6 +90,10 @@ public class QuizActivity extends AppCompatActivity {
         languageName = getIntent().getStringExtra("LANGUAGE_NAME");
         languageCode = getIntent().getStringExtra("LANGUAGE_CODE");
         String rawType = getIntent().getStringExtra("QUIZ_TYPE");
+
+        // Check if this is challenge mode
+        isChallengeMode = getIntent().getBooleanExtra("CHALLENGE_MODE", false);
+        challengeId = getIntent().getStringExtra("CHALLENGE_ID");
 
         if (languageCode == null) languageCode = "en";
         if (languageName == null) languageName = "Unknown";
@@ -529,6 +539,11 @@ public class QuizActivity extends AppCompatActivity {
             );
         }
 
+        // Save challenge result if in challenge mode
+        if (isChallengeMode && challengeId != null) {
+            saveChallengeResult();
+        }
+
         if (score == 100) {
             notificationManager.sendAchievementNotification(
                 "Perfect Score! ⭐",
@@ -650,6 +665,65 @@ public class QuizActivity extends AppCompatActivity {
         if (mp != null) {
             mp.setOnCompletionListener(MediaPlayer::release);
             mp.start();
+        }
+    }
+
+    private void saveChallengeResult() {
+        com.edulinguaghana.social.SocialRepository repo = com.edulinguaghana.social.SocialProvider.get();
+        if (repo == null) return;
+
+        try {
+            // Get current user ID
+            com.google.firebase.auth.FirebaseUser currentUser = com.google.firebase.auth.FirebaseAuth.getInstance().getCurrentUser();
+            if (currentUser == null) return;
+
+            String userId = currentUser.getUid();
+
+            // Get the challenge from Firebase
+            com.google.firebase.database.DatabaseReference challengeRef =
+                com.google.firebase.database.FirebaseDatabase.getInstance()
+                    .getReference("challenges").child(challengeId);
+
+            challengeRef.addListenerForSingleValueEvent(new com.google.firebase.database.ValueEventListener() {
+                @Override
+                public void onDataChange(com.google.firebase.database.DataSnapshot snapshot) {
+                    com.edulinguaghana.social.Challenge challenge = snapshot.getValue(com.edulinguaghana.social.Challenge.class);
+                    if (challenge != null) {
+                        // Save the score
+                        if (challenge.results == null) {
+                            challenge.results = new java.util.HashMap<>();
+                        }
+                        challenge.results.put(userId, score);
+
+                        // Check if both players have completed
+                        if (challenge.results.size() >= 2) {
+                            challenge.state = com.edulinguaghana.social.Challenge.State.COMPLETED;
+                        }
+
+                        // Update challenge
+                        challengeRef.setValue(challenge);
+
+                        // Show result
+                        runOnUiThread(() -> {
+                            Toast.makeText(QuizActivity.this,
+                                "Challenge score saved: " + score + " points! ⚔️",
+                                Toast.LENGTH_LONG).show();
+                        });
+                    }
+                }
+
+                @Override
+                public void onCancelled(com.google.firebase.database.DatabaseError error) {
+                    runOnUiThread(() -> {
+                        Toast.makeText(QuizActivity.this,
+                            "Failed to save challenge result",
+                            Toast.LENGTH_SHORT).show();
+                    });
+                }
+            });
+
+        } catch (Exception ex) {
+            Toast.makeText(this, "Error saving challenge result", Toast.LENGTH_SHORT).show();
         }
     }
 

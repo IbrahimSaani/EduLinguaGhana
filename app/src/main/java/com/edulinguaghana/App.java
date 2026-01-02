@@ -9,6 +9,7 @@ import com.google.firebase.crashlytics.FirebaseCrashlytics;
 import com.edulinguaghana.social.impl.FirebaseSocialRepository;
 import com.edulinguaghana.social.SocialRepository;
 import com.edulinguaghana.social.SocialProvider;
+import com.edulinguaghana.social.FCMTokenManager;
 
 public class App extends Application {
     @Override
@@ -34,6 +35,14 @@ public class App extends Application {
             SocialProvider.init(repo);
         } catch (Exception e) {
             // Fall back to null provider; existing code should handle null
+            e.printStackTrace();
+        }
+
+        // Initialize FCM token
+        try {
+            FCMTokenManager fcmTokenManager = new FCMTokenManager(this);
+            fcmTokenManager.initializeFCMToken();
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }

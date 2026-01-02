@@ -130,4 +130,41 @@
     <string name="xp_text_pattern">%d / %d XP</string>
     <string name="badges_preview">Badges</string>
     <string name="xp_content_description">XP Icon</string>
+
+    <!-- Profile Screen -->
+    <string name="profile_title">My Profile</string>
+    <string name="profile_app_icon_desc">App Icon</string>
+    <string name="profile_join_adventure">Join the Adventure!</string>
+    <string name="profile_sign_in_message">Sign in to save your progress, earn cool badges, and see your custom avatar everywhere!</string>
+    <string name="profile_sign_in_button">Let\'s Sign In! 🚀</string>
+    <string name="profile_picture_desc">Profile Picture</string>
+    <string name="profile_default_name">Young Learner</string>
+    <string name="profile_default_email">user@example.com</string>
+    <string name="profile_user_id_label">ID: </string>
+    <string name="profile_user_id_placeholder">...</string>
+    <string name="profile_copy_id">Copy</string>
+    <string name="profile_edit_avatar">Edit Avatar</string>
+    <string name="profile_friends">Friends</string>
+    <string name="profile_challenge">Challenge</string>
+    <string name="profile_streak_emoji">🔥</string>
+    <string name="profile_streak_default">0 days</string>
+    <string name="profile_streak_label">Streak</string>
+    <string name="profile_best_score_emoji">🏆</string>
+    <string name="profile_best_score_default">0 / 10</string>
+    <string name="profile_best_score_label">Best Score</string>
+    <string name="profile_learning_stats">📊 Learning Stats</string>
+    <string name="profile_total_lessons">Total Lessons</string>
+    <string name="profile_lessons_default">0</string>
+    <string name="profile_favorite_language">Favorite Language</string>
+    <string name="profile_language_not_set">Not set yet</string>
+    <string name="profile_achievements_title">🌟 Achievements</string>
+    <string name="profile_achievements_message">Keep learning to unlock awesome badges!</string>
+    <string name="profile_achievement_emoji_1">🏆</string>
+    <string name="profile_achievement_emoji_2">🏅</string>
+    <string name="profile_achievement_emoji_3">⭐</string>
+    <string name="profile_settings_title">⚙️ Settings</string>
+    <string name="profile_manage_account">Manage Account</string>
+    <string name="profile_sign_out">Sign Out</string>
+    <string name="profile_stats_icon_desc">Statistics Icon</string>
+    <string name="profile_language_icon_desc">Language Icon</string>
 </resources>

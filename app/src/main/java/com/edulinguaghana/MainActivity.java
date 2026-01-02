@@ -154,6 +154,19 @@ public class MainActivity extends AppCompatActivity {
         } else {
             offlineBanner.setVisibility(View.VISIBLE);
         }
+
+        // Request notification permission (Android 13+)
+        requestNotificationPermission();
+    }
+
+    private void requestNotificationPermission() {
+        com.edulinguaghana.social.NotificationPermissionHelper permissionHelper =
+            new com.edulinguaghana.social.NotificationPermissionHelper(this);
+
+        // Request permission after a short delay to not overwhelm user on startup
+        new android.os.Handler().postDelayed(() -> {
+            permissionHelper.requestPermissionSilently();
+        }, 2000); // Wait 2 seconds after app starts
     }
 
     private void setupQuickStats() {
