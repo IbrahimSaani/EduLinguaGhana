@@ -248,14 +248,23 @@ public class ProfileActivity extends AppCompatActivity {
                     return;
                 }
 
-                // If viewing another user, keep existing direct flow
-                if (viewedUserId != null && !viewedUserId.equals(currentUserId)) {
-                    performSendFriendRequest(currentUserId, viewedUserId);
-                    return;
+                // Show dialog to add friend
+                presentAddFriendDialog(currentUserId);
+            });
+
+            // Long press to view friend requests
+            btnAddFriend.setOnLongClickListener(v -> {
+                String testOverride = getIntent().getStringExtra("TEST_CURRENT_USER_ID");
+                FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
+                String currentUserId = testOverride != null ? testOverride : (currentUser != null ? currentUser.getUid() : null);
+
+                if (currentUserId == null) {
+                    Toast.makeText(this, "Please sign in first", Toast.LENGTH_SHORT).show();
+                    return true;
                 }
 
-                // Otherwise open a small search dialog to enter a user id
-                presentAddFriendDialog(currentUserId);
+                showFriendRequests(currentUserId);
+                return true;
             });
         }
 
@@ -278,6 +287,21 @@ public class ProfileActivity extends AppCompatActivity {
 
                 // Otherwise open dialog to choose who to challenge
                 presentChallengeDialog(currentUserId);
+            });
+
+            // Long press to view challenges
+            btnChallengeFriend.setOnLongClickListener(v -> {
+                String testOverride = getIntent().getStringExtra("TEST_CURRENT_USER_ID");
+                FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
+                String currentUserId = testOverride != null ? testOverride : (currentUser != null ? currentUser.getUid() : null);
+
+                if (currentUserId == null) {
+                    Toast.makeText(this, "Please sign in first", Toast.LENGTH_SHORT).show();
+                    return true;
+                }
+
+                showChallenges(currentUserId);
+                return true;
             });
         }
 
@@ -350,8 +374,11 @@ public class ProfileActivity extends AppCompatActivity {
             FriendService svc = new FriendService(repo);
             svc.sendFriendRequest(fromUserId, toUserId);
             Toast.makeText(this, "Friend request sent to " + toUserId, Toast.LENGTH_SHORT).show();
+        } catch (IllegalArgumentException ex) {
+            // User doesn't exist
+            Toast.makeText(this, "User not found: " + toUserId, Toast.LENGTH_LONG).show();
         } catch (Exception ex) {
-            Toast.makeText(this, "Failed to send request", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "Failed to send request: " + ex.getMessage(), Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -368,9 +395,163 @@ public class ProfileActivity extends AppCompatActivity {
         try {
             repo.createChallenge(ch);
             Toast.makeText(this, "Challenge sent to " + toUserId, Toast.LENGTH_SHORT).show();
+        } catch (IllegalArgumentException ex) {
+            // User doesn't exist
+            Toast.makeText(this, "User not found: " + toUserId, Toast.LENGTH_LONG).show();
         } catch (Exception ex) {
-            Toast.makeText(this, "Failed to send challenge", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "Failed to send challenge: " + ex.getMessage(), Toast.LENGTH_SHORT).show();
         }
+    }
+
+    private void showFriendRequests(String userId) {
+        SocialRepository repo = SocialProvider.get();
+        if (repo == null) {
+            Toast.makeText(this, "Social features unavailable", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        // Use Firebase listener to get friend requests
+        com.google.firebase.database.DatabaseReference friendsRef =
+            com.google.firebase.database.FirebaseDatabase.getInstance().getReference("friends");
+
+        friendsRef.orderByChild("friendUserId").equalTo(userId)
+            .addListenerForSingleValueEvent(new com.google.firebase.database.ValueEventListener() {
+                @Override
+                public void onDataChange(com.google.firebase.database.DataSnapshot snapshot) {
+                    java.util.List<Friend> pendingRequests = new java.util.ArrayList<>();
+                    for (com.google.firebase.database.DataSnapshot child : snapshot.getChildren()) {
+                        Friend friend = child.getValue(Friend.class);
+                        if (friend != null && friend.status == Friend.Status.PENDING) {
+                            pendingRequests.add(friend);
+                        }
+                    }
+
+                    if (pendingRequests.isEmpty()) {
+                        Toast.makeText(ProfileActivity.this, "No pending friend requests", Toast.LENGTH_SHORT).show();
+                        return;
+                    }
+
+                    // Show dialog with friend requests
+                    showFriendRequestsDialog(pendingRequests);
+                }
+
+                @Override
+                public void onCancelled(com.google.firebase.database.DatabaseError error) {
+                    Toast.makeText(ProfileActivity.this, "Failed to load friend requests", Toast.LENGTH_SHORT).show();
+                }
+            });
+    }
+
+    private void showFriendRequestsDialog(java.util.List<Friend> requests) {
+        String[] requestItems = new String[requests.size()];
+        for (int i = 0; i < requests.size(); i++) {
+            Friend friend = requests.get(i);
+            requestItems[i] = "Request from: " + friend.userId;
+        }
+
+        new AlertDialog.Builder(this)
+            .setTitle("Friend Requests (" + requests.size() + ")")
+            .setItems(requestItems, (dialog, which) -> {
+                Friend selectedRequest = requests.get(which);
+                showAcceptRejectDialog(selectedRequest);
+            })
+            .setNegativeButton("Close", null)
+            .show();
+    }
+
+    private void showAcceptRejectDialog(Friend request) {
+        new AlertDialog.Builder(this)
+            .setTitle("Friend Request")
+            .setMessage("Accept friend request from " + request.userId + "?")
+            .setPositiveButton("Accept", (dialog, which) -> {
+                SocialRepository repo = SocialProvider.get();
+                if (repo != null) {
+                    try {
+                        FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
+                        String currentUserId = currentUser != null ? currentUser.getUid() : null;
+                        if (currentUserId != null) {
+                            repo.acceptFriend(currentUserId, request.userId);
+                            Toast.makeText(this, "Friend request accepted!", Toast.LENGTH_SHORT).show();
+                        }
+                    } catch (Exception ex) {
+                        Toast.makeText(this, "Failed to accept request", Toast.LENGTH_SHORT).show();
+                    }
+                }
+            })
+            .setNegativeButton("Reject", (dialog, which) -> {
+                SocialRepository repo = SocialProvider.get();
+                if (repo != null) {
+                    try {
+                        FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
+                        String currentUserId = currentUser != null ? currentUser.getUid() : null;
+                        if (currentUserId != null) {
+                            repo.removeFriend(currentUserId, request.userId);
+                            Toast.makeText(this, "Friend request rejected", Toast.LENGTH_SHORT).show();
+                        }
+                    } catch (Exception ex) {
+                        Toast.makeText(this, "Failed to reject request", Toast.LENGTH_SHORT).show();
+                    }
+                }
+            })
+            .setNeutralButton("Cancel", null)
+            .show();
+    }
+
+    private void showChallenges(String userId) {
+        SocialRepository repo = SocialProvider.get();
+        if (repo == null) {
+            Toast.makeText(this, "Social features unavailable", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        // Use Firebase listener to get challenges
+        com.google.firebase.database.DatabaseReference challengesRef =
+            com.google.firebase.database.FirebaseDatabase.getInstance().getReference("challenges");
+
+        challengesRef.orderByChild("challengedId").equalTo(userId)
+            .addListenerForSingleValueEvent(new com.google.firebase.database.ValueEventListener() {
+                @Override
+                public void onDataChange(com.google.firebase.database.DataSnapshot snapshot) {
+                    java.util.List<com.edulinguaghana.social.Challenge> pendingChallenges = new java.util.ArrayList<>();
+                    for (com.google.firebase.database.DataSnapshot child : snapshot.getChildren()) {
+                        com.edulinguaghana.social.Challenge challenge = child.getValue(com.edulinguaghana.social.Challenge.class);
+                        if (challenge != null && challenge.state == com.edulinguaghana.social.Challenge.State.PENDING) {
+                            pendingChallenges.add(challenge);
+                        }
+                    }
+
+                    if (pendingChallenges.isEmpty()) {
+                        Toast.makeText(ProfileActivity.this, "No pending challenges", Toast.LENGTH_SHORT).show();
+                        return;
+                    }
+
+                    // Show dialog with challenges
+                    showChallengesDialog(pendingChallenges);
+                }
+
+                @Override
+                public void onCancelled(com.google.firebase.database.DatabaseError error) {
+                    Toast.makeText(ProfileActivity.this, "Failed to load challenges", Toast.LENGTH_SHORT).show();
+                }
+            });
+    }
+
+    private void showChallengesDialog(java.util.List<com.edulinguaghana.social.Challenge> challenges) {
+        String[] challengeItems = new String[challenges.size()];
+        for (int i = 0; i < challenges.size(); i++) {
+            com.edulinguaghana.social.Challenge challenge = challenges.get(i);
+            challengeItems[i] = "Challenge from: " + challenge.challengerId + " (Quiz: " + challenge.quizId + ")";
+        }
+
+        new AlertDialog.Builder(this)
+            .setTitle("Challenges (" + challenges.size() + ")")
+            .setItems(challengeItems, (dialog, which) -> {
+                com.edulinguaghana.social.Challenge selectedChallenge = challenges.get(which);
+                Toast.makeText(this, "Challenge selected! Start the quiz to accept.", Toast.LENGTH_LONG).show();
+                // TODO: Navigate to quiz activity with challenge info
+            })
+            .setNegativeButton("Close", null)
+            .show();
     }
 
     private void showSignOutDialog() {

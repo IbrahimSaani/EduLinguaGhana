@@ -1,6 +1,8 @@
 package com.edulinguaghana.social.impl;
 
 import com.edulinguaghana.social.*;
+import com.google.android.gms.tasks.Tasks;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -10,6 +12,9 @@ import com.google.firebase.database.ValueEventListener;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 
 /**
  * Lightweight Firebase-backed SocialRepository using Realtime Database.
@@ -31,11 +36,31 @@ public class FirebaseSocialRepository implements SocialRepository {
 
     @Override
     public Friend addFriend(String requesterId, String friendId) {
+        // First validate that the target user exists in Firebase Auth
+        try {
+            boolean userExists = checkUserExists(friendId);
+            if (!userExists) {
+                throw new IllegalArgumentException("User does not exist");
+            }
+        } catch (Exception e) {
+            throw new IllegalArgumentException("Failed to validate user: " + e.getMessage());
+        }
+
         String id = UUID.randomUUID().toString();
         long now = System.currentTimeMillis();
         Friend f = new Friend(id, requesterId, friendId, null, Friend.Status.PENDING, now, null);
         rootRef.child("friends").child(id).setValue(f);
         return f;
+    }
+
+    /**
+     * Check if a user exists in Firebase by checking the users node
+     */
+    private boolean checkUserExists(String userId) throws ExecutionException, InterruptedException, TimeoutException {
+        // Check if user exists in the users node
+        var task = rootRef.child("users").child(userId).get();
+        DataSnapshot snapshot = Tasks.await(task, 5, TimeUnit.SECONDS);
+        return snapshot.exists();
     }
 
     @Override
@@ -96,6 +121,16 @@ public class FirebaseSocialRepository implements SocialRepository {
 
     @Override
     public Challenge createChallenge(Challenge challenge) {
+        // Validate that the challenged user exists
+        try {
+            boolean userExists = checkUserExists(challenge.challengedId);
+            if (!userExists) {
+                throw new IllegalArgumentException("User does not exist");
+            }
+        } catch (Exception e) {
+            throw new IllegalArgumentException("Failed to validate user: " + e.getMessage());
+        }
+
         String id = UUID.randomUUID().toString();
         challenge.id = id;
         challenge.state = Challenge.State.PENDING;

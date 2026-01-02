@@ -23,6 +23,8 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.GoogleAuthProvider;
 import com.google.firebase.auth.UserProfileChangeRequest;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 
 import com.facebook.AccessToken;
 import com.facebook.CallbackManager;
@@ -32,6 +34,8 @@ import com.facebook.login.LoginManager;
 import com.facebook.login.LoginResult;
 
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
 
 public class SignUpActivity extends AppCompatActivity {
 
@@ -138,6 +142,8 @@ public class SignUpActivity extends AppCompatActivity {
                         user.updateProfile(profileUpdates)
                                 .addOnCompleteListener(updateTask -> {
                                     if (updateTask.isSuccessful()) {
+                                        // Save user to database for friend lookups
+                                        saveUserToDatabase(user);
                                         Toast.makeText(SignUpActivity.this,
                                                 "Account created successfully!",
                                                 Toast.LENGTH_SHORT).show();
@@ -191,6 +197,8 @@ public class SignUpActivity extends AppCompatActivity {
                 .addOnCompleteListener(this, task -> {
                     if (task.isSuccessful()) {
                         FirebaseUser user = mAuth.getCurrentUser();
+                        // Save user to database for friend lookups
+                        saveUserToDatabase(user);
                         Toast.makeText(SignUpActivity.this,
                                 "Welcome " + user.getDisplayName() + "!",
                                 Toast.LENGTH_SHORT).show();
@@ -274,6 +282,8 @@ public class SignUpActivity extends AppCompatActivity {
                 .addOnCompleteListener(this, task -> {
                     if (task.isSuccessful()) {
                         FirebaseUser user = mAuth.getCurrentUser();
+                        // Save user to database for friend lookups
+                        saveUserToDatabase(user);
                         Toast.makeText(SignUpActivity.this,
                                 "Welcome " + user.getDisplayName() + "!",
                                 Toast.LENGTH_SHORT).show();
@@ -284,6 +294,22 @@ public class SignUpActivity extends AppCompatActivity {
                                 Toast.LENGTH_LONG).show();
                     }
                 });
+    }
+
+    /**
+     * Save user profile to Firebase Realtime Database
+     */
+    private void saveUserToDatabase(FirebaseUser user) {
+        if (user == null) return;
+
+        DatabaseReference usersRef = FirebaseDatabase.getInstance().getReference("users");
+        Map<String, Object> userProfile = new HashMap<>();
+        userProfile.put("uid", user.getUid());
+        userProfile.put("email", user.getEmail());
+        userProfile.put("displayName", user.getDisplayName());
+        userProfile.put("createdAt", System.currentTimeMillis());
+
+        usersRef.child(user.getUid()).setValue(userProfile);
     }
 
     private void navigateToMain() {
