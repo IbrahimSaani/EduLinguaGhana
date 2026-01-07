@@ -66,6 +66,8 @@ public class MainActivity extends AppCompatActivity {
     private android.widget.TextView notificationBadge;
     private android.view.View offlineBanner;
     private BottomNavigationView bottomNavigation;
+    private com.edulinguaghana.social.NotificationPermissionHelper permissionHelper;
+
     private static final String KEY_ANIMATIONS_ENABLED = "ANIMATIONS_ENABLED";
     private static final String KEY_LOW_POWER_ANIMATIONS = "LOW_POWER_ANIMATIONS";
 
@@ -86,6 +88,9 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        // Initialize permission helper early (must be before STARTED state)
+        permissionHelper = new com.edulinguaghana.social.NotificationPermissionHelper(this);
 
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -160,8 +165,8 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void requestNotificationPermission() {
-        com.edulinguaghana.social.NotificationPermissionHelper permissionHelper =
-            new com.edulinguaghana.social.NotificationPermissionHelper(this);
+        // Use the pre-initialized permissionHelper
+        if (permissionHelper == null) return;
 
         // Request permission after a short delay to not overwhelm user on startup
         new android.os.Handler().postDelayed(() -> {

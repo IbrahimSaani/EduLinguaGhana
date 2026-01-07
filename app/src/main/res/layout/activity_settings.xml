@@ -423,56 +423,6 @@
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
 
-            <!-- Reset Progress Section -->
-            <com.google.android.material.card.MaterialCardView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="16dp"
-                app:cardCornerRadius="16dp"
-                app:cardElevation="2dp">
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:padding="20dp">
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="⚠️ Reset Progress"
-                        android:textColor="@color/colorPrimary"
-                        android:textSize="18sp"
-                        android:textStyle="bold"
-                        android:fontFamily="@font/agbalumo" />
-
-                    <TextView
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="8dp"
-                        android:paddingStart="4dp"
-                        android:paddingEnd="4dp"
-                        android:text="This will permanently delete all your progress and scores. This action cannot be undone!"
-                        android:textColor="@color/textColorSecondary"
-                        android:textSize="14sp"
-                        android:lineSpacingExtra="2dp" />
-
-                    <com.google.android.material.button.MaterialButton
-                        android:id="@+id/btnResetProgress"
-                        style="@style/Widget.Material3.Button"
-                        android:layout_width="match_parent"
-                        android:layout_height="56dp"
-                        android:text="Reset All Progress"
-                        android:textSize="15sp"
-                        android:textStyle="bold"
-                        app:icon="@drawable/ic_delete"
-                        app:iconGravity="textStart"
-                        app:iconPadding="8dp"
-                        app:cornerRadius="12dp"
-                        app:backgroundTint="@color/wrongAnswer" />
-
-                </LinearLayout>
-            </com.google.android.material.card.MaterialCardView>
 
         </LinearLayout>
     </ScrollView>
