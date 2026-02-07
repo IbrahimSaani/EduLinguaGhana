@@ -168,44 +168,93 @@ public class LeaderboardActivity extends AppCompatActivity {
                     return;
                 }
 
+                // First, collect all entries
+                List<LeaderboardEntry> tempList = new ArrayList<>();
                 for (DataSnapshot entrySnapshot : snapshot.getChildren()) {
                     LeaderboardEntry entry = entrySnapshot.getValue(LeaderboardEntry.class);
                     if (entry != null) {
-                        leaderboardList.add(entry);
+                        tempList.add(entry);
                     }
                 }
 
-                // Sort by score descending
-                Collections.sort(leaderboardList, (e1, e2) -> Integer.compare(e2.getScore(), e1.getScore()));
+                // Now fetch usernames from users node for each entry
+                DatabaseReference usersRef = FirebaseDatabase.getInstance().getReference("users");
+                final int totalEntries = tempList.size();
+                final int[] processedCount = {0};
 
-                // Assign ranks
-                for (int i = 0; i < leaderboardList.size(); i++) {
-                    leaderboardList.get(i).setRank(i + 1);
-                }
-
-                progressBar.setVisibility(View.GONE);
-                if (swipeRefreshLayout != null && swipeRefreshLayout.isRefreshing()) {
-                    swipeRefreshLayout.setRefreshing(false);
-                }
-
-                if (leaderboardList.isEmpty()) {
+                if (totalEntries == 0) {
+                    progressBar.setVisibility(View.GONE);
+                    if (swipeRefreshLayout != null && swipeRefreshLayout.isRefreshing()) {
+                        swipeRefreshLayout.setRefreshing(false);
+                    }
                     emptyStateLayout.setVisibility(View.VISIBLE);
                     mainContentLayout.setVisibility(View.GONE);
-                    tvYourRank.setText("#--");
-                    tvYourScore.setText("0");
-                    if (swipeTriggered) {
-                        Snackbar.make(findViewById(android.R.id.content), "No rankings yet", Snackbar.LENGTH_SHORT).show();
-                    }
-                } else {
-                    emptyStateLayout.setVisibility(View.GONE);
-                    mainContentLayout.setVisibility(View.VISIBLE);
-                    adapter.notifyDataSetChanged();
+                    return;
+                }
 
-                    // Update user's rank and score
-                    updateUserRank();
+                for (LeaderboardEntry entry : tempList) {
+                    // Check if userName is missing or looks like a UID
+                    String userName = entry.getUserName();
+                    boolean isLikelyUID = userName == null || userName.isEmpty() ||
+                                          userName.length() > 20 ||
+                                          userName.equals(entry.getUserId()) ||
+                                          (userName.length() >= 20 && !userName.contains(" "));
 
-                    if (swipeTriggered) {
-                        Snackbar.make(findViewById(android.R.id.content), "Leaderboard updated", Snackbar.LENGTH_SHORT).show();
+                    if (isLikelyUID) {
+                        // Fetch username from users node
+                        usersRef.child(entry.getUserId()).addListenerForSingleValueEvent(new ValueEventListener() {
+                            @Override
+                            public void onDataChange(@NonNull DataSnapshot userSnapshot) {
+                                if (userSnapshot.exists()) {
+                                    String displayName = userSnapshot.child("displayName").getValue(String.class);
+                                    String email = userSnapshot.child("email").getValue(String.class);
+
+                                    // Check if displayName is valid (not null, not empty, not a UID)
+                                    if (displayName != null && !displayName.isEmpty() &&
+                                        displayName.length() <= 30 &&
+                                        !displayName.equals(entry.getUserId())) {
+                                        entry.setUserName(displayName);
+                                    } else if (email != null && email.contains("@")) {
+                                        // Use email prefix if displayName is invalid
+                                        entry.setUserName(email.split("@")[0]);
+                                    } else {
+                                        // Last resort: generate a username from UID
+                                        entry.setUserName("User" + entry.getUserId().substring(0, Math.min(6, entry.getUserId().length())));
+                                    }
+                                } else {
+                                    // User not found in database, use fallback
+                                    entry.setUserName("User" + entry.getUserId().substring(0, Math.min(6, entry.getUserId().length())));
+                                }
+                                leaderboardList.add(entry);
+                                processedCount[0]++;
+
+                                if (processedCount[0] == totalEntries) {
+                                    finishLoadingLeaderboard(swipeTriggered);
+                                }
+                            }
+
+                            @Override
+                            public void onCancelled(@NonNull DatabaseError error) {
+                                // Use fallback name
+                                if (entry.getUserName() == null || entry.getUserName().isEmpty()) {
+                                    entry.setUserName("User" + entry.getUserId().substring(0, Math.min(6, entry.getUserId().length())));
+                                }
+                                leaderboardList.add(entry);
+                                processedCount[0]++;
+
+                                if (processedCount[0] == totalEntries) {
+                                    finishLoadingLeaderboard(swipeTriggered);
+                                }
+                            }
+                        });
+                    } else {
+                        // Username is fine, just add it
+                        leaderboardList.add(entry);
+                        processedCount[0]++;
+
+                        if (processedCount[0] == totalEntries) {
+                            finishLoadingLeaderboard(swipeTriggered);
+                        }
                     }
                 }
             }
@@ -225,6 +274,43 @@ public class LeaderboardActivity extends AppCompatActivity {
             }
         });
     }
+
+    private void finishLoadingLeaderboard(boolean swipeTriggered) {
+        // Sort by score descending
+        Collections.sort(leaderboardList, (e1, e2) -> Integer.compare(e2.getScore(), e1.getScore()));
+
+        // Assign ranks
+        for (int i = 0; i < leaderboardList.size(); i++) {
+            leaderboardList.get(i).setRank(i + 1);
+        }
+
+        progressBar.setVisibility(View.GONE);
+        if (swipeRefreshLayout != null && swipeRefreshLayout.isRefreshing()) {
+            swipeRefreshLayout.setRefreshing(false);
+        }
+
+        if (leaderboardList.isEmpty()) {
+            emptyStateLayout.setVisibility(View.VISIBLE);
+            mainContentLayout.setVisibility(View.GONE);
+            tvYourRank.setText("#--");
+            tvYourScore.setText("0");
+            if (swipeTriggered) {
+                Snackbar.make(findViewById(android.R.id.content), "No rankings yet", Snackbar.LENGTH_SHORT).show();
+            }
+        } else {
+            emptyStateLayout.setVisibility(View.GONE);
+            mainContentLayout.setVisibility(View.VISIBLE);
+            adapter.notifyDataSetChanged();
+
+            // Update user's rank and score
+            updateUserRank();
+
+            if (swipeTriggered) {
+                Snackbar.make(findViewById(android.R.id.content), "Leaderboard updated", Snackbar.LENGTH_SHORT).show();
+            }
+        }
+    }
+
 
     private void updateUserRank() {
         if (currentUser == null) {

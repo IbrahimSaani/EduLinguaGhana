@@ -143,6 +143,50 @@ public class ProfileActivity extends AppCompatActivity {
         ivBadgesPreview = findViewById(R.id.iv_badges_preview);
     }
 
+    /**
+     * Ensure the current user's data exists in Firebase Realtime Database
+     * This is crucial for friend search and social features to work
+     */
+    private void ensureUserInDatabase(FirebaseUser user) {
+        if (user == null) return;
+
+        com.google.firebase.database.DatabaseReference usersRef =
+            com.google.firebase.database.FirebaseDatabase.getInstance().getReference("users");
+
+        // Check if user exists
+        usersRef.child(user.getUid()).addListenerForSingleValueEvent(new com.google.firebase.database.ValueEventListener() {
+            @Override
+            public void onDataChange(com.google.firebase.database.DataSnapshot snapshot) {
+                if (!snapshot.exists()) {
+                    // User doesn't exist, create entry
+                    android.util.Log.d("ProfileActivity", "User not in database, creating entry for: " + user.getUid());
+
+                    java.util.Map<String, Object> userProfile = new java.util.HashMap<>();
+                    userProfile.put("uid", user.getUid());
+                    userProfile.put("email", user.getEmail());
+                    userProfile.put("displayName", user.getDisplayName());
+                    userProfile.put("username", user.getDisplayName() != null ? user.getDisplayName() : user.getEmail());
+                    userProfile.put("createdAt", System.currentTimeMillis());
+
+                    usersRef.child(user.getUid()).setValue(userProfile)
+                        .addOnSuccessListener(aVoid -> {
+                            android.util.Log.d("ProfileActivity", "User profile created successfully");
+                        })
+                        .addOnFailureListener(e -> {
+                            android.util.Log.e("ProfileActivity", "Failed to create user profile", e);
+                        });
+                } else {
+                    android.util.Log.d("ProfileActivity", "User already exists in database: " + user.getUid());
+                }
+            }
+
+            @Override
+            public void onCancelled(com.google.firebase.database.DatabaseError error) {
+                android.util.Log.e("ProfileActivity", "Failed to check user existence", error.toException());
+            }
+        });
+    }
+
     private void setupProfile() {
         // Determine current user id (respect test override for androidTest)
         String testOverride = getIntent().getStringExtra("TEST_CURRENT_USER_ID");
@@ -155,6 +199,9 @@ public class ProfileActivity extends AppCompatActivity {
         boolean viewingOther = viewedUserId != null && !viewedUserId.equals(currentUserId);
 
         if (signedIn) {
+            // Ensure current user's data is in the database
+            ensureUserInDatabase(currentUser);
+
             // User is signed in
             notSignedInLayout.setVisibility(View.GONE);
             signedInLayout.setVisibility(View.VISIBLE);
@@ -343,11 +390,17 @@ public class ProfileActivity extends AppCompatActivity {
     private void showSearchByIdDialog(String currentUserId) {
         android.app.AlertDialog.Builder builder = new android.app.AlertDialog.Builder(this);
         builder.setTitle("Add Friend by ID");
+
+        // Add button to show all users for debugging
+        builder.setNeutralButton("Show All Users", (dialog, which) -> {
+            showAllUsersInDatabase();
+        });
+
         final EditText input = new EditText(this);
         input.setHint("Enter user ID");
         input.setInputType(InputType.TYPE_CLASS_TEXT);
         builder.setView(input);
-        builder.setPositiveButton("Send Request", (dialog, which) -> {
+        builder.setPositiveButton("Search", (dialog, which) -> {
             String target = input.getText() != null ? input.getText().toString().trim() : "";
             if (target.isEmpty()) {
                 Toast.makeText(this, "Please enter a user id", Toast.LENGTH_SHORT).show();
@@ -357,15 +410,133 @@ public class ProfileActivity extends AppCompatActivity {
                 Toast.makeText(this, "You can't add yourself", Toast.LENGTH_SHORT).show();
                 return;
             }
-            performSendFriendRequest(currentUserId, target);
+            // Validate user exists before sending request
+            validateAndAddFriendById(currentUserId, target);
         });
         builder.setNegativeButton("Cancel", (dialog, which) -> dialog.cancel());
         builder.show();
     }
 
+    private void showAllUsersInDatabase() {
+        android.util.Log.d("ProfileActivity", "Fetching all users from database...");
+        Toast.makeText(this, "Loading users...", Toast.LENGTH_SHORT).show();
+
+        com.google.firebase.database.DatabaseReference usersRef =
+            com.google.firebase.database.FirebaseDatabase.getInstance().getReference("users");
+
+        usersRef.addListenerForSingleValueEvent(new com.google.firebase.database.ValueEventListener() {
+            @Override
+            public void onDataChange(com.google.firebase.database.DataSnapshot snapshot) {
+                StringBuilder userList = new StringBuilder();
+                int count = 0;
+
+                android.util.Log.d("ProfileActivity", "Total users in database: " + snapshot.getChildrenCount());
+
+                for (com.google.firebase.database.DataSnapshot child : snapshot.getChildren()) {
+                    String uid = child.getKey();
+                    String email = child.child("email").getValue(String.class);
+                    String displayName = child.child("displayName").getValue(String.class);
+                    String username = child.child("username").getValue(String.class);
+
+                    String name = displayName != null ? displayName : (username != null ? username : "No name");
+
+                    userList.append(++count).append(". ").append(name)
+                           .append("\n   Email: ").append(email != null ? email : "N/A")
+                           .append("\n   UID: ").append(uid).append("\n\n");
+
+                    android.util.Log.d("ProfileActivity", "User #" + count + " - UID: " + uid + ", Email: " + email + ", Name: " + name);
+                }
+
+                if (count == 0) {
+                    userList.append("No users found in database!\n\nMake sure users are signing up properly.");
+                    android.util.Log.e("ProfileActivity", "No users found in database!");
+                } else {
+                    userList.insert(0, "Users in Database (" + count + "):\n\n");
+                }
+
+                // Show dialog with scrollable list
+                android.widget.ScrollView scrollView = new android.widget.ScrollView(ProfileActivity.this);
+                android.widget.TextView textView = new android.widget.TextView(ProfileActivity.this);
+                textView.setText(userList.toString());
+                textView.setPadding(40, 40, 40, 40);
+                textView.setTextSize(12);
+                scrollView.addView(textView);
+
+                new android.app.AlertDialog.Builder(ProfileActivity.this)
+                    .setTitle("All Users in Database")
+                    .setView(scrollView)
+                    .setPositiveButton("OK", null)
+                    .show();
+            }
+
+            @Override
+            public void onCancelled(com.google.firebase.database.DatabaseError error) {
+                android.util.Log.e("ProfileActivity", "Failed to fetch users: " + error.getMessage());
+                Toast.makeText(ProfileActivity.this, "Failed to load users: " + error.getMessage(), Toast.LENGTH_LONG).show();
+            }
+        });
+    }
+
+    private void validateAndAddFriendById(String currentUserId, String targetUserId) {
+        Toast.makeText(this, "Searching...", Toast.LENGTH_SHORT).show();
+        android.util.Log.d("ProfileActivity", "Searching for user ID: " + targetUserId);
+
+        // Check if user exists in Firebase
+        com.google.firebase.database.DatabaseReference usersRef =
+            com.google.firebase.database.FirebaseDatabase.getInstance().getReference("users");
+
+        usersRef.child(targetUserId).addListenerForSingleValueEvent(new com.google.firebase.database.ValueEventListener() {
+            @Override
+            public void onDataChange(com.google.firebase.database.DataSnapshot snapshot) {
+                android.util.Log.d("ProfileActivity", "Search result - exists: " + snapshot.exists());
+
+                if (!snapshot.exists()) {
+                    android.util.Log.e("ProfileActivity", "User not found in database: " + targetUserId);
+
+                    // Show more helpful error message
+                    new AlertDialog.Builder(ProfileActivity.this)
+                        .setTitle("User Not Found")
+                        .setMessage("The user with ID:\n" + targetUserId +
+                                  "\n\ndoes not exist in the database.\n\n" +
+                                  "Possible reasons:\n" +
+                                  "• The user hasn't signed up yet\n" +
+                                  "• The user ID is incorrect\n" +
+                                  "• The user signed up but their data wasn't saved\n\n" +
+                                  "Tip: Use the 'Show All Users' button to see available users.")
+                        .setPositiveButton("OK", null)
+                        .setNeutralButton("Show All Users", (d, w) -> showAllUsersInDatabase())
+                        .show();
+                    return;
+                }
+
+                // Log all available fields
+                android.util.Log.d("ProfileActivity", "User data: " + snapshot.getValue());
+
+                String displayName = snapshot.child("displayName").getValue(String.class);
+                String email = snapshot.child("email").getValue(String.class);
+                String username = snapshot.child("username").getValue(String.class);
+
+                android.util.Log.d("ProfileActivity", "displayName: " + displayName + ", email: " + email + ", username: " + username);
+
+                // Use displayName, username, or email as fallback
+                String name = displayName != null ? displayName : (username != null ? username : "Unknown");
+
+                // Show confirmation dialog
+                showAddFriendConfirmation(currentUserId, targetUserId, name, email != null ? email : "Unknown");
+            }
+
+            @Override
+            public void onCancelled(com.google.firebase.database.DatabaseError error) {
+                android.util.Log.e("ProfileActivity", "Search error: " + error.getMessage());
+                Toast.makeText(ProfileActivity.this, "Search failed: " + error.getMessage(), Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
     private void searchUserByEmail(String email, String currentUserId) {
         // Show progress
         Toast.makeText(this, "Searching...", Toast.LENGTH_SHORT).show();
+        android.util.Log.d("ProfileActivity", "Searching for email: " + email);
 
         // Search in Firebase users by email
         com.google.firebase.database.DatabaseReference usersRef =
@@ -375,15 +546,36 @@ public class ProfileActivity extends AppCompatActivity {
             .addListenerForSingleValueEvent(new com.google.firebase.database.ValueEventListener() {
                 @Override
                 public void onDataChange(com.google.firebase.database.DataSnapshot snapshot) {
+                    android.util.Log.d("ProfileActivity", "Email search result - exists: " + snapshot.exists() + ", count: " + snapshot.getChildrenCount());
+
                     if (!snapshot.exists()) {
-                        Toast.makeText(ProfileActivity.this, "No user found with that email", Toast.LENGTH_LONG).show();
+                        android.util.Log.e("ProfileActivity", "No user found with email: " + email);
+
+                        // Show more helpful error message
+                        new AlertDialog.Builder(ProfileActivity.this)
+                            .setTitle("User Not Found")
+                            .setMessage("No user found with email:\n" + email +
+                                      "\n\nPossible reasons:\n" +
+                                      "• The user hasn't signed up yet\n" +
+                                      "• The email address is incorrect\n" +
+                                      "• The email is not indexed in database\n\n" +
+                                      "Tip: Use the 'Show All Users' button to see available users.")
+                            .setPositiveButton("OK", null)
+                            .setNeutralButton("Show All Users", (d, w) -> showAllUsersInDatabase())
+                            .show();
                         return;
                     }
 
                     // Get the first matching user
                     for (com.google.firebase.database.DataSnapshot child : snapshot.getChildren()) {
                         String foundUserId = child.getKey();
+                        android.util.Log.d("ProfileActivity", "Found user ID: " + foundUserId);
+                        android.util.Log.d("ProfileActivity", "User data: " + child.getValue());
+
                         String displayName = child.child("displayName").getValue(String.class);
+                        String username = child.child("username").getValue(String.class);
+
+                        android.util.Log.d("ProfileActivity", "displayName: " + displayName + ", username: " + username);
 
                         if (foundUserId != null) {
                             if (foundUserId.equals(currentUserId)) {
@@ -391,8 +583,11 @@ public class ProfileActivity extends AppCompatActivity {
                                 return;
                             }
 
+                            // Use displayName, username, or email as fallback
+                            String name = displayName != null ? displayName : (username != null ? username : "Unknown");
+
                             // Show confirmation dialog
-                            showAddFriendConfirmation(currentUserId, foundUserId, displayName, email);
+                            showAddFriendConfirmation(currentUserId, foundUserId, name, email);
                             return;
                         }
                     }
@@ -400,7 +595,8 @@ public class ProfileActivity extends AppCompatActivity {
 
                 @Override
                 public void onCancelled(com.google.firebase.database.DatabaseError error) {
-                    Toast.makeText(ProfileActivity.this, "Search failed", Toast.LENGTH_SHORT).show();
+                    android.util.Log.e("ProfileActivity", "Email search error: " + error.getMessage());
+                    Toast.makeText(ProfileActivity.this, "Search failed: " + error.getMessage(), Toast.LENGTH_SHORT).show();
                 }
             });
     }
@@ -445,21 +641,51 @@ public class ProfileActivity extends AppCompatActivity {
     }
 
     private void performSendFriendRequest(String fromUserId, String toUserId) {
+        android.util.Log.d("ProfileActivity", "Sending friend request from " + fromUserId + " to " + toUserId);
+
         SocialRepository repo = SocialProvider.get();
         if (repo == null) {
+            android.util.Log.e("ProfileActivity", "SocialRepository is null!");
             Toast.makeText(this, "Social features unavailable", Toast.LENGTH_SHORT).show();
             return;
         }
-        try {
-            FriendService svc = new FriendService(repo);
-            svc.sendFriendRequest(fromUserId, toUserId);
-            Toast.makeText(this, "Friend request sent to " + toUserId, Toast.LENGTH_SHORT).show();
-        } catch (IllegalArgumentException ex) {
-            // User doesn't exist
-            Toast.makeText(this, "User not found: " + toUserId, Toast.LENGTH_LONG).show();
-        } catch (Exception ex) {
-            Toast.makeText(this, "Failed to send request: " + ex.getMessage(), Toast.LENGTH_SHORT).show();
-        }
+
+        // First validate that the target user exists in Firebase
+        Toast.makeText(this, "Validating user...", Toast.LENGTH_SHORT).show();
+
+        com.google.firebase.database.DatabaseReference usersRef =
+            com.google.firebase.database.FirebaseDatabase.getInstance().getReference("users");
+
+        usersRef.child(toUserId).addListenerForSingleValueEvent(new com.google.firebase.database.ValueEventListener() {
+            @Override
+            public void onDataChange(com.google.firebase.database.DataSnapshot snapshot) {
+                android.util.Log.d("ProfileActivity", "Validation check - user exists: " + snapshot.exists());
+
+                if (!snapshot.exists()) {
+                    android.util.Log.e("ProfileActivity", "User not found: " + toUserId);
+                    Toast.makeText(ProfileActivity.this, "User not found: " + toUserId, Toast.LENGTH_LONG).show();
+                    return;
+                }
+
+                // User exists, proceed with friend request
+                try {
+                    android.util.Log.d("ProfileActivity", "Creating FriendService and sending request...");
+                    FriendService svc = new FriendService(repo);
+                    Friend result = svc.sendFriendRequest(fromUserId, toUserId);
+                    android.util.Log.d("ProfileActivity", "Friend request created: " + (result != null ? result.id : "null"));
+                    Toast.makeText(ProfileActivity.this, "Friend request sent!", Toast.LENGTH_SHORT).show();
+                } catch (Exception ex) {
+                    android.util.Log.e("ProfileActivity", "Error sending friend request", ex);
+                    Toast.makeText(ProfileActivity.this, "Failed to send request: " + ex.getMessage(), Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            @Override
+            public void onCancelled(com.google.firebase.database.DatabaseError error) {
+                android.util.Log.e("ProfileActivity", "Validation error: " + error.getMessage());
+                Toast.makeText(ProfileActivity.this, "Failed to validate user: " + error.getMessage(), Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 
     private void performCreateChallenge(String fromUserId, String toUserId) {
@@ -468,19 +694,39 @@ public class ProfileActivity extends AppCompatActivity {
             Toast.makeText(this, "Social features unavailable", Toast.LENGTH_SHORT).show();
             return;
         }
-        com.edulinguaghana.social.Challenge ch = new com.edulinguaghana.social.Challenge();
-        ch.quizId = "default_quiz";
-        ch.challengerId = fromUserId;
-        ch.challengedId = toUserId;
-        try {
-            repo.createChallenge(ch);
-            Toast.makeText(this, "Challenge sent to " + toUserId, Toast.LENGTH_SHORT).show();
-        } catch (IllegalArgumentException ex) {
-            // User doesn't exist
-            Toast.makeText(this, "User not found: " + toUserId, Toast.LENGTH_LONG).show();
-        } catch (Exception ex) {
-            Toast.makeText(this, "Failed to send challenge: " + ex.getMessage(), Toast.LENGTH_SHORT).show();
-        }
+
+        // First validate that the target user exists in Firebase
+        Toast.makeText(this, "Validating user...", Toast.LENGTH_SHORT).show();
+
+        com.google.firebase.database.DatabaseReference usersRef =
+            com.google.firebase.database.FirebaseDatabase.getInstance().getReference("users");
+
+        usersRef.child(toUserId).addListenerForSingleValueEvent(new com.google.firebase.database.ValueEventListener() {
+            @Override
+            public void onDataChange(com.google.firebase.database.DataSnapshot snapshot) {
+                if (!snapshot.exists()) {
+                    Toast.makeText(ProfileActivity.this, "User not found: " + toUserId, Toast.LENGTH_LONG).show();
+                    return;
+                }
+
+                // User exists, proceed with challenge creation
+                com.edulinguaghana.social.Challenge ch = new com.edulinguaghana.social.Challenge();
+                ch.quizId = "default_quiz";
+                ch.challengerId = fromUserId;
+                ch.challengedId = toUserId;
+                try {
+                    repo.createChallenge(ch);
+                    Toast.makeText(ProfileActivity.this, "Challenge sent!", Toast.LENGTH_SHORT).show();
+                } catch (Exception ex) {
+                    Toast.makeText(ProfileActivity.this, "Failed to send challenge: " + ex.getMessage(), Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            @Override
+            public void onCancelled(com.google.firebase.database.DatabaseError error) {
+                Toast.makeText(ProfileActivity.this, "Failed to validate user: " + error.getMessage(), Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 
     private void showFriendsMenu(String userId) {
@@ -533,8 +779,8 @@ public class ProfileActivity extends AppCompatActivity {
                         return;
                     }
 
-                    // Show dialog with friends
-                    showFriendsListDialog(acceptedFriends, userId);
+                    // Fetch usernames for each friend
+                    fetchUsernamesForFriends(acceptedFriends, userId);
                 }
 
                 @Override
@@ -544,11 +790,64 @@ public class ProfileActivity extends AppCompatActivity {
             });
     }
 
+    private void fetchUsernamesForFriends(java.util.List<Friend> friends, String currentUserId) {
+        if (friends.isEmpty()) {
+            showFriendsListDialog(friends, currentUserId);
+            return;
+        }
+
+        com.google.firebase.database.DatabaseReference usersRef =
+            com.google.firebase.database.FirebaseDatabase.getInstance().getReference("users");
+
+        final int[] fetchedCount = {0};
+        final int totalCount = friends.size();
+
+        for (Friend friend : friends) {
+            usersRef.child(friend.friendUserId).addListenerForSingleValueEvent(
+                new com.google.firebase.database.ValueEventListener() {
+                    @Override
+                    public void onDataChange(com.google.firebase.database.DataSnapshot snapshot) {
+                        if (snapshot.exists()) {
+                            String displayName = snapshot.child("displayName").getValue(String.class);
+                            if (displayName != null && !displayName.isEmpty()) {
+                                friend.displayName = displayName;
+                            } else {
+                                // Fallback to email or UID
+                                String email = snapshot.child("email").getValue(String.class);
+                                friend.displayName = email != null ? email : friend.friendUserId;
+                            }
+                        } else {
+                            friend.displayName = friend.friendUserId; // Fallback to UID
+                        }
+
+                        fetchedCount[0]++;
+                        if (fetchedCount[0] == totalCount) {
+                            // All usernames fetched, show the dialog
+                            showFriendsListDialog(friends, currentUserId);
+                        }
+                    }
+
+                    @Override
+                    public void onCancelled(com.google.firebase.database.DatabaseError error) {
+                        friend.displayName = friend.friendUserId; // Fallback to UID on error
+                        fetchedCount[0]++;
+                        if (fetchedCount[0] == totalCount) {
+                            showFriendsListDialog(friends, currentUserId);
+                        }
+                    }
+                }
+            );
+        }
+    }
+
     private void showFriendsListDialog(java.util.List<Friend> friends, String currentUserId) {
         String[] friendItems = new String[friends.size()];
         for (int i = 0; i < friends.size(); i++) {
             Friend friend = friends.get(i);
-            friendItems[i] = "👤 " + friend.friendUserId;
+            String displayName = friend.displayName != null && !friend.displayName.isEmpty()
+                ? friend.displayName
+                : friend.friendUserId;
+            friendItems[i] = "👤 " + displayName;
         }
 
         new AlertDialog.Builder(this)
@@ -563,9 +862,12 @@ public class ProfileActivity extends AppCompatActivity {
 
     private void showFriendOptionsDialog(Friend friend, String currentUserId) {
         String[] options = {"👤 View Profile", "⚔️ Challenge", "❌ Remove Friend"};
+        String displayName = friend.displayName != null && !friend.displayName.isEmpty()
+            ? friend.displayName
+            : friend.friendUserId;
 
         new AlertDialog.Builder(this)
-            .setTitle(friend.friendUserId)
+            .setTitle(displayName)
             .setItems(options, (dialog, which) -> {
                 switch (which) {
                     case 0:
@@ -807,8 +1109,8 @@ public class ProfileActivity extends AppCompatActivity {
                         return;
                     }
 
-                    // Show dialog with challenges
-                    showChallengesDialog(pendingChallenges);
+                    // Fetch usernames for challenges
+                    fetchUsernamesForChallenges(pendingChallenges);
                 }
 
                 @Override
@@ -818,11 +1120,62 @@ public class ProfileActivity extends AppCompatActivity {
             });
     }
 
+    private void fetchUsernamesForChallenges(java.util.List<com.edulinguaghana.social.Challenge> challenges) {
+        if (challenges.isEmpty()) {
+            showChallengesDialog(challenges);
+            return;
+        }
+
+        com.google.firebase.database.DatabaseReference usersRef =
+            com.google.firebase.database.FirebaseDatabase.getInstance().getReference("users");
+
+        final int[] fetchedCount = {0};
+        final int totalCount = challenges.size();
+
+        for (com.edulinguaghana.social.Challenge challenge : challenges) {
+            usersRef.child(challenge.challengerId).addListenerForSingleValueEvent(
+                new com.google.firebase.database.ValueEventListener() {
+                    @Override
+                    public void onDataChange(com.google.firebase.database.DataSnapshot snapshot) {
+                        if (snapshot.exists()) {
+                            String displayName = snapshot.child("displayName").getValue(String.class);
+                            if (displayName != null && !displayName.isEmpty()) {
+                                challenge.challengerName = displayName;
+                            } else {
+                                String email = snapshot.child("email").getValue(String.class);
+                                challenge.challengerName = email != null ? email : challenge.challengerId;
+                            }
+                        } else {
+                            challenge.challengerName = challenge.challengerId;
+                        }
+
+                        fetchedCount[0]++;
+                        if (fetchedCount[0] == totalCount) {
+                            showChallengesDialog(challenges);
+                        }
+                    }
+
+                    @Override
+                    public void onCancelled(com.google.firebase.database.DatabaseError error) {
+                        challenge.challengerName = challenge.challengerId;
+                        fetchedCount[0]++;
+                        if (fetchedCount[0] == totalCount) {
+                            showChallengesDialog(challenges);
+                        }
+                    }
+                }
+            );
+        }
+    }
+
     private void showChallengesDialog(java.util.List<com.edulinguaghana.social.Challenge> challenges) {
         String[] challengeItems = new String[challenges.size()];
         for (int i = 0; i < challenges.size(); i++) {
             com.edulinguaghana.social.Challenge challenge = challenges.get(i);
-            challengeItems[i] = "⚔️ Challenge from: " + challenge.challengerId;
+            String displayName = challenge.challengerName != null && !challenge.challengerName.isEmpty()
+                ? challenge.challengerName
+                : challenge.challengerId;
+            challengeItems[i] = "⚔️ Challenge from: " + displayName;
         }
 
         new AlertDialog.Builder(this)

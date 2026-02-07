@@ -26,7 +26,7 @@
               </option>
               <option name="failureTypes">
                 <list>
-                  <option value="NON_FATAL" />
+                  <option value="FATAL" />
                 </list>
               </option>
               <option name="signal" value="SIGNAL_UNSPECIFIED" />

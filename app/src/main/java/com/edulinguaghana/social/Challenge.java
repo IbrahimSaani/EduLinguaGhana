@@ -15,6 +15,10 @@ public class Challenge {
     public Long expiresAt;
     public Map<String, Integer> results = new HashMap<>();
 
+    // Transient fields for UI display (not saved to Firebase)
+    public transient String challengerName;
+    public transient String challengedName;
+
     public Challenge() {}
 
     public Challenge(String id, String quizId, String challengerId, String challengedId, State state, long createdAt, Long expiresAt) {

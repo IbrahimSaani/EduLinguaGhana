@@ -556,15 +556,46 @@ public class QuizActivity extends AppCompatActivity {
             com.edulinguaghana.social.SocialRepository social = com.edulinguaghana.social.SocialProvider.get();
             if (social != null) {
                 // Post to Firebase leaderboard (Realtime DB path "leaderboard")
-                com.edulinguaghana.LeaderboardEntry entry = new com.edulinguaghana.LeaderboardEntry();
                 String uid = com.google.firebase.auth.FirebaseAuth.getInstance().getCurrentUser() != null ? com.google.firebase.auth.FirebaseAuth.getInstance().getCurrentUser().getUid() : "anonymous";
-                entry.setUserId(uid);
-                entry.setUserName(uid); // ideally use displayName
-                entry.setScore(score);
-                entry.setTimestamp(System.currentTimeMillis());
-                // If the SocialRepository is a FirebaseSocialRepository it will push achievement shares and challenges.
-                // For leaderboard we still use the app's existing Firebase Database reference directly for compatibility:
-                com.google.firebase.database.FirebaseDatabase.getInstance().getReference("leaderboard").child(entry.getUserId()).setValue(entry);
+
+                // Fetch user's displayName from /users node before saving to leaderboard
+                com.google.firebase.database.FirebaseDatabase.getInstance().getReference("users").child(uid)
+                    .addListenerForSingleValueEvent(new com.google.firebase.database.ValueEventListener() {
+                        @Override
+                        public void onDataChange(com.google.firebase.database.DataSnapshot snapshot) {
+                            String displayName = uid; // fallback to uid
+                            if (snapshot.exists() && snapshot.child("displayName").getValue() != null) {
+                                displayName = snapshot.child("displayName").getValue(String.class);
+                            }
+
+                            // Create and save leaderboard entry with actual displayName
+                            com.edulinguaghana.LeaderboardEntry entry = new com.edulinguaghana.LeaderboardEntry();
+                            entry.setUserId(uid);
+                            entry.setUserName(displayName);
+                            entry.setScore(score);
+                            entry.setTimestamp(System.currentTimeMillis());
+
+                            com.google.firebase.database.FirebaseDatabase.getInstance()
+                                .getReference("leaderboard")
+                                .child(entry.getUserId())
+                                .setValue(entry);
+                        }
+
+                        @Override
+                        public void onCancelled(com.google.firebase.database.DatabaseError error) {
+                            // Fallback: save with uid as username if fetch fails
+                            com.edulinguaghana.LeaderboardEntry entry = new com.edulinguaghana.LeaderboardEntry();
+                            entry.setUserId(uid);
+                            entry.setUserName(uid);
+                            entry.setScore(score);
+                            entry.setTimestamp(System.currentTimeMillis());
+
+                            com.google.firebase.database.FirebaseDatabase.getInstance()
+                                .getReference("leaderboard")
+                                .child(entry.getUserId())
+                                .setValue(entry);
+                        }
+                    });
 
                 // Resolve pending challenges for this user: fetch challenges where challengedId==uid
                 // FirebaseSocialRepository does not provide a synchronous get, so we update via DB query
