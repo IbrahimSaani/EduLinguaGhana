@@ -1,6 +1,8 @@
 package com.edulinguaghana;
 
+import android.Manifest;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.text.InputType;
 import android.view.MenuItem;
@@ -14,12 +16,15 @@ import android.widget.ProgressBar;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 
 import com.google.android.material.button.MaterialButton;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.zxing.integration.android.IntentIntegrator;
+import com.google.zxing.integration.android.IntentResult;
 
-import androidx.core.content.ContextCompat;
 import java.util.Calendar;
 
 import com.edulinguaghana.gamification.XPManager;
@@ -28,8 +33,14 @@ import com.edulinguaghana.social.SocialProvider;
 import com.edulinguaghana.social.SocialRepository;
 import com.edulinguaghana.social.service.FriendService;
 import com.edulinguaghana.social.Friend;
+import com.edulinguaghana.social.SearchHistory;
+import com.edulinguaghana.social.QRCodeGenerator;
+import com.edulinguaghana.social.FriendSuggestionEngine;
+import android.graphics.Bitmap;
 
 public class ProfileActivity extends AppCompatActivity {
+
+    private static final int CAMERA_PERMISSION_REQUEST_CODE = 100;
 
     private FirebaseAuth mAuth;
     private View notSignedInLayout, signedInLayout;
@@ -44,6 +55,7 @@ public class ProfileActivity extends AppCompatActivity {
     private AvatarView profileImage, avatarNotSignedIn;
     private DynamicBackgroundView dynamicBackground;
     private MaterialButton btnAddFriend, btnChallengeFriend;
+    private SearchHistory searchHistory;
 
     private final XPManager.XPListener xpListener = new XPManager.XPListener() {
         @Override
@@ -64,6 +76,7 @@ public class ProfileActivity extends AppCompatActivity {
         setContentView(R.layout.activity_profile);
 
         mAuth = FirebaseAuth.getInstance();
+        searchHistory = new SearchHistory(this);
 
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -353,19 +366,113 @@ public class ProfileActivity extends AppCompatActivity {
 
     // Helper: show dialog to find a user id to add as friend
     private void presentAddFriendDialog(String currentUserId) {
-        String[] searchOptions = {"Search by Email", "Search by User ID"};
+        String[] searchOptions = {
+            "🔍 Search by Username",
+            "📧 Search by Email",
+            "🆔 Search by User ID",
+            "📱 Scan QR Code",
+            "💡 Friend Suggestions",
+            "📜 Search History"
+        };
 
         new AlertDialog.Builder(this)
             .setTitle("Add Friend")
             .setItems(searchOptions, (dialog, which) -> {
-                if (which == 0) {
-                    showSearchByEmailDialog(currentUserId);
-                } else {
-                    showSearchByIdDialog(currentUserId);
+                switch (which) {
+                    case 0:
+                        showSearchByUsernameDialog(currentUserId);
+                        break;
+                    case 1:
+                        showSearchByEmailDialog(currentUserId);
+                        break;
+                    case 2:
+                        showSearchByIdDialog(currentUserId);
+                        break;
+                    case 3:
+                        showQRCodeScanner(currentUserId);
+                        break;
+                    case 4:
+                        showFriendSuggestions(currentUserId);
+                        break;
+                    case 5:
+                        showSearchHistoryDialog(currentUserId);
+                        break;
                 }
+            })
+            .setNeutralButton("Share My QR", (dialog, which) -> {
+                showMyQRCode(currentUserId);
             })
             .setNegativeButton("Cancel", null)
             .show();
+    }
+
+    private void showSearchByUsernameDialog(String currentUserId) {
+        android.app.AlertDialog.Builder builder = new android.app.AlertDialog.Builder(this);
+        builder.setTitle("Add Friend by Username");
+        final EditText input = new EditText(this);
+        input.setHint("Enter username");
+        input.setInputType(InputType.TYPE_CLASS_TEXT);
+        builder.setView(input);
+        builder.setPositiveButton("Search", (dialog, which) -> {
+            String username = input.getText() != null ? input.getText().toString().trim() : "";
+            if (username.isEmpty()) {
+                Toast.makeText(this, "Please enter a username", Toast.LENGTH_SHORT).show();
+                return;
+            }
+            searchHistory.addUsernameSearch(username);
+            searchUserByUsername(username, currentUserId);
+        });
+        builder.setNegativeButton("Cancel", (dialog, which) -> dialog.cancel());
+        builder.show();
+    }
+
+    private void searchUserByUsername(String username, String currentUserId) {
+        Toast.makeText(this, "Searching...", Toast.LENGTH_SHORT).show();
+        android.util.Log.d("ProfileActivity", "Searching for username: " + username);
+
+        com.google.firebase.database.DatabaseReference usersRef =
+            com.google.firebase.database.FirebaseDatabase.getInstance().getReference("users");
+
+        usersRef.orderByChild("username").equalTo(username)
+            .addListenerForSingleValueEvent(new com.google.firebase.database.ValueEventListener() {
+                @Override
+                public void onDataChange(com.google.firebase.database.DataSnapshot snapshot) {
+                    android.util.Log.d("ProfileActivity", "Username search result - exists: " + snapshot.exists());
+
+                    if (!snapshot.exists()) {
+                        android.util.Log.e("ProfileActivity", "No user found with username: " + username);
+                        new AlertDialog.Builder(ProfileActivity.this)
+                            .setTitle("User Not Found")
+                            .setMessage("No user found with username:\n" + username +
+                                      "\n\nTry searching by email or user ID instead.")
+                            .setPositiveButton("OK", null)
+                            .show();
+                        return;
+                    }
+
+                    for (com.google.firebase.database.DataSnapshot child : snapshot.getChildren()) {
+                        String foundUserId = child.getKey();
+                        String displayName = child.child("displayName").getValue(String.class);
+                        String email = child.child("email").getValue(String.class);
+
+                        if (foundUserId != null) {
+                            if (foundUserId.equals(currentUserId)) {
+                                Toast.makeText(ProfileActivity.this, "That's you!", Toast.LENGTH_SHORT).show();
+                                return;
+                            }
+
+                            String name = displayName != null ? displayName : username;
+                            showAddFriendConfirmation(currentUserId, foundUserId, name, email != null ? email : "Unknown");
+                            return;
+                        }
+                    }
+                }
+
+                @Override
+                public void onCancelled(com.google.firebase.database.DatabaseError error) {
+                    Toast.makeText(ProfileActivity.this, "Search failed: " + error.getMessage(), Toast.LENGTH_SHORT).show();
+                }
+            });
     }
 
     private void showSearchByEmailDialog(String currentUserId) {
@@ -381,6 +488,7 @@ public class ProfileActivity extends AppCompatActivity {
                 Toast.makeText(this, "Please enter an email", Toast.LENGTH_SHORT).show();
                 return;
             }
+            searchHistory.addEmailSearch(email);
             searchUserByEmail(email, currentUserId);
         });
         builder.setNegativeButton("Cancel", (dialog, which) -> dialog.cancel());
@@ -410,11 +518,308 @@ public class ProfileActivity extends AppCompatActivity {
                 Toast.makeText(this, "You can't add yourself", Toast.LENGTH_SHORT).show();
                 return;
             }
+            searchHistory.addUidSearch(target);
             // Validate user exists before sending request
             validateAndAddFriendById(currentUserId, target);
         });
         builder.setNegativeButton("Cancel", (dialog, which) -> dialog.cancel());
         builder.show();
+    }
+
+    private void showQRCodeScanner(String currentUserId) {
+        // Check camera permission
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA)
+                != PackageManager.PERMISSION_GRANTED) {
+            // Request permission
+            ActivityCompat.requestPermissions(this,
+                new String[]{Manifest.permission.CAMERA},
+                CAMERA_PERMISSION_REQUEST_CODE);
+        } else {
+            // Permission already granted, start scanner
+            startQRScanner();
+        }
+    }
+
+    private void startQRScanner() {
+        IntentIntegrator integrator = new IntentIntegrator(this);
+        integrator.setDesiredBarcodeFormats(IntentIntegrator.QR_CODE);
+        integrator.setPrompt("📷 Scan Friend's QR Code");
+        integrator.setOrientationLocked(false);
+        integrator.setBeepEnabled(true);
+        integrator.setBarcodeImageEnabled(false);
+        integrator.initiateScan();
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+
+        if (requestCode == CAMERA_PERMISSION_REQUEST_CODE) {
+            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                // Permission granted, start scanner
+                startQRScanner();
+            } else {
+                // Permission denied
+                Toast.makeText(this, "Camera permission is required to scan QR codes", Toast.LENGTH_LONG).show();
+
+                // Show dialog explaining why permission is needed
+                new AlertDialog.Builder(this)
+                    .setTitle("Camera Permission Required")
+                    .setMessage("To scan QR codes and add friends quickly, this app needs access to your camera.\n\nYou can grant permission in Settings.")
+                    .setPositiveButton("Settings", (dialog, which) -> {
+                        // Open app settings
+                        Intent intent = new Intent(android.provider.Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
+                        intent.setData(android.net.Uri.fromParts("package", getPackageName(), null));
+                        startActivity(intent);
+                    })
+                    .setNegativeButton("Cancel", null)
+                    .show();
+            }
+        }
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        IntentResult result = IntentIntegrator.parseActivityResult(requestCode, resultCode, data);
+
+        if (result != null) {
+            if (result.getContents() == null) {
+                Toast.makeText(this, "Scan cancelled", Toast.LENGTH_SHORT).show();
+            } else {
+                // QR code scanned successfully
+                String scannedUserId = result.getContents();
+                handleScannedQRCode(scannedUserId);
+            }
+        } else {
+            super.onActivityResult(requestCode, resultCode, data);
+        }
+    }
+
+    private void handleScannedQRCode(String scannedUserId) {
+        FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
+        if (currentUser == null) {
+            Toast.makeText(this, "Please sign in first", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        String currentUserId = currentUser.getUid();
+
+        if (scannedUserId == null || scannedUserId.trim().isEmpty()) {
+            Toast.makeText(this, "Invalid QR code", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        if (scannedUserId.equals(currentUserId)) {
+            Toast.makeText(this, "That's your own QR code!", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        // Show loading
+        android.app.ProgressDialog progressDialog = new android.app.ProgressDialog(this);
+        progressDialog.setMessage("Looking up user...");
+        progressDialog.setCancelable(false);
+        progressDialog.show();
+
+        // Validate user exists and show confirmation
+        com.google.firebase.database.DatabaseReference usersRef =
+            com.google.firebase.database.FirebaseDatabase.getInstance().getReference("users");
+
+        usersRef.child(scannedUserId).addListenerForSingleValueEvent(
+            new com.google.firebase.database.ValueEventListener() {
+                @Override
+                public void onDataChange(com.google.firebase.database.DataSnapshot snapshot) {
+                    progressDialog.dismiss();
+
+                    if (!snapshot.exists()) {
+                        new AlertDialog.Builder(ProfileActivity.this)
+                            .setTitle("Invalid QR Code")
+                            .setMessage("This QR code doesn't belong to any registered user.")
+                            .setPositiveButton("OK", null)
+                            .show();
+                        return;
+                    }
+
+                    String displayName = snapshot.child("displayName").getValue(String.class);
+                    String email = snapshot.child("email").getValue(String.class);
+                    String username = snapshot.child("username").getValue(String.class);
+
+                    String friendName = displayName != null ? displayName :
+                                       (username != null ? username : "User");
+                    String friendEmail = email != null ? email : "Unknown";
+
+                    // Show confirmation dialog
+                    new AlertDialog.Builder(ProfileActivity.this)
+                        .setTitle("✅ QR Code Scanned!")
+                        .setMessage("Add " + friendName + " as friend?\n\nEmail: " + friendEmail)
+                        .setPositiveButton("Add Friend", (dialog, which) -> {
+                            sendFriendRequest(currentUserId, scannedUserId, friendName);
+                        })
+                        .setNegativeButton("Cancel", null)
+                        .show();
+                }
+
+                @Override
+                public void onCancelled(com.google.firebase.database.DatabaseError error) {
+                    progressDialog.dismiss();
+                    Toast.makeText(ProfileActivity.this,
+                        "Error: " + error.getMessage(),
+                        Toast.LENGTH_SHORT).show();
+                }
+            });
+    }
+
+    private void sendFriendRequest(String fromUserId, String toUserId, String friendName) {
+        SocialRepository repo = SocialProvider.get();
+        if (repo == null) {
+            Toast.makeText(this, "Social features unavailable", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        try {
+            repo.addFriend(fromUserId, toUserId);
+            Toast.makeText(this, "✅ Friend request sent to " + friendName + "!", Toast.LENGTH_LONG).show();
+        } catch (Exception ex) {
+            android.util.Log.e("ProfileActivity", "Failed to send friend request", ex);
+            Toast.makeText(this, "Failed to send friend request", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    private void showMyQRCode(String currentUserId) {
+        if (currentUserId == null) return;
+
+        // Generate QR code
+        Bitmap qrBitmap = QRCodeGenerator.generateQRCode(currentUserId, 512);
+
+        if (qrBitmap == null) {
+            Toast.makeText(this, "Failed to generate QR code", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        // Create ImageView to display QR code
+        ImageView qrImageView = new ImageView(this);
+        qrImageView.setImageBitmap(qrBitmap);
+        qrImageView.setPadding(40, 40, 40, 40);
+
+        // Show in dialog
+        new AlertDialog.Builder(this)
+            .setTitle("📱 My Friend Code")
+            .setMessage("Show this QR code to friends so they can add you!")
+            .setView(qrImageView)
+            .setPositiveButton("Close", null)
+            .setNeutralButton("Share ID", (dialog, which) -> {
+                android.content.ClipboardManager clipboard = (android.content.ClipboardManager) getSystemService(CLIPBOARD_SERVICE);
+                android.content.ClipData clip = android.content.ClipData.newPlainText("User ID", currentUserId);
+                clipboard.setPrimaryClip(clip);
+                Toast.makeText(this, "User ID copied!", Toast.LENGTH_SHORT).show();
+            })
+            .show();
+    }
+
+    private void showFriendSuggestions(String currentUserId) {
+        android.app.ProgressDialog progressDialog = new android.app.ProgressDialog(this);
+        progressDialog.setMessage("Finding friends for you...");
+        progressDialog.setCancelable(false);
+        progressDialog.show();
+
+        FriendSuggestionEngine.getSuggestions(currentUserId, new FriendSuggestionEngine.SuggestionCallback() {
+            @Override
+            public void onSuggestionsReady(java.util.List<FriendSuggestionEngine.UserSuggestion> suggestions) {
+                progressDialog.dismiss();
+
+                if (suggestions.isEmpty()) {
+                    new AlertDialog.Builder(ProfileActivity.this)
+                        .setTitle("No Suggestions")
+                        .setMessage("No friend suggestions available right now.\n\nTry again after more users join the app!")
+                        .setPositiveButton("OK", null)
+                        .show();
+                    return;
+                }
+
+                String[] suggestionItems = new String[suggestions.size()];
+                for (int i = 0; i < suggestions.size(); i++) {
+                    FriendSuggestionEngine.UserSuggestion suggestion = suggestions.get(i);
+                    String commonText = suggestion.commonInterests.isEmpty() ? "" :
+                        " • " + String.join(", ", suggestion.commonInterests);
+                    suggestionItems[i] = "💡 " + suggestion.username + " (Match: " + suggestion.matchScore + "%)" + commonText;
+                }
+
+                new AlertDialog.Builder(ProfileActivity.this)
+                    .setTitle("Friend Suggestions")
+                    .setItems(suggestionItems, (dialog, which) -> {
+                        FriendSuggestionEngine.UserSuggestion selected = suggestions.get(which);
+                        showAddFriendConfirmation(currentUserId, selected.userId, selected.username, selected.email);
+                    })
+                    .setNegativeButton("Close", null)
+                    .show();
+            }
+
+            @Override
+            public void onError(String error) {
+                progressDialog.dismiss();
+                Toast.makeText(ProfileActivity.this, "Error: " + error, Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    private void showSearchHistoryDialog(String currentUserId) {
+        java.util.List<String> emailHistory = searchHistory.getEmailHistory();
+        java.util.List<String> uidHistory = searchHistory.getUidHistory();
+        java.util.List<String> usernameHistory = searchHistory.getUsernameHistory();
+
+        if (emailHistory.isEmpty() && uidHistory.isEmpty() && usernameHistory.isEmpty()) {
+            Toast.makeText(this, "No search history yet", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        // Combine all history into one list with labels
+        java.util.List<String> allHistory = new java.util.ArrayList<>();
+        java.util.List<String> allHistoryValues = new java.util.ArrayList<>();
+        java.util.List<String> allHistoryTypes = new java.util.ArrayList<>();
+
+        for (String email : emailHistory) {
+            allHistory.add("📧 " + email);
+            allHistoryValues.add(email);
+            allHistoryTypes.add("email");
+        }
+
+        for (String username : usernameHistory) {
+            allHistory.add("👤 " + username);
+            allHistoryValues.add(username);
+            allHistoryTypes.add("username");
+        }
+
+        for (String uid : uidHistory) {
+            allHistory.add("🆔 " + uid.substring(0, Math.min(20, uid.length())) + "...");
+            allHistoryValues.add(uid);
+            allHistoryTypes.add("uid");
+        }
+
+        String[] historyItems = allHistory.toArray(new String[0]);
+
+        new AlertDialog.Builder(this)
+            .setTitle("Recent Searches")
+            .setItems(historyItems, (dialog, which) -> {
+                String value = allHistoryValues.get(which);
+                String type = allHistoryTypes.get(which);
+
+                switch (type) {
+                    case "email":
+                        searchUserByEmail(value, currentUserId);
+                        break;
+                    case "username":
+                        searchUserByUsername(value, currentUserId);
+                        break;
+                    case "uid":
+                        validateAndAddFriendById(currentUserId, value);
+                        break;
+                }
+            })
+            .setNeutralButton("Clear History", (dialog, which) -> {
+                searchHistory.clearAll();
+                Toast.makeText(this, "Search history cleared", Toast.LENGTH_SHORT).show();
+            })
+            .setNegativeButton("Close", null)
+            .show();
     }
 
     private void showAllUsersInDatabase() {
@@ -1008,7 +1413,7 @@ public class ProfileActivity extends AppCompatActivity {
         String[] requestItems = new String[requests.size()];
         for (int i = 0; i < requests.size(); i++) {
             Friend friend = requests.get(i);
-            requestItems[i] = "Request from: " + friend.userId;
+            requestItems[i] = "📬 Request from: " + friend.userId;
         }
 
         new AlertDialog.Builder(this)
@@ -1017,9 +1422,72 @@ public class ProfileActivity extends AppCompatActivity {
                 Friend selectedRequest = requests.get(which);
                 showAcceptRejectDialog(selectedRequest);
             })
+            .setNeutralButton("Accept All", (dialog, which) -> {
+                showAcceptAllConfirmation(requests);
+            })
             .setNegativeButton("Close", null)
             .show();
     }
+
+    private void showAcceptAllConfirmation(java.util.List<Friend> requests) {
+        new AlertDialog.Builder(this)
+            .setTitle("Accept All Friend Requests?")
+            .setMessage("Accept all " + requests.size() + " pending friend requests?")
+            .setPositiveButton("Accept All", (dialog, which) -> {
+                acceptAllFriendRequests(requests);
+            })
+            .setNegativeButton("Cancel", null)
+            .show();
+    }
+
+    private void acceptAllFriendRequests(java.util.List<Friend> requests) {
+        SocialRepository repo = SocialProvider.get();
+        if (repo == null) {
+            Toast.makeText(this, "Social features unavailable", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
+        String currentUserId = currentUser != null ? currentUser.getUid() : null;
+
+        if (currentUserId == null) {
+            Toast.makeText(this, "Please sign in", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        android.app.ProgressDialog progressDialog = new android.app.ProgressDialog(this);
+        progressDialog.setMessage("Accepting requests...");
+        progressDialog.setMax(requests.size());
+        progressDialog.setProgressStyle(android.app.ProgressDialog.STYLE_HORIZONTAL);
+        progressDialog.setCancelable(false);
+        progressDialog.show();
+
+        final int[] accepted = {0};
+        final int[] failed = {0};
+
+        for (Friend request : requests) {
+            try {
+                repo.acceptFriend(currentUserId, request.userId);
+                accepted[0]++;
+            } catch (Exception ex) {
+                failed[0]++;
+                android.util.Log.e("ProfileActivity", "Failed to accept request from " + request.userId, ex);
+            }
+
+            progressDialog.setProgress(accepted[0] + failed[0]);
+
+            // Update UI after all processed
+            if (accepted[0] + failed[0] == requests.size()) {
+                progressDialog.dismiss();
+                String message = "✅ Accepted: " + accepted[0];
+                if (failed[0] > 0) {
+                    message += "\n❌ Failed: " + failed[0];
+                }
+                Toast.makeText(this, message, Toast.LENGTH_LONG).show();
+            }
+        }
+    }
+
 
     private void showAcceptRejectDialog(Friend request) {
         new AlertDialog.Builder(this)

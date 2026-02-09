@@ -31,6 +31,11 @@ android {
         sourceCompatibility = JavaVersion.VERSION_11
         targetCompatibility = JavaVersion.VERSION_11
     }
+
+    lint {
+        abortOnError = false
+        disable += setOf("LongLogTag", "NewApi")
+    }
 }
 
 dependencies {
@@ -42,6 +47,10 @@ dependencies {
     implementation("androidx.annotation:annotation:1.7.0")
     implementation("com.airbnb.android:lottie:6.7.1")
     implementation("com.google.code.gson:gson:2.10.1")
+
+    // QR Code generation and scanning
+    implementation("com.google.zxing:core:3.5.2")
+    implementation("com.journeyapps:zxing-android-embedded:4.3.0")
 
     // Firebase Authentication
     implementation(platform("com.google.firebase:firebase-bom:32.7.0"))

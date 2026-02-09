@@ -4,6 +4,8 @@
     <uses-permission android:name="android.permission.RECORD_AUDIO"/>
     <!--  Haptic feedback permission -->
     <uses-permission android:name="android.permission.VIBRATE" />
+    <!--  Camera permission for QR code scanning  -->
+    <uses-permission android:name="android.permission.CAMERA"/>
     <!--  Optional: TTS requires internet for language downloads in some cases  -->
     <uses-permission android:name="android.permission.INTERNET"/>
     <!--  Network state permission for connectivity checks  -->
@@ -74,6 +76,12 @@
         <activity android:name=".AnimatedAvatarDemoActivity" android:exported="false"/>
         <!--  ChallengesActivity  -->
         <activity android:name=".ChallengesActivity" android:exported="false"/>
+        <!--  QR Code Scanner Activity  -->
+        <activity
+            android:name="com.journeyapps.barcodescanner.CaptureActivity"
+            android:screenOrientation="fullSensor"
+            android:exported="false"
+            tools:replace="screenOrientation" />
 
         <!--  Firebase Cloud Messaging Service  -->
         <service
