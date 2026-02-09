@@ -6,6 +6,9 @@ import android.widget.Toast;
 
 import com.edulinguaghana.gamification.XPManager;
 import com.edulinguaghana.gamification.QuestManager;
+import com.edulinguaghana.tracking.ProgressTracker;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 
 public class ProgressManager {
 
@@ -16,6 +19,11 @@ public class ProgressManager {
 
     // Update global progress stats
     public static void updateProgress(Context context, String mode, int score, int correctCount) {
+        updateProgress(context, mode, score, correctCount, 10); // Default 10 questions
+    }
+
+    // Update global progress stats with total questions parameter
+    public static void updateProgress(Context context, String mode, int score, int correctCount, int totalQuestions) {
         SharedPreferences prefs = context.getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = prefs.edit();
 
@@ -40,6 +48,19 @@ public class ProgressManager {
             // progress the daily_quiz quest by 1
             QuestManager.progressQuest(context, "daily_quiz", 1);
         } catch (Exception ignored) { }
+
+        // --- Real-time Progress Tracking: Log to Firebase ---
+        try {
+            FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+            if (user != null) {
+                ProgressTracker tracker = new ProgressTracker();
+                tracker.logQuizCompletion(context, user.getUid(), mode, score,
+                                        correctCount, totalQuestions, 0, null);
+            }
+        } catch (Exception e) {
+            // Silently fail if Firebase is not available
+            android.util.Log.e("ProgressManager", "Failed to log to Firebase", e);
+        }
     }
 
     // Get total quizzes taken

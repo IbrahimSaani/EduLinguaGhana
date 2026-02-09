@@ -14,12 +14,89 @@
 .cxx
 local.properties
 
-# Firebase / secrets
+# Firebase / Secrets (CRITICAL - NEVER COMMIT!)
 google-services.json
+firebase-adminsdk-*.json
+serviceAccountKey.json
 *.jks
 *.keystore
 *.pem
 *.p12
-serviceAccountKey.json
 .env
+.env.local
+.env.production
+firebase-config.json
+
+# API Keys and Secrets
+secrets.properties
+keystore.properties
+signing.properties
+**/secrets/**
+**/credentials/**
+
+# Build outputs
+*.apk
+*.ap_
+*.aab
+*.dex
+*.class
+output.json
+app-debug.apk
+app-release.apk
+
+# Logs and temporary files
+*.log
+*.txt
+build.log
+build-output.txt
+build_errors.txt
+build_output.txt
+build_result.txt
+lint-results*.xml
+lint-results*.html
+
+# Generated documentation (optional - keep source .md files)
+# Uncomment if you don't want to commit documentation
+# *.md
+# !README.md
+
+# Personal notes and drafts
+NOTES.md
+DRAFT*.md
+TODO_PERSONAL.md
+
+# Test data
+test-data/
+mock-data/
+
+# Android Studio navigation files
+.navigation/
+
+# Captures
+captures/
+
+# IntelliJ
+out/
+.idea_modules/
+
+# User-specific configurations
+*.iws
+.idea/gradle.xml
+.idea/misc.xml
+.idea/compiler.xml
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# Backup files
+*.bak
+*.backup
+*~
 

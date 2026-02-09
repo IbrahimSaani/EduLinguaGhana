@@ -9,6 +9,8 @@ import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.edulinguaghana.roles.RoleManager;
+import com.edulinguaghana.roles.UserRole;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
@@ -300,6 +302,13 @@ public class SignUpActivity extends AppCompatActivity {
      * Save user profile to Firebase Realtime Database
      */
     private void saveUserToDatabase(FirebaseUser user) {
+        saveUserToDatabase(user, UserRole.STUDENT); // Default to student
+    }
+
+    /**
+     * Save user profile to Firebase Realtime Database with role
+     */
+    private void saveUserToDatabase(FirebaseUser user, UserRole role) {
         if (user == null) return;
 
         DatabaseReference usersRef = FirebaseDatabase.getInstance().getReference("users");
@@ -307,9 +316,15 @@ public class SignUpActivity extends AppCompatActivity {
         userProfile.put("uid", user.getUid());
         userProfile.put("email", user.getEmail());
         userProfile.put("displayName", user.getDisplayName());
+        userProfile.put("username", user.getDisplayName() != null ? user.getDisplayName() : user.getEmail());
+        userProfile.put("role", role.name());
         userProfile.put("createdAt", System.currentTimeMillis());
 
         usersRef.child(user.getUid()).setValue(userProfile);
+
+        // Also set role via RoleManager
+        RoleManager roleManager = new RoleManager();
+        roleManager.setUserRole(this, user.getUid(), role);
     }
 
     private void navigateToMain() {

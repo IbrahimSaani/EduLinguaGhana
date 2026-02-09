@@ -35,6 +35,14 @@ import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.card.MaterialCardView;
 import com.google.android.material.chip.Chip;
 import com.google.android.material.chip.ChipGroup;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.edulinguaghana.roles.RoleManager;
+import com.edulinguaghana.roles.UserRole;
+import com.edulinguaghana.tracking.TeacherDashboardActivity;
+import com.edulinguaghana.tracking.ParentDashboardActivity;
+import com.edulinguaghana.tracking.RelationshipManagementActivity;
 
 import java.util.Calendar;
 
@@ -67,6 +75,7 @@ public class MainActivity extends AppCompatActivity {
     private android.view.View offlineBanner;
     private BottomNavigationView bottomNavigation;
     private com.edulinguaghana.social.NotificationPermissionHelper permissionHelper;
+    private FloatingActionButton fabRoleDashboard;
 
     private static final String KEY_ANIMATIONS_ENABLED = "ANIMATIONS_ENABLED";
     private static final String KEY_LOW_POWER_ANIMATIONS = "LOW_POWER_ANIMATIONS";
@@ -148,6 +157,9 @@ public class MainActivity extends AppCompatActivity {
 
         // Initialize notification system
         initializeNotifications();
+
+        // Setup role-based navigation
+        setupRoleBasedNavigation();
     }
 
     private void setupOfflineIndicator() {
@@ -653,6 +665,23 @@ public class MainActivity extends AppCompatActivity {
             }
         }
 
+        // Add role-based menu items dynamically
+        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+        if (user != null) {
+            RoleManager roleManager = new RoleManager();
+            roleManager.getUserRole(this, user.getUid(), new RoleManager.RoleCallback() {
+                @Override
+                public void onRoleRetrieved(UserRole role) {
+                    addRoleMenuItems(menu, role);
+                }
+
+                @Override
+                public void onError(String error) {
+                    // No special menu items
+                }
+            });
+        }
+
         return true;
     }
 
@@ -672,6 +701,22 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+
+        if (id == R.id.menu_my_students) {
+            Intent intent = new Intent(this, TeacherDashboardActivity.class);
+            startActivity(intent);
+            return true;
+        } else if (id == R.id.menu_my_children) {
+            Intent intent = new Intent(this, ParentDashboardActivity.class);
+            startActivity(intent);
+            return true;
+        } else if (id == R.id.menu_connections) {
+            Intent intent = new Intent(this, RelationshipManagementActivity.class);
+            startActivity(intent);
+            return true;
+        }
+
         return super.onOptionsItemSelected(item);
     }
 
@@ -1226,5 +1271,139 @@ public class MainActivity extends AppCompatActivity {
     private void openNotificationsScreen() {
         Intent intent = new Intent(MainActivity.this, NotificationsActivity.class);
         startActivity(intent);
+    }
+
+    /**
+     * Setup role-based navigation for teachers and parents
+     */
+    private void setupRoleBasedNavigation() {
+        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+        if (user == null) {
+            // User not logged in, hide role-based features
+            return;
+        }
+
+        RoleManager roleManager = new RoleManager();
+        roleManager.getUserRole(this, user.getUid(), new RoleManager.RoleCallback() {
+            @Override
+            public void onRoleRetrieved(UserRole role) {
+                setupNavigationForRole(role);
+            }
+
+            @Override
+            public void onError(String error) {
+                // Default to student - no special navigation needed
+                android.util.Log.d("MainActivity", "Could not get user role: " + error);
+            }
+        });
+    }
+
+    /**
+     * Setup navigation UI based on user role
+     */
+    private void setupNavigationForRole(UserRole role) {
+        if (role == UserRole.TEACHER) {
+            setupTeacherNavigation();
+        } else if (role == UserRole.PARENT) {
+            setupParentNavigation();
+        } else {
+            // Student role - add connection management access
+            setupStudentNavigation();
+        }
+    }
+
+    /**
+     * Setup navigation for teachers
+     */
+    private void setupTeacherNavigation() {
+        // Find or create FAB for teacher dashboard
+        fabRoleDashboard = findViewById(R.id.fabRoleDashboard);
+        if (fabRoleDashboard == null) {
+            // FAB doesn't exist in layout, create it programmatically
+            createRoleFAB();
+        }
+
+        if (fabRoleDashboard != null) {
+            fabRoleDashboard.setVisibility(View.VISIBLE);
+            fabRoleDashboard.setImageResource(android.R.drawable.ic_menu_agenda);
+            fabRoleDashboard.setContentDescription("My Students");
+            fabRoleDashboard.setOnClickListener(v -> {
+                Intent intent = new Intent(MainActivity.this, TeacherDashboardActivity.class);
+                startActivity(intent);
+            });
+        }
+
+        // Also add menu item if toolbar menu exists
+        invalidateOptionsMenu();
+    }
+
+    /**
+     * Setup navigation for parents
+     */
+    private void setupParentNavigation() {
+        // Find or create FAB for parent dashboard
+        fabRoleDashboard = findViewById(R.id.fabRoleDashboard);
+        if (fabRoleDashboard == null) {
+            createRoleFAB();
+        }
+
+        if (fabRoleDashboard != null) {
+            fabRoleDashboard.setVisibility(View.VISIBLE);
+            fabRoleDashboard.setImageResource(android.R.drawable.ic_menu_agenda);
+            fabRoleDashboard.setContentDescription("My Children");
+            fabRoleDashboard.setOnClickListener(v -> {
+                Intent intent = new Intent(MainActivity.this, ParentDashboardActivity.class);
+                startActivity(intent);
+            });
+        }
+
+        invalidateOptionsMenu();
+    }
+
+    /**
+     * Setup navigation for students
+     */
+    private void setupStudentNavigation() {
+        // Students get access to connection management in the menu
+        invalidateOptionsMenu();
+    }
+
+    /**
+     * Create a FAB programmatically if it doesn't exist in layout
+     */
+    private void createRoleFAB() {
+        if (rootCoordinator == null) return;
+
+        fabRoleDashboard = new FloatingActionButton(this);
+        CoordinatorLayout.LayoutParams params = new CoordinatorLayout.LayoutParams(
+            CoordinatorLayout.LayoutParams.WRAP_CONTENT,
+            CoordinatorLayout.LayoutParams.WRAP_CONTENT
+        );
+        params.gravity = android.view.Gravity.BOTTOM | android.view.Gravity.END;
+        params.setMargins(0, 0, 48, 48); // 48dp margin from bottom and end
+        fabRoleDashboard.setLayoutParams(params);
+        fabRoleDashboard.setId(View.generateViewId());
+
+        rootCoordinator.addView(fabRoleDashboard);
+    }
+
+    /**
+     * Add menu items based on user role
+     */
+    private void addRoleMenuItems(Menu menu, UserRole role) {
+        if (role == UserRole.TEACHER) {
+            menu.add(0, R.id.menu_my_students, 100, "My Students")
+                .setIcon(android.R.drawable.ic_menu_agenda)
+                .setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM);
+        } else if (role == UserRole.PARENT) {
+            menu.add(0, R.id.menu_my_children, 100, "My Children")
+                .setIcon(android.R.drawable.ic_menu_agenda)
+                .setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM);
+        } else {
+            // Student - add connection management
+            menu.add(0, R.id.menu_connections, 100, "Connections")
+                .setIcon(android.R.drawable.ic_menu_add)
+                .setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM);
+        }
     }
 }

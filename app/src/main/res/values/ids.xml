@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Menu IDs for role-based navigation -->
+    <item type="id" name="menu_my_students" />
+    <item type="id" name="menu_my_children" />
+    <item type="id" name="menu_connections" />
+
+    <!-- FloatingActionButton ID -->
+    <item type="id" name="fabRoleDashboard" />
+</resources>
+

@@ -76,6 +76,29 @@
         <activity android:name=".AnimatedAvatarDemoActivity" android:exported="false"/>
         <!--  ChallengesActivity  -->
         <activity android:name=".ChallengesActivity" android:exported="false"/>
+
+        <!--  Progress Tracking Activities  -->
+        <activity
+            android:name=".tracking.TeacherDashboardActivity"
+            android:label="My Students"
+            android:parentActivityName=".MainActivity"
+            android:exported="false"/>
+        <activity
+            android:name=".tracking.ParentDashboardActivity"
+            android:label="My Children"
+            android:parentActivityName=".MainActivity"
+            android:exported="false"/>
+        <activity
+            android:name=".tracking.StudentDetailActivity"
+            android:label="Student Progress"
+            android:parentActivityName=".tracking.TeacherDashboardActivity"
+            android:exported="false"/>
+        <activity
+            android:name=".tracking.RelationshipManagementActivity"
+            android:label="Manage Connections"
+            android:parentActivityName=".MainActivity"
+            android:exported="false"/>
+
         <!--  QR Code Scanner Activity  -->
         <activity
             android:name="com.journeyapps.barcodescanner.CaptureActivity"
