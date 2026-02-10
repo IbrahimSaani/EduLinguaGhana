@@ -5,14 +5,18 @@
 
     <!-- App-specific branding -->
     <color name="colorPrimary">#1A237E</color>
+    <color name="primary">#1A237E</color>
     <color name="colorPrimaryDark">#0D47A1</color>
     <color name="colorAccent">#FFAB40</color>
 
     <!-- UI elements -->
     <color name="appBackground">#F3F5FF</color>
     <color name="cardBackground">#FFFFFF</color>
+    <color name="card_background">#FFFFFF</color>
+    <color name="card_stroke">#E0E0E0</color>
     <color name="textColorPrimary">#263238</color>
     <color name="textColorSecondary">#455A64</color>
+    <color name="text_secondary">#455A64</color>
 
     <!-- Buttons -->
     <color name="buttonPrimary">#1A237E</color>

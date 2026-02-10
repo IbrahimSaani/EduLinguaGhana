@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="120dp"
+    android:height="120dp"
+    android:viewportWidth="120"
+    android:viewportHeight="120">
+
+    <!-- Circle background -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M60,10 A50,50 0,1,1 60,110 A50,50 0,1,1 60,10 Z"/>
+
+    <!-- Graduation cap -->
+    <path
+        android:fillColor="#1A237E"
+        android:pathData="M60,35 L30,45 L30,65 L60,75 L90,65 L90,45 Z"/>
+
+    <!-- Cap top -->
+    <path
+        android:fillColor="#FFAB40"
+        android:pathData="M55,30 L65,30 L65,40 L60,45 L55,40 Z"/>
+
+    <!-- Book -->
+    <path
+        android:fillColor="#1A237E"
+        android:pathData="M40,70 L80,70 L80,95 L40,95 Z"/>
+
+    <!-- Book pages -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M45,75 L75,75 L75,77 L45,77 Z M45,80 L75,80 L75,82 L45,82 Z M45,85 L75,85 L75,87 L45,87 Z"/>
+</vector>
+

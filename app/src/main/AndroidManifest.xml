@@ -68,6 +68,8 @@
         <activity android:name=".LoginActivity" android:exported="false"/>
         <!--  SignUpActivity  -->
         <activity android:name=".SignUpActivity" android:exported="false"/>
+        <!--  RoleSelectionActivity  -->
+        <activity android:name=".RoleSelectionActivity" android:exported="false"/>
         <!--  AccountManagementActivity  -->
         <activity android:name=".AccountManagementActivity" android:exported="false"/>
         <!--  AvatarEditorActivity  -->

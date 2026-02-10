@@ -302,7 +302,18 @@ public class SignUpActivity extends AppCompatActivity {
      * Save user profile to Firebase Realtime Database
      */
     private void saveUserToDatabase(FirebaseUser user) {
-        saveUserToDatabase(user, UserRole.STUDENT); // Default to student
+        if (user == null) return;
+
+        DatabaseReference usersRef = FirebaseDatabase.getInstance().getReference("users");
+        Map<String, Object> userProfile = new HashMap<>();
+        userProfile.put("uid", user.getUid());
+        userProfile.put("email", user.getEmail());
+        userProfile.put("displayName", user.getDisplayName());
+        userProfile.put("username", user.getDisplayName() != null ? user.getDisplayName() : user.getEmail());
+        userProfile.put("createdAt", System.currentTimeMillis());
+        // Don't set role yet - let user choose in RoleSelectionActivity
+
+        usersRef.child(user.getUid()).setValue(userProfile);
     }
 
     /**
@@ -328,7 +339,9 @@ public class SignUpActivity extends AppCompatActivity {
     }
 
     private void navigateToMain() {
-        Intent intent = new Intent(SignUpActivity.this, MainActivity.class);
+        // Navigate to role selection for first-time users
+        Intent intent = new Intent(SignUpActivity.this, RoleSelectionActivity.class);
+        intent.putExtra("first_time", true);
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
         startActivity(intent);
         finish();

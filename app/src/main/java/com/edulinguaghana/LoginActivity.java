@@ -10,6 +10,8 @@ import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.edulinguaghana.roles.RoleManager;
+import com.edulinguaghana.roles.UserRole;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
@@ -341,10 +343,33 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     private void navigateToMain() {
-        Intent intent = new Intent(LoginActivity.this, MainActivity.class);
-        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-        startActivity(intent);
-        finish();
+        FirebaseUser user = mAuth.getCurrentUser();
+        if (user == null) {
+            return;
+        }
+
+        // Check if user has a role set
+        RoleManager roleManager = new RoleManager();
+        roleManager.getUserRole(this, user.getUid(), new RoleManager.RoleCallback() {
+            @Override
+            public void onRoleRetrieved(UserRole role) {
+                // User has a role, go to MainActivity
+                Intent intent = new Intent(LoginActivity.this, MainActivity.class);
+                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                startActivity(intent);
+                finish();
+            }
+
+            @Override
+            public void onError(String error) {
+                // No role set, go to RoleSelectionActivity
+                Intent intent = new Intent(LoginActivity.this, RoleSelectionActivity.class);
+                intent.putExtra("first_time", true);
+                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                startActivity(intent);
+                finish();
+            }
+        });
     }
 
     @Override

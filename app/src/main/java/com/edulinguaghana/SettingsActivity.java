@@ -6,6 +6,7 @@ import androidx.appcompat.app.AppCompatDelegate;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.content.res.ResourcesCompat;
 
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Typeface;
 import android.os.Bundle;
@@ -19,6 +20,8 @@ import android.widget.Toast;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.edulinguaghana.roles.RoleManager;
+import com.edulinguaghana.roles.UserRole;
 
 public class SettingsActivity extends AppCompatActivity {
 
@@ -28,7 +31,9 @@ public class SettingsActivity extends AppCompatActivity {
     private Button btnResetProgress;
     private Button btnSyncToCloud;
     private Button btnSyncFromCloud;
+    private Button btnChangeRole;
     private TextView tvLastSync;
+    private TextView tvCurrentRole;
     private RadioGroup rgTheme;
     private RadioButton rbLight, rbDark, rbSystem;
 
@@ -68,7 +73,9 @@ public class SettingsActivity extends AppCompatActivity {
         btnResetProgress = findViewById(R.id.btnResetProgress);
         btnSyncToCloud = findViewById(R.id.btnSyncToCloud);
         btnSyncFromCloud = findViewById(R.id.btnSyncFromCloud);
+        btnChangeRole = findViewById(R.id.btnChangeRole);
         tvLastSync = findViewById(R.id.tvLastSync);
+        tvCurrentRole = findViewById(R.id.tvCurrentRole);
         rgTheme = findViewById(R.id.rgTheme);
         rbLight = findViewById(R.id.rbLight);
         rbDark = findViewById(R.id.rbDark);
@@ -79,6 +86,9 @@ public class SettingsActivity extends AppCompatActivity {
 
         // Update last sync time
         updateLastSyncTime();
+
+        // Display current role
+        displayCurrentRole();
 
         // Load preferences
         SharedPreferences prefs = getSharedPreferences(PREF_NAME, MODE_PRIVATE);
@@ -129,6 +139,11 @@ public class SettingsActivity extends AppCompatActivity {
         // Cloud Sync buttons
         btnSyncToCloud.setOnClickListener(v -> syncToCloud());
         btnSyncFromCloud.setOnClickListener(v -> syncFromCloud());
+
+        // Change Role button
+        if (btnChangeRole != null) {
+            btnChangeRole.setOnClickListener(v -> openRoleSelection());
+        }
 
         // Test upload score button
         btnSyncToCloud.setOnLongClickListener(v -> {
@@ -224,6 +239,57 @@ public class SettingsActivity extends AppCompatActivity {
         CloudSyncManager syncManager = new CloudSyncManager(this);
         String lastSyncTime = syncManager.getLastSyncTimeString();
         tvLastSync.setText("Last sync: " + lastSyncTime);
+    }
+
+    private void displayCurrentRole() {
+        if (tvCurrentRole == null) return;
+
+        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+        if (user == null) {
+            tvCurrentRole.setText("Current role: Not logged in");
+            if (btnChangeRole != null) {
+                btnChangeRole.setEnabled(false);
+            }
+            return;
+        }
+
+        RoleManager roleManager = new RoleManager();
+        roleManager.getUserRole(this, user.getUid(), new RoleManager.RoleCallback() {
+            @Override
+            public void onRoleRetrieved(UserRole role) {
+                String roleText = "Current role: ";
+                switch (role) {
+                    case STUDENT:
+                        roleText += "🎓 Student";
+                        break;
+                    case TEACHER:
+                        roleText += "👨‍🏫 Teacher";
+                        break;
+                    case PARENT:
+                        roleText += "👨‍👩‍👧‍👦 Parent";
+                        break;
+                }
+                tvCurrentRole.setText(roleText);
+            }
+
+            @Override
+            public void onError(String error) {
+                tvCurrentRole.setText("Current role: Not set");
+            }
+        });
+    }
+
+    private void openRoleSelection() {
+        Intent intent = new Intent(this, RoleSelectionActivity.class);
+        intent.putExtra("first_time", false); // Not first time, allow back navigation
+        startActivity(intent);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        // Refresh role display when returning from RoleSelectionActivity
+        displayCurrentRole();
     }
 
     private void syncToCloud() {

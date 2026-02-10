@@ -341,6 +341,84 @@
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
 
+            <!-- Account & Role Section -->
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="20dp"
+                app:cardCornerRadius="16dp"
+                app:cardElevation="2dp"
+                app:strokeWidth="0dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="20dp">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:gravity="center_vertical"
+                        android:layout_marginBottom="16dp"
+                        android:orientation="horizontal">
+
+                        <ImageView
+                            android:layout_width="28dp"
+                            android:layout_height="28dp"
+                            android:src="@drawable/ic_user"
+                            app:tint="@color/colorPrimary"
+                            android:contentDescription="Account Settings" />
+
+                        <TextView
+                            android:id="@+id/tvAccountHeader"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="12dp"
+                            android:text="👤 Account"
+                            android:textColor="?attr/colorOnSurface"
+                            android:textSize="18sp"
+                            android:textStyle="bold" />
+                    </LinearLayout>
+
+                    <TextView
+                        android:id="@+id/tvCurrentRole"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="12dp"
+                        android:paddingStart="4dp"
+                        android:paddingEnd="4dp"
+                        android:text="Current role: Loading..."
+                        android:textColor="@color/textColorSecondary"
+                        android:textSize="14sp" />
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="16dp"
+                        android:paddingStart="4dp"
+                        android:paddingEnd="4dp"
+                        android:text="Choose your role to access features tailored for students, teachers, or parents."
+                        android:textColor="@color/textColorSecondary"
+                        android:textSize="13sp"
+                        android:lineSpacingExtra="2dp" />
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btnChangeRole"
+                        style="@style/Widget.Material3.Button.TonalButton"
+                        android:layout_width="match_parent"
+                        android:layout_height="56dp"
+                        android:text="Change Role"
+                        android:textSize="15sp"
+                        android:textStyle="bold"
+                        app:icon="@drawable/ic_user"
+                        app:iconGravity="textStart"
+                        app:iconPadding="8dp"
+                        app:cornerRadius="12dp" />
+
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
             <!-- Cloud Sync Section -->
             <com.google.android.material.card.MaterialCardView
                 android:layout_width="match_parent"
