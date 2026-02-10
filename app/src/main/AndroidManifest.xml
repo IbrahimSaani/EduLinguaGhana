@@ -6,6 +6,12 @@
     <uses-permission android:name="android.permission.VIBRATE" />
     <!--  Camera permission for QR code scanning  -->
     <uses-permission android:name="android.permission.CAMERA"/>
+
+    <!--  Hardware features (optional - app works without these)  -->
+    <uses-feature android:name="android.hardware.camera" android:required="false"/>
+    <uses-feature android:name="android.hardware.camera.autofocus" android:required="false"/>
+    <uses-feature android:name="android.hardware.microphone" android:required="false"/>
+
     <!--  Optional: TTS requires internet for language downloads in some cases  -->
     <uses-permission android:name="android.permission.INTERNET"/>
     <!--  Network state permission for connectivity checks  -->

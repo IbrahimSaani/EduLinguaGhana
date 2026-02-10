@@ -11,8 +11,11 @@ import android.graphics.RectF;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -1439,10 +1442,21 @@ public class AvatarBuilder {
     }
 
     /**
+     * Get SharedPreferences name for current user
+     */
+    private static String getPrefsName(Context context) {
+        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+        if (user != null) {
+            return "AvatarPrefs_" + user.getUid();
+        }
+        return "AvatarPrefs_guest";
+    }
+
+    /**
      * Save avatar configuration
      */
     public void saveConfig(Context context) {
-        SharedPreferences prefs = context.getSharedPreferences("AvatarPrefs", Context.MODE_PRIVATE);
+        SharedPreferences prefs = context.getSharedPreferences(getPrefsName(context), Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = prefs.edit();
         editor.putString("skinTone", config.skinTone.name());
         editor.putString("hairStyle", config.hairStyle.name());
@@ -1454,6 +1468,7 @@ public class AvatarBuilder {
         editor.putString("clothingColor", config.clothingColor.name());
         editor.putString("facialExpression", config.facialExpression.name());
         editor.putString("backgroundColor", config.backgroundColor);
+        editor.putLong("lastUpdated", System.currentTimeMillis());
         editor.apply();
 
         // Also save to Firebase if user is logged in
@@ -1463,7 +1478,10 @@ public class AvatarBuilder {
                 .getReference("users")
                 .child(user.getUid())
                 .child("avatar");
-            avatarRef.setValue(config.toMap());
+
+            Map<String, Object> avatarData = config.toMap();
+            avatarData.put("lastUpdated", System.currentTimeMillis());
+            avatarRef.setValue(avatarData);
         }
     }
 
@@ -1471,8 +1489,12 @@ public class AvatarBuilder {
      * Load avatar configuration
      */
     public static AvatarConfig loadConfig(Context context) {
-        SharedPreferences prefs = context.getSharedPreferences("AvatarPrefs", Context.MODE_PRIVATE);
+        SharedPreferences prefs = context.getSharedPreferences(getPrefsName(context), Context.MODE_PRIVATE);
         AvatarConfig config = new AvatarConfig();
+
+        // Check if we have cached data
+        long lastUpdated = prefs.getLong("lastUpdated", 0);
+        boolean hasCache = lastUpdated > 0;
 
         try {
             String skinTone = prefs.getString("skinTone", null);
@@ -1508,7 +1530,95 @@ public class AvatarBuilder {
             e.printStackTrace();
         }
 
+        // If user is logged in and we don't have cache, try loading from Firebase
+        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+        if (user != null && !hasCache) {
+            loadFromFirebase(context, user.getUid());
+        }
+
         return config;
+    }
+
+    /**
+     * Load avatar from Firebase (asynchronous)
+     */
+    private static void loadFromFirebase(Context context, String userId) {
+        DatabaseReference avatarRef = FirebaseDatabase.getInstance()
+            .getReference("users")
+            .child(userId)
+            .child("avatar");
+
+        avatarRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot snapshot) {
+                if (snapshot.exists()) {
+                    try {
+                        AvatarConfig config = new AvatarConfig();
+
+                        String skinTone = snapshot.child("skinTone").getValue(String.class);
+                        if (skinTone != null) config.skinTone = SkinTone.valueOf(skinTone);
+
+                        String hairStyle = snapshot.child("hairStyle").getValue(String.class);
+                        if (hairStyle != null) config.hairStyle = HairStyle.valueOf(hairStyle);
+
+                        String hairColor = snapshot.child("hairColor").getValue(String.class);
+                        if (hairColor != null) config.hairColor = HairColor.valueOf(hairColor);
+
+                        String eyeStyle = snapshot.child("eyeStyle").getValue(String.class);
+                        if (eyeStyle != null) config.eyeStyle = EyeStyle.valueOf(eyeStyle);
+
+                        String mouthStyle = snapshot.child("mouthStyle").getValue(String.class);
+                        if (mouthStyle != null) config.mouthStyle = MouthStyle.valueOf(mouthStyle);
+
+                        String accessory = snapshot.child("accessory").getValue(String.class);
+                        if (accessory != null) config.accessory = Accessory.valueOf(accessory);
+
+                        String clothingStyle = snapshot.child("clothingStyle").getValue(String.class);
+                        if (clothingStyle != null) config.clothingStyle = ClothingStyle.valueOf(clothingStyle);
+
+                        String clothingColor = snapshot.child("clothingColor").getValue(String.class);
+                        if (clothingColor != null) config.clothingColor = ClothingColor.valueOf(clothingColor);
+
+                        String facialExpression = snapshot.child("facialExpression").getValue(String.class);
+                        if (facialExpression != null) config.facialExpression = FacialExpression.valueOf(facialExpression);
+
+                        String bgColor = snapshot.child("backgroundColor").getValue(String.class);
+                        if (bgColor != null) config.backgroundColor = bgColor;
+
+                        // Save to local cache
+                        SharedPreferences prefs = context.getSharedPreferences(getPrefsName(context), Context.MODE_PRIVATE);
+                        SharedPreferences.Editor editor = prefs.edit();
+                        editor.putString("skinTone", config.skinTone.name());
+                        editor.putString("hairStyle", config.hairStyle.name());
+                        editor.putString("hairColor", config.hairColor.name());
+                        editor.putString("eyeStyle", config.eyeStyle.name());
+                        editor.putString("mouthStyle", config.mouthStyle.name());
+                        editor.putString("accessory", config.accessory.name());
+                        editor.putString("clothingStyle", config.clothingStyle.name());
+                        editor.putString("clothingColor", config.clothingColor.name());
+                        editor.putString("facialExpression", config.facialExpression.name());
+                        editor.putString("backgroundColor", config.backgroundColor);
+                        editor.putLong("lastUpdated", System.currentTimeMillis());
+                        editor.apply();
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError error) {
+                // Ignore errors - will use default avatar
+            }
+        });
+    }
+
+    /**
+     * Clear avatar cache for current user
+     */
+    public static void clearCache(Context context) {
+        SharedPreferences prefs = context.getSharedPreferences(getPrefsName(context), Context.MODE_PRIVATE);
+        prefs.edit().clear().apply();
     }
 
     public AvatarConfig getConfig() {

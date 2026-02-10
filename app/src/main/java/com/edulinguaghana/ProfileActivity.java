@@ -29,6 +29,7 @@ import java.util.Calendar;
 
 import com.edulinguaghana.gamification.XPManager;
 import com.edulinguaghana.gamification.XPState;
+import com.edulinguaghana.roles.RoleManager;
 import com.edulinguaghana.social.SocialProvider;
 import com.edulinguaghana.social.SocialRepository;
 import com.edulinguaghana.social.service.FriendService;
@@ -1828,7 +1829,16 @@ public class ProfileActivity extends AppCompatActivity {
                 .setTitle("Sign Out")
                 .setMessage("Are you sure you want to sign out?")
                 .setPositiveButton("Sign Out", (dialog, which) -> {
+                    // Clear avatar cache before signing out
+                    AvatarBuilder.clearCache(this);
+
+                    // Clear role cache
+                    RoleManager roleManager = new RoleManager();
+                    roleManager.clearCache(this);
+
+                    // Sign out from Firebase
                     mAuth.signOut();
+
                     Toast.makeText(ProfileActivity.this, "Signed out successfully", Toast.LENGTH_SHORT).show();
                     setupProfile(); // Refresh the UI
                 })

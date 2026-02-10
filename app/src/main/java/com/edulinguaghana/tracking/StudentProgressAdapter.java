@@ -63,6 +63,8 @@ public class StudentProgressAdapter extends RecyclerView.Adapter<StudentProgress
         private TextView tvAccuracy;
         private TextView tvStreak;
         private TextView tvLastActive;
+        private View streakLayout;
+        private View btnViewDetails;
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -74,22 +76,28 @@ public class StudentProgressAdapter extends RecyclerView.Adapter<StudentProgress
             tvAccuracy = itemView.findViewById(R.id.tvAccuracy);
             tvStreak = itemView.findViewById(R.id.tvStreak);
             tvLastActive = itemView.findViewById(R.id.tvLastActive);
+            streakLayout = itemView.findViewById(R.id.streakLayout);
+            btnViewDetails = itemView.findViewById(R.id.btnViewDetails);
         }
 
         public void bind(StudentProgressItem item, OnStudentClickListener listener) {
             ProgressAggregate progress = item.getProgress();
 
             tvStudentName.setText(item.getStudentName() != null ? item.getStudentName() : "Unknown Student");
-            tvLevel.setText("Level " + progress.getCurrentLevel());
-            tvXP.setText(progress.getTotalXP() + " XP");
-            tvQuizzes.setText(progress.getTotalQuizzes() + " quizzes");
-            tvAccuracy.setText(String.format("%.1f%%", progress.getAccuracy()));
+            tvLevel.setText("Lvl " + progress.getCurrentLevel());
+            tvXP.setText(String.valueOf(progress.getTotalXP()));
+            tvQuizzes.setText(String.valueOf(progress.getTotalQuizzes()));
+            tvAccuracy.setText(String.format("%.0f%%", progress.getAccuracy()));
 
             if (progress.getCurrentStreak() > 0) {
                 tvStreak.setText("🔥 " + progress.getCurrentStreak() + " day streak");
-                tvStreak.setVisibility(View.VISIBLE);
+                if (streakLayout != null) {
+                    streakLayout.setVisibility(View.VISIBLE);
+                }
             } else {
-                tvStreak.setVisibility(View.GONE);
+                if (streakLayout != null) {
+                    streakLayout.setVisibility(View.GONE);
+                }
             }
 
             // Format last active time
@@ -107,11 +115,20 @@ public class StudentProgressAdapter extends RecyclerView.Adapter<StudentProgress
                 tvLastActive.setText("Not active yet");
             }
 
+            // Click listeners
             cardView.setOnClickListener(v -> {
                 if (listener != null) {
                     listener.onStudentClick(item.getStudentId());
                 }
             });
+
+            if (btnViewDetails != null) {
+                btnViewDetails.setOnClickListener(v -> {
+                    if (listener != null) {
+                        listener.onStudentClick(item.getStudentId());
+                    }
+                });
+            }
         }
     }
 }
