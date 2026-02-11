@@ -367,44 +367,66 @@ public class ProfileActivity extends AppCompatActivity {
 
     // Helper: show dialog to find a user id to add as friend
     private void presentAddFriendDialog(String currentUserId) {
-        String[] searchOptions = {
-            "🔍 Search by Username",
-            "📧 Search by Email",
-            "🆔 Search by User ID",
-            "📱 Scan QR Code",
-            "💡 Friend Suggestions",
-            "📜 Search History"
-        };
+        java.util.List<StyledMenuHelper.MenuItem> menuItems = new java.util.ArrayList<>();
 
-        new AlertDialog.Builder(this)
-            .setTitle("Add Friend")
-            .setItems(searchOptions, (dialog, which) -> {
-                switch (which) {
-                    case 0:
-                        showSearchByUsernameDialog(currentUserId);
-                        break;
-                    case 1:
-                        showSearchByEmailDialog(currentUserId);
-                        break;
-                    case 2:
-                        showSearchByIdDialog(currentUserId);
-                        break;
-                    case 3:
-                        showQRCodeScanner(currentUserId);
-                        break;
-                    case 4:
-                        showFriendSuggestions(currentUserId);
-                        break;
-                    case 5:
-                        showSearchHistoryDialog(currentUserId);
-                        break;
-                }
-            })
-            .setNeutralButton("Share My QR", (dialog, which) -> {
-                showMyQRCode(currentUserId);
-            })
-            .setNegativeButton("Cancel", null)
-            .show();
+        menuItems.add(new StyledMenuHelper.MenuItem(
+            "🔍",
+            "Search by Username",
+            "Find friends by their username",
+            () -> showSearchByUsernameDialog(currentUserId)
+        ));
+
+        menuItems.add(new StyledMenuHelper.MenuItem(
+            "📧",
+            "Search by Email",
+            "Find friends using email address",
+            () -> showSearchByEmailDialog(currentUserId)
+        ));
+
+        menuItems.add(new StyledMenuHelper.MenuItem(
+            "🆔",
+            "Search by User ID",
+            "Find friends using their unique ID",
+            () -> showSearchByIdDialog(currentUserId)
+        ));
+
+        menuItems.add(new StyledMenuHelper.MenuItem(
+            "📱",
+            "Scan QR Code",
+            "Scan a friend's QR code",
+            () -> showQRCodeScanner(currentUserId)
+        ));
+
+        menuItems.add(new StyledMenuHelper.MenuItem(
+            "💡",
+            "Friend Suggestions",
+            "Discover new friends",
+            () -> showFriendSuggestions(currentUserId)
+        ));
+
+        menuItems.add(new StyledMenuHelper.MenuItem(
+            "📜",
+            "Search History",
+            "View recent friend searches",
+            () -> showSearchHistoryDialog(currentUserId)
+        ));
+
+        // Add a special item for sharing QR code
+        menuItems.add(new StyledMenuHelper.MenuItem(
+            "📲",
+            "Share My QR Code",
+            "Let others scan your code",
+            () -> showMyQRCode(currentUserId)
+        ));
+
+        StyledMenuHelper.showStyledMenu(
+            this,
+            "➕",
+            "Add Friend",
+            "Choose how to find friends",
+            menuItems,
+            null
+        );
     }
 
     private void showSearchByUsernameDialog(String currentUserId) {
@@ -1136,25 +1158,37 @@ public class ProfileActivity extends AppCompatActivity {
     }
 
     private void showFriendsMenu(String userId) {
-        String[] options = {"👥 View Friends", "📬 View Requests", "➕ Add Friend"};
+        java.util.List<StyledMenuHelper.MenuItem> menuItems = new java.util.ArrayList<>();
 
-        new AlertDialog.Builder(this)
-            .setTitle("Friends")
-            .setItems(options, (dialog, which) -> {
-                switch (which) {
-                    case 0:
-                        showFriendsList(userId);
-                        break;
-                    case 1:
-                        showFriendRequests(userId);
-                        break;
-                    case 2:
-                        presentAddFriendDialog(userId);
-                        break;
-                }
-            })
-            .setNegativeButton("Cancel", null)
-            .show();
+        menuItems.add(new StyledMenuHelper.MenuItem(
+            "👥",
+            "View Friends",
+            "See your current friends list",
+            () -> showFriendsList(userId)
+        ));
+
+        menuItems.add(new StyledMenuHelper.MenuItem(
+            "📬",
+            "View Requests",
+            "Check pending friend requests",
+            () -> showFriendRequests(userId)
+        ));
+
+        menuItems.add(new StyledMenuHelper.MenuItem(
+            "➕",
+            "Add Friend",
+            "Find and add new friends",
+            () -> presentAddFriendDialog(userId)
+        ));
+
+        StyledMenuHelper.showStyledMenu(
+            this,
+            "👥",
+            "Friends",
+            "Manage your connections",
+            menuItems,
+            null
+        );
     }
 
     private void showFriendsList(String userId) {
@@ -1529,25 +1563,37 @@ public class ProfileActivity extends AppCompatActivity {
     }
 
     private void showChallengesMenu(String userId) {
-        String[] options = {"⚔️ Pending Challenges", "🏆 Completed Challenges", "🎯 Create Challenge"};
+        java.util.List<StyledMenuHelper.MenuItem> menuItems = new java.util.ArrayList<>();
 
-        new AlertDialog.Builder(this)
-            .setTitle("Challenges")
-            .setItems(options, (dialog, which) -> {
-                switch (which) {
-                    case 0:
-                        showChallenges(userId);
-                        break;
-                    case 1:
-                        showCompletedChallenges(userId);
-                        break;
-                    case 2:
-                        presentChallengeDialog(userId);
-                        break;
-                }
-            })
-            .setNegativeButton("Cancel", null)
-            .show();
+        menuItems.add(new StyledMenuHelper.MenuItem(
+            "⚔️",
+            "Pending Challenges",
+            "View and accept challenges",
+            () -> showChallenges(userId)
+        ));
+
+        menuItems.add(new StyledMenuHelper.MenuItem(
+            "🏆",
+            "Completed Challenges",
+            "See your challenge history",
+            () -> showCompletedChallenges(userId)
+        ));
+
+        menuItems.add(new StyledMenuHelper.MenuItem(
+            "🎯",
+            "Create Challenge",
+            "Challenge a friend",
+            () -> presentChallengeDialog(userId)
+        ));
+
+        StyledMenuHelper.showStyledMenu(
+            this,
+            "⚔️",
+            "Challenges",
+            "Compete with friends",
+            menuItems,
+            null
+        );
     }
 
     private void showChallenges(String userId) {

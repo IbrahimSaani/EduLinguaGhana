@@ -7,6 +7,7 @@
     <color name="colorPrimary">#1A237E</color>
     <color name="primary">#1A237E</color>
     <color name="colorPrimaryDark">#0D47A1</color>
+    <color name="colorPrimaryLight">#E8EAF6</color>
     <color name="colorAccent">#FFAB40</color>
 
     <!-- UI elements -->
