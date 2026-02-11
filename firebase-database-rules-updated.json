@@ -1,0 +1,68 @@
+{
+  "rules": {
+    "leaderboard": {
+      ".read": true,
+      "$userId": {
+        ".write": "$userId === auth.uid"
+      }
+    },
+    "users": {
+      ".read": "auth != null",
+      ".indexOn": ["email", "username", "role"],
+      "$userId": {
+        ".write": "$userId === auth.uid",
+        ".read": true,
+        "role": {
+          ".write": "$userId === auth.uid",
+          ".validate": "newData.isString() && (newData.val() === 'STUDENT' || newData.val() === 'TEACHER' || newData.val() === 'PARENT')"
+        },
+        "fcmToken": {
+          ".write": "$userId === auth.uid",
+          ".validate": "newData.isString()"
+        }
+      }
+    },
+    "friends": {
+      ".read": "auth != null",
+      ".write": "auth != null"
+    },
+    "challenges": {
+      ".read": "auth != null",
+      ".write": "auth != null"
+    },
+    "relationships": {
+      ".read": "auth != null",
+      ".indexOn": ["supervisorId", "studentId"],
+      "$relationshipId": {
+        ".write": "auth != null"
+      }
+    },
+    "progress": {
+      "$userId": {
+        ".read": "auth != null",
+        ".write": "$userId === auth.uid",
+        "activities": {
+          "$activityId": {
+            ".write": "$userId === auth.uid"
+          }
+        }
+      }
+    },
+    "aggregates": {
+      "$userId": {
+        ".read": "auth != null",
+        ".write": "$userId === auth.uid"
+      }
+    },
+    "milestones": {
+      "$userId": {
+        ".read": "auth != null",
+        ".write": "$userId === auth.uid",
+        "$milestoneId": {
+          ".write": "$userId === auth.uid"
+        }
+      }
+    }
+  }
+}
+

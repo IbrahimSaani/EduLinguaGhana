@@ -77,69 +77,47 @@
                         android:id="@+id/roleRadioGroup"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:orientation="vertical">
+                        android:orientation="vertical"
+                        android:checkedButton="@id/rbStudent">
 
                         <!-- Student Option -->
-                        <com.google.android.material.card.MaterialCardView
+                        <RadioButton
+                            android:id="@+id/rbStudent"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            app:cardCornerRadius="12dp"
-                            app:cardElevation="2dp"
-                            app:strokeWidth="2dp"
-                            app:strokeColor="@color/card_stroke"
-                            android:layout_marginBottom="12dp">
-
-                            <RadioButton
-                                android:id="@+id/rbStudent"
-                                android:layout_width="match_parent"
-                                android:layout_height="wrap_content"
-                                android:text="🎓 Student"
-                                android:textSize="18sp"
-                                android:textStyle="bold"
-                                android:padding="16dp"
-                                android:buttonTint="@color/primary"/>
-                        </com.google.android.material.card.MaterialCardView>
+                            android:text="🎓 Student"
+                            android:textSize="18sp"
+                            android:textStyle="bold"
+                            android:padding="16dp"
+                            android:layout_marginBottom="12dp"
+                            android:background="@drawable/role_selector_background"
+                            android:buttonTint="@color/primary"
+                            android:checked="true"/>
 
                         <!-- Teacher Option -->
-                        <com.google.android.material.card.MaterialCardView
+                        <RadioButton
+                            android:id="@+id/rbTeacher"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            app:cardCornerRadius="12dp"
-                            app:cardElevation="2dp"
-                            app:strokeWidth="2dp"
-                            app:strokeColor="@color/card_stroke"
-                            android:layout_marginBottom="12dp">
-
-                            <RadioButton
-                                android:id="@+id/rbTeacher"
-                                android:layout_width="match_parent"
-                                android:layout_height="wrap_content"
-                                android:text="👨‍🏫 Teacher"
-                                android:textSize="18sp"
-                                android:textStyle="bold"
-                                android:padding="16dp"
-                                android:buttonTint="@color/primary"/>
-                        </com.google.android.material.card.MaterialCardView>
+                            android:text="👨‍🏫 Teacher"
+                            android:textSize="18sp"
+                            android:textStyle="bold"
+                            android:padding="16dp"
+                            android:layout_marginBottom="12dp"
+                            android:background="@drawable/role_selector_background"
+                            android:buttonTint="@color/primary"/>
 
                         <!-- Parent Option -->
-                        <com.google.android.material.card.MaterialCardView
+                        <RadioButton
+                            android:id="@+id/rbParent"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            app:cardCornerRadius="12dp"
-                            app:cardElevation="2dp"
-                            app:strokeWidth="2dp"
-                            app:strokeColor="@color/card_stroke">
-
-                            <RadioButton
-                                android:id="@+id/rbParent"
-                                android:layout_width="match_parent"
-                                android:layout_height="wrap_content"
-                                android:text="👨‍👩‍👧‍👦 Parent"
-                                android:textSize="18sp"
-                                android:textStyle="bold"
-                                android:padding="16dp"
-                                android:buttonTint="@color/primary"/>
-                        </com.google.android.material.card.MaterialCardView>
+                            android:text="👨‍👩‍👧‍👦 Parent"
+                            android:textSize="18sp"
+                            android:textStyle="bold"
+                            android:padding="16dp"
+                            android:background="@drawable/role_selector_background"
+                            android:buttonTint="@color/primary"/>
 
                     </RadioGroup>
 

@@ -8,6 +8,7 @@ import android.widget.RadioGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.activity.OnBackPressedCallback;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.edulinguaghana.roles.RoleManager;
@@ -49,6 +50,26 @@ public class RoleSelectionActivity extends AppCompatActivity {
         initViews();
         setupListeners();
         checkExistingRole();
+        setupBackPressHandler();
+    }
+
+    private void setupBackPressHandler() {
+        // Handle back button press using OnBackPressedDispatcher
+        getOnBackPressedDispatcher().addCallback(this, new OnBackPressedCallback(true) {
+            @Override
+            public void handleOnBackPressed() {
+                // Check if this is first time setup
+                boolean isFirstTime = getIntent().getBooleanExtra("first_time", false);
+                if (isFirstTime) {
+                    // Don't allow back on first time setup
+                    Toast.makeText(RoleSelectionActivity.this, "Please select your role to continue", Toast.LENGTH_SHORT).show();
+                } else {
+                    // Allow back navigation
+                    setEnabled(false);
+                    getOnBackPressedDispatcher().onBackPressed();
+                }
+            }
+        });
     }
 
     private void initViews() {
@@ -62,14 +83,18 @@ public class RoleSelectionActivity extends AppCompatActivity {
     }
 
     private void setupListeners() {
+        // Ensure only one radio button can be selected at a time
         roleRadioGroup.setOnCheckedChangeListener((group, checkedId) -> {
-            updateRoleDescription(checkedId);
+            // Clear all other selections
+            if (checkedId != -1) {
+                updateRoleDescription(checkedId);
+            }
         });
 
         btnConfirmRole.setOnClickListener(v -> confirmRoleSelection());
 
-        // Set default selection
-        rbStudent.setChecked(true);
+        // Set default selection to Student
+        roleRadioGroup.check(R.id.rbStudent);
         updateRoleDescription(R.id.rbStudent);
     }
 
@@ -163,18 +188,6 @@ public class RoleSelectionActivity extends AppCompatActivity {
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
         startActivity(intent);
         finish();
-    }
-
-    @Override
-    public void onBackPressed() {
-        // Check if this is first time setup
-        boolean isFirstTime = getIntent().getBooleanExtra("first_time", false);
-        if (isFirstTime) {
-            // Don't allow back on first time setup
-            Toast.makeText(this, "Please select your role to continue", Toast.LENGTH_SHORT).show();
-        } else {
-            super.onBackPressed();
-        }
     }
 }
 
