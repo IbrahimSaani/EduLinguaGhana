@@ -14,31 +14,45 @@
         android:paddingBottom="40dp">
 
         <!-- App Icon with animation -->
-        <ImageView
-            android:id="@+id/ivLogo"
-            android:layout_width="140dp"
-            android:layout_height="140dp"
-            android:src="@drawable/ic_graduation_cap"
-            android:contentDescription="App Logo"
-            android:scaleType="centerInside"
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/logoCard"
+            android:layout_width="160dp"
+            android:layout_height="160dp"
+            app:cardCornerRadius="80dp"
+            app:cardElevation="8dp"
+            app:strokeWidth="4dp"
+            app:strokeColor="@color/colorPrimary"
+            app:cardBackgroundColor="@android:color/white"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent" />
+            app:layout_constraintEnd_toEndOf="parent">
+
+            <ImageView
+                android:id="@+id/ivLogo"
+                android:layout_width="100dp"
+                android:layout_height="100dp"
+                android:layout_gravity="center"
+                android:src="@drawable/ic_graduation_cap"
+                android:contentDescription="App Logo"
+                android:scaleType="centerInside"
+                app:tint="@color/colorPrimary" />
+
+        </com.google.android.material.card.MaterialCardView>
 
         <!-- Welcome Title -->
         <TextView
             android:id="@+id/tvWelcomeTitle"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginTop="20dp"
-            android:text="Welcome Back!"
-            android:textSize="32sp"
+            android:layout_marginTop="24dp"
+            android:text="👋 Welcome Back!"
+            android:textSize="34sp"
             android:textStyle="bold"
             android:fontFamily="@font/agbalumo"
             android:textColor="@color/colorPrimary"
             android:gravity="center"
             android:letterSpacing="0.02"
-            app:layout_constraintTop_toBottomOf="@id/ivLogo"
+            app:layout_constraintTop_toBottomOf="@id/logoCard"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent" />
 
@@ -63,10 +77,12 @@
             android:id="@+id/loginFormCard"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginTop="32dp"
-            app:cardCornerRadius="20dp"
-            app:cardElevation="8dp"
-            app:cardBackgroundColor="@color/cardBackground"
+            android:layout_marginTop="36dp"
+            app:cardCornerRadius="24dp"
+            app:cardElevation="6dp"
+            app:strokeWidth="1dp"
+            app:strokeColor="@color/dividerColor"
+            app:cardBackgroundColor="@android:color/white"
             app:layout_constraintTop_toBottomOf="@id/tvSubtitle"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent">
@@ -75,7 +91,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
-                android:padding="24dp">
+                android:padding="28dp">
 
                 <!-- Email Input with Icon -->
                 <com.google.android.material.textfield.TextInputLayout
@@ -86,6 +102,10 @@
                     app:startIconDrawable="@android:drawable/ic_dialog_email"
                     app:startIconTint="@color/colorPrimary"
                     app:boxStrokeColor="@color/colorPrimary"
+                    app:boxCornerRadiusBottomEnd="14dp"
+                    app:boxCornerRadiusBottomStart="14dp"
+                    app:boxCornerRadiusTopEnd="14dp"
+                    app:boxCornerRadiusTopStart="14dp"
                     app:hintTextColor="@color/colorPrimary"
                     style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox">
 
@@ -111,6 +131,10 @@
                     app:startIconTint="@color/colorPrimary"
                     app:endIconMode="password_toggle"
                     app:boxStrokeColor="@color/colorPrimary"
+                    app:boxCornerRadiusBottomEnd="14dp"
+                    app:boxCornerRadiusBottomStart="14dp"
+                    app:boxCornerRadiusTopEnd="14dp"
+                    app:boxCornerRadiusTopStart="14dp"
                     app:hintTextColor="@color/colorPrimary"
                     style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox">
 
