@@ -4,14 +4,14 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/appBackground"
+    android:background="@drawable/bg_main_day"
     tools:context=".SettingsActivity">
 
     <com.google.android.material.appbar.AppBarLayout
         android:id="@+id/appBarLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="?attr/colorPrimary"
+        android:background="@color/colorPrimary"
         android:elevation="4dp"
         android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar">
 
@@ -20,10 +20,38 @@
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
             android:elevation="0dp"
-            app:titleTextColor="?attr/colorOnPrimary"
+            app:titleTextColor="@android:color/white"
             app:navigationIcon="?attr/homeAsUpIndicator"
-            app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
-            app:title="@string/settings_title" />
+            app:popupTheme="@style/ThemeOverlay.AppCompat.Light">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:paddingEnd="16dp">
+
+                <ImageView
+                    android:layout_width="28dp"
+                    android:layout_height="28dp"
+                    android:src="@drawable/ic_settings"
+                    android:layout_marginEnd="12dp"
+                    android:contentDescription="Settings"
+                    app:tint="@android:color/white" />
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="@string/settings_title"
+                    android:textSize="20sp"
+                    android:textColor="@android:color/white"
+                    android:fontFamily="@font/agbalumo"
+                    android:textStyle="bold" />
+
+            </LinearLayout>
+
+        </androidx.appcompat.widget.Toolbar>
 
         <!-- Note: Font will be applied programmatically in SettingsActivity -->
 
@@ -47,10 +75,12 @@
             <com.google.android.material.card.MaterialCardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="20dp"
+                android:layout_marginBottom="16dp"
                 app:cardCornerRadius="16dp"
-                app:cardElevation="2dp"
-                app:strokeWidth="0dp">
+                app:cardElevation="4dp"
+                app:strokeWidth="1dp"
+                app:strokeColor="@color/dividerColor"
+                app:cardBackgroundColor="@android:color/white">
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -65,22 +95,22 @@
                         android:layout_marginBottom="16dp"
                         android:orientation="horizontal">
 
-                        <ImageView
-                            android:layout_width="28dp"
-                            android:layout_height="28dp"
-                            android:src="@drawable/ic_audio_settings"
-                            app:tint="@color/colorPrimary"
-                            android:contentDescription="@string/settings_audio_title" />
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="🔊"
+                            android:textSize="28sp"
+                            android:layout_marginEnd="12dp" />
 
                         <TextView
                             android:id="@+id/tvAudioHeader"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_marginStart="12dp"
                             android:text="@string/settings_audio_title"
-                            android:textColor="?attr/colorOnSurface"
+                            android:textColor="@color/colorPrimary"
                             android:textSize="18sp"
-                            android:textStyle="bold" />
+                            android:textStyle="bold"
+                            android:fontFamily="@font/agbalumo" />
                     </LinearLayout>
 
                     <com.google.android.material.switchmaterial.SwitchMaterial
@@ -91,7 +121,7 @@
                         android:paddingStart="4dp"
                         android:paddingEnd="4dp"
                         android:text="@string/settings_background_music"
-                        android:textColor="?attr/colorOnSurface"
+                        android:textColor="@color/textColorPrimary"
                         android:textSize="15sp" />
 
                     <View
@@ -99,7 +129,7 @@
                         android:layout_height="1dp"
                         android:layout_marginStart="4dp"
                         android:layout_marginEnd="4dp"
-                        android:background="@color/chipStroke" />
+                        android:background="@color/dividerColor" />
 
                     <com.google.android.material.switchmaterial.SwitchMaterial
                         android:id="@+id/switchSfx"
@@ -109,7 +139,7 @@
                         android:paddingStart="4dp"
                         android:paddingEnd="4dp"
                         android:text="@string/settings_sound_effects"
-                        android:textColor="?attr/colorOnSurface"
+                        android:textColor="@color/textColorPrimary"
                         android:textSize="15sp" />
 
 
@@ -120,10 +150,12 @@
             <com.google.android.material.card.MaterialCardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="20dp"
+                android:layout_marginBottom="16dp"
                 app:cardCornerRadius="16dp"
-                app:cardElevation="2dp"
-                app:strokeWidth="0dp">
+                app:cardElevation="4dp"
+                app:strokeWidth="1dp"
+                app:strokeColor="@color/dividerColor"
+                app:cardBackgroundColor="@android:color/white">
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -138,22 +170,22 @@
                         android:layout_marginBottom="16dp"
                         android:orientation="horizontal">
 
-                        <ImageView
-                            android:layout_width="28dp"
-                            android:layout_height="28dp"
-                            android:src="@drawable/ic_visual_settings"
-                            app:tint="?attr/colorPrimary"
-                            android:contentDescription="@string/settings_visual_title" />
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="🎨"
+                            android:textSize="28sp"
+                            android:layout_marginEnd="12dp" />
 
                         <TextView
                             android:id="@+id/tvVisualHeader"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_marginStart="12dp"
                             android:text="@string/settings_visual_title"
-                            android:textColor="?attr/colorOnSurface"
+                            android:textColor="@color/colorPrimary"
                             android:textSize="18sp"
-                            android:textStyle="bold" />
+                            android:textStyle="bold"
+                            android:fontFamily="@font/agbalumo" />
                     </LinearLayout>
 
                     <com.google.android.material.switchmaterial.SwitchMaterial
@@ -164,7 +196,7 @@
                         android:paddingStart="4dp"
                         android:paddingEnd="4dp"
                         android:text="@string/settings_background_animations"
-                        android:textColor="?attr/colorOnSurface"
+                        android:textColor="@color/textColorPrimary"
                         android:textSize="15sp" />
 
                     <View
@@ -172,7 +204,7 @@
                         android:layout_height="1dp"
                         android:layout_marginStart="4dp"
                         android:layout_marginEnd="4dp"
-                        android:background="@color/chipStroke" />
+                        android:background="@color/dividerColor" />
 
                     <com.google.android.material.switchmaterial.SwitchMaterial
                         android:id="@+id/switchLowPowerAnimations"
@@ -182,7 +214,7 @@
                         android:paddingStart="4dp"
                         android:paddingEnd="4dp"
                         android:text="@string/settings_low_power_animations"
-                        android:textColor="?attr/colorOnSurface"
+                        android:textColor="@color/textColorPrimary"
                         android:textSize="15sp" />
 
                 </LinearLayout>
@@ -192,10 +224,12 @@
             <com.google.android.material.card.MaterialCardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="20dp"
+                android:layout_marginBottom="16dp"
                 app:cardCornerRadius="16dp"
-                app:cardElevation="2dp"
-                app:strokeWidth="0dp">
+                app:cardElevation="4dp"
+                app:strokeWidth="1dp"
+                app:strokeColor="@color/dividerColor"
+                app:cardBackgroundColor="@android:color/white">
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -210,22 +244,22 @@
                         android:layout_marginBottom="16dp"
                         android:orientation="horizontal">
 
-                        <ImageView
-                            android:layout_width="28dp"
-                            android:layout_height="28dp"
-                            android:src="@drawable/ic_theme"
-                            app:tint="?attr/colorPrimary"
-                            android:contentDescription="@string/settings_theme_title" />
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="🌓"
+                            android:textSize="28sp"
+                            android:layout_marginEnd="12dp" />
 
                         <TextView
                             android:id="@+id/tvThemeHeader"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_marginStart="12dp"
                             android:text="@string/settings_theme_title"
-                            android:textColor="?attr/colorOnSurface"
+                            android:textColor="@color/colorPrimary"
                             android:textSize="18sp"
-                            android:textStyle="bold" />
+                            android:textStyle="bold"
+                            android:fontFamily="@font/agbalumo" />
                     </LinearLayout>
 
                     <RadioGroup
@@ -244,7 +278,7 @@
                             android:paddingStart="8dp"
                             android:paddingEnd="8dp"
                             android:text="@string/settings_theme_light"
-                            android:textColor="?attr/colorOnSurface"
+                            android:textColor="@color/textColorPrimary"
                             android:textSize="15sp" />
 
                         <RadioButton
@@ -255,7 +289,7 @@
                             android:paddingStart="8dp"
                             android:paddingEnd="8dp"
                             android:text="@string/settings_theme_dark"
-                            android:textColor="?attr/colorOnSurface"
+                            android:textColor="@color/textColorPrimary"
                             android:textSize="15sp" />
 
                         <RadioButton
@@ -267,7 +301,7 @@
                             android:paddingStart="8dp"
                             android:paddingEnd="8dp"
                             android:text="@string/settings_theme_system"
-                            android:textColor="?attr/colorOnSurface"
+                            android:textColor="@color/textColorPrimary"
                             android:textSize="15sp" />
                     </RadioGroup>
                 </LinearLayout>
@@ -277,10 +311,12 @@
             <com.google.android.material.card.MaterialCardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="20dp"
+                android:layout_marginBottom="16dp"
                 app:cardCornerRadius="16dp"
-                app:cardElevation="2dp"
-                app:strokeWidth="0dp">
+                app:cardElevation="4dp"
+                app:strokeWidth="2dp"
+                app:strokeColor="@color/wrongAnswer"
+                app:cardBackgroundColor="@android:color/white">
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -292,25 +328,25 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:gravity="center_vertical"
-                        android:layout_marginBottom="16dp"
+                        android:layout_marginBottom="12dp"
                         android:orientation="horizontal">
 
-                        <ImageView
-                            android:layout_width="28dp"
-                            android:layout_height="28dp"
-                            android:src="@drawable/ic_delete"
-                            app:tint="@color/wrongAnswer"
-                            android:contentDescription="@string/settings_progress_title" />
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="⚠️"
+                            android:textSize="28sp"
+                            android:layout_marginEnd="12dp" />
 
                         <TextView
                             android:id="@+id/tvProgressHeader"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_marginStart="12dp"
                             android:text="@string/settings_progress_title"
-                            android:textColor="?attr/colorOnSurface"
+                            android:textColor="@color/wrongAnswer"
                             android:textSize="18sp"
-                            android:textStyle="bold" />
+                            android:textStyle="bold"
+                            android:fontFamily="@font/agbalumo" />
                     </LinearLayout>
 
                     <TextView
@@ -334,8 +370,10 @@
                         android:textStyle="bold"
                         app:icon="@drawable/ic_delete"
                         app:iconGravity="textStart"
+                        app:iconSize="20dp"
                         app:iconPadding="8dp"
                         app:cornerRadius="12dp"
+                        android:elevation="2dp"
                         app:backgroundTint="@color/wrongAnswer" />
 
                 </LinearLayout>
@@ -345,10 +383,12 @@
             <com.google.android.material.card.MaterialCardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="20dp"
+                android:layout_marginBottom="16dp"
                 app:cardCornerRadius="16dp"
-                app:cardElevation="2dp"
-                app:strokeWidth="0dp">
+                app:cardElevation="4dp"
+                app:strokeWidth="1dp"
+                app:strokeColor="@color/dividerColor"
+                app:cardBackgroundColor="@android:color/white">
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -363,34 +403,59 @@
                         android:layout_marginBottom="16dp"
                         android:orientation="horizontal">
 
-                        <ImageView
-                            android:layout_width="28dp"
-                            android:layout_height="28dp"
-                            android:src="@drawable/ic_user"
-                            app:tint="@color/colorPrimary"
-                            android:contentDescription="Account Settings" />
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="👤"
+                            android:textSize="28sp"
+                            android:layout_marginEnd="12dp" />
 
                         <TextView
                             android:id="@+id/tvAccountHeader"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_marginStart="12dp"
-                            android:text="👤 Account"
-                            android:textColor="?attr/colorOnSurface"
+                            android:text="Account &amp; Role"
+                            android:textColor="@color/colorPrimary"
                             android:textSize="18sp"
-                            android:textStyle="bold" />
+                            android:textStyle="bold"
+                            android:fontFamily="@font/agbalumo" />
                     </LinearLayout>
 
-                    <TextView
-                        android:id="@+id/tvCurrentRole"
+                    <com.google.android.material.card.MaterialCardView
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginBottom="12dp"
-                        android:paddingStart="4dp"
-                        android:paddingEnd="4dp"
-                        android:text="Current role: Loading..."
-                        android:textColor="@color/textColorSecondary"
-                        android:textSize="14sp" />
+                        android:layout_marginBottom="16dp"
+                        app:cardCornerRadius="12dp"
+                        app:cardElevation="0dp"
+                        app:cardBackgroundColor="@color/cardBackground">
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="vertical"
+                            android:padding="16dp">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Current Role"
+                                android:textSize="12sp"
+                                android:textColor="@color/textColorSecondary"
+                                android:textAllCaps="true"
+                                android:letterSpacing="0.1"
+                                android:layout_marginBottom="4dp" />
+
+                            <TextView
+                                android:id="@+id/tvCurrentRole"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:text="Loading..."
+                                android:textColor="@color/colorPrimary"
+                                android:textSize="18sp"
+                                android:textStyle="bold"
+                                android:fontFamily="@font/agbalumo" />
+                        </LinearLayout>
+                    </com.google.android.material.card.MaterialCardView>
 
                     <TextView
                         android:layout_width="match_parent"
@@ -400,7 +465,7 @@
                         android:paddingEnd="4dp"
                         android:text="Choose your role to access features tailored for students, teachers, or parents."
                         android:textColor="@color/textColorSecondary"
-                        android:textSize="13sp"
+                        android:textSize="14sp"
                         android:lineSpacingExtra="2dp" />
 
                     <com.google.android.material.button.MaterialButton
@@ -413,8 +478,10 @@
                         android:textStyle="bold"
                         app:icon="@drawable/ic_user"
                         app:iconGravity="textStart"
+                        app:iconSize="20dp"
                         app:iconPadding="8dp"
-                        app:cornerRadius="12dp" />
+                        app:cornerRadius="12dp"
+                        android:elevation="0dp" />
 
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
@@ -423,9 +490,12 @@
             <com.google.android.material.card.MaterialCardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="16dp"
+                android:layout_marginBottom="16dp"
                 app:cardCornerRadius="16dp"
-                app:cardElevation="2dp">
+                app:cardElevation="4dp"
+                app:strokeWidth="1dp"
+                app:strokeColor="@color/dividerColor"
+                app:cardBackgroundColor="@android:color/white">
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -433,20 +503,38 @@
                     android:orientation="vertical"
                     android:padding="20dp">
 
-                    <TextView
-                        android:layout_width="wrap_content"
+                    <LinearLayout
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="☁️ Cloud Sync"
-                        android:textColor="@color/colorPrimary"
-                        android:textSize="18sp"
-                        android:textStyle="bold"
-                        android:fontFamily="@font/agbalumo" />
+                        android:gravity="center_vertical"
+                        android:layout_marginBottom="12dp"
+                        android:orientation="horizontal">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="☁️"
+                            android:textSize="28sp"
+                            android:layout_marginEnd="12dp" />
+
+                        <TextView
+                            android:id="@+id/tvCloudHeader"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Cloud Sync"
+                            android:textColor="@color/colorPrimary"
+                            android:textSize="18sp"
+                            android:textStyle="bold"
+                            android:fontFamily="@font/agbalumo" />
+                    </LinearLayout>
 
                     <TextView
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="8dp"
-                        android:text="Backup and sync your progress across devices. Requires login and internet connection."
+                        android:layout_marginBottom="12dp"
+                        android:paddingStart="4dp"
+                        android:paddingEnd="4dp"
+                        android:text="Backup and sync your progress across devices"
                         android:textColor="@color/textColorSecondary"
                         android:textSize="14sp"
                         android:lineSpacingExtra="2dp" />
@@ -455,48 +543,44 @@
                         android:id="@+id/tvLastSync"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="8dp"
+                        android:layout_marginBottom="16dp"
+                        android:paddingStart="4dp"
+                        android:paddingEnd="4dp"
                         android:text="Last sync: Never"
-                        android:textSize="12sp"
+                        android:textSize="13sp"
                         android:textColor="@color/textColorSecondary"
                         android:textStyle="italic" />
 
-                    <LinearLayout
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btnSyncToCloud"
+                        style="@style/Widget.Material3.Button.OutlinedButton"
                         android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="16dp"
-                        android:orientation="horizontal"
-                        android:weightSum="2">
+                        android:layout_height="56dp"
+                        android:layout_marginBottom="12dp"
+                        android:text="Upload to Cloud"
+                        android:textSize="15sp"
+                        android:textStyle="bold"
+                        app:icon="@android:drawable/ic_menu_upload"
+                        app:iconGravity="textStart"
+                        app:iconSize="20dp"
+                        app:iconPadding="8dp"
+                        app:cornerRadius="12dp"
+                        app:strokeWidth="2dp" />
 
-                        <com.google.android.material.button.MaterialButton
-                            android:id="@+id/btnSyncToCloud"
-                            style="@style/Widget.Material3.Button.TonalButton"
-                            android:layout_width="0dp"
-                            android:layout_height="56dp"
-                            android:layout_weight="1"
-                            android:layout_marginEnd="8dp"
-                            android:text="Upload"
-                            android:textSize="14sp"
-                            app:icon="@android:drawable/ic_menu_upload"
-                            app:iconGravity="textStart"
-                            app:iconPadding="4dp"
-                            app:cornerRadius="12dp" />
-
-                        <com.google.android.material.button.MaterialButton
-                            android:id="@+id/btnSyncFromCloud"
-                            style="@style/Widget.Material3.Button.TonalButton"
-                            android:layout_width="0dp"
-                            android:layout_height="56dp"
-                            android:layout_weight="1"
-                            android:layout_marginStart="8dp"
-                            android:text="Download"
-                            android:textSize="14sp"
-                            app:icon="@android:drawable/stat_sys_download"
-                            app:iconGravity="textStart"
-                            app:iconPadding="4dp"
-                            app:cornerRadius="12dp" />
-
-                    </LinearLayout>
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btnSyncFromCloud"
+                        style="@style/Widget.Material3.Button.OutlinedButton"
+                        android:layout_width="match_parent"
+                        android:layout_height="56dp"
+                        android:text="Download from Cloud"
+                        android:textSize="15sp"
+                        android:textStyle="bold"
+                        app:icon="@android:drawable/stat_sys_download"
+                        app:iconGravity="textStart"
+                        app:iconSize="20dp"
+                        app:iconPadding="8dp"
+                        app:cornerRadius="12dp"
+                        app:strokeWidth="2dp" />
 
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>

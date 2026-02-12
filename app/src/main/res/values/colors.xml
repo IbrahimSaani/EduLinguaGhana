@@ -18,6 +18,7 @@
     <color name="textColorPrimary">#263238</color>
     <color name="textColorSecondary">#455A64</color>
     <color name="text_secondary">#455A64</color>
+    <color name="dividerColor">#E0E0E0</color>
 
     <!-- Buttons -->
     <color name="buttonPrimary">#1A237E</color>
@@ -33,6 +34,9 @@
     <color name="progressScreenBackground">#EDE7F6</color>
     <color name="progressTitleColor">#4527A0</color>
     <color name="achievementsTextColor">#5D4037</color>
+    <color name="textPrimary">#263238</color>
+    <color name="textSecondary">#455A64</color>
+    <color name="progressTrackColor">#E0E0E0</color>
 
     <!-- Playful palette -->
     <color name="playfulSkyStart">#FDF2FF</color>

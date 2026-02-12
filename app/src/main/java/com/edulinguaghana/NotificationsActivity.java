@@ -12,6 +12,9 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
+
+import com.google.android.material.button.MaterialButton;
 
 import java.util.List;
 
@@ -19,6 +22,8 @@ public class NotificationsActivity extends AppCompatActivity implements Notifica
 
     private RecyclerView notificationsRecyclerView;
     private LinearLayout emptyStateLayout;
+    private SwipeRefreshLayout swipeRefresh;
+    private MaterialButton btnStartLearning;
     private NotificationsAdapter adapter;
     private NotificationManager notificationManager;
     private List<Notification> notifications;
@@ -38,9 +43,22 @@ public class NotificationsActivity extends AppCompatActivity implements Notifica
         // Initialize views
         notificationsRecyclerView = findViewById(R.id.notificationsRecyclerView);
         emptyStateLayout = findViewById(R.id.emptyStateLayout);
+        swipeRefresh = findViewById(R.id.swipeRefresh);
+        btnStartLearning = findViewById(R.id.btnStartLearning);
 
         // Initialize notification manager
         notificationManager = new NotificationManager(this);
+
+        // Setup swipe to refresh
+        swipeRefresh.setOnRefreshListener(() -> {
+            loadNotifications();
+            swipeRefresh.setRefreshing(false);
+        });
+
+        // Setup start learning button
+        btnStartLearning.setOnClickListener(v -> {
+            finish(); // Go back to main activity
+        });
 
         // Check and generate notifications based on user progress
         notificationManager.checkAndGenerateNotifications();
@@ -71,11 +89,11 @@ public class NotificationsActivity extends AppCompatActivity implements Notifica
         if (notifications.isEmpty()) {
             // Show empty state
             emptyStateLayout.setVisibility(View.VISIBLE);
-            notificationsRecyclerView.setVisibility(View.GONE);
+            swipeRefresh.setVisibility(View.GONE);
         } else {
             // Show notifications
             emptyStateLayout.setVisibility(View.GONE);
-            notificationsRecyclerView.setVisibility(View.VISIBLE);
+            swipeRefresh.setVisibility(View.VISIBLE);
 
             adapter = new NotificationsAdapter(this, notifications, this);
             notificationsRecyclerView.setAdapter(adapter);

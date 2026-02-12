@@ -88,10 +88,13 @@ public class QuestManager {
         boolean changed = false;
         for (Quest q : list) {
             if (q.id.equals(questId) && !q.completed) {
-                q.completed = true;
-                changed = true;
-                // award xp
-                XPManager.awardXP(ctx, q.xpReward, "quest:" + q.id);
+                // Only complete if progress has reached target
+                if (q.progress >= q.target) {
+                    q.completed = true;
+                    changed = true;
+                    // award xp
+                    XPManager.awardXP(ctx, q.xpReward, "quest:" + q.id);
+                }
             }
         }
         if (changed) saveQuests(ctx, list);

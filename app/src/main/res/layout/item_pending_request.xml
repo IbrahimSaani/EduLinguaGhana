@@ -1,12 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.cardview.widget.CardView
+<com.google.android.material.card.MaterialCardView
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_margin="8dp"
-    app:cardCornerRadius="8dp"
-    app:cardElevation="4dp">
+    android:layout_marginStart="8dp"
+    android:layout_marginEnd="8dp"
+    android:layout_marginTop="4dp"
+    android:layout_marginBottom="4dp"
+    app:cardCornerRadius="12dp"
+    app:cardElevation="3dp"
+    app:cardBackgroundColor="@android:color/white"
+    app:strokeWidth="1dp"
+    app:strokeColor="@color/colorPrimary">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -14,44 +20,93 @@
         android:orientation="vertical"
         android:padding="16dp">
 
-        <TextView
-            android:id="@+id/tvRequestFrom"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Teacher Name"
-            android:textSize="16sp"
-            android:textStyle="bold"/>
-
-        <TextView
-            android:id="@+id/tvRequestType"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="wants to track your progress"
-            android:textSize="14sp"
-            android:layout_marginTop="4dp"/>
-
+        <!-- Header with icon -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
-            android:layout_marginTop="12dp">
+            android:gravity="center_vertical"
+            android:layout_marginBottom="8dp">
 
-            <Button
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="👤"
+                android:textSize="24sp"
+                android:layout_marginEnd="12dp"/>
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/tvRequestFrom"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Teacher Name"
+                    android:textSize="18sp"
+                    android:textStyle="bold"
+                    android:textColor="@color/textColorPrimary"/>
+
+                <TextView
+                    android:id="@+id/tvRequestType"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="wants to track your progress"
+                    android:textSize="14sp"
+                    android:textColor="@color/textColorSecondary"
+                    android:layout_marginTop="4dp"/>
+            </LinearLayout>
+        </LinearLayout>
+
+        <!-- Divider -->
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@color/dividerColor"
+            android:layout_marginTop="8dp"
+            android:layout_marginBottom="12dp"/>
+
+        <!-- Action Buttons -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center">
+
+            <com.google.android.material.button.MaterialButton
                 android:id="@+id/btnAccept"
                 android:layout_width="0dp"
-                android:layout_height="wrap_content"
+                android:layout_height="48dp"
                 android:layout_weight="1"
                 android:text="Accept"
-                android:layout_marginEnd="8dp"/>
+                android:textSize="15sp"
+                android:textStyle="bold"
+                app:icon="@android:drawable/ic_input_add"
+                app:iconSize="18dp"
+                app:iconGravity="textStart"
+                app:cornerRadius="10dp"
+                android:layout_marginEnd="8dp"
+                app:backgroundTint="@color/correctAnswer"/>
 
-            <Button
+            <com.google.android.material.button.MaterialButton
                 android:id="@+id/btnReject"
                 android:layout_width="0dp"
-                android:layout_height="wrap_content"
+                android:layout_height="48dp"
                 android:layout_weight="1"
                 android:text="Reject"
-                style="@style/Widget.MaterialComponents.Button.OutlinedButton"/>
+                android:textSize="15sp"
+                android:textStyle="bold"
+                app:icon="@android:drawable/ic_delete"
+                app:iconSize="18dp"
+                app:iconGravity="textStart"
+                app:cornerRadius="10dp"
+                style="@style/Widget.Material3.Button.OutlinedButton"
+                app:strokeWidth="2dp"
+                app:strokeColor="@color/wrongAnswer"/>
         </LinearLayout>
     </LinearLayout>
-</androidx.cardview.widget.CardView>
+</com.google.android.material.card.MaterialCardView>
 

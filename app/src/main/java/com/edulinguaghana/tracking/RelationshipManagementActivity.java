@@ -47,6 +47,7 @@ public class RelationshipManagementActivity extends AppCompatActivity {
     private RecyclerView pendingRequestsRecyclerView;
     private ProgressBar loadingProgress;
     private TextView emptyTextView;
+    private LinearLayout emptyStateLayout;
 
     private RoleManager roleManager;
     private String currentUserId;
@@ -90,6 +91,7 @@ public class RelationshipManagementActivity extends AppCompatActivity {
         pendingRequestsRecyclerView = findViewById(R.id.pendingRequestsRecyclerView);
         loadingProgress = findViewById(R.id.loadingProgress);
         emptyTextView = findViewById(R.id.emptyTextView);
+        emptyStateLayout = findViewById(R.id.emptyStateLayout);
 
         btnCopyCode.setOnClickListener(v -> copyCodeToClipboard());
         btnAddStudent.setOnClickListener(v -> addStudent());
@@ -258,12 +260,12 @@ public class RelationshipManagementActivity extends AppCompatActivity {
             roleManager.getPendingRequests(currentUserId, new RoleManager.RelationshipCallback() {
                 @Override
                 public void onRelationshipsRetrieved(List<UserRelationship> relationships) {
+                    loadingProgress.setVisibility(View.GONE);
                     if (relationships.isEmpty()) {
-                        emptyTextView.setVisibility(View.VISIBLE);
-                        emptyTextView.setText("No pending requests");
+                        emptyStateLayout.setVisibility(View.VISIBLE);
                         pendingRequestsRecyclerView.setVisibility(View.GONE);
                     } else {
-                        emptyTextView.setVisibility(View.GONE);
+                        emptyStateLayout.setVisibility(View.GONE);
                         pendingRequestsRecyclerView.setVisibility(View.VISIBLE);
                         setupPendingRequestsAdapter(relationships);
                     }
@@ -271,7 +273,8 @@ public class RelationshipManagementActivity extends AppCompatActivity {
 
                 @Override
                 public void onError(String error) {
-                    emptyTextView.setVisibility(View.VISIBLE);
+                    loadingProgress.setVisibility(View.GONE);
+                    emptyStateLayout.setVisibility(View.VISIBLE);
                     emptyTextView.setText("Error loading requests");
                 }
             });
