@@ -201,7 +201,7 @@ public class LeaderboardActivity extends AppCompatActivity {
                                           (userName.length() >= 20 && !userName.contains(" "));
 
                     if (isLikelyUID) {
-                        // Fetch username from users node
+                        // Fetch username and avatar from users node
                         usersRef.child(entry.getUserId()).addListenerForSingleValueEvent(new ValueEventListener() {
                             @Override
                             public void onDataChange(@NonNull DataSnapshot userSnapshot) {
@@ -220,6 +220,11 @@ public class LeaderboardActivity extends AppCompatActivity {
                                     } else {
                                         // Last resort: generate a username from UID
                                         entry.setUserName("User" + entry.getUserId().substring(0, Math.min(6, entry.getUserId().length())));
+                                    }
+
+                                    // Fetch avatar data
+                                    if (userSnapshot.child("avatarData").exists()) {
+                                        entry.setAvatarData((java.util.Map<String, Object>) userSnapshot.child("avatarData").getValue());
                                     }
                                 } else {
                                     // User not found in database, use fallback
@@ -248,13 +253,31 @@ public class LeaderboardActivity extends AppCompatActivity {
                             }
                         });
                     } else {
-                        // Username is fine, just add it
-                        leaderboardList.add(entry);
-                        processedCount[0]++;
+                        // Username is fine, but still fetch avatar data
+                        usersRef.child(entry.getUserId()).child("avatarData").addListenerForSingleValueEvent(new ValueEventListener() {
+                            @Override
+                            public void onDataChange(@NonNull DataSnapshot avatarSnapshot) {
+                                if (avatarSnapshot.exists()) {
+                                    entry.setAvatarData((java.util.Map<String, Object>) avatarSnapshot.getValue());
+                                }
+                                leaderboardList.add(entry);
+                                processedCount[0]++;
 
-                        if (processedCount[0] == totalEntries) {
-                            finishLoadingLeaderboard(swipeTriggered);
-                        }
+                                if (processedCount[0] == totalEntries) {
+                                    finishLoadingLeaderboard(swipeTriggered);
+                                }
+                            }
+
+                            @Override
+                            public void onCancelled(@NonNull DatabaseError error) {
+                                leaderboardList.add(entry);
+                                processedCount[0]++;
+
+                                if (processedCount[0] == totalEntries) {
+                                    finishLoadingLeaderboard(swipeTriggered);
+                                }
+                            }
+                        });
                     }
                 }
             }

@@ -93,6 +93,84 @@ public class AnimatedAvatarView extends androidx.appcompat.widget.AppCompatImage
         }
     }
 
+    /**
+     * Set avatar from a Map (usually from Firebase)
+     */
+    public void setAvatarFromMap(java.util.Map<String, Object> avatarMap) {
+        if (avatarMap == null) {
+            setDefaultAvatar();
+            return;
+        }
+
+        AvatarBuilder.AvatarConfig newConfig = new AvatarBuilder.AvatarConfig();
+
+        try {
+            // Parse skin tone
+            String skinToneStr = (String) avatarMap.get("skinTone");
+            if (skinToneStr != null) {
+                newConfig.skinTone = AvatarBuilder.SkinTone.valueOf(skinToneStr);
+            }
+
+            // Parse hair style
+            String hairStyleStr = (String) avatarMap.get("hairStyle");
+            if (hairStyleStr != null) {
+                newConfig.hairStyle = AvatarBuilder.HairStyle.valueOf(hairStyleStr);
+            }
+
+            // Parse hair color
+            String hairColorStr = (String) avatarMap.get("hairColor");
+            if (hairColorStr != null) {
+                newConfig.hairColor = AvatarBuilder.HairColor.valueOf(hairColorStr);
+            }
+
+            // Parse facial expression
+            String expressionStr = (String) avatarMap.get("facialExpression");
+            if (expressionStr != null) {
+                newConfig.facialExpression = AvatarBuilder.FacialExpression.valueOf(expressionStr);
+            }
+
+            // Parse clothing style
+            String clothingStyleStr = (String) avatarMap.get("clothingStyle");
+            if (clothingStyleStr != null) {
+                newConfig.clothingStyle = AvatarBuilder.ClothingStyle.valueOf(clothingStyleStr);
+            }
+
+            // Parse clothing color
+            String clothingColorStr = (String) avatarMap.get("clothingColor");
+            if (clothingColorStr != null) {
+                newConfig.clothingColor = AvatarBuilder.ClothingColor.valueOf(clothingColorStr);
+            }
+
+            // Parse accessory
+            String accessoryStr = (String) avatarMap.get("accessory");
+            if (accessoryStr != null) {
+                newConfig.accessory = AvatarBuilder.Accessory.valueOf(accessoryStr);
+            }
+
+        } catch (Exception e) {
+            // If parsing fails, use default avatar
+            setDefaultAvatar();
+            return;
+        }
+
+        setAvatarConfig(newConfig);
+    }
+
+    /**
+     * Set a default avatar
+     */
+    public void setDefaultAvatar() {
+        AvatarBuilder.AvatarConfig defaultConfig = new AvatarBuilder.AvatarConfig();
+        defaultConfig.skinTone = AvatarBuilder.SkinTone.LIGHT;
+        defaultConfig.hairStyle = AvatarBuilder.HairStyle.SHORT;
+        defaultConfig.hairColor = AvatarBuilder.HairColor.BROWN;
+        defaultConfig.facialExpression = AvatarBuilder.FacialExpression.HAPPY;
+        defaultConfig.clothingStyle = AvatarBuilder.ClothingStyle.CASUAL;
+        defaultConfig.clothingColor = AvatarBuilder.ClothingColor.BLUE;
+        defaultConfig.accessory = AvatarBuilder.Accessory.NONE;
+        setAvatarConfig(defaultConfig);
+    }
+
     private void startAnimations() {
         post(animationRunnable);
     }

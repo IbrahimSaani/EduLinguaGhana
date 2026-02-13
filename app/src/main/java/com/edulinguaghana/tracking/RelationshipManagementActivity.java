@@ -22,6 +22,7 @@ import com.edulinguaghana.R;
 import com.edulinguaghana.roles.RoleManager;
 import com.edulinguaghana.roles.UserRelationship;
 import com.edulinguaghana.roles.UserRole;
+import com.google.android.material.card.MaterialCardView;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -38,8 +39,8 @@ import java.util.List;
  */
 public class RelationshipManagementActivity extends AppCompatActivity {
 
-    private LinearLayout addStudentSection;
-    private LinearLayout myCodeSection;
+    private MaterialCardView addStudentSection;
+    private MaterialCardView myCodeSection;
     private TextView tvMyCode;
     private Button btnCopyCode;
     private TextInputEditText etStudentEmail;

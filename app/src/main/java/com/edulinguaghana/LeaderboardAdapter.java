@@ -40,6 +40,14 @@ public class LeaderboardAdapter extends RecyclerView.Adapter<LeaderboardAdapter.
         holder.tvUserName.setText(entry.getUserName());
         holder.tvScore.setText(String.valueOf(entry.getScore()));
 
+        // Display avatar
+        if (entry.getAvatarData() != null && !entry.getAvatarData().isEmpty()) {
+            holder.avatarView.setAvatarFromMap(entry.getAvatarData());
+        } else {
+            // Set default avatar
+            holder.avatarView.setDefaultAvatar();
+        }
+
         // Special styling for top 3
         if (rank == 1) {
             holder.tvRank.setText("🥇");
@@ -79,6 +87,7 @@ public class LeaderboardAdapter extends RecyclerView.Adapter<LeaderboardAdapter.
         TextView tvUserName;
         TextView tvScore;
         View rankBackground;
+        AnimatedAvatarView avatarView;
 
         public LeaderboardViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -87,6 +96,7 @@ public class LeaderboardAdapter extends RecyclerView.Adapter<LeaderboardAdapter.
             tvUserName = itemView.findViewById(R.id.tvUserName);
             tvScore = itemView.findViewById(R.id.tvScore);
             rankBackground = itemView.findViewById(R.id.rankBackground);
+            avatarView = itemView.findViewById(R.id.avatarView);
         }
     }
 }
