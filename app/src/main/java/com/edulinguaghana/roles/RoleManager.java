@@ -105,36 +105,91 @@ public class RoleManager {
     }
 
     /**
+     * Check if a relationship already exists between supervisor and student
+     */
+    public void checkRelationshipExists(String supervisorId, String studentId, RelationshipExistsCallback callback) {
+        relationshipsRef.orderByChild("supervisorId").equalTo(supervisorId)
+            .addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(DataSnapshot snapshot) {
+                    boolean exists = false;
+                    UserRelationship existingRelationship = null;
+
+                    for (DataSnapshot child : snapshot.getChildren()) {
+                        UserRelationship rel = child.getValue(UserRelationship.class);
+                        if (rel != null && rel.getStudentId().equals(studentId)) {
+                            exists = true;
+                            existingRelationship = rel;
+                            break;
+                        }
+                    }
+                    callback.onResult(exists, existingRelationship);
+                }
+
+                @Override
+                public void onCancelled(DatabaseError error) {
+                    callback.onError(error.getMessage());
+                }
+            });
+    }
+
+    public interface RelationshipExistsCallback {
+        void onResult(boolean exists, UserRelationship relationship);
+        void onError(String error);
+    }
+
+    /**
      * Create a relationship request (teacher to student or parent to child)
      */
     public void createRelationship(String supervisorId, String supervisorName,
                                    String studentId, String studentName,
                                    UserRelationship.RelationType type,
                                    RelationshipActionCallback callback) {
-        String relationshipId = UUID.randomUUID().toString();
-        long now = System.currentTimeMillis();
+        // First check if relationship already exists
+        checkRelationshipExists(supervisorId, studentId, new RelationshipExistsCallback() {
+            @Override
+            public void onResult(boolean exists, UserRelationship existingRelationship) {
+                if (exists) {
+                    // Relationship already exists
+                    String status = existingRelationship.getStatus() == UserRelationship.RelationshipStatus.PENDING
+                        ? "A pending request already exists for this student"
+                        : "This student is already connected to you";
+                    callback.onError(status);
+                    return;
+                }
 
-        UserRelationship relationship = new UserRelationship(
-            relationshipId,
-            supervisorId,
-            studentId,
-            supervisorName,
-            studentName,
-            type,
-            UserRelationship.RelationshipStatus.PENDING,
-            now,
-            0
-        );
+                // Create new relationship
+                String relationshipId = UUID.randomUUID().toString();
+                long now = System.currentTimeMillis();
 
-        relationshipsRef.child(relationshipId).setValue(relationship)
-            .addOnSuccessListener(aVoid -> {
-                Log.d(TAG, "Relationship created: " + relationshipId);
-                callback.onSuccess(relationship);
-            })
-            .addOnFailureListener(e -> {
-                Log.e(TAG, "Failed to create relationship", e);
-                callback.onError(e.getMessage());
-            });
+                UserRelationship relationship = new UserRelationship(
+                    relationshipId,
+                    supervisorId,
+                    studentId,
+                    supervisorName,
+                    studentName,
+                    type,
+                    UserRelationship.RelationshipStatus.PENDING,
+                    now,
+                    0
+                );
+
+                relationshipsRef.child(relationshipId).setValue(relationship)
+                    .addOnSuccessListener(aVoid -> {
+                        Log.d(TAG, "Relationship created: " + relationshipId);
+                        callback.onSuccess(relationship);
+                    })
+                    .addOnFailureListener(e -> {
+                        Log.e(TAG, "Failed to create relationship", e);
+                        callback.onError(e.getMessage());
+                    });
+            }
+
+            @Override
+            public void onError(String error) {
+                callback.onError("Failed to check existing relationships: " + error);
+            }
+        });
     }
 
     /**
