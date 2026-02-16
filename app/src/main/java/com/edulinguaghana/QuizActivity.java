@@ -24,6 +24,7 @@ import com.google.android.material.appbar.AppBarLayout;
 import com.google.android.material.appbar.MaterialToolbar;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.edulinguaghana.tts.GhanaLPTtsService;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -77,6 +78,10 @@ public class QuizActivity extends AppCompatActivity {
     private String currentCorrectAnswer;
     private String currentPromptTtsText;
     private boolean isSfxOn = true;
+
+    // GhanaLP TTS for native Ghanaian languages
+    private GhanaLPTtsService ghanaLpTts;
+    private boolean isGhanaLpPlaying = false;
 
     private final String[] alphabet = {"A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z"};
     private final String[] matchLetters = {"A", "B", "C"};
@@ -270,9 +275,84 @@ public class QuizActivity extends AppCompatActivity {
     }
 
     private void speakPrompt() {
-        if (!ttsReady || currentPromptTtsText == null) return;
-        tts.stop();
-        tts.speak(currentPromptTtsText, TextToSpeech.QUEUE_FLUSH, null, "quiz_tts");
+        if (currentPromptTtsText == null) return;
+
+        // Use GhanaLP TTS for Ghanaian languages (Twi, Ewe, Ga)
+        if (isGhanaianLanguage(languageCode)) {
+            speakWithGhanaLP(currentPromptTtsText);
+        } else {
+            // Use Android TTS for English/French
+            if (!ttsReady) return;
+            tts.stop();
+            tts.speak(currentPromptTtsText, TextToSpeech.QUEUE_FLUSH, null, "quiz_tts");
+        }
+    }
+
+    private boolean isGhanaianLanguage(String code) {
+        if (code == null) return false;
+        String lower = code.toLowerCase();
+        return lower.equals("ak") || lower.equals("twi") ||
+               lower.equals("ee") || lower.equals("ewe") ||
+               lower.equals("gaa") || lower.equals("ga");
+    }
+
+    private void speakWithGhanaLP(String text) {
+        if (isGhanaLpPlaying) {
+            ghanaLpTts.stop();
+        }
+
+        // Normalize language code for API
+        String apiLangCode = normalizeLanguageCode(languageCode);
+
+        // Get speaker preference from SharedPreferences
+        SharedPreferences prefs = getSharedPreferences("TTS_PREFS", MODE_PRIVATE);
+        String speakerId = prefs.getString("ghananlp_speaker", "male_low");
+
+        ghanaLpTts.synthesizeAndPlay(
+            text,
+            apiLangCode,
+            speakerId,
+            new GhanaLPTtsService.PlaybackCallback() {
+                @Override
+                public void onStart() {
+                    isGhanaLpPlaying = true;
+                }
+
+                @Override
+                public void onComplete() {
+                    isGhanaLpPlaying = false;
+                }
+
+                @Override
+                public void onError(String error) {
+                    isGhanaLpPlaying = false;
+                    runOnUiThread(() -> {
+                        // Fallback to Android TTS on error
+                        android.util.Log.e("QuizActivity", "GhanaLP TTS error: " + error);
+                        if (tts != null && ttsReady) {
+                            tts.speak(text, TextToSpeech.QUEUE_FLUSH, null, "quiz_tts");
+                        }
+                    });
+                }
+            }
+        );
+    }
+
+    private String normalizeLanguageCode(String code) {
+        if (code == null) return "twi";
+        switch (code.toLowerCase()) {
+            case "ak":
+            case "twi":
+                return "twi";
+            case "ee":
+            case "ewe":
+                return "ewe";
+            case "gaa":
+            case "ga":
+                return "ga";
+            default:
+                return code.toLowerCase();
+        }
     }
 
     private void startGame() {
@@ -774,6 +854,9 @@ public class QuizActivity extends AppCompatActivity {
         if (tts != null) {
             tts.stop();
             tts.shutdown();
+        }
+        if (ghanaLpTts != null) {
+            ghanaLpTts.release();
         }
     }
 }

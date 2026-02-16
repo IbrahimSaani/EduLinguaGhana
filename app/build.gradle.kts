@@ -48,6 +48,9 @@ dependencies {
     implementation("com.airbnb.android:lottie:6.7.1")
     implementation("com.google.code.gson:gson:2.10.1")
 
+    // HTTP client for GhanaLP TTS API
+    implementation("com.squareup.okhttp3:okhttp:4.12.0")
+
     // QR Code generation and scanning
     implementation("com.google.zxing:core:3.5.2")
     implementation("com.journeyapps:zxing-android-embedded:4.3.0")

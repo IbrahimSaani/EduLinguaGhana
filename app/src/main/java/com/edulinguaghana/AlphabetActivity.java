@@ -26,6 +26,8 @@ import com.google.android.material.progressindicator.LinearProgressIndicator;
 import java.util.ArrayList;
 import java.util.Locale;
 
+import com.edulinguaghana.tts.OfflineGhanaLPTtsService;
+
 public class AlphabetActivity extends AppCompatActivity {
 
     private TextView tvLanguageTitle, tvLetter, tvLetterWord, tvLetterShadow;
@@ -58,6 +60,10 @@ public class AlphabetActivity extends AppCompatActivity {
 
     private TextToSpeech tts;
     private MediaPlayer mediaPlayer;
+
+    // Offline TTS for native Ghanaian languages (loads from res/raw)
+    private OfflineGhanaLPTtsService offlineTts;
+    private boolean isGhanaLpPlaying = false;
 
     private static final int REQ_CODE_SPEECH_INPUT = 100;
     private static final int REQ_CODE_RECORD_AUDIO = 200;
@@ -131,6 +137,9 @@ public class AlphabetActivity extends AppCompatActivity {
         }
 
         progressBar.setMax(letters.length);
+
+        // Initialize Offline TTS for native languages (loads from res/raw)
+        offlineTts = new OfflineGhanaLPTtsService(this);
 
         // Start background animations after views are ready
         try {
@@ -370,13 +379,118 @@ public class AlphabetActivity extends AppCompatActivity {
 
     private void speakCurrentLetter() {
         String letter = letters[currentIndex];
-        int resId = getLetterAudioResId(languageCode, letter);
-        if (resId != 0) {
-            playAudioResource(resId);
-        } else if (tts != null) {
-            tts.speak(letter, TextToSpeech.QUEUE_FLUSH, null, "LETTER_ID");
+
+        // Use GhanaLP TTS for Ghanaian languages (Twi, Ewe, Ga)
+        if (isGhanaianLanguage(languageCode)) {
+            speakWithGhanaLP(letter);
+        } else {
+            // Use local audio or Android TTS for English/French
+            int resId = getLetterAudioResId(languageCode, letter);
+            if (resId != 0) {
+                playAudioResource(resId);
+            } else if (tts != null) {
+                tts.speak(letter, TextToSpeech.QUEUE_FLUSH, null, "LETTER_ID");
+            }
         }
+
         animateLetter();
+    }
+
+    private boolean isGhanaianLanguage(String code) {
+        if (code == null) return false;
+        String lower = code.toLowerCase();
+        return lower.equals("ak") || lower.equals("twi") ||
+               lower.equals("ee") || lower.equals("ewe") ||
+               lower.equals("gaa") || lower.equals("ga");
+    }
+
+    private void speakWithGhanaLP(String text) {
+        if (isGhanaLpPlaying) {
+            offlineTts.stop();
+        }
+
+        // Normalize language code for audio file lookup
+        String apiLangCode = normalizeLanguageCode(languageCode);
+
+        // Disable speak button during playback
+        if (btnSpeak != null) {
+            btnSpeak.setEnabled(false);
+        }
+
+        // Try to speak the letter first, with word as fallback
+        offlineTts.speakLetter(
+            text,
+            apiLangCode,
+            new OfflineGhanaLPTtsService.PlaybackCallback() {
+                @Override
+                public void onStart() {
+                    isGhanaLpPlaying = true;
+                }
+
+                @Override
+                public void onComplete() {
+                    isGhanaLpPlaying = false;
+                    runOnUiThread(() -> {
+                        if (btnSpeak != null) {
+                            btnSpeak.setEnabled(true);
+                        }
+                    });
+                }
+
+                @Override
+                public void onError(String error) {
+                    // Try as word if letter fails
+                    offlineTts.speakWord(text, apiLangCode, new OfflineGhanaLPTtsService.PlaybackCallback() {
+                        @Override
+                        public void onStart() {
+                            isGhanaLpPlaying = true;
+                        }
+
+                        @Override
+                        public void onComplete() {
+                            isGhanaLpPlaying = false;
+                            runOnUiThread(() -> {
+                                if (btnSpeak != null) {
+                                    btnSpeak.setEnabled(true);
+                                }
+                            });
+                        }
+
+                        @Override
+                        public void onError(String wordError) {
+                            // Fallback to Android TTS if no offline audio found
+                            isGhanaLpPlaying = false;
+                            runOnUiThread(() -> {
+                                if (btnSpeak != null) {
+                                    btnSpeak.setEnabled(true);
+                                }
+                                android.util.Log.w("AlphabetActivity", "No offline audio found for: " + text);
+                                if (tts != null) {
+                                    tts.speak(text, TextToSpeech.QUEUE_FLUSH, null, "LETTER_ID");
+                                }
+                            });
+                        }
+                    });
+                }
+            }
+        );
+    }
+
+    private String normalizeLanguageCode(String code) {
+        if (code == null) return "twi";
+        switch (code.toLowerCase()) {
+            case "ak":
+            case "twi":
+                return "twi";
+            case "ee":
+            case "ewe":
+                return "ewe";
+            case "gaa":
+            case "ga":
+                return "ga";
+            default:
+                return code.toLowerCase();
+        }
     }
 
     private int getLetterAudioResId(String lang, String letter) {
@@ -516,6 +630,9 @@ public class AlphabetActivity extends AppCompatActivity {
             mediaPlayer.stop();
             mediaPlayer.release();
             mediaPlayer = null;
+        }
+        if (offlineTts != null) {
+            offlineTts.release();
         }
     }
 }

@@ -21,6 +21,7 @@ import android.widget.Toast;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.progressindicator.LinearProgressIndicator;
+import com.edulinguaghana.tts.OfflineGhanaLPTtsService;
 
 import java.util.ArrayList;
 import java.util.Locale;
@@ -41,6 +42,10 @@ public class NumbersActivity extends AppCompatActivity {
     private int currentNumber = 1;  // 1..100
     private TextToSpeech tts;
     private MediaPlayer mediaPlayer;
+
+    // Offline TTS for native Ghanaian languages (loads from res/raw)
+    private OfflineGhanaLPTtsService offlineTts;
+    private boolean isGhanaLpPlaying = false;
 
     private static final int REQ_CODE_SPEECH_INPUT = 300;
     private static final int REQ_CODE_RECORD_AUDIO = 400;
@@ -72,6 +77,9 @@ public class NumbersActivity extends AppCompatActivity {
         btnSpeakNumber.setText(isRecitalMode ? "Repeat" : "Practice");
 
         progressBar.setMax(100);
+
+        // Initialize Offline TTS for native languages (loads from res/raw)
+        offlineTts = new OfflineGhanaLPTtsService(this);
 
         tts = new TextToSpeech(this, status -> {
             if (status == TextToSpeech.SUCCESS) {
@@ -139,14 +147,97 @@ public class NumbersActivity extends AppCompatActivity {
     }
 
     private void speakCurrentNumber() {
-        String numberText = String.valueOf(currentNumber);
-        int resId = getNumberAudioResId(languageCode, currentNumber);
-        if (resId != 0) {
-            playAudioResource(resId);
-        } else if (tts != null) {
-            tts.speak(numberText, TextToSpeech.QUEUE_FLUSH, null, "NUMBER_ID");
+        String numberText = convertNumberToWord(currentNumber);
+
+        // Use GhanaLP TTS for Ghanaian languages (Twi, Ewe, Ga)
+        if (isGhanaianLanguage(languageCode)) {
+            speakWithGhanaLP(numberText);
+        } else {
+            // Use local audio or Android TTS for English/French
+            int resId = getNumberAudioResId(languageCode, currentNumber);
+            if (resId != 0) {
+                playAudioResource(resId);
+            } else if (tts != null) {
+                tts.speak(String.valueOf(currentNumber), TextToSpeech.QUEUE_FLUSH, null, "NUMBER_ID");
+            }
         }
         animateNumber();
+    }
+
+    private boolean isGhanaianLanguage(String code) {
+        if (code == null) return false;
+        String lower = code.toLowerCase();
+        return lower.equals("ak") || lower.equals("twi") ||
+               lower.equals("ee") || lower.equals("ewe") ||
+               lower.equals("gaa") || lower.equals("ga");
+    }
+
+    private void speakWithGhanaLP(String text) {
+        if (isGhanaLpPlaying) {
+            offlineTts.stop();
+        }
+
+        // Normalize language code for audio file lookup
+        String apiLangCode = normalizeLanguageCode(languageCode);
+
+        // Disable speak button during playback
+        if (btnSpeakNumber != null) {
+            btnSpeakNumber.setEnabled(false);
+        }
+
+        // Use speakNumber for numbers
+        offlineTts.speakNumber(
+            currentNumber,
+            apiLangCode,
+            new OfflineGhanaLPTtsService.PlaybackCallback() {
+                @Override
+                public void onStart() {
+                    isGhanaLpPlaying = true;
+                }
+
+                @Override
+                public void onComplete() {
+                    isGhanaLpPlaying = false;
+                    runOnUiThread(() -> {
+                        if (btnSpeakNumber != null) {
+                            btnSpeakNumber.setEnabled(true);
+                        }
+                    });
+                }
+
+                @Override
+                public void onError(String error) {
+                    // Fallback to Android TTS if no offline audio found
+                    isGhanaLpPlaying = false;
+                    runOnUiThread(() -> {
+                        if (btnSpeakNumber != null) {
+                            btnSpeakNumber.setEnabled(true);
+                        }
+                        android.util.Log.w("NumbersActivity", "No offline audio found for number: " + currentNumber);
+                        if (tts != null) {
+                            tts.speak(String.valueOf(currentNumber), TextToSpeech.QUEUE_FLUSH, null, "NUMBER_ID");
+                        }
+                    });
+                }
+            }
+        );
+    }
+
+    private String normalizeLanguageCode(String code) {
+        if (code == null) return "twi";
+        switch (code.toLowerCase()) {
+            case "ak":
+            case "twi":
+                return "twi";
+            case "ee":
+            case "ewe":
+                return "ewe";
+            case "gaa":
+            case "ga":
+                return "ga";
+            default:
+                return code.toLowerCase();
+        }
     }
 
     private int getNumberAudioResId(String lang, int num) {
@@ -407,6 +498,9 @@ public class NumbersActivity extends AppCompatActivity {
             mediaPlayer.stop();
             mediaPlayer.release();
             mediaPlayer = null;
+        }
+        if (offlineTts != null) {
+            offlineTts.release();
         }
     }
 }
