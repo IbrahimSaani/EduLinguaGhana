@@ -34,23 +34,12 @@ public class SettingsActivity extends AppCompatActivity {
     private Button btnChangeRole;
     private TextView tvLastSync;
     private TextView tvCurrentRole;
-    private RadioGroup rgTheme;
-    private RadioButton rbLight, rbDark, rbSystem;
-
-    // Voice settings for GhanaLP TTS
-    private RadioGroup rgVoiceType;
-    private RadioButton rbMaleLow, rbMaleHigh, rbFemaleLow, rbFemaleHigh;
 
     private static final String PREF_NAME = "EduLinguaPrefs";
     private static final String KEY_MUSIC_ENABLED = "MUSIC_ENABLED";
     private static final String KEY_SFX_ENABLED = "SFX_ENABLED";
     private static final String KEY_ANIMATIONS_ENABLED = "ANIMATIONS_ENABLED";
     private static final String KEY_LOW_POWER_ANIMATIONS = "LOW_POWER_ANIMATIONS";
-    private static final String KEY_THEME = "THEME";
-
-    // TTS preference keys
-    private static final String TTS_PREF_NAME = "TTS_PREFS";
-    private static final String KEY_GHANANLP_SPEAKER = "ghananlp_speaker";
 
     private static final String KEY_HIGH_SCORE = "HIGH_SCORE";
     private static final String KEY_TOTAL_QUIZZES = "TOTAL_QUIZZES";
@@ -84,22 +73,11 @@ public class SettingsActivity extends AppCompatActivity {
         btnChangeRole = findViewById(R.id.btnChangeRole);
         tvLastSync = findViewById(R.id.tvLastSync);
         tvCurrentRole = findViewById(R.id.tvCurrentRole);
-        rgTheme = findViewById(R.id.rgTheme);
-        rbLight = findViewById(R.id.rbLight);
-        rbDark = findViewById(R.id.rbDark);
-        rbSystem = findViewById(R.id.rbSystem);
-
-        // Voice settings
-        rgVoiceType = findViewById(R.id.rgVoiceType);
-        rbMaleLow = findViewById(R.id.rbMaleLow);
-        rbMaleHigh = findViewById(R.id.rbMaleHigh);
-        rbFemaleLow = findViewById(R.id.rbFemaleLow);
-        rbFemaleHigh = findViewById(R.id.rbFemaleHigh);
 
         // Apply custom font to section headers
         applySectionHeaderFonts();
 
-        // Update last sync time
+        // ...existing code...
         updateLastSyncTime();
 
         // Display current role
@@ -111,19 +89,12 @@ public class SettingsActivity extends AppCompatActivity {
         boolean sfxEnabled = prefs.getBoolean(KEY_SFX_ENABLED, true);
         boolean animationsEnabled = prefs.getBoolean(KEY_ANIMATIONS_ENABLED, true);
         boolean lowPowerEnabled = prefs.getBoolean(KEY_LOW_POWER_ANIMATIONS, false);
-        int currentTheme = prefs.getInt(KEY_THEME, AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM);
-
-        // Load voice settings
-        SharedPreferences ttsPrefs = getSharedPreferences(TTS_PREF_NAME, MODE_PRIVATE);
-        String currentSpeaker = ttsPrefs.getString(KEY_GHANANLP_SPEAKER, "male_low");
 
         // Set UI states
         switchMusic.setChecked(musicEnabled);
         switchSfx.setChecked(sfxEnabled);
         switchAnimations.setChecked(animationsEnabled);
         switchLowPowerAnimations.setChecked(lowPowerEnabled);
-        updateThemeRadioButtons(currentTheme);
-        updateVoiceRadioButtons(currentSpeaker);
 
         // Save preferences when toggles change
         switchMusic.setOnCheckedChangeListener((buttonView, isChecked) -> {
@@ -142,35 +113,6 @@ public class SettingsActivity extends AppCompatActivity {
             prefs.edit().putBoolean(KEY_LOW_POWER_ANIMATIONS, isChecked).apply();
         });
 
-        // Change theme when radio button is selected
-        rgTheme.setOnCheckedChangeListener((group, checkedId) -> {
-            int newTheme = currentTheme;
-            if (checkedId == R.id.rbLight) {
-                newTheme = AppCompatDelegate.MODE_NIGHT_NO;
-            } else if (checkedId == R.id.rbDark) {
-                newTheme = AppCompatDelegate.MODE_NIGHT_YES;
-            } else if (checkedId == R.id.rbSystem) {
-                newTheme = AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM;
-            }
-            prefs.edit().putInt(KEY_THEME, newTheme).apply();
-            AppCompatDelegate.setDefaultNightMode(newTheme);
-        });
-
-        // Change voice type when radio button is selected
-        rgVoiceType.setOnCheckedChangeListener((group, checkedId) -> {
-            String speakerId = "male_low";
-            if (checkedId == R.id.rbMaleLow) {
-                speakerId = "male_low";
-            } else if (checkedId == R.id.rbMaleHigh) {
-                speakerId = "male_high";
-            } else if (checkedId == R.id.rbFemaleLow) {
-                speakerId = "female_low";
-            } else if (checkedId == R.id.rbFemaleHigh) {
-                speakerId = "female_high";
-            }
-            ttsPrefs.edit().putString(KEY_GHANANLP_SPEAKER, speakerId).apply();
-            Toast.makeText(this, "Voice changed to " + getVoiceDisplayName(speakerId), Toast.LENGTH_SHORT).show();
-        });
 
         // Cloud Sync buttons
         btnSyncToCloud.setOnClickListener(v -> syncToCloud());
@@ -212,49 +154,6 @@ public class SettingsActivity extends AppCompatActivity {
         return true;
     }
 
-    private void updateThemeRadioButtons(int currentTheme) {
-        if (currentTheme == AppCompatDelegate.MODE_NIGHT_NO) {
-            rbLight.setChecked(true);
-        } else if (currentTheme == AppCompatDelegate.MODE_NIGHT_YES) {
-            rbDark.setChecked(true);
-        } else {
-            rbSystem.setChecked(true);
-        }
-    }
-
-    private void updateVoiceRadioButtons(String speakerId) {
-        if (speakerId == null) speakerId = "male_low";
-
-        switch (speakerId) {
-            case "male_high":
-                rbMaleHigh.setChecked(true);
-                break;
-            case "female_low":
-                rbFemaleLow.setChecked(true);
-                break;
-            case "female_high":
-                rbFemaleHigh.setChecked(true);
-                break;
-            case "male_low":
-            default:
-                rbMaleLow.setChecked(true);
-                break;
-        }
-    }
-
-    private String getVoiceDisplayName(String speakerId) {
-        switch (speakerId) {
-            case "male_high":
-                return "Male Voice (High)";
-            case "female_low":
-                return "Female Voice (Low)";
-            case "female_high":
-                return "Female Voice (High)";
-            case "male_low":
-            default:
-                return "Male Voice (Low)";
-        }
-    }
 
     private void applyToolbarFont(Toolbar toolbar) {
         try {
@@ -282,22 +181,14 @@ public class SettingsActivity extends AppCompatActivity {
 
             // Apply font to all section headers
             TextView tvAudioHeader = findViewById(R.id.tvAudioHeader);
-            TextView tvVoiceHeader = findViewById(R.id.tvVoiceHeader);
             TextView tvVisualHeader = findViewById(R.id.tvVisualHeader);
-            TextView tvThemeHeader = findViewById(R.id.tvThemeHeader);
             TextView tvProgressHeader = findViewById(R.id.tvProgressHeader);
 
             if (tvAudioHeader != null) {
                 tvAudioHeader.setTypeface(typeface, android.graphics.Typeface.BOLD);
             }
-            if (tvVoiceHeader != null) {
-                tvVoiceHeader.setTypeface(typeface, android.graphics.Typeface.BOLD);
-            }
             if (tvVisualHeader != null) {
                 tvVisualHeader.setTypeface(typeface, android.graphics.Typeface.BOLD);
-            }
-            if (tvThemeHeader != null) {
-                tvThemeHeader.setTypeface(typeface, android.graphics.Typeface.BOLD);
             }
             if (tvProgressHeader != null) {
                 tvProgressHeader.setTypeface(typeface, android.graphics.Typeface.BOLD);
