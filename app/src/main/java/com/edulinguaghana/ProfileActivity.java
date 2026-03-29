@@ -51,6 +51,7 @@ public class ProfileActivity extends AppCompatActivity {
     private MaterialButton btnGoToLogin, btnManageAccount, btnSignOut, btnEditAvatar;
     private TextView tvUserName, tvUserEmail, tvUserId, tvProfileStreak, tvTotalLessons, tvBestScore, tvFavoriteLanguage;
     private View userIdSection;
+    private View languageSection;
     private MaterialButton btnCopyUserId;
     // Gamification views
     private TextView tvLevel, tvXpText;
@@ -150,6 +151,7 @@ public class ProfileActivity extends AppCompatActivity {
         tvTotalLessons = findViewById(R.id.tvTotalLessons);
         tvBestScore = findViewById(R.id.tvBestScore);
         tvFavoriteLanguage = findViewById(R.id.tvFavoriteLanguage);
+        languageSection = findViewById(R.id.languageSection);
         profileImage = findViewById(R.id.profileImage);
         avatarNotSignedIn = findViewById(R.id.avatarNotSignedIn);
         dynamicBackground = findViewById(R.id.dynamicBackground);
@@ -372,8 +374,8 @@ public class ProfileActivity extends AppCompatActivity {
         });
 
         // Add listener for favorite language selection
-        if (tvFavoriteLanguage != null) {
-            tvFavoriteLanguage.setOnClickListener(v -> showLanguageSelectionDialog());
+        if (languageSection != null) {
+            languageSection.setOnClickListener(v -> showLanguageSelectionDialog());
         }
 
         // Add listener for achievements card
