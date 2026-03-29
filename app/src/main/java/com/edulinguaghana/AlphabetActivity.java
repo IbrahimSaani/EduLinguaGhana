@@ -417,9 +417,13 @@ public class AlphabetActivity extends AppCompatActivity {
             btnSpeak.setEnabled(false);
         }
 
-        // Try to speak the letter first, with word as fallback
-        offlineTts.speakLetter(
-            text,
+        // IMPROVEMENT: Speak the example WORD instead of the letter
+        // This works better because word pronunciations are correct
+        // The word demonstrates the letter sound in context
+        String wordToSpeak = words[currentIndex];
+
+        offlineTts.speakWord(
+            wordToSpeak,
             apiLangCode,
             new OfflineGhanaLPTtsService.PlaybackCallback() {
                 @Override
@@ -439,8 +443,8 @@ public class AlphabetActivity extends AppCompatActivity {
 
                 @Override
                 public void onError(String error) {
-                    // Try as word if letter fails
-                    offlineTts.speakWord(text, apiLangCode, new OfflineGhanaLPTtsService.PlaybackCallback() {
+                    // Fallback: Try letter pronunciation
+                    offlineTts.speakLetter(text, apiLangCode, new OfflineGhanaLPTtsService.PlaybackCallback() {
                         @Override
                         public void onStart() {
                             isGhanaLpPlaying = true;
@@ -457,8 +461,8 @@ public class AlphabetActivity extends AppCompatActivity {
                         }
 
                         @Override
-                        public void onError(String wordError) {
-                            // Fallback to Android TTS if no offline audio found
+                        public void onError(String letterError) {
+                            // Final fallback to Android TTS
                             isGhanaLpPlaying = false;
                             runOnUiThread(() -> {
                                 if (btnSpeak != null) {
