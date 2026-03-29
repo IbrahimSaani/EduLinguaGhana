@@ -77,26 +77,23 @@
                 android:orientation="horizontal"
                 android:gravity="center_vertical">
 
-                <!-- XP Icon Container -->
+                <!-- XP Icon Container with Circular Progress -->
                 <FrameLayout
                     android:layout_width="64dp"
-                    android:layout_height="64dp">
+                    android:layout_height="64dp"
+                    android:layout_marginEnd="16dp">
 
-                    <com.google.android.material.card.MaterialCardView
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        app:cardCornerRadius="32dp"
-                        app:cardElevation="2dp"
-                        app:strokeWidth="2dp"
-                        app:strokeColor="@color/colorPrimary"
-                        app:cardBackgroundColor="@color/colorPrimaryLight">
-
-                        <View
-                            android:layout_width="match_parent"
-                            android:layout_height="match_parent"
-                            android:background="@color/colorPrimary"
-                            android:alpha="0.1" />
-                    </com.google.android.material.card.MaterialCardView>
+                    <com.google.android.material.progressindicator.CircularProgressIndicator
+                        android:id="@+id/pb_xp"
+                        android:layout_width="64dp"
+                        android:layout_height="64dp"
+                        android:progress="40"
+                        android:max="100"
+                        app:indicatorColor="@color/colorAccent"
+                        app:trackColor="@color/progressTrackColor"
+                        app:trackThickness="4dp"
+                        app:indicatorSize="64dp"
+                        app:indicatorInset="0dp" />
 
                     <ImageView
                         android:id="@+id/iv_xp_icon"
@@ -114,8 +111,7 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:orientation="vertical"
-                    android:layout_marginStart="16dp">
+                    android:orientation="vertical">
 
                     <TextView
                         android:id="@+id/tv_level"
@@ -128,16 +124,6 @@
                         android:fontFamily="@font/agbalumo"
                         android:layout_marginBottom="8dp" />
 
-                    <com.google.android.material.progressindicator.LinearProgressIndicator
-                        android:id="@+id/pb_xp"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:progress="40"
-                        android:max="100"
-                        app:indicatorColor="@color/colorAccent"
-                        app:trackColor="@color/progressTrackColor"
-                        app:trackCornerRadius="4dp"
-                        app:trackThickness="8dp" />
 
                     <TextView
                         android:id="@+id/tv_xp_text"

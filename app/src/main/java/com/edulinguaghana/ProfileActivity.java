@@ -2,6 +2,7 @@ package com.edulinguaghana;
 
 import android.Manifest;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.text.InputType;
@@ -20,6 +21,7 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
 import com.google.android.material.button.MaterialButton;
+import com.google.android.material.switchmaterial.SwitchMaterial;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.zxing.integration.android.IntentIntegrator;
@@ -45,6 +47,7 @@ public class ProfileActivity extends AppCompatActivity {
 
     private FirebaseAuth mAuth;
     private View notSignedInLayout, signedInLayout;
+    private SwitchMaterial switchMusic, switchSfx;
     private MaterialButton btnGoToLogin, btnManageAccount, btnSignOut, btnEditAvatar;
     private TextView tvUserName, tvUserEmail, tvUserId, tvProfileStreak, tvTotalLessons, tvBestScore, tvFavoriteLanguage;
     private View userIdSection;
@@ -53,6 +56,7 @@ public class ProfileActivity extends AppCompatActivity {
     private TextView tvLevel, tvXpText;
     private ProgressBar pbXp;
     private ImageView ivBadgesPreview;
+    private View achievementsCard;
     private AvatarView profileImage, avatarNotSignedIn;
     private DynamicBackgroundView dynamicBackground;
     private MaterialButton btnAddFriend, btnChallengeFriend;
@@ -155,6 +159,7 @@ public class ProfileActivity extends AppCompatActivity {
         pbXp = findViewById(R.id.pb_xp);
         tvXpText = findViewById(R.id.tv_xp_text);
         ivBadgesPreview = findViewById(R.id.iv_badges_preview);
+        achievementsCard = findViewById(R.id.achievementsCard);
     }
 
     /**
@@ -247,10 +252,12 @@ public class ProfileActivity extends AppCompatActivity {
 
             // Display best score
             int bestScore = ProgressManager.getHighScore(this);
-            tvBestScore.setText(bestScore + " / 10");
+            tvBestScore.setText(String.valueOf(bestScore));
 
-            // Display favorite language (TODO: implement favorite language tracking)
-            tvFavoriteLanguage.setText("Not set yet");
+            // Display favorite language
+            SharedPreferences prefs = getSharedPreferences("ProfilePrefs", MODE_PRIVATE);
+            String favoriteLanguage = prefs.getString("favorite_language", "Not set yet");
+            tvFavoriteLanguage.setText(favoriteLanguage);
 
             // Populate gamification panel
             XPState s = XPManager.getState(this);
@@ -363,6 +370,58 @@ public class ProfileActivity extends AppCompatActivity {
             Intent intent = new Intent(ProfileActivity.this, AvatarEditorActivity.class);
             startActivity(intent);
         });
+
+        // Add listener for favorite language selection
+        if (tvFavoriteLanguage != null) {
+            tvFavoriteLanguage.setOnClickListener(v -> showLanguageSelectionDialog());
+        }
+
+        // Add listener for achievements card
+        if (achievementsCard != null) {
+            achievementsCard.setOnClickListener(v -> showAchievementsDialog());
+        }
+    }
+
+    private void showLanguageSelectionDialog() {
+        String[] languages = {"Twi", "Ewe", "Ga", "English", "French"};
+        int currentSelection = -1;
+
+        String currentFavorite = tvFavoriteLanguage.getText().toString();
+        for (int i = 0; i < languages.length; i++) {
+            if (languages[i].equals(currentFavorite)) {
+                currentSelection = i;
+                break;
+            }
+        }
+
+        new AlertDialog.Builder(this)
+            .setTitle("Select Favorite Language")
+            .setSingleChoiceItems(languages, currentSelection, (dialog, which) -> {
+                String selected = languages[which];
+                tvFavoriteLanguage.setText(selected);
+
+                // Save preference
+                SharedPreferences prefs = getSharedPreferences("ProfilePrefs", MODE_PRIVATE);
+                prefs.edit().putString("favorite_language", selected).apply();
+
+                Toast.makeText(this, "Favorite language set to " + selected, Toast.LENGTH_SHORT).show();
+                dialog.dismiss();
+            })
+            .setNegativeButton("Cancel", null)
+            .show();
+    }
+
+    private void showAchievementsDialog() {
+        new AlertDialog.Builder(this)
+            .setTitle("🏆 Achievements")
+            .setMessage("Keep learning to unlock achievements!\n\n" +
+                       "📚 First Steps - Complete your first lesson\n" +
+                       "⭐ Rising Star - Complete 10 lessons\n" +
+                       "🔥 On Fire - Maintain a 7-day streak\n" +
+                       "🎯 Perfectionist - Get 10 perfect scores\n" +
+                       "🌍 Language Master - Complete all languages")
+            .setPositiveButton("Got it!", null)
+            .show();
     }
 
     // Helper: show dialog to find a user id to add as friend
