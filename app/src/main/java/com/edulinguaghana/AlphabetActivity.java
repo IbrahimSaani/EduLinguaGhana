@@ -380,17 +380,16 @@ public class AlphabetActivity extends AppCompatActivity {
     private void speakCurrentLetter() {
         String letter = letters[currentIndex];
 
-        // Use GhanaLP TTS for Ghanaian languages (Twi, Ewe, Ga)
-        if (isGhanaianLanguage(languageCode)) {
+        // Try to load audio from recorded files first
+        int resId = getLetterAudioResId(languageCode, letter);
+        if (resId != 0) {
+            playAudioResource(resId);
+        } else if (isGhanaianLanguage(languageCode)) {
+            // Fallback to GhanaLP TTS if no recorded audio exists
             speakWithGhanaLP(letter);
-        } else {
-            // Use local audio or Android TTS for English/French
-            int resId = getLetterAudioResId(languageCode, letter);
-            if (resId != 0) {
-                playAudioResource(resId);
-            } else if (tts != null) {
-                tts.speak(letter, TextToSpeech.QUEUE_FLUSH, null, "LETTER_ID");
-            }
+        } else if (tts != null) {
+            // Fallback to Android TTS for other languages
+            tts.speak(letter, TextToSpeech.QUEUE_FLUSH, null, "LETTER_ID");
         }
 
         animateLetter();
@@ -499,10 +498,39 @@ public class AlphabetActivity extends AppCompatActivity {
 
     private int getLetterAudioResId(String lang, String letter) {
         if (lang == null || letter == null) return 0;
-        // Sanitize special characters for resource names
-        String sanitizedLetter = letter.replaceAll("[^a-zA-Z0-9]", "").toLowerCase(Locale.ROOT);
-        if (sanitizedLetter.isEmpty()) return 0;
-        String fileName = lang.toLowerCase(Locale.ROOT) + "_" + sanitizedLetter;
+
+        String sanitizedLetter = letter.toLowerCase(Locale.ROOT);
+
+        // Map special characters to their filename equivalents (ASCII-safe)
+        switch (sanitizedLetter) {
+            case "ɛ":
+                sanitizedLetter = "e_open";  // Renamed from ɛ to e_open for Android resources
+                break;
+            case "ɔ":
+                sanitizedLetter = "o_open";  // Renamed from ɔ to o_open for Android resources
+                break;
+            case "ŋ":
+                sanitizedLetter = "ng";  // Renamed from ŋ to ng for Android resources
+                break;
+            case "ɖ":
+                sanitizedLetter = "d_caron";  // For future use
+                break;
+            case "ƒ":
+                sanitizedLetter = "f_hook";  // For future use
+                break;
+            case "ɣ":
+                sanitizedLetter = "g_hook";  // For future use
+                break;
+            case "ʋ":
+                sanitizedLetter = "v_hook";  // For future use
+                break;
+            case "x":
+                // For Ewe, 'x' is actually "X" sound (chi)
+                sanitizedLetter = "x";
+                break;
+        }
+
+        String fileName = lang.toLowerCase(Locale.ROOT) + "_letter_" + sanitizedLetter;
         return getResources().getIdentifier(fileName, "raw", getPackageName());
     }
 

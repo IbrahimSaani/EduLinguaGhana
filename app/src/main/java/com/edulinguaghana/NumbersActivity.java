@@ -147,19 +147,16 @@ public class NumbersActivity extends AppCompatActivity {
     }
 
     private void speakCurrentNumber() {
-        String numberText = convertNumberToWord(currentNumber);
-
-        // Use GhanaLP TTS for Ghanaian languages (Twi, Ewe, Ga)
-        if (isGhanaianLanguage(languageCode)) {
-            speakWithGhanaLP(numberText);
-        } else {
-            // Use local audio or Android TTS for English/French
-            int resId = getNumberAudioResId(languageCode, currentNumber);
-            if (resId != 0) {
-                playAudioResource(resId);
-            } else if (tts != null) {
-                tts.speak(String.valueOf(currentNumber), TextToSpeech.QUEUE_FLUSH, null, "NUMBER_ID");
-            }
+        // Try to load audio from recorded files first
+        int resId = getNumberAudioResId(languageCode, currentNumber);
+        if (resId != 0) {
+            playAudioResource(resId);
+        } else if (isGhanaianLanguage(languageCode)) {
+            // Fallback to GhanaLP TTS if no recorded audio exists
+            speakWithGhanaLP(currentNumber);
+        } else if (tts != null) {
+            // Fallback to Android TTS for other languages
+            tts.speak(String.valueOf(currentNumber), TextToSpeech.QUEUE_FLUSH, null, "NUMBER_ID");
         }
         animateNumber();
     }
@@ -172,7 +169,7 @@ public class NumbersActivity extends AppCompatActivity {
                lower.equals("gaa") || lower.equals("ga");
     }
 
-    private void speakWithGhanaLP(String text) {
+    private void speakWithGhanaLP(int number) {
         if (isGhanaLpPlaying) {
             offlineTts.stop();
         }
@@ -187,7 +184,7 @@ public class NumbersActivity extends AppCompatActivity {
 
         // Use speakNumber for numbers
         offlineTts.speakNumber(
-            currentNumber,
+            number,
             apiLangCode,
             new OfflineGhanaLPTtsService.PlaybackCallback() {
                 @Override
@@ -213,9 +210,9 @@ public class NumbersActivity extends AppCompatActivity {
                         if (btnSpeakNumber != null) {
                             btnSpeakNumber.setEnabled(true);
                         }
-                        android.util.Log.w("NumbersActivity", "No offline audio found for number: " + currentNumber);
+                        android.util.Log.w("NumbersActivity", "No offline audio found for number: " + number);
                         if (tts != null) {
-                            tts.speak(String.valueOf(currentNumber), TextToSpeech.QUEUE_FLUSH, null, "NUMBER_ID");
+                            tts.speak(String.valueOf(number), TextToSpeech.QUEUE_FLUSH, null, "NUMBER_ID");
                         }
                     });
                 }
@@ -242,7 +239,13 @@ public class NumbersActivity extends AppCompatActivity {
 
     private int getNumberAudioResId(String lang, int num) {
         if (lang == null) return 0;
-        String fileName = lang.toLowerCase(Locale.ROOT) + "_" + num;
+        // Format number with leading zeros (001-099, 0100 for 100)
+        String fileName;
+        if (num == 100) {
+            fileName = lang.toLowerCase(Locale.ROOT) + "_number_0100";
+        } else {
+            fileName = String.format(Locale.ROOT, "%s_number_%03d", lang.toLowerCase(Locale.ROOT), num);
+        }
         return getResources().getIdentifier(fileName, "raw", getPackageName());
     }
 

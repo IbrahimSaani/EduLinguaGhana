@@ -1342,51 +1342,67 @@ public class ProfileActivity extends AppCompatActivity {
     }
 
     private void showFriendsListDialog(java.util.List<Friend> friends, String currentUserId) {
-        String[] friendItems = new String[friends.size()];
-        for (int i = 0; i < friends.size(); i++) {
-            Friend friend = friends.get(i);
+        java.util.List<StyledMenuHelper.MenuItem> menuItems = new java.util.ArrayList<>();
+
+        for (Friend friend : friends) {
             String displayName = friend.displayName != null && !friend.displayName.isEmpty()
                 ? friend.displayName
                 : friend.friendUserId;
-            friendItems[i] = "👤 " + displayName;
+
+            menuItems.add(new StyledMenuHelper.MenuItem(
+                "👤",
+                displayName,
+                friend.friendUserId,
+                () -> showFriendOptionsDialog(friend, currentUserId)
+            ));
         }
 
-        new AlertDialog.Builder(this)
-            .setTitle("My Friends (" + friends.size() + ")")
-            .setItems(friendItems, (dialog, which) -> {
-                Friend selectedFriend = friends.get(which);
-                showFriendOptionsDialog(selectedFriend, currentUserId);
-            })
-            .setNegativeButton("Close", null)
-            .show();
+        StyledMenuHelper.showStyledMenu(
+            this,
+            "👥",
+            "My Friends",
+            "Select a friend to interact with",
+            menuItems,
+            null
+        );
     }
 
     private void showFriendOptionsDialog(Friend friend, String currentUserId) {
-        String[] options = {"👤 View Profile", "⚔️ Challenge", "❌ Remove Friend"};
         String displayName = friend.displayName != null && !friend.displayName.isEmpty()
             ? friend.displayName
             : friend.friendUserId;
 
-        new AlertDialog.Builder(this)
-            .setTitle(displayName)
-            .setItems(options, (dialog, which) -> {
-                switch (which) {
-                    case 0:
-                        // View profile
-                        showFriendProfile(friend.friendUserId);
-                        break;
-                    case 1:
-                        // Challenge friend
-                        performCreateChallenge(currentUserId, friend.friendUserId);
-                        break;
-                    case 2:
-                        // Remove friend
-                        showRemoveFriendConfirmation(friend, currentUserId);
-                        break;
-                }
-            })
-            .setNegativeButton("Cancel", null)
-            .show();
+        java.util.List<StyledMenuHelper.MenuItem> menuItems = new java.util.ArrayList<>();
+
+        menuItems.add(new StyledMenuHelper.MenuItem(
+            "👤",
+            "View Profile",
+            "See their profile and stats",
+            () -> showFriendProfile(friend.friendUserId)
+        ));
+
+        menuItems.add(new StyledMenuHelper.MenuItem(
+            "⚔️",
+            "Challenge",
+            "Send a challenge",
+            () -> performCreateChallenge(currentUserId, friend.friendUserId)
+        ));
+
+        menuItems.add(new StyledMenuHelper.MenuItem(
+            "❌",
+            "Remove Friend",
+            "Remove from friends list",
+            () -> showRemoveFriendConfirmation(friend, currentUserId)
+        ));
+
+        StyledMenuHelper.showStyledMenu(
+            this,
+            "👤",
+            displayName,
+            "What would you like to do?",
+            menuItems,
+            null
+        );
     }
 
     private void showFriendProfile(String friendUserId) {
@@ -1506,23 +1522,30 @@ public class ProfileActivity extends AppCompatActivity {
     }
 
     private void showFriendRequestsDialog(java.util.List<Friend> requests) {
-        String[] requestItems = new String[requests.size()];
-        for (int i = 0; i < requests.size(); i++) {
-            Friend friend = requests.get(i);
-            requestItems[i] = "📬 Request from: " + friend.userId;
+        java.util.List<StyledMenuHelper.MenuItem> menuItems = new java.util.ArrayList<>();
+
+        for (Friend request : requests) {
+            menuItems.add(new StyledMenuHelper.MenuItem(
+                "📬",
+                "Request from " + request.userId,
+                request.userId,
+                () -> showAcceptRejectDialog(request)
+            ));
         }
 
-        new AlertDialog.Builder(this)
-            .setTitle("Friend Requests (" + requests.size() + ")")
-            .setItems(requestItems, (dialog, which) -> {
-                Friend selectedRequest = requests.get(which);
-                showAcceptRejectDialog(selectedRequest);
-            })
-            .setNeutralButton("Accept All", (dialog, which) -> {
-                showAcceptAllConfirmation(requests);
-            })
-            .setNegativeButton("Close", null)
-            .show();
+        StyledMenuHelper.showStyledMenu(
+            this,
+            "📬",
+            "Friend Requests",
+            "Review pending requests",
+            menuItems,
+            new Runnable() {
+                @Override
+                public void run() {
+                    showAcceptAllConfirmation(requests);
+                }
+            }
+        );
     }
 
     private void showAcceptAllConfirmation(java.util.List<Friend> requests) {
