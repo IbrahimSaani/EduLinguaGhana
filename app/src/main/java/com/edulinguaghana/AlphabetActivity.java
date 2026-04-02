@@ -499,38 +499,72 @@ public class AlphabetActivity extends AppCompatActivity {
     private int getLetterAudioResId(String lang, String letter) {
         if (lang == null || letter == null) return 0;
 
-        String sanitizedLetter = letter.toLowerCase(Locale.ROOT);
+        String langLower = lang.toLowerCase(Locale.ROOT);
+        String letterLower = letter.toLowerCase(Locale.ROOT);
 
-        // Map special characters to their filename equivalents (ASCII-safe)
-        switch (sanitizedLetter) {
+        // For Ewe language, map special characters to safe filenames
+        if ("ee".equals(langLower) || "ewe".equals(langLower)) {
+            String sanitizedLetter = letterLower;
+            switch (letterLower) {
+                case "ɛ":
+                    sanitizedLetter = "e_open";
+                    break;
+                case "ɔ":
+                    sanitizedLetter = "o_open";
+                    break;
+                case "ŋ":
+                    sanitizedLetter = "ng";
+                    break;
+                case "ɖ":
+                    sanitizedLetter = "d_caron";
+                    break;
+                case "ƒ":
+                    sanitizedLetter = "f_hook";
+                    break;
+                case "ɣ":
+                    sanitizedLetter = "g_hook";
+                    break;
+                case "ʋ":
+                    sanitizedLetter = "v_hook";
+                    break;
+            }
+            String fileName = "ewe_letter_" + sanitizedLetter;
+            return getResources().getIdentifier(fileName, "raw", getPackageName());
+        }
+
+        // For Gaa language, try direct character match first, then fallback to safe names
+        if ("gaa".equals(langLower) || "ga".equals(langLower)) {
+            String sanitizedLetter = letterLower;
+            switch (letterLower) {
+                case "ɛ":
+                    sanitizedLetter = "e_open";
+                    break;
+                case "ɔ":
+                    sanitizedLetter = "o_open";
+                    break;
+                case "ŋ":
+                    sanitizedLetter = "ng";
+                    break;
+            }
+            String fileName = "gaa_letter_" + sanitizedLetter;
+            return getResources().getIdentifier(fileName, "raw", getPackageName());
+        }
+
+        // For other languages (Akan, French, English)
+        String sanitizedLetter = letterLower;
+        switch (letterLower) {
             case "ɛ":
-                sanitizedLetter = "e_open";  // Renamed from ɛ to e_open for Android resources
+                sanitizedLetter = "e_open";
                 break;
             case "ɔ":
-                sanitizedLetter = "o_open";  // Renamed from ɔ to o_open for Android resources
+                sanitizedLetter = "o_open";
                 break;
             case "ŋ":
-                sanitizedLetter = "ng";  // Renamed from ŋ to ng for Android resources
-                break;
-            case "ɖ":
-                sanitizedLetter = "d_caron";  // For future use
-                break;
-            case "ƒ":
-                sanitizedLetter = "f_hook";  // For future use
-                break;
-            case "ɣ":
-                sanitizedLetter = "g_hook";  // For future use
-                break;
-            case "ʋ":
-                sanitizedLetter = "v_hook";  // For future use
-                break;
-            case "x":
-                // For Ewe, 'x' is actually "X" sound (chi)
-                sanitizedLetter = "x";
+                sanitizedLetter = "ng";
                 break;
         }
 
-        String fileName = lang.toLowerCase(Locale.ROOT) + "_letter_" + sanitizedLetter;
+        String fileName = langLower + "_letter_" + sanitizedLetter;
         return getResources().getIdentifier(fileName, "raw", getPackageName());
     }
 
