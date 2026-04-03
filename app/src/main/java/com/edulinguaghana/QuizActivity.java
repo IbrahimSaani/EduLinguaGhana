@@ -8,6 +8,7 @@ import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.os.Handler;
 import android.speech.tts.TextToSpeech;
+import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.animation.Animation;
@@ -24,13 +25,16 @@ import com.google.android.material.appbar.AppBarLayout;
 import com.google.android.material.appbar.MaterialToolbar;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
-import com.edulinguaghana.tts.GhanaLPTtsService;
+import com.edulinguaghana.tts.OfflineGhanaLPTtsService;
+import com.edulinguaghana.utils.LanguageConversionUtils;
+import com.edulinguaghana.utils.LanguageWordMappings;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Random;
 import java.util.Set;
 
@@ -79,11 +83,11 @@ public class QuizActivity extends AppCompatActivity {
     private String currentPromptTtsText;
     private boolean isSfxOn = true;
 
-    // GhanaLP TTS for native Ghanaian languages
-    private GhanaLPTtsService ghanaLpTts;
-    private boolean isGhanaLpPlaying = false;
+    // Offline TTS for native Ghanaian languages (loads pre-recorded audio from res/raw)
+    private OfflineGhanaLPTtsService offlineTts;
+    private boolean isOfflineTtsPlaying = false;
 
-    private final String[] alphabet = {"A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z"};
+    private String[] alphabet; // Will be set based on language
     private final String[] matchLetters = {"A", "B", "C"};
     private final String[] matchWords = {"Apple", "Ball", "Cat"};
 
@@ -92,8 +96,8 @@ public class QuizActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_quiz);
 
-        languageName = getIntent().getStringExtra("LANGUAGE_NAME");
-        languageCode = getIntent().getStringExtra("LANGUAGE_CODE");
+        languageName = getIntent().getStringExtra("LANG_NAME");
+        languageCode = getIntent().getStringExtra("LANG_CODE");
         String rawType = getIntent().getStringExtra("QUIZ_TYPE");
 
         // Check if this is challenge mode
@@ -122,6 +126,9 @@ public class QuizActivity extends AppCompatActivity {
         bestScore = prefs.getInt(getHighScoreKey(), 0);
         isSfxOn = prefs.getBoolean(KEY_SFX_ENABLED, true);
         tvGameBest.setText(String.format(Locale.getDefault(), getString(R.string.quiz_best_score), bestScore));
+
+        // Initialize language-specific alphabet
+        alphabet = LanguageConversionUtils.getAlphabetForLanguage(languageCode);
 
         initTTS();
 
@@ -255,17 +262,16 @@ public class QuizActivity extends AppCompatActivity {
     }
 
     private void initTTS() {
+        // Initialize Offline TTS for Ghanaian languages (loads from res/raw)
+        if (LanguageConversionUtils.isGhanaianLanguage(languageCode)) {
+            offlineTts = new OfflineGhanaLPTtsService(this);
+        }
+
+        // Initialize Android TTS for all languages
         tts = new TextToSpeech(this, status -> {
             if (status == TextToSpeech.SUCCESS) {
-                switch (languageCode.toLowerCase()) {
-                    case "fr":
-                        tts.setLanguage(Locale.FRENCH);
-                        break;
-                    case "en":
-                    default:
-                        tts.setLanguage(Locale.US);
-                        break;
-                }
+                Locale locale = LanguageConversionUtils.getLocaleForLanguage(languageCode);
+                tts.setLanguage(locale);
                 ttsReady = true;
                 if (currentPromptTtsText != null) {
                     speakPrompt();
@@ -289,46 +295,38 @@ public class QuizActivity extends AppCompatActivity {
     }
 
     private boolean isGhanaianLanguage(String code) {
-        if (code == null) return false;
-        String lower = code.toLowerCase();
-        return lower.equals("ak") || lower.equals("twi") ||
-               lower.equals("ee") || lower.equals("ewe") ||
-               lower.equals("gaa") || lower.equals("ga");
+        return LanguageConversionUtils.isGhanaianLanguage(code);
     }
 
     private void speakWithGhanaLP(String text) {
-        if (isGhanaLpPlaying) {
-            ghanaLpTts.stop();
+        if (isOfflineTtsPlaying) {
+            offlineTts.stop();
         }
 
-        // Normalize language code for API
-        String apiLangCode = normalizeLanguageCode(languageCode);
+        // Normalize language code for audio file lookup
+        String audioLangCode = normalizeLanguageCode(languageCode);
 
-        // Get speaker preference from SharedPreferences
-        SharedPreferences prefs = getSharedPreferences("TTS_PREFS", MODE_PRIVATE);
-        String speakerId = prefs.getString("ghananlp_speaker", "male_low");
-
-        ghanaLpTts.synthesizeAndPlay(
+        // Play pre-recorded audio from res/raw
+        offlineTts.speak(
             text,
-            apiLangCode,
-            speakerId,
-            new GhanaLPTtsService.PlaybackCallback() {
+            audioLangCode,
+            new OfflineGhanaLPTtsService.PlaybackCallback() {
                 @Override
                 public void onStart() {
-                    isGhanaLpPlaying = true;
+                    isOfflineTtsPlaying = true;
                 }
 
                 @Override
                 public void onComplete() {
-                    isGhanaLpPlaying = false;
+                    isOfflineTtsPlaying = false;
                 }
 
                 @Override
                 public void onError(String error) {
-                    isGhanaLpPlaying = false;
+                    isOfflineTtsPlaying = false;
                     runOnUiThread(() -> {
                         // Fallback to Android TTS on error
-                        android.util.Log.e("QuizActivity", "GhanaLP TTS error: " + error);
+                        Log.w("QuizActivity", "Offline TTS error: " + error + ", falling back to Android TTS");
                         if (tts != null && ttsReady) {
                             tts.speak(text, TextToSpeech.QUEUE_FLUSH, null, "quiz_tts");
                         }
@@ -339,20 +337,7 @@ public class QuizActivity extends AppCompatActivity {
     }
 
     private String normalizeLanguageCode(String code) {
-        if (code == null) return "twi";
-        switch (code.toLowerCase()) {
-            case "ak":
-            case "twi":
-                return "twi";
-            case "ee":
-            case "ewe":
-                return "ewe";
-            case "gaa":
-            case "ga":
-                return "ga";
-            default:
-                return code.toLowerCase();
-        }
+        return LanguageConversionUtils.normalizeLanguageCode(code);
     }
 
     private void startGame() {
@@ -431,7 +416,15 @@ public class QuizActivity extends AppCompatActivity {
         btnOption4.setText(options.get(3));
         btnOption5.setText(options.get(4));
         btnOption6.setText(options.get(5));
-        tvGamePrompt.setText(R.string.quiz_prompt_number);
+
+        // Show the number word spelling if available
+        String numberWord = LanguageConversionUtils.convertNumberToWord(correctNumber, languageCode);
+        if (!numberWord.isEmpty()) {
+            tvGamePrompt.setText(getString(R.string.quiz_prompt_number) + "\n(" + numberWord + ")");
+        } else {
+            tvGamePrompt.setText(R.string.quiz_prompt_number);
+        }
+
         currentPromptTtsText = currentCorrectAnswer;
     }
 
@@ -482,25 +475,64 @@ public class QuizActivity extends AppCompatActivity {
     }
 
     private void generateMatchingQuestion() {
-        int idx = random.nextInt(matchLetters.length);
-        String letter = matchLetters[idx];
-        String correctWord = matchWords[idx];
+        // Get language-specific letter-word pairs
+        List<Map.Entry<String, String>> pairs = LanguageWordMappings.getSampleMatchingPairs(languageCode, 6);
+
+        if (pairs.isEmpty()) {
+            // Fallback to basic matching
+            int idx = random.nextInt(matchLetters.length);
+            String letter = matchLetters[idx];
+            String correctWord = matchWords[idx];
+            currentCorrectAnswer = correctWord;
+            tvGamePrompt.setText(getString(R.string.quiz_prompt_matching, letter));
+            List<String> options = new ArrayList<>();
+            Set<Integer> used = new HashSet<>();
+            options.add(correctWord);
+            used.add(idx);
+            while (options.size() < 6 && used.size() < matchWords.length) {
+                int pick = random.nextInt(matchWords.length);
+                if (!used.contains(pick)) {
+                    options.add(matchWords[pick]);
+                    used.add(pick);
+                }
+            }
+            while (options.size() < 6) {
+                options.add(matchWords[random.nextInt(matchWords.length)]);
+            }
+            Collections.shuffle(options);
+            btnOption1.setText(options.get(0));
+            btnOption2.setText(options.get(1));
+            btnOption3.setText(options.get(2));
+            btnOption4.setText(options.get(3));
+            btnOption5.setText(options.get(4));
+            btnOption6.setText(options.get(5));
+            currentPromptTtsText = letter;
+            return;
+        }
+
+        // Select a random pair from language-specific mappings
+        int selectedIdx = random.nextInt(pairs.size());
+        Map.Entry<String, String> selectedPair = pairs.get(selectedIdx);
+        String letter = selectedPair.getKey();
+        String correctWord = selectedPair.getValue();
         currentCorrectAnswer = correctWord;
+
         tvGamePrompt.setText(getString(R.string.quiz_prompt_matching, letter));
+
+        // Build options with other words from the mapping
         List<String> options = new ArrayList<>();
         Set<Integer> used = new HashSet<>();
         options.add(correctWord);
-        used.add(idx);
-        while (options.size() < 6 && used.size() < matchWords.length) {
-            int pick = random.nextInt(matchWords.length);
+        used.add(selectedIdx);
+
+        while (options.size() < 6 && used.size() < pairs.size()) {
+            int pick = random.nextInt(pairs.size());
             if (!used.contains(pick)) {
-                options.add(matchWords[pick]);
+                options.add(pairs.get(pick).getValue());
                 used.add(pick);
             }
         }
-        while (options.size() < 6) {
-            options.add(matchWords[random.nextInt(matchWords.length)]);
-        }
+
         Collections.shuffle(options);
         btnOption1.setText(options.get(0));
         btnOption2.setText(options.get(1));
@@ -855,8 +887,8 @@ public class QuizActivity extends AppCompatActivity {
             tts.stop();
             tts.shutdown();
         }
-        if (ghanaLpTts != null) {
-            ghanaLpTts.release();
+        if (offlineTts != null) {
+            offlineTts.stop();
         }
     }
 }

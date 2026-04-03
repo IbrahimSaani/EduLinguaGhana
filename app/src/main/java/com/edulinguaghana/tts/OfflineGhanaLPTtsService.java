@@ -72,15 +72,22 @@ public class OfflineGhanaLPTtsService {
             language + "_letter_" + sanitized,       // Letter pattern
         };
 
+        Log.d(TAG, "Attempting to speak '" + text + "' in language '" + language + "'");
+
         for (String resourceName : patterns) {
+            Log.d(TAG, "Trying resource pattern: " + resourceName);
             int resId = getResourceId(resourceName);
             if (resId != 0) {
+                Log.d(TAG, "Found resource: " + resourceName + " (ID: " + resId + ")");
                 playAudioResource(resourceName, callback);
                 return;
+            } else {
+                Log.w(TAG, "Resource not found: " + resourceName);
             }
         }
 
         // No audio file found
+        Log.e(TAG, "No audio file found for: " + text + " in language: " + language);
         callback.onError("No audio file found for: " + text);
     }
 
@@ -152,6 +159,7 @@ public class OfflineGhanaLPTtsService {
     /**
      * Sanitize text for filename compatibility
      * Converts special characters to safe alternatives
+     * Handles Ghanaian language-specific characters
      */
     private String sanitizeForFilename(String text) {
         if (text == null || text.isEmpty()) {
@@ -161,15 +169,16 @@ public class OfflineGhanaLPTtsService {
         // Convert to lowercase
         String result = text.toLowerCase(Locale.ROOT);
 
-        // Replace special Ghanaian characters
-        result = result.replace("ɛ", "e")
-                      .replace("ɔ", "o")
-                      .replace("ɖ", "d")
-                      .replace("ƒ", "f")
-                      .replace("ɣ", "g")
-                      .replace("ŋ", "n")
-                      .replace("ʋ", "v")
-                      .replace("ɲ", "ny");
+        // Replace special Ghanaian characters with descriptive names
+        // These match the actual filenames in res/raw
+        result = result.replace("ɛ", "e_open")      // Open e (Ewe, Twi)
+                      .replace("ɔ", "o_open")       // Open o (Ewe, Twi)
+                      .replace("ɖ", "d_caron")      // D with hook (Ewe)
+                      .replace("ƒ", "f_hook")       // F with hook (Ewe)
+                      .replace("ɣ", "g_hook")       // G with hook (Ewe)
+                      .replace("ŋ", "ng")           // Engma/Ng (Ga, Ewe)
+                      .replace("ʋ", "v_hook")       // V with hook (Ewe)
+                      .replace("ɲ", "ny");          // Ny digraph
 
         // Replace diacritics
         result = result.replace("ã", "a")

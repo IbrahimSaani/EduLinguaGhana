@@ -451,9 +451,17 @@ public class NumbersActivity extends AppCompatActivity {
     private String convertNumberToWordEwe(int num) {
         if (num < 1 || num > 100) return "";
         String[] units = {"", "ɖeka", "eve", "etɔ̃", "ene", "atɔ̃", "adẽ", "adrẽ", "enyi", "asieke"};
-        if (num <= 10) return units[num-1];
+
+        // Handle 1-9
+        if (num < 10) return units[num];
+
+        // Handle 10
         if (num == 10) return "ewó";
-        if (num < 20) return "ewóí" + units[num-11];
+
+        // Handle 11-19
+        if (num < 20) return "ewóí" + units[num - 10];
+
+        // Handle 20-99
         if (num % 10 == 0) {
             if (num == 20) return "blaeve";
             if (num == 30) return "blaetɔ̃";
@@ -463,9 +471,11 @@ public class NumbersActivity extends AppCompatActivity {
             if (num == 70) return "blaadrẽ";
             if (num == 80) return "blaenyi";
             if (num == 90) return "blaasieke";
-            if (num == 100) return "alakpa ɖeka";
         }
-        return convertNumberToWordEwe(num - (num%10)) + " kple " + units[(num%10)-1];
+
+        // Handle 21-99 with remainder
+        if (num == 100) return "alakpa ɖeka";
+        return convertNumberToWordEwe(num - (num % 10)) + " kple " + units[num % 10];
     }
 
     private String convertNumberToWordGa(int num) {
