@@ -12,42 +12,52 @@
     <com.google.android.material.appbar.AppBarLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@color/colorPrimary"
-        app:elevation="4dp"
+        android:background="@drawable/gradient_background"
+        app:elevation="8dp"
         android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar">
 
         <androidx.appcompat.widget.Toolbar
             android:id="@+id/toolbar"
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
-            android:background="@color/colorPrimary"
-            app:titleTextColor="?attr/colorOnPrimary"
+            android:background="@android:color/transparent"
+            android:elevation="0dp"
+            app:titleTextColor="@color/white"
             app:popupTheme="@style/ThemeOverlay.AppCompat.Light">
 
-            <TextView
-                android:id="@+id/toolbarTitle"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/profile_title"
-                android:textSize="20sp"
-                android:textColor="?attr/colorOnPrimary"
-                android:fontFamily="@font/agbalumo"
-                android:textStyle="bold" />
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:paddingEnd="16dp">
 
-            <!-- Settings button aligned to the end (top-right) of the Toolbar -->
-            <androidx.appcompat.widget.AppCompatImageButton
-                android:id="@+id/btn_profile_settings"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="end|center_vertical"
-                android:layout_marginEnd="16dp"
-                android:padding="12dp"
-                android:minWidth="48dp"
-                android:minHeight="48dp"
-                android:src="@drawable/ic_settings"
-                android:contentDescription="@string/nav_settings"
-                android:background="?attr/selectableItemBackgroundBorderless"
-                app:tint="?attr/colorOnPrimary" />
+                <TextView
+                    android:id="@+id/toolbarTitle"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="@string/profile_title"
+                    android:textSize="20sp"
+                    android:textColor="@color/white"
+                    android:fontFamily="@font/agbalumo"
+                    android:textStyle="bold" />
+
+                <!-- Settings button aligned to the end (top-right) of the Toolbar -->
+                <androidx.appcompat.widget.AppCompatImageButton
+                    android:id="@+id/btn_profile_settings"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="end|center_vertical"
+                    android:padding="12dp"
+                    android:minWidth="48dp"
+                    android:minHeight="48dp"
+                    android:src="@drawable/ic_settings"
+                    android:contentDescription="@string/nav_settings"
+                    android:background="?attr/selectableItemBackgroundBorderless"
+                    app:tint="@color/white" />
+
+            </LinearLayout>
 
         </androidx.appcompat.widget.Toolbar>
 

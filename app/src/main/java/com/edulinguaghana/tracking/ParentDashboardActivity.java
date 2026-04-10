@@ -128,15 +128,27 @@ public class ParentDashboardActivity extends AppCompatActivity {
     private void showSortDialog() {
         String[] options = {"Sort by Name", "Sort by Level", "Sort by Recent Activity"};
 
-        new AlertDialog.Builder(this)
-            .setTitle("Sort Children")
-            .setSingleChoiceItems(options, currentSortOption, (dialog, which) -> {
-                currentSortOption = which;
-                sortChildren();
-                dialog.dismiss();
-            })
-            .setNegativeButton("Cancel", null)
-            .show();
+        // Create menu items for styled dialog
+        java.util.List<com.edulinguaghana.StyledMenuHelper.MenuItem> menuItems = new java.util.ArrayList<>();
+        for (int i = 0; i < options.length; i++) {
+            final int index = i;
+            String icon = index == 0 ? "🔤" : (index == 1 ? "📊" : "🕐");
+            menuItems.add(new com.edulinguaghana.StyledMenuHelper.MenuItem(
+                icon,
+                options[i],
+                () -> {
+                    currentSortOption = index;
+                    sortChildren();
+                }
+            ));
+        }
+
+        com.edulinguaghana.StyledMenuHelper.showStyledMenu(
+            this,
+            "🔀",
+            "Sort Children",
+            menuItems
+        );
     }
 
     private void sortChildren() {

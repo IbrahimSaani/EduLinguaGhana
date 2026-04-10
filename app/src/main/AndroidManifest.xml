@@ -84,6 +84,8 @@
         <activity android:name=".AnimatedAvatarDemoActivity" android:exported="false"/>
         <!--  ChallengesActivity  -->
         <activity android:name=".ChallengesActivity" android:exported="false"/>
+        <!--  LanguageLeaderboardActivity  -->
+        <activity android:name=".LanguageLeaderboardActivity" android:exported="false"/>
 
         <!--  Progress Tracking Activities  -->
         <activity

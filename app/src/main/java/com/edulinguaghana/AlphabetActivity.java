@@ -10,6 +10,8 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.media.MediaPlayer;
 import android.os.Bundle;
+import android.os.VibrationEffect;
+import android.os.Vibrator;
 import android.speech.RecognizerIntent;
 import android.speech.tts.TextToSpeech;
 import android.view.animation.Animation;
@@ -31,12 +33,17 @@ import com.edulinguaghana.tts.OfflineGhanaLPTtsService;
 public class AlphabetActivity extends AppCompatActivity {
 
     private TextView tvLanguageTitle, tvLetter, tvLetterWord, tvLetterShadow;
+    private TextView tvProgressCounter;
     private MaterialButton btnPrev, btnNext, btnSpeak;
     private FloatingActionButton btnBack;
     private LinearProgressIndicator progressBar;
     private MaterialCardView letterCard, languageCard;
     private ImageView decorativeShape1, decorativeShape2, decorativeShape3, decorativeShape4;
-    private ImageView progressIcon, languageIcon, modeIcon;
+    private ImageView progressIcon;
+    private TextView modeIcon;  // Changed to TextView for emoji
+    private TextView celebrationEmoji;  // For celebration animations
+
+    private Vibrator vibrator;  // For haptic feedback
 
     private String languageCode;
     private String languageName;
@@ -78,6 +85,8 @@ public class AlphabetActivity extends AppCompatActivity {
         tvLetter = findViewById(R.id.tvLetter);
         tvLetterWord = findViewById(R.id.tvLetterWord);
         tvLetterShadow = findViewById(R.id.tvLetterShadow);
+        tvProgressCounter = findViewById(R.id.tvProgressCounter);
+        celebrationEmoji = findViewById(R.id.celebrationEmoji);
 
         // Initialize buttons
         btnPrev = findViewById(R.id.btnPrev);
@@ -96,8 +105,10 @@ public class AlphabetActivity extends AppCompatActivity {
         decorativeShape3 = findViewById(R.id.decorativeShape3);
         decorativeShape4 = findViewById(R.id.decorativeShape4);
         progressIcon = findViewById(R.id.progressIcon);
-        languageIcon = findViewById(R.id.languageIcon);
         modeIcon = findViewById(R.id.modeIcon);
+
+        // Initialize vibrator for haptic feedback
+        vibrator = (Vibrator) getSystemService(VIBRATOR_SERVICE);
 
 
         languageCode = getIntent().getStringExtra("LANG_CODE");
@@ -150,76 +161,124 @@ public class AlphabetActivity extends AppCompatActivity {
         }
 
         tts = new TextToSpeech(this, status -> {
-            if (status == TextToSpeech.SUCCESS) {
-                tts.setLanguage(getLocaleForLanguage(languageCode));
-                updateLetter();
-                if (isRecitalMode) {
-                    speakCurrentLetter();
+            try {
+                if (status == TextToSpeech.SUCCESS) {
+                    tts.setLanguage(getLocaleForLanguage(languageCode));
+                    updateLetter();
+                    if (isRecitalMode) {
+                        speakCurrentLetter();
+                    }
+                } else {
+                    Toast.makeText(this, "TTS initialization failed", Toast.LENGTH_SHORT).show();
+                    updateLetter();
                 }
-            } else {
-                Toast.makeText(this, "TTS initialization failed", Toast.LENGTH_SHORT).show();
-                updateLetter();
+            } catch (Exception e) {
+                android.util.Log.e("AlphabetActivity", "Error during TTS initialization or recital playback", e);
+                try {
+                    updateLetter();
+                } catch (Exception ignored) {
+                }
             }
         });
 
         btnNext.setOnClickListener(v -> {
             try {
+                triggerHapticFeedback(30);  // Light haptic
                 animateButtonPress(btnNext);
             } catch (Exception e) {
-                e.printStackTrace();
+                android.util.Log.w("AlphabetActivity", "Haptic feedback failed", e);
             }
-            currentIndex++;
-            if (currentIndex >= letters.length) currentIndex = 0;
-            updateLetterWithAnimation();
-            if (isRecitalMode) speakCurrentLetter();
+            try {
+                currentIndex++;
+                if (currentIndex >= letters.length) currentIndex = 0;
+                updateLetterWithAnimation();
+                if (isRecitalMode) speakCurrentLetter();
+            } catch (Exception e) {
+                android.util.Log.e("AlphabetActivity", "Error advancing letter", e);
+            }
         });
 
         btnPrev.setOnClickListener(v -> {
             try {
+                triggerHapticFeedback(30);  // Light haptic
                 animateButtonPress(btnPrev);
             } catch (Exception e) {
-                e.printStackTrace();
+                android.util.Log.w("AlphabetActivity", "Haptic feedback failed", e);
             }
-            currentIndex--;
-            if (currentIndex < 0) currentIndex = letters.length - 1;
-            updateLetterWithAnimation();
-            if (isRecitalMode) speakCurrentLetter();
+            try {
+                currentIndex--;
+                if (currentIndex < 0) currentIndex = letters.length - 1;
+                updateLetterWithAnimation();
+                if (isRecitalMode) speakCurrentLetter();
+            } catch (Exception e) {
+                android.util.Log.e("AlphabetActivity", "Error going back letter", e);
+            }
         });
 
         btnBack.setOnClickListener(v -> {
             try {
+                triggerHapticFeedback(50);  // Medium haptic
                 animateButtonPress(btnBack);
             } catch (Exception e) {
-                e.printStackTrace();
+                android.util.Log.w("AlphabetActivity", "Haptic feedback failed", e);
             }
             finish();
         });
 
         btnSpeak.setOnClickListener(v -> {
             try {
+                triggerHapticFeedback(50);  // Medium haptic
                 animateButtonPress(btnSpeak);
+                celebrateAction();  // Celebration animation
             } catch (Exception e) {
-                e.printStackTrace();
+                android.util.Log.w("AlphabetActivity", "Haptic feedback or celebration failed", e);
             }
-            if (isRecitalMode) {
+            try {
+                if (isRecitalMode) {
+                    speakCurrentLetter();
+                } else {
+                    startPracticePronunciation();
+                }
+            } catch (Exception e) {
+                android.util.Log.e("AlphabetActivity", "Error speaking letter", e);
+            }
+        });
+
+        // Make letter card tappable to speak
+        letterCard.setOnClickListener(v -> {
+            try {
+                triggerHapticFeedback(40);  // Light-medium haptic
                 speakCurrentLetter();
-            } else {
-                startPracticePronunciation();
+                celebrateAction();  // Show celebration
+            } catch (Exception e) {
+                android.util.Log.e("AlphabetActivity", "Error in letter card click", e);
             }
         });
     }
 
     private void updateLetter() {
-        // Update text with letter and shadow
-        String letter = letters[currentIndex];
-        tvLetter.setText(letter);
-        if (tvLetterShadow != null) {
-            tvLetterShadow.setText(letter);
-        }
-        tvLetterWord.setText(words[currentIndex]);
+        try {
+            // Update text with letter and shadow
+            String letter = letters[currentIndex];
+            tvLetter.setText(letter);
+            if (tvLetterShadow != null) {
+                tvLetterShadow.setText(letter);
+            }
+            tvLetterWord.setText(words[currentIndex]);
 
-        // Update progress
-        progressBar.setProgress(currentIndex + 1);
+            // Update progress bar and counter
+            progressBar.setProgress(currentIndex + 1);
+            updateProgressCounter();
+        } catch (Exception e) {
+            android.util.Log.e("AlphabetActivity", "Error updating letter display", e);
+            // Ensure display is at least partially updated
+            try {
+                if (currentIndex < letters.length) {
+                    tvLetter.setText(letters[currentIndex]);
+                }
+            } catch (Exception ignored) {
+            }
+        }
     }
 
     private void updateLetterWithAnimation() {
@@ -238,13 +297,35 @@ public class AlphabetActivity extends AppCompatActivity {
         }
         tvLetterWord.setText(words[currentIndex]);
 
-        // Update progress
+        // Update progress bar and counter
         progressBar.setProgress(currentIndex + 1);
+        updateProgressCounter();
 
         try {
             animateProgressIcon();
         } catch (Exception e) {
             e.printStackTrace();
+        }
+    }
+
+    private void updateProgressCounter() {
+        if (tvProgressCounter != null) {
+            String progressText = "Letter " + (currentIndex + 1) + " of " + letters.length;
+            tvProgressCounter.setText(progressText);
+
+            // Animate counter update
+            tvProgressCounter.animate()
+                .scaleX(1.1f)
+                .scaleY(1.1f)
+                .setDuration(100)
+                .withEndAction(() -> {
+                    tvProgressCounter.animate()
+                        .scaleX(1.0f)
+                        .scaleY(1.0f)
+                        .setDuration(100)
+                        .start();
+                })
+                .start();
         }
     }
 
@@ -378,21 +459,27 @@ public class AlphabetActivity extends AppCompatActivity {
     }
 
     private void speakCurrentLetter() {
-        String letter = letters[currentIndex];
+        try {
+            String letter = letters[currentIndex];
 
-        // Try to load audio from recorded files first
-        int resId = getLetterAudioResId(languageCode, letter);
-        if (resId != 0) {
-            playAudioResource(resId);
-        } else if (isGhanaianLanguage(languageCode)) {
-            // Fallback to GhanaLP TTS if no recorded audio exists
-            speakWithGhanaLP(letter);
-        } else if (tts != null) {
-            // Fallback to Android TTS for other languages
-            tts.speak(letter, TextToSpeech.QUEUE_FLUSH, null, "LETTER_ID");
+            // Try to load audio from recorded files first
+            int resId = getLetterAudioResId(languageCode, letter);
+            if (resId != 0) {
+                playAudioResource(resId);
+            } else if (isGhanaianLanguage(languageCode)) {
+                // Fallback to GhanaLP TTS if no recorded audio exists
+                speakWithGhanaLP(letter);
+            } else if (tts != null) {
+                // Use language-specific pronunciation for letters
+                String textToSpeak = getFrenchLetterPronunciation(letter);
+                tts.speak(textToSpeak, TextToSpeech.QUEUE_FLUSH, null, "LETTER_ID");
+            }
+
+            animateLetter();
+        } catch (Exception e) {
+            android.util.Log.e("AlphabetActivity", "Error in speakCurrentLetter", e);
+            // Silently fail - don't crash the app
         }
-
-        animateLetter();
     }
 
     private boolean isGhanaianLanguage(String code) {
@@ -404,79 +491,122 @@ public class AlphabetActivity extends AppCompatActivity {
     }
 
     private void speakWithGhanaLP(String text) {
-        if (isGhanaLpPlaying) {
-            offlineTts.stop();
-        }
+        try {
+            if (isGhanaLpPlaying) {
+                offlineTts.stop();
+            }
 
-        // Normalize language code for audio file lookup
-        String apiLangCode = normalizeLanguageCode(languageCode);
+            // Normalize language code for audio file lookup
+            String apiLangCode = normalizeLanguageCode(languageCode);
 
-        // Disable speak button during playback
-        if (btnSpeak != null) {
-            btnSpeak.setEnabled(false);
-        }
+            // Disable speak button during playback
+            if (btnSpeak != null) {
+                btnSpeak.setEnabled(false);
+            }
 
-        // IMPROVEMENT: Speak the example WORD instead of the letter
-        // This works better because word pronunciations are correct
-        // The word demonstrates the letter sound in context
-        String wordToSpeak = words[currentIndex];
+            // IMPROVEMENT: Speak the example WORD instead of the letter
+            // This works better because word pronunciations are correct
+            // The word demonstrates the letter sound in context
+            String wordToSpeak = words[currentIndex];
 
-        offlineTts.speakWord(
-            wordToSpeak,
-            apiLangCode,
-            new OfflineGhanaLPTtsService.PlaybackCallback() {
-                @Override
-                public void onStart() {
-                    isGhanaLpPlaying = true;
-                }
+            offlineTts.speakWord(
+                wordToSpeak,
+                apiLangCode,
+                new OfflineGhanaLPTtsService.PlaybackCallback() {
+                    @Override
+                    public void onStart() {
+                        isGhanaLpPlaying = true;
+                    }
 
-                @Override
-                public void onComplete() {
-                    isGhanaLpPlaying = false;
-                    runOnUiThread(() -> {
-                        if (btnSpeak != null) {
-                            btnSpeak.setEnabled(true);
-                        }
-                    });
-                }
+                    @Override
+                    public void onComplete() {
+                        isGhanaLpPlaying = false;
+                        runOnUiThread(() -> {
+                            if (btnSpeak != null) {
+                                btnSpeak.setEnabled(true);
+                            }
+                        });
+                    }
 
-                @Override
-                public void onError(String error) {
-                    // Fallback: Try letter pronunciation
-                    offlineTts.speakLetter(text, apiLangCode, new OfflineGhanaLPTtsService.PlaybackCallback() {
-                        @Override
-                        public void onStart() {
-                            isGhanaLpPlaying = true;
-                        }
+                    @Override
+                    public void onError(String error) {
+                        // Fallback: Try letter pronunciation
+                        try {
+                            offlineTts.speakLetter(text, apiLangCode, new OfflineGhanaLPTtsService.PlaybackCallback() {
+                                @Override
+                                public void onStart() {
+                                    isGhanaLpPlaying = true;
+                                }
 
-                        @Override
-                        public void onComplete() {
-                            isGhanaLpPlaying = false;
-                            runOnUiThread(() -> {
-                                if (btnSpeak != null) {
-                                    btnSpeak.setEnabled(true);
+                                @Override
+                                public void onComplete() {
+                                    isGhanaLpPlaying = false;
+                                    runOnUiThread(() -> {
+                                        if (btnSpeak != null) {
+                                            btnSpeak.setEnabled(true);
+                                        }
+                                    });
+                                }
+
+                                @Override
+                                public void onError(String letterError) {
+                                    // Final fallback to Android TTS
+                                    isGhanaLpPlaying = false;
+                                    runOnUiThread(() -> {
+                                        if (btnSpeak != null) {
+                                            btnSpeak.setEnabled(true);
+                                        }
+                                        android.util.Log.w("AlphabetActivity", "No offline audio found for: " + text);
+                                        try {
+                                            if (tts != null) {
+                                                tts.speak(text, TextToSpeech.QUEUE_FLUSH, null, "LETTER_ID");
+                                            }
+                                        } catch (Exception e) {
+                                            android.util.Log.e("AlphabetActivity", "TTS fallback failed", e);
+                                        }
+                                    });
                                 }
                             });
-                        }
-
-                        @Override
-                        public void onError(String letterError) {
-                            // Final fallback to Android TTS
+                        } catch (Exception e) {
+                            android.util.Log.e("AlphabetActivity", "Error in fallback letter speak", e);
                             isGhanaLpPlaying = false;
-                            runOnUiThread(() -> {
+                            try {
                                 if (btnSpeak != null) {
                                     btnSpeak.setEnabled(true);
                                 }
-                                android.util.Log.w("AlphabetActivity", "No offline audio found for: " + text);
                                 if (tts != null) {
                                     tts.speak(text, TextToSpeech.QUEUE_FLUSH, null, "LETTER_ID");
                                 }
-                            });
+                            } catch (Exception ttsError) {
+                                android.util.Log.e("AlphabetActivity", "Final TTS fallback also failed", ttsError);
+                                if (btnSpeak != null) {
+                                    btnSpeak.setEnabled(true);
+                                }
+                            }
                         }
-                    });
+                    }
+                }
+            );
+        } catch (Exception e) {
+            android.util.Log.e("AlphabetActivity", "Error in speakWithGhanaLP", e);
+            isGhanaLpPlaying = false;
+            try {
+                if (btnSpeak != null) {
+                    btnSpeak.setEnabled(true);
+                }
+                if (tts != null && tts.isSpeaking()) {
+                    tts.stop();
+                }
+                if (tts != null) {
+                    tts.speak(text, TextToSpeech.QUEUE_FLUSH, null, "LETTER_ID");
+                }
+            } catch (Exception ttsError) {
+                android.util.Log.e("AlphabetActivity", "TTS ultimate fallback failed", ttsError);
+                if (btnSpeak != null) {
+                    btnSpeak.setEnabled(true);
                 }
             }
-        );
+        }
     }
 
     private String normalizeLanguageCode(String code) {
@@ -568,6 +698,47 @@ public class AlphabetActivity extends AppCompatActivity {
         return getResources().getIdentifier(fileName, "raw", getPackageName());
     }
 
+    /**
+     * Get French pronunciation for a letter
+     * Maps vowels and consonants to their proper French pronunciations
+     */
+    private String getFrenchLetterPronunciation(String letter) {
+        if (letter == null || letter.isEmpty()) {
+            return letter;
+        }
+
+        // For French, vowels need special handling
+        switch (letter.toUpperCase()) {
+            // Vowels - use full pronunciation words for clarity
+            case "A":
+                return "a";
+            case "E":
+                return "e";
+            case "I":
+                return "i";
+            case "O":
+                return "o";
+            case "U":
+                return "u";
+            case "Y":
+                return "i grec"; // "i grec" (Greek i) in French
+
+            // Common consonants
+            case "H":
+                return "ache"; // h is silent, so say "ache"
+            case "W":
+                return "double v";
+            case "X":
+                return "iks";
+            case "Z":
+                return "zed";
+
+            // For all other letters, just return as is
+            default:
+                return letter;
+        }
+    }
+
     private void playAudioResource(int resId) {
         if (mediaPlayer != null) {
             mediaPlayer.release();
@@ -581,19 +752,76 @@ public class AlphabetActivity extends AppCompatActivity {
     }
 
     private void startPracticePronunciation() {
-        // Only support grading for English & French
-        if (!("en".equals(languageCode) || "fr".equals(languageCode))) {
-            Toast.makeText(this, "Pronunciation grading is not yet available for " + languageName, Toast.LENGTH_LONG).show();
-            speakCurrentLetter(); // still let them hear audio
-            return;
-        }
-
         speakCurrentLetter();
 
-        if (!isRecordAudioPermissionGranted()) {
-            requestRecordAudioPermission();
+        // For English & French: Use speech recognition
+        if ("en".equals(languageCode) || "fr".equals(languageCode)) {
+            if (!isRecordAudioPermissionGranted()) {
+                requestRecordAudioPermission();
+            } else {
+                promptSpeechInput();
+            }
         } else {
-            promptSpeechInput();
+            // For Ghanaian languages: Show friendly message and provide audio example
+            Toast.makeText(this,
+                "🎤 Try to pronounce: " + letters[currentIndex] +
+                "\n\n📝 Listen carefully to the audio above and repeat it!\n\n" +
+                "Tap the letter again to hear it.",
+                Toast.LENGTH_LONG).show();
+
+            // Show helpful tips for Ghanaian languages
+            showPronunciationTips();
+        }
+    }
+
+    private void showPronunciationTips() {
+        String tips = "";
+        String letter = letters[currentIndex];
+
+        switch (languageCode) {
+            case "ak": // Twi
+                tips = getTwiPronunciationTip(letter);
+                break;
+            case "ee": // Ewe
+                tips = getEwePronunciationTip(letter);
+                break;
+            case "gaa": // Ga
+                tips = getGaPronunciationTip(letter);
+                break;
+        }
+
+        if (!tips.isEmpty()) {
+            Toast.makeText(this, "💡 Tip: " + tips, Toast.LENGTH_LONG).show();
+        }
+    }
+
+    private String getTwiPronunciationTip(String letter) {
+        switch (letter) {
+            case "Ɛ": return "Pronounced like 'eh' - open mouth more";
+            case "Ɔ": return "Pronounced like 'aw' - round your lips";
+            default: return "Listen to the audio carefully and repeat!";
+        }
+    }
+
+    private String getEwePronunciationTip(String letter) {
+        switch (letter) {
+            case "Ɛ": return "Open e - sounds like 'eh'";
+            case "Ɔ": return "Open o - sounds like 'aw'";
+            case "Ɖ": return "D with hook - softer than regular D";
+            case "Ƒ": return "F with hook - similar to F but softer";
+            case "Ɣ": return "G with hook - guttural sound";
+            case "Ŋ": return "Ng - velar nasal sound";
+            case "Ʋ": return "V with hook - like a v sound";
+            default: return "Listen carefully and repeat!";
+        }
+    }
+
+    private String getGaPronunciationTip(String letter) {
+        switch (letter) {
+            case "Ɛ": return "Open e - sounds like 'eh'";
+            case "Ɔ": return "Open o - sounds like 'aw'";
+            case "Ŋ": return "Ng - velar nasal sound";
+            default: return "Listen carefully and repeat!";
         }
     }
 
@@ -661,12 +889,31 @@ public class AlphabetActivity extends AppCompatActivity {
             String simplifiedRecognized = recognized.toUpperCase().substring(0, 1);
 
             if (simplifiedRecognized.equals(expectedLetter)) {
-                Toast.makeText(this, "Great! Pronunciation matched (" + recognized + ")", Toast.LENGTH_LONG).show();
+                // Perfect match!
+                celebrateAction();
+                Toast.makeText(this,
+                    "🎉 Excellent! Perfect pronunciation of '" + recognized + "'" +
+                    "\n✅ You got it right!",
+                    Toast.LENGTH_LONG).show();
+            } else if (recognized.equalsIgnoreCase(expectedLetter)) {
+                // Case-insensitive match (still correct)
+                celebrateAction();
+                Toast.makeText(this,
+                    "✅ Great! '" + recognized + "' matches '" + expectedLetter + "'" +
+                    "\n\n🎯 Pronunciation is correct!",
+                    Toast.LENGTH_LONG).show();
             } else {
-                Toast.makeText(this, "It heard: \"" + recognized + "\". Expected: " + expectedLetter, Toast.LENGTH_LONG).show();
+                // Didn't match
+                Toast.makeText(this,
+                    "🎤 I heard: \"" + recognized + "\"" +
+                    "\n📝 Expected: \"" + expectedLetter + "\"" +
+                    "\n\n💡 Listen to the audio again and try once more!",
+                    Toast.LENGTH_LONG).show();
             }
         } else {
-            Toast.makeText(this, "Could not detect any sound. Try again.", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this,
+                "🔇 Could not detect any sound.\n\n🎤 Please try again and speak clearly!",
+                Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -682,6 +929,47 @@ public class AlphabetActivity extends AppCompatActivity {
             } else {
                 Toast.makeText(this, "Microphone permission is needed for pronunciation practice.", Toast.LENGTH_LONG).show();
             }
+        }
+    }
+
+    /**
+     * Trigger haptic feedback (vibration)
+     * @param durationMs Duration in milliseconds (30-50 for light feedback)
+     */
+    private void triggerHapticFeedback(long durationMs) {
+        if (vibrator != null && vibrator.hasVibrator()) {
+            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+                vibrator.vibrate(VibrationEffect.createOneShot(durationMs, VibrationEffect.DEFAULT_AMPLITUDE));
+            } else {
+                vibrator.vibrate(durationMs);
+            }
+        }
+    }
+
+    /**
+     * Show celebration animation with emoji
+     */
+    private void celebrateAction() {
+        if (celebrationEmoji != null) {
+            // Celebration emoji animation
+            celebrationEmoji.animate()
+                .scaleX(1.3f)
+                .scaleY(1.3f)
+                .setDuration(150)
+                .withEndAction(() -> {
+                    celebrationEmoji.animate()
+                        .scaleX(1.0f)
+                        .scaleY(1.0f)
+                        .setDuration(150)
+                        .start();
+                })
+                .start();
+
+            // Rotate emoji for extra fun
+            celebrationEmoji.animate()
+                .rotation(360)
+                .setDuration(500)
+                .start();
         }
     }
 

@@ -61,7 +61,9 @@ public class ProgressActivity extends AppCompatActivity {
         final int percentage    = ProgressManager.getAccuracy(this);
 
         // Basic stats
-        tvStatHighScore.setText("Best quiz score: " + highScore + " / 10");
+        // Cap the high score display at 10 (quiz can have scores > 10 in time-limited mode)
+        int displayHighScore = Math.min(highScore, 10);
+        tvStatHighScore.setText("Best quiz score: " + displayHighScore + " / 10");
         tvStatTotalQuizzes.setText("Total quizzes taken: " + totalQuizzes);
         tvStatTotalCorrect.setText("Total correct answers: " + totalCorrect);
         tvStatAccuracy.setText("Overall accuracy: " + percentage + "%");

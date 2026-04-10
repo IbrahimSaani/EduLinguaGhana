@@ -127,7 +127,7 @@
 
     <!-- Gamification UI -->
     <string name="xp_label_level">Level %d</string>
-    <string name="xp_text_pattern">%d / %d XP</string>
+    <string name="xp_text_pattern" formatted="false">%d / %d XP</string>
     <string name="badges_preview">Badges</string>
     <string name="xp_content_description">XP Icon</string>
 
@@ -167,4 +167,53 @@
     <string name="profile_sign_out">Sign Out</string>
     <string name="profile_stats_icon_desc">Statistics Icon</string>
     <string name="profile_language_icon_desc">Language Icon</string>
+
+    <!-- Accessibility - Quiz Options -->
+    <string name="accessibility_option">Option %s</string>
+    <string name="accessibility_option_letter" formatted="false">Letter %s, Option %s of 6</string>
+    <string name="accessibility_play_audio">Play audio of question</string>
+
+    <!-- Accessibility - Quiz Feedback -->
+    <string name="accessibility_correct_answer">Correct! You scored %d points</string>
+    <string name="accessibility_wrong_answer">Incorrect. The correct answer is %s</string>
+    <string name="accessibility_score">Score: %d points</string>
+    <string name="accessibility_timer">Time remaining: %d seconds</string>
+    <string name="accessibility_quiz_started">Quiz started. Listen to the question and select the correct answer</string>
+    <string name="accessibility_question_prompt">Listen to the %s and select the correct option</string>
+
+    <!-- Accessibility - Quiz Mode Descriptions -->
+    <string name="accessibility_letter_quiz">Letter Quiz - Listen to a letter and select the correct one</string>
+    <string name="accessibility_number_quiz">Number Quiz - Listen to a number and select the correct one</string>
+    <string name="accessibility_sequence_quiz">Sequence Quiz - Complete the number sequence by selecting the missing number</string>
+    <string name="accessibility_matching_quiz">Matching Quiz - Match letters to words that start with that letter</string>
+    <string name="accessibility_mixed_quiz">Mixed Quiz - Alternates between letter and number questions</string>
+
+    <!-- Accessibility - Navigation -->
+    <string name="accessibility_back_to_main">Back to main menu</string>
+    <string name="accessibility_language_selection">Select a language to begin</string>
+    <string name="accessibility_quiz_mode_selection">Select a quiz mode to start</string>
+
+    <!-- Accessibility - Game States -->
+    <string name="accessibility_game_over">Game over. Your final score is %d</string>
+    <string name="accessibility_best_score">Your best score is %d</string>
+    <string name="accessibility_quiz_paused">Quiz paused. Tap Resume to continue</string>
+
+    <!-- Language Names -->
+    <string name="lang_english">English</string>
+    <string name="lang_french">French</string>
+    <string name="lang_twi">Twi</string>
+    <string name="lang_ewe">Ewe</string>
+    <string name="lang_ga">Ga</string>
+
+    <!-- Accessibility - Buttons -->
+    <string name="accessibility_button_resume">Resume Quiz</string>
+    <string name="accessibility_button_quit">Quit Quiz</string>
+    <string name="accessibility_button_retry">Retry Quiz</string>
+    <string name="accessibility_button_next">Next Question</string>
+    <string name="accessibility_button_previous">Previous Question</string>
+
+    <!-- Quiz UI Enhanced -->
+    <string name="quiz_welcome">Welcome to Quiz</string>
+    <string name="quiz_time_limit">Time Limit</string>
+    <string name="quiz_mode">Quiz Mode</string>
 </resources>

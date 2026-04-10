@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">EduLinguaGhana</string>
+
+    <!-- Quiz Prompts - French -->
+    <string name="quiz_prompt_letter">Quelle lettre avez-vous entendue?</string>
+    <string name="quiz_prompt_number">Quel numéro avez-vous entendu?</string>
+    <string name="quiz_prompt_matching">Quel mot commence par la lettre %s?</string>
+
+    <!-- Quiz Feedback -->
+    <string name="quiz_feedback_correct">✅ Correct!</string>
+    <string name="quiz_feedback_wrong">❌ Incorrect! Correct: %s</string>
+    <string name="quiz_timer">Temps: %ds</string>
+    <string name="quiz_timer_done">Temps: 0s</string>
+    <string name="quiz_score">Score: %d</string>
+    <string name="quiz_best_score">Meilleur: %d</string>
+    <string name="quiz_final_score">Votre score: %d</string>
+    <string name="quiz_title">Mode Quiz</string>
+    <string name="quiz_start_button">Commencer le Quiz</string>
+    <string name="quiz_end_title">Temps Écoulé</string>
+    <string name="quiz_end_new_high_score">Nouveau Record! 🎉</string>
+    <string name="quiz_play_again_button">Rejouer</string>
+    <string name="quiz_quit_button">Quitter</string>
+
+    <!-- Language Names - Accessibility -->
+    <string name="lang_english">Anglais</string>
+    <string name="lang_french">Français</string>
+    <string name="lang_twi">Twi</string>
+    <string name="lang_ewe">Ewe</string>
+    <string name="lang_ga">Ga</string>
+</resources>
+

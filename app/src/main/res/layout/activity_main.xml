@@ -358,20 +358,21 @@
         android:id="@+id/appBarLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="?attr/colorPrimary"
-        android:elevation="4dp"
+        android:background="@drawable/gradient_background"
+        android:elevation="8dp"
         android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar">
 
         <androidx.appcompat.widget.Toolbar
             android:id="@+id/toolbar"
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
+            android:background="@android:color/transparent"
             android:elevation="0dp"
             app:logo="@drawable/ic_launcher_foreground"
             app:title="@string/app_name"
-            app:titleTextColor="?attr/colorOnPrimary"
+            app:titleTextColor="@color/white"
             app:titleMarginStart="8dp"
-            app:subtitleTextColor="?attr/colorOnPrimary"
+            app:subtitleTextColor="@color/white"
             app:popupTheme="@style/ThemeOverlay.AppCompat.Light" />
 
         <!-- Offline Indicator Banner -->
@@ -1105,14 +1106,18 @@
 
     <com.google.android.material.bottomnavigation.BottomNavigationView
         android:id="@+id/bottomNavigation"
+        style="@style/BottomNavigationViewStyle"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom"
         android:background="?attr/colorSurface"
         android:elevation="8dp"
+        android:minHeight="56dp"
         app:itemIconTint="@null"
         app:itemTextColor="@color/bottom_nav_color"
         app:labelVisibilityMode="labeled"
+        app:itemPaddingTop="4dp"
+        app:itemPaddingBottom="4dp"
         app:menu="@menu/bottom_navigation_menu" />
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

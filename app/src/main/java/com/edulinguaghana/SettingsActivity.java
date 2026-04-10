@@ -132,19 +132,23 @@ public class SettingsActivity extends AppCompatActivity {
 
         // Reset quiz progress when clicked
         btnResetProgress.setOnClickListener(v -> {
-            new AlertDialog.Builder(this)
-                    .setTitle(R.string.settings_reset_dialog_title)
-                    .setMessage(R.string.settings_reset_dialog_message)
-                    .setPositiveButton(R.string.settings_reset_dialog_positive, (dialog, which) -> {
+            StyledMenuHelper.showStyledConfirmationDialog(
+                    this,
+                    "⚠️",
+                    getString(R.string.settings_reset_dialog_title),
+                    getString(R.string.settings_reset_dialog_message),
+                    getString(R.string.settings_reset_dialog_positive),
+                    getString(R.string.settings_reset_dialog_negative),
+                    () -> {
                         SharedPreferences.Editor editor = prefs.edit();
                         editor.putInt(KEY_HIGH_SCORE, 0);
                         editor.putInt(KEY_TOTAL_QUIZZES, 0);
                         editor.putInt(KEY_TOTAL_CORRECT, 0);
                         editor.apply();
                         Toast.makeText(this, getString(R.string.settings_reset_toast), Toast.LENGTH_SHORT).show();
-                    })
-                    .setNegativeButton(R.string.settings_reset_dialog_negative, null)
-                    .show();
+                    },
+                    null
+            );
         });
     }
 
@@ -261,35 +265,51 @@ public class SettingsActivity extends AppCompatActivity {
         CloudSyncManager syncManager = new CloudSyncManager(this);
 
         if (!syncManager.canSync()) {
-            new AlertDialog.Builder(this)
-                .setTitle("Sync Unavailable")
-                .setMessage("Cloud sync requires login and internet connection.")
-                .setPositiveButton("OK", null)
-                .show();
+            StyledMenuHelper.showStyledConfirmationDialog(
+                this,
+                "☁️",
+                "Sync Unavailable",
+                "Cloud sync requires login and internet connection.",
+                "OK",
+                null,
+                null,
+                null
+            );
             return;
         }
 
         // Show progress dialog
-        AlertDialog progressDialog = new AlertDialog.Builder(this)
-            .setTitle("Syncing to Cloud")
-            .setMessage("Uploading your progress...")
-            .setCancelable(false)
-            .create();
+        AlertDialog progressDialog = StyledMenuHelper.showStyledConfirmationDialog(
+            this,
+            "☁️",
+            "Syncing to Cloud",
+            "Uploading your progress...",
+            null,
+            null,
+            null,
+            null
+        );
+        progressDialog.setCancelable(false);
         progressDialog.show();
 
         syncManager.syncToCloud((success, message) -> {
             runOnUiThread(() -> {
                 progressDialog.dismiss();
 
-                new AlertDialog.Builder(this)
-                    .setTitle(success ? "Sync Complete" : "Sync Failed")
-                    .setMessage(message)
-                    .setPositiveButton("OK", null)
-                    .show();
-
-                if (success) {
-                    updateLastSyncTime();
-                }
+                StyledMenuHelper.showStyledConfirmationDialog(
+                    this,
+                    success ? "✅" : "❌",
+                    success ? "Sync Complete" : "Sync Failed",
+                    message,
+                    "OK",
+                    null,
+                    () -> {
+                        if (success) {
+                            updateLastSyncTime();
+                        }
+                    },
+                    null
+                );
             });
         });
     }
@@ -298,45 +318,64 @@ public class SettingsActivity extends AppCompatActivity {
         CloudSyncManager syncManager = new CloudSyncManager(this);
 
         if (!syncManager.canSync()) {
-            new AlertDialog.Builder(this)
-                .setTitle("Sync Unavailable")
-                .setMessage("Cloud sync requires login and internet connection.")
-                .setPositiveButton("OK", null)
-                .show();
+            StyledMenuHelper.showStyledConfirmationDialog(
+                this,
+                "☁️",
+                "Sync Unavailable",
+                "Cloud sync requires login and internet connection.",
+                "OK",
+                null,
+                null,
+                null
+            );
             return;
         }
 
         // Show confirmation
-        new AlertDialog.Builder(this)
-            .setTitle("Download Progress")
-            .setMessage("This will replace your local progress with cloud data. Continue?")
-            .setPositiveButton("Download", (dialog, which) -> {
+        StyledMenuHelper.showStyledConfirmationDialog(
+            this,
+            "⬇️",
+            "Download Progress",
+            "This will replace your local progress with cloud data. Continue?",
+            "Download",
+            "Cancel",
+            () -> {
                 // Show progress dialog
-                AlertDialog progressDialog = new AlertDialog.Builder(this)
-                    .setTitle("Syncing from Cloud")
-                    .setMessage("Downloading your progress...")
-                    .setCancelable(false)
-                    .create();
-                progressDialog.show();
+                AlertDialog progressDialog = StyledMenuHelper.showStyledConfirmationDialog(
+                    this,
+                    "☁️",
+                    "Syncing from Cloud",
+                    "Downloading your progress...",
+                    null,
+                    null,
+                    null,
+                    null
+                );
+                progressDialog.setCancelable(false);
 
                 syncManager.syncFromCloud((success, message) -> {
                     runOnUiThread(() -> {
                         progressDialog.dismiss();
 
-                        new AlertDialog.Builder(this)
-                            .setTitle(success ? "Sync Complete" : "Sync Failed")
-                            .setMessage(message)
-                            .setPositiveButton("OK", null)
-                            .show();
-
-                        if (success) {
-                            updateLastSyncTime();
-                        }
+                        StyledMenuHelper.showStyledConfirmationDialog(
+                            this,
+                            success ? "✅" : "❌",
+                            success ? "Sync Complete" : "Sync Failed",
+                            message,
+                            "OK",
+                            null,
+                            () -> {
+                                if (success) {
+                                    updateLastSyncTime();
+                                }
+                            },
+                            null
+                        );
                     });
                 });
-            })
-            .setNegativeButton("Cancel", null)
-            .show();
+            },
+            null
+        );
     }
 
     /**

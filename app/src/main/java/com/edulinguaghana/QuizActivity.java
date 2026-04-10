@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.ColorStateList;
 import android.media.MediaPlayer;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.os.Handler;
@@ -26,8 +27,8 @@ import com.google.android.material.appbar.MaterialToolbar;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.edulinguaghana.tts.OfflineGhanaLPTtsService;
+import com.edulinguaghana.audio.AudioCacheManager;
 import com.edulinguaghana.utils.LanguageConversionUtils;
-import com.edulinguaghana.utils.LanguageWordMappings;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -54,7 +55,7 @@ public class QuizActivity extends AppCompatActivity {
 
     // Start screen
     private TextView tvStartTitle, tvStartDescription;
-    private ImageView ivQuizIcon;
+    private ImageView ivWelcomeIcon;
     private MaterialButton btnStartQuiz;
 
     // Game screen
@@ -68,6 +69,8 @@ public class QuizActivity extends AppCompatActivity {
     private LottieAnimationView lottieAnimationView;
 
     private String quizType, languageCode, languageName;
+    private String difficulty = "beginner";  // Default difficulty level
+    private String category = "all";  // Default category
     private int score = 0;
     private int bestScore = 0;
     private CountDownTimer countDownTimer;
@@ -87,6 +90,13 @@ public class QuizActivity extends AppCompatActivity {
     private OfflineGhanaLPTtsService offlineTts;
     private boolean isOfflineTtsPlaying = false;
 
+    // Phase 3: TTS Audio Caching
+    private AudioCacheManager audioCacheManager;
+
+    // Background music
+    private MediaPlayer backgroundMusicPlayer;
+    private static final String KEY_BACKGROUND_MUSIC_ENABLED = "background_music_enabled";
+
     private String[] alphabet; // Will be set based on language
     private final String[] matchLetters = {"A", "B", "C"};
     private final String[] matchWords = {"Apple", "Ball", "Cat"};
@@ -99,6 +109,8 @@ public class QuizActivity extends AppCompatActivity {
         languageName = getIntent().getStringExtra("LANG_NAME");
         languageCode = getIntent().getStringExtra("LANG_CODE");
         String rawType = getIntent().getStringExtra("QUIZ_TYPE");
+        difficulty = getIntent().getStringExtra("DIFFICULTY");
+        category = getIntent().getStringExtra("CATEGORY");
 
         // Check if this is challenge mode
         isChallengeMode = getIntent().getBooleanExtra("CHALLENGE_MODE", false);
@@ -107,6 +119,8 @@ public class QuizActivity extends AppCompatActivity {
         if (languageCode == null) languageCode = "en";
         if (languageName == null) languageName = "Unknown";
         if (rawType == null) rawType = "letters";
+        if (difficulty == null) difficulty = "beginner";
+        if (category == null) category = "all";
 
         quizType = normalizeQuizType(rawType);
 
@@ -125,12 +139,24 @@ public class QuizActivity extends AppCompatActivity {
         SharedPreferences prefs = getSharedPreferences(PREF_NAME, MODE_PRIVATE);
         bestScore = prefs.getInt(getHighScoreKey(), 0);
         isSfxOn = prefs.getBoolean(KEY_SFX_ENABLED, true);
-        tvGameBest.setText(String.format(Locale.getDefault(), getString(R.string.quiz_best_score), bestScore));
+        // Cap best score display at 10 (quiz can have scores > 10 in time-limited mode)
+        int displayBestScore = Math.min(bestScore, 10);
+        tvGameBest.setText(String.format(Locale.getDefault(), getString(R.string.quiz_best_score), displayBestScore));
 
         // Initialize language-specific alphabet
         alphabet = LanguageConversionUtils.getAlphabetForLanguage(languageCode);
 
+        // Phase 3: Initialize Audio Cache Manager for TTS
+        audioCacheManager = new AudioCacheManager(this);
+
+
         initTTS();
+
+        // Setup accessibility features
+        setupAccessibility();
+
+        // Initialize background music
+        initializeBackgroundMusic();
 
         btnStartQuiz.setOnClickListener(v -> showQuizContent());
 
@@ -165,7 +191,7 @@ public class QuizActivity extends AppCompatActivity {
 
         tvStartTitle = findViewById(R.id.tvStartTitle);
         tvStartDescription = findViewById(R.id.tvStartDescription);
-        ivQuizIcon = findViewById(R.id.ivQuizIcon);
+        ivWelcomeIcon = findViewById(R.id.ivWelcomeIcon);
         btnStartQuiz = findViewById(R.id.btnStartQuiz);
 
         tvGameTimer = findViewById(R.id.tvTimer);
@@ -173,6 +199,10 @@ public class QuizActivity extends AppCompatActivity {
         tvGameBest = findViewById(R.id.tvBest);
         tvGameFeedback = findViewById(R.id.tvFeedback);
         tvGamePrompt = findViewById(R.id.tvGamePrompt);
+
+        // Accessibility: Make feedback announcements readable by screen readers
+        tvGameFeedback.setAccessibilityLiveRegion(View.ACCESSIBILITY_LIVE_REGION_POLITE);
+        tvGamePrompt.setAccessibilityLiveRegion(View.ACCESSIBILITY_LIVE_REGION_POLITE);
 
         btnPlayAudio = findViewById(R.id.btnPlayAudio);
 
@@ -189,6 +219,30 @@ public class QuizActivity extends AppCompatActivity {
         btnEndQuit = findViewById(R.id.btnEndQuit);
         tvNewHighScore = findViewById(R.id.tvNewHighScore);
         lottieAnimationView = findViewById(R.id.lottieAnimationView);
+    }
+
+    private void setupAccessibility() {
+        // Set content descriptions for answer buttons
+        btnOption1.setContentDescription(getString(R.string.accessibility_option, "1"));
+        btnOption2.setContentDescription(getString(R.string.accessibility_option, "2"));
+        btnOption3.setContentDescription(getString(R.string.accessibility_option, "3"));
+        btnOption4.setContentDescription(getString(R.string.accessibility_option, "4"));
+        btnOption5.setContentDescription(getString(R.string.accessibility_option, "5"));
+        btnOption6.setContentDescription(getString(R.string.accessibility_option, "6"));
+
+        // Set content description for play audio button
+        if (btnPlayAudio != null) {
+            btnPlayAudio.setContentDescription(getString(R.string.accessibility_play_audio));
+        }
+
+        // Make game prompt region live for accessibility
+        tvGamePrompt.setAccessibilityLiveRegion(View.ACCESSIBILITY_LIVE_REGION_POLITE);
+        tvGameFeedback.setAccessibilityLiveRegion(View.ACCESSIBILITY_LIVE_REGION_POLITE);
+
+        // Set content descriptions for navigation buttons
+        if (btnStartQuiz != null) {
+            btnStartQuiz.setContentDescription("Start Quiz");
+        }
     }
 
     private void setupStartScreen() {
@@ -223,15 +277,33 @@ public class QuizActivity extends AppCompatActivity {
                 iconRes = R.drawable.ic_quiz_letters;
                 break;
         }
+
+        // Add difficulty and category information to description
+        String fullDescription = description;
+        if (!difficulty.equalsIgnoreCase("beginner") || !category.equalsIgnoreCase("all")) {
+            fullDescription += "\n\nDifficulty: " + capitalizeWord(difficulty);
+            if (!category.equalsIgnoreCase("all")) {
+                fullDescription += " | Category: " + capitalizeWord(category);
+            }
+        }
+
         if (getSupportActionBar() != null) {
             getSupportActionBar().setTitle(modeLabel + " – " + languageName);
         }
         tvStartTitle.setText(modeLabel);
-        tvStartDescription.setText(description);
-        ivQuizIcon.setImageResource(iconRes);
+        tvStartDescription.setText(fullDescription);
+        ivWelcomeIcon.setImageResource(iconRes);
 
         Animation startButtonAnim = AnimationUtils.loadAnimation(this, R.anim.bounce_pop);
         btnStartQuiz.startAnimation(startButtonAnim);
+    }
+
+    /**
+     * Capitalize first letter of a word
+     */
+    private String capitalizeWord(String word) {
+        if (word == null || word.length() == 0) return "";
+        return word.substring(0, 1).toUpperCase() + word.substring(1);
     }
 
     private void showQuizContent() {
@@ -241,6 +313,7 @@ public class QuizActivity extends AppCompatActivity {
         appBarLayout.setVisibility(View.VISIBLE);
         quizContentContainer.startAnimation(fadeIn);
         appBarLayout.startAnimation(fadeIn);
+        startBackgroundMusic();
         startGame();
     }
 
@@ -249,6 +322,13 @@ public class QuizActivity extends AppCompatActivity {
         super.onResume();
         SharedPreferences prefs = getSharedPreferences(PREF_NAME, MODE_PRIVATE);
         isSfxOn = prefs.getBoolean(KEY_SFX_ENABLED, true);
+        startBackgroundMusic();
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        pauseBackgroundMusic();
     }
 
     private String normalizeQuizType(String raw) {
@@ -281,16 +361,50 @@ public class QuizActivity extends AppCompatActivity {
     }
 
     private void speakPrompt() {
-        if (currentPromptTtsText == null) return;
+        if (currentPromptTtsText == null || currentPromptTtsText.trim().isEmpty()) {
+            Log.w("QuizActivity", "Cannot speak: currentPromptTtsText is null or empty");
+            return;
+        }
 
         // Use GhanaLP TTS for Ghanaian languages (Twi, Ewe, Ga)
         if (isGhanaianLanguage(languageCode)) {
             speakWithGhanaLP(currentPromptTtsText);
         } else {
-            // Use Android TTS for English/French
-            if (!ttsReady) return;
+            // Use Android TTS with caching for English/French
+            if (!ttsReady) {
+                Log.w("QuizActivity", "TTS not ready yet, cannot speak: " + currentPromptTtsText);
+                return;
+            }
+
+            // Phase 3: Check cache first
+            android.net.Uri cachedAudio = audioCacheManager.getCachedTtsAudio(currentPromptTtsText, languageCode);
+            if (cachedAudio != null) {
+                Log.d("QuizActivity", "Playing cached audio: " + currentPromptTtsText);
+                playAudioFile(cachedAudio);
+                return;
+            }
+
+            Log.d("QuizActivity", "Speaking text (not cached): '" + currentPromptTtsText + "' in language: " + languageCode);
             tts.stop();
-            tts.speak(currentPromptTtsText, TextToSpeech.QUEUE_FLUSH, null, "quiz_tts");
+            tts.setSpeechRate(0.9f); // Slightly slower for clarity
+
+            int result = tts.speak(currentPromptTtsText, TextToSpeech.QUEUE_FLUSH, null, "quiz_tts");
+
+            if (result != TextToSpeech.SUCCESS) {
+                Log.e("QuizActivity", "TTS.speak() failed with result: " + result + " for text: " + currentPromptTtsText);
+            }
+        }
+    }
+
+    private void playAudioFile(android.net.Uri audioUri) {
+        try {
+            MediaPlayer mediaPlayer = new MediaPlayer();
+            mediaPlayer.setDataSource(this, audioUri);
+            mediaPlayer.prepareAsync();
+            mediaPlayer.setOnPreparedListener(mp -> mp.start());
+            mediaPlayer.setOnCompletionListener(MediaPlayer::release);
+        } catch (Exception e) {
+            Log.e("QuizActivity", "Error playing audio file", e);
         }
     }
 
@@ -303,13 +417,11 @@ public class QuizActivity extends AppCompatActivity {
             offlineTts.stop();
         }
 
-        // Normalize language code for audio file lookup
-        String audioLangCode = normalizeLanguageCode(languageCode);
-
         // Play pre-recorded audio from res/raw
+        // OfflineGhanaLPTtsService will handle language code normalization internally
         offlineTts.speak(
             text,
-            audioLangCode,
+            languageCode,
             new OfflineGhanaLPTtsService.PlaybackCallback() {
                 @Override
                 public void onStart() {
@@ -373,6 +485,11 @@ public class QuizActivity extends AppCompatActivity {
 
     private void generateLetterQuestion() {
         currentCorrectAnswer = alphabet[random.nextInt(alphabet.length)];
+        android.util.Log.d("QuizActivity", "Letter quiz for " + languageCode + ": " + currentCorrectAnswer);
+
+        // Use the letter directly as the TTS text (for audio prompts)
+        currentPromptTtsText = currentCorrectAnswer;
+
         List<String> options = new ArrayList<>();
         Set<String> used = new HashSet<>();
         options.add(currentCorrectAnswer);
@@ -391,8 +508,16 @@ public class QuizActivity extends AppCompatActivity {
         btnOption4.setText(options.get(3));
         btnOption5.setText(options.get(4));
         btnOption6.setText(options.get(5));
+
+        // Add accessibility descriptions for each button with the letter
+        btnOption1.setContentDescription("Letter " + options.get(0) + ", Option 1");
+        btnOption2.setContentDescription("Letter " + options.get(1) + ", Option 2");
+        btnOption3.setContentDescription("Letter " + options.get(2) + ", Option 3");
+        btnOption4.setContentDescription("Letter " + options.get(3) + ", Option 4");
+        btnOption5.setContentDescription("Letter " + options.get(4) + ", Option 5");
+        btnOption6.setContentDescription("Letter " + options.get(5) + ", Option 6");
+
         tvGamePrompt.setText(R.string.quiz_prompt_letter);
-        currentPromptTtsText = currentCorrectAnswer;
     }
 
     private void generateNumberQuestion() {
@@ -417,6 +542,14 @@ public class QuizActivity extends AppCompatActivity {
         btnOption5.setText(options.get(4));
         btnOption6.setText(options.get(5));
 
+        // Add accessibility descriptions for each button with the number
+        btnOption1.setContentDescription("Number " + options.get(0) + ", Option 1");
+        btnOption2.setContentDescription("Number " + options.get(1) + ", Option 2");
+        btnOption3.setContentDescription("Number " + options.get(2) + ", Option 3");
+        btnOption4.setContentDescription("Number " + options.get(3) + ", Option 4");
+        btnOption5.setContentDescription("Number " + options.get(4) + ", Option 5");
+        btnOption6.setContentDescription("Number " + options.get(5) + ", Option 6");
+
         // Show the number word spelling if available
         String numberWord = LanguageConversionUtils.convertNumberToWord(correctNumber, languageCode);
         if (!numberWord.isEmpty()) {
@@ -425,7 +558,14 @@ public class QuizActivity extends AppCompatActivity {
             tvGamePrompt.setText(R.string.quiz_prompt_number);
         }
 
-        currentPromptTtsText = currentCorrectAnswer;
+        // Use word form for TTS for non-Ghanaian languages (like French)
+        // This ensures French/English TTS can pronounce the number word instead of the digit
+        if (!isGhanaianLanguage(languageCode)) {
+            currentPromptTtsText = numberWord.isEmpty() ? currentCorrectAnswer : numberWord;
+        } else {
+            // For Ghanaian languages, use the numeric string to lookup audio files
+            currentPromptTtsText = currentCorrectAnswer;
+        }
     }
 
     private void generateSequenceQuestion() {
@@ -438,19 +578,10 @@ public class QuizActivity extends AppCompatActivity {
         int missingIndex = random.nextInt(2) + 1;
         int missingValue = seq[missingIndex];
         currentCorrectAnswer = String.valueOf(missingValue);
-        StringBuilder sb = new StringBuilder("Complete the sequence: ");
-        for (int i = 0; i < 4; i++) {
-            if (i == missingIndex) {
-                sb.append("?, ");
-            } else {
-                sb.append(seq[i]).append(", ");
-            }
-        }
-        String prompt = sb.toString();
-        if (prompt.endsWith(", ")) {
-            prompt = prompt.substring(0, prompt.length() - 2);
-        }
-        tvGamePrompt.setText(prompt);
+
+        // Display sequence prompt without localization
+        tvGamePrompt.setText("Find the missing number: " + seq[0] + ", " + seq[1] + ", ?, " + seq[3]);
+
         List<String> options = new ArrayList<>();
         Set<Integer> used = new HashSet<>();
         options.add(currentCorrectAnswer);
@@ -475,62 +606,28 @@ public class QuizActivity extends AppCompatActivity {
     }
 
     private void generateMatchingQuestion() {
-        // Get language-specific letter-word pairs
-        List<Map.Entry<String, String>> pairs = LanguageWordMappings.getSampleMatchingPairs(languageCode, 6);
-
-        if (pairs.isEmpty()) {
-            // Fallback to basic matching
-            int idx = random.nextInt(matchLetters.length);
-            String letter = matchLetters[idx];
-            String correctWord = matchWords[idx];
-            currentCorrectAnswer = correctWord;
-            tvGamePrompt.setText(getString(R.string.quiz_prompt_matching, letter));
-            List<String> options = new ArrayList<>();
-            Set<Integer> used = new HashSet<>();
-            options.add(correctWord);
-            used.add(idx);
-            while (options.size() < 6 && used.size() < matchWords.length) {
-                int pick = random.nextInt(matchWords.length);
-                if (!used.contains(pick)) {
-                    options.add(matchWords[pick]);
-                    used.add(pick);
-                }
-            }
-            while (options.size() < 6) {
-                options.add(matchWords[random.nextInt(matchWords.length)]);
-            }
-            Collections.shuffle(options);
-            btnOption1.setText(options.get(0));
-            btnOption2.setText(options.get(1));
-            btnOption3.setText(options.get(2));
-            btnOption4.setText(options.get(3));
-            btnOption5.setText(options.get(4));
-            btnOption6.setText(options.get(5));
-            currentPromptTtsText = letter;
-            return;
-        }
-
-        // Select a random pair from language-specific mappings
-        int selectedIdx = random.nextInt(pairs.size());
-        Map.Entry<String, String> selectedPair = pairs.get(selectedIdx);
-        String letter = selectedPair.getKey();
-        String correctWord = selectedPair.getValue();
+        // Use fallback matching with hardcoded words
+        int idx = random.nextInt(matchLetters.length);
+        String letter = matchLetters[idx];
+        String correctWord = matchWords[idx];
         currentCorrectAnswer = correctWord;
-
         tvGamePrompt.setText(getString(R.string.quiz_prompt_matching, letter));
 
-        // Build options with other words from the mapping
         List<String> options = new ArrayList<>();
         Set<Integer> used = new HashSet<>();
         options.add(correctWord);
-        used.add(selectedIdx);
+        used.add(idx);
 
-        while (options.size() < 6 && used.size() < pairs.size()) {
-            int pick = random.nextInt(pairs.size());
+        while (options.size() < 6 && used.size() < matchWords.length) {
+            int pick = random.nextInt(matchWords.length);
             if (!used.contains(pick)) {
-                options.add(pairs.get(pick).getValue());
+                options.add(matchWords[pick]);
                 used.add(pick);
             }
+        }
+
+        while (options.size() < 6) {
+            options.add(matchWords[random.nextInt(matchWords.length)]);
         }
 
         Collections.shuffle(options);
@@ -562,6 +659,7 @@ public class QuizActivity extends AppCompatActivity {
             score++;
             tvGameFeedback.setText(R.string.quiz_feedback_correct);
             tvGameFeedback.setTextColor(ContextCompat.getColor(this, R.color.correctAnswer));
+            tvGameFeedback.announceForAccessibility(getString(R.string.accessibility_correct_answer, score));
             clickedButton.setStrokeColor(ColorStateList.valueOf(ContextCompat.getColor(this, R.color.correctAnswer)));
             clickedButton.startAnimation(correctAnim);
             playSfx(true);
@@ -573,12 +671,14 @@ public class QuizActivity extends AppCompatActivity {
         } else {
             tvGameFeedback.setText(getString(R.string.quiz_feedback_wrong, currentCorrectAnswer));
             tvGameFeedback.setTextColor(ContextCompat.getColor(this, R.color.wrongAnswer));
+            tvGameFeedback.announceForAccessibility(getString(R.string.accessibility_wrong_answer, currentCorrectAnswer));
             clickedButton.setStrokeColor(ColorStateList.valueOf(ContextCompat.getColor(this, R.color.wrongAnswer)));
             clickedButton.startAnimation(wrongAnim);
             playSfx(false);
             remainingTime -= PENALTY_TIME;
             if (remainingTime < 0) remainingTime = 0;
         }
+
 
         tvGameScore.setText(String.format(Locale.getDefault(), getString(R.string.quiz_score), score));
         setButtonsEnabled(false);
@@ -746,7 +846,9 @@ public class QuizActivity extends AppCompatActivity {
         endQuizContainer.startAnimation(fadeIn);
 
         tvFinalScore.setText(String.format(Locale.getDefault(), getString(R.string.quiz_final_score), score));
-        tvEndBestScore.setText(String.format(Locale.getDefault(), getString(R.string.quiz_best_score), bestScore));
+        // Cap best score display at 10 (quiz can have scores > 10 in time-limited mode)
+        int displayBestScore = Math.min(bestScore, 10);
+        tvEndBestScore.setText(String.format(Locale.getDefault(), getString(R.string.quiz_best_score), displayBestScore));
 
         if (newHighScore) {
             tvNewHighScore.setVisibility(View.VISIBLE);
@@ -870,19 +972,75 @@ public class QuizActivity extends AppCompatActivity {
         }
     }
 
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        if (item.getItemId() == android.R.id.home) {
-            finish();
-            return true;
+    /**
+     * Initialize and prepare background music for quiz
+     */
+    private void initializeBackgroundMusic() {
+        try {
+            SharedPreferences prefs = getSharedPreferences(PREF_NAME, MODE_PRIVATE);
+            boolean backgroundMusicEnabled = prefs.getBoolean(KEY_BACKGROUND_MUSIC_ENABLED, true);
+
+            if (backgroundMusicEnabled) {
+                backgroundMusicPlayer = MediaPlayer.create(this, R.raw.quiz_music);
+                if (backgroundMusicPlayer != null) {
+                    backgroundMusicPlayer.setLooping(true);
+                    backgroundMusicPlayer.setVolume(0.3f, 0.3f); // Set to 30% volume
+                }
+            }
+        } catch (Exception e) {
+            Log.e("QuizActivity", "Error initializing background music: " + e.getMessage());
         }
-        return super.onOptionsItemSelected(item);
     }
+
+    /**
+     * Start playing background music during quiz
+     */
+    private void startBackgroundMusic() {
+        try {
+            if (backgroundMusicPlayer != null && !backgroundMusicPlayer.isPlaying()) {
+                backgroundMusicPlayer.start();
+            }
+        } catch (Exception e) {
+            Log.e("QuizActivity", "Error starting background music: " + e.getMessage());
+        }
+    }
+
+    /**
+     * Pause background music
+     */
+    private void pauseBackgroundMusic() {
+        try {
+            if (backgroundMusicPlayer != null && backgroundMusicPlayer.isPlaying()) {
+                backgroundMusicPlayer.pause();
+            }
+        } catch (Exception e) {
+            Log.e("QuizActivity", "Error pausing background music: " + e.getMessage());
+        }
+    }
+
+    /**
+     * Stop and release background music resources
+     */
+    private void stopBackgroundMusic() {
+        try {
+            if (backgroundMusicPlayer != null) {
+                if (backgroundMusicPlayer.isPlaying()) {
+                    backgroundMusicPlayer.stop();
+                }
+                backgroundMusicPlayer.release();
+                backgroundMusicPlayer = null;
+            }
+        } catch (Exception e) {
+            Log.e("QuizActivity", "Error stopping background music: " + e.getMessage());
+        }
+    }
+
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
         cancelTimer();
+        stopBackgroundMusic();
         if (tts != null) {
             tts.stop();
             tts.shutdown();

@@ -396,34 +396,51 @@ public class ProfileActivity extends AppCompatActivity {
             }
         }
 
-        new AlertDialog.Builder(this)
-            .setTitle("Select Favorite Language")
-            .setSingleChoiceItems(languages, currentSelection, (dialog, which) -> {
-                String selected = languages[which];
-                tvFavoriteLanguage.setText(selected);
+        // Create menu items for language selection
+        java.util.List<StyledMenuHelper.MenuItem> languageItems = new java.util.ArrayList<>();
+        for (int i = 0; i < languages.length; i++) {
+            final int index = i;
+            String icon = "🌍";
+            languageItems.add(new StyledMenuHelper.MenuItem(
+                icon,
+                languages[i],
+                () -> {
+                    String selected = languages[index];
+                    tvFavoriteLanguage.setText(selected);
 
-                // Save preference
-                SharedPreferences prefs = getSharedPreferences("ProfilePrefs", MODE_PRIVATE);
-                prefs.edit().putString("favorite_language", selected).apply();
+                    // Save preference
+                    SharedPreferences prefs = getSharedPreferences("ProfilePrefs", MODE_PRIVATE);
+                    prefs.edit().putString("favorite_language", selected).apply();
 
-                Toast.makeText(this, "Favorite language set to " + selected, Toast.LENGTH_SHORT).show();
-                dialog.dismiss();
-            })
-            .setNegativeButton("Cancel", null)
-            .show();
+                    Toast.makeText(ProfileActivity.this, "Favorite language set to " + selected, Toast.LENGTH_SHORT).show();
+                }
+            ));
+        }
+
+        StyledMenuHelper.showStyledMenu(
+            this,
+            "🌍",
+            "Select Favorite Language",
+            languageItems
+        );
     }
 
     private void showAchievementsDialog() {
-        new AlertDialog.Builder(this)
-            .setTitle("🏆 Achievements")
-            .setMessage("Keep learning to unlock achievements!\n\n" +
-                       "📚 First Steps - Complete your first lesson\n" +
-                       "⭐ Rising Star - Complete 10 lessons\n" +
-                       "🔥 On Fire - Maintain a 7-day streak\n" +
-                       "🎯 Perfectionist - Get 10 perfect scores\n" +
-                       "🌍 Language Master - Complete all languages")
-            .setPositiveButton("Got it!", null)
-            .show();
+        StyledMenuHelper.showStyledConfirmationDialog(
+            this,
+            "🏆",
+            "Achievements",
+            "Keep learning to unlock achievements!\n\n" +
+            "📚 First Steps - Complete your first lesson\n" +
+            "⭐ Rising Star - Complete 10 lessons\n" +
+            "🔥 On Fire - Maintain a 7-day streak\n" +
+            "🎯 Perfectionist - Get 10 perfect scores\n" +
+            "🌍 Language Master - Complete all languages",
+            "Got it!",
+            null,
+            null,
+            null
+        );
     }
 
     // Helper: show dialog to find a user id to add as friend

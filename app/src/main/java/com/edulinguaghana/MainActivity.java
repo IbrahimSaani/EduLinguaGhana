@@ -71,7 +71,6 @@ public class MainActivity extends AppCompatActivity {
     private android.widget.TextView tvTotalQuizzes;
     private android.widget.TextView tvAccuracy;
     private android.widget.TextView tvAchievements;
-    private android.widget.TextView notificationBadge;
     private android.view.View offlineBanner;
     private BottomNavigationView bottomNavigation;
     private com.edulinguaghana.social.NotificationPermissionHelper permissionHelper;
@@ -652,18 +651,6 @@ public class MainActivity extends AppCompatActivity {
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.main_menu, menu);
 
-        // Setup notification badge
-        MenuItem notificationItem = menu.findItem(R.id.action_notifications);
-        if (notificationItem != null) {
-            View actionView = notificationItem.getActionView();
-            if (actionView != null) {
-                notificationBadge = actionView.findViewById(R.id.notification_badge);
-                updateNotificationBadge();
-
-                // Set click listener on the action view
-                actionView.setOnClickListener(v -> openNotificationsScreen());
-            }
-        }
 
         // Add role-based menu items dynamically
         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
@@ -685,19 +672,6 @@ public class MainActivity extends AppCompatActivity {
         return true;
     }
 
-    private void updateNotificationBadge() {
-        if (notificationBadge == null) return;
-
-        NotificationManager notificationManager = new NotificationManager(this);
-        int unreadCount = notificationManager.getUnreadCount();
-
-        if (unreadCount > 0) {
-            notificationBadge.setVisibility(View.VISIBLE);
-            notificationBadge.setText(unreadCount > 9 ? "9+" : String.valueOf(unreadCount));
-        } else {
-            notificationBadge.setVisibility(View.GONE);
-        }
-    }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
@@ -824,7 +798,6 @@ public class MainActivity extends AppCompatActivity {
         setupQuickStats();
         setupLearningStreak();
         setupOfflineIndicator();
-        updateNotificationBadge();
 
         // Check and unlock achievements
         AchievementManager achievementManager = new AchievementManager(this);
@@ -1060,9 +1033,28 @@ public class MainActivity extends AppCompatActivity {
                     else if (which == 2) quizType = "matching";
                     else                 quizType = "mixed";
 
-                    openQuizScreen(langCode, langName, quizType);
+                    // Launch quiz directly with default difficulty (beginner) and category (all)
+                    openQuizScreen(langCode, langName, quizType, "beginner", "all");
                 })
                 .show();
+    }
+
+    /**
+     * Show dialog for selecting difficulty level and word category
+     * (DEPRECATED - directly launching with defaults now)
+     */
+    @Deprecated
+    private void showDifficultyAndCategoryDialog(String langCode, String langName, String quizType) {
+        // This method is no longer used - quiz launches with default settings
+    }
+
+    /**
+     * Show dialog for selecting word category
+     * (DEPRECATED - directly launching with defaults now)
+     */
+    @Deprecated
+    private void showCategorySelectionDialog(String langCode, String langName, String quizType, String difficulty) {
+        // This method is no longer used - quiz launches with default settings
     }
 
     private void openAlphabetScreen(String langCode, String langName, String mode) {
@@ -1086,6 +1078,19 @@ public class MainActivity extends AppCompatActivity {
         intent.putExtra("LANG_CODE", langCode);
         intent.putExtra("LANG_NAME", langName);
         intent.putExtra("QUIZ_TYPE", quizType);
+        startActivity(intent);
+    }
+
+    /**
+     * Open quiz screen with difficulty level and category selection
+     */
+    private void openQuizScreen(String langCode, String langName, String quizType, String difficulty, String category) {
+        Intent intent = new Intent(MainActivity.this, QuizActivity.class);
+        intent.putExtra("LANG_CODE", langCode);
+        intent.putExtra("LANG_NAME", langName);
+        intent.putExtra("QUIZ_TYPE", quizType);
+        intent.putExtra("DIFFICULTY", difficulty);
+        intent.putExtra("CATEGORY", category);
         startActivity(intent);
     }
 
@@ -1392,18 +1397,27 @@ public class MainActivity extends AppCompatActivity {
      */
     private void addRoleMenuItems(Menu menu, UserRole role) {
         if (role == UserRole.TEACHER) {
-            menu.add(0, R.id.menu_my_students, 100, "My Students")
-                .setIcon(android.R.drawable.ic_menu_agenda)
-                .setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM);
+            // Check if item already exists before adding
+            if (menu.findItem(R.id.menu_my_students) == null) {
+                menu.add(0, R.id.menu_my_students, 100, "My Students")
+                    .setIcon(android.R.drawable.ic_menu_agenda)
+                    .setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM);
+            }
         } else if (role == UserRole.PARENT) {
-            menu.add(0, R.id.menu_my_children, 100, "My Children")
-                .setIcon(android.R.drawable.ic_menu_agenda)
-                .setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM);
+            // Check if item already exists before adding
+            if (menu.findItem(R.id.menu_my_children) == null) {
+                menu.add(0, R.id.menu_my_children, 100, "My Children")
+                    .setIcon(android.R.drawable.ic_menu_agenda)
+                    .setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM);
+            }
         } else {
             // Student - add connection management
-            menu.add(0, R.id.menu_connections, 100, "Connections")
-                .setIcon(android.R.drawable.ic_menu_add)
-                .setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM);
+            // Check if item already exists before adding
+            if (menu.findItem(R.id.menu_connections) == null) {
+                menu.add(0, R.id.menu_connections, 100, "Connections")
+                    .setIcon(android.R.drawable.ic_menu_add)
+                    .setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM);
+            }
         }
     }
 }

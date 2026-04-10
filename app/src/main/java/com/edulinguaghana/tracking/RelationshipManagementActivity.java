@@ -310,10 +310,14 @@ public class RelationshipManagementActivity extends AppCompatActivity {
     }
 
     private void rejectRequest(UserRelationship relationship) {
-        new AlertDialog.Builder(this)
-            .setTitle("Reject Request")
-            .setMessage("Are you sure you want to reject this connection request?")
-            .setPositiveButton("Reject", (dialog, which) -> {
+        com.edulinguaghana.StyledMenuHelper.showStyledConfirmationDialog(
+            this,
+            "❌",
+            "Reject Request",
+            "Are you sure you want to reject this connection request?",
+            "Reject",
+            "Cancel",
+            () -> {
                 roleManager.removeRelationship(relationship.getId(),
                                              new RoleManager.RelationshipActionCallback() {
                     @Override
@@ -329,9 +333,9 @@ public class RelationshipManagementActivity extends AppCompatActivity {
                                      "Failed to reject: " + error, Toast.LENGTH_SHORT).show();
                     }
                 });
-            })
-            .setNegativeButton("Cancel", null)
-            .show();
+            },
+            null
+        );
     }
 
     @Override

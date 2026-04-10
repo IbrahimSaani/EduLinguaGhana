@@ -104,6 +104,7 @@ public class LanguageConversionUtils {
 
     /**
      * Converts number to French words (1-100)
+     * Uses TTS-friendly format without hyphens or special spacing
      */
     public static String convertNumberToWordFrench(int num) {
         if (num < 1 || num > 100) {
@@ -112,11 +113,11 @@ public class LanguageConversionUtils {
 
         String[] units = {
                 "", "Un", "Deux", "Trois", "Quatre", "Cinq", "Six", "Sept", "Huit", "Neuf", "Dix",
-                "Onze", "Douze", "Treize", "Quatorze", "Quinze", "Seize", "Dix-sept", "Dix-huit", "Dix-neuf"
+                "Onze", "Douze", "Treize", "Quatorze", "Quinze", "Seize", "Dix sept", "Dix huit", "Dix neuf"
         };
 
         String[] tens = {
-                "", "Dix", "Vingt", "Trente", "Quarante", "Cinquante", "Soixante", "Soixante-dix", "Quatre-vingts", "Quatre-vingt-dix"
+                "", "Dix", "Vingt", "Trente", "Quarante", "Cinquante", "Soixante", "Soixante dix", "Quatre vingts", "Quatre vingt dix"
         };
 
         if (num < 20) {
@@ -128,17 +129,19 @@ public class LanguageConversionUtils {
             int ten = num / 10;
             if (unit == 0) {
                 if (ten == 8) { // 80
-                    return "Quatre-vingts";
+                    return "Quatre vingts";
                 } else {
                     return tens[ten];
                 }
             } else {
                 if (ten == 7 || ten == 9) { // 70s, 90s
-                    return tens[ten-1] + "-" + units[10+unit];
-                } else if (ten == 8) { // 80s
-                    return tens[ten] + "-" + units[unit];
+                    // 71 = 60+11, 91 = 90+1
+                    return tens[ten - 1] + " " + units[10 + unit];
+                } else if (ten == 8) { // 80s (81-89)
+                    return tens[ten] + " " + units[unit];
                 } else {
-                    return tens[ten] + (unit == 1 ? " et " : "-") + units[unit];
+                    // 20-69 (21-29, 31-39, 41-49, 51-59, 61-69)
+                    return tens[ten] + " " + units[unit];
                 }
             }
         }
@@ -287,19 +290,33 @@ public class LanguageConversionUtils {
     }
 
     /**
-     * Ewe alphabet - includes both English letters and Ewe-specific letters
-     * Ewe uses: A, B, C, D, E, Ɛ, F, G, Gbe, H, I, J, K, L, M, N, O, Ɔ, P, T, U, V, W, X, Y, Z
-     * Note: Some sources show Ewe using all English letters plus diacritics
+     * Ewe alphabet - includes English letters and Ewe-specific letters with diacritics
+     * Based on available audio files in res/raw:
+     * A, B, D, Ɖ, E, Ɛ, F, Ƒ, G, Ɣ, H, I, K, L, M, N, Ŋ, O, Ɔ, P, R, S, T, U, V, Ʋ, W, X, Y, Z
+     * Missing: C, J (no audio files)
+     * Special: Ɖ (D with hook), Ƒ (F with hook), Ɣ (G with hook), Ŋ (Ng), Ʋ (V with hook)
+     * Special: Ɛ (E open), Ɔ (O open)
+     * Total: 29 letters
      */
     public static String[] getEweAlphabet() {
-        return new String[]{"A", "B", "C", "D", "E", "Ɛ", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "Ɔ", "P", "R", "S", "T", "U", "V", "W", "Y", "Z"};
+        return new String[]{
+            "A", "B", "D", "Ɖ", "E", "Ɛ", "F", "Ƒ", "G", "Ɣ", "H", "I", "K", "L", "M",
+            "N", "Ŋ", "O", "Ɔ", "P", "R", "S", "T", "U", "V", "Ʋ", "W", "X", "Y", "Z"
+        };
     }
 
     /**
-     * Ga alphabet - uses English letters with some Ga-specific sounds
-     * Ga alphabet: A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, R, S, T, U, V, W, Y, Z
+     * Ga alphabet - includes English letters and Ga-specific letters
+     * Based on available audio files in res/raw:
+     * A, B, D, E, Ɛ, F, G, H, I, J, K, L, M, N, Ŋ, O, Ɔ, P, R, S, T, U, V, W, Y, Z
+     * Missing: C (no audio file available)
+     * Special: Ɛ (E open), Ɔ (O open), Ŋ (Ng)
+     * Total: 26 letters (includes both E/Ɛ and O/Ɔ as separate characters)
      */
     public static String[] getGaAlphabet() {
-        return new String[]{"A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "R", "S", "T", "U", "V", "W", "Y", "Z"};
+        return new String[]{
+            "A", "B", "D", "E", "Ɛ", "F", "G", "H", "I", "J", "K", "L", "M", "N", "Ŋ",
+            "O", "Ɔ", "P", "R", "S", "T", "U", "V", "W", "Y", "Z"
+        };
     }
 }

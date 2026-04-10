@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">EduLinguaGhana</string>
+
+    <!-- Quiz Prompts - Ga -->
+    <string name="quiz_prompt_letter">Kpɛ lo osɔŋ ka fũ?</string>
+    <string name="quiz_prompt_number">Kpɛ lo nomɔ ka fũ?</string>
+    <string name="quiz_prompt_matching">Osɔŋ hini ko nɔ shɔ %s?</string>
+
+    <!-- Quiz Feedback -->
+    <string name="quiz_feedback_correct">✅ Ofui!</string>
+    <string name="quiz_feedback_wrong">❌ Odiɔ! Shifoŋ: %s</string>
+    <string name="quiz_timer">Akɔkɔ: %ds</string>
+    <string name="quiz_timer_done">Akɔkɔ: 0s</string>
+    <string name="quiz_score">Ŋwɔŋwɔ: %d</string>
+    <string name="quiz_best_score">Ŋwɔŋwɔ Kɔ: %d</string>
+    <string name="quiz_final_score">Wo Ŋwɔŋwɔ: %d</string>
+    <string name="quiz_title">Quiz Mode</string>
+    <string name="quiz_start_button">Hyɛ Quiz</string>
+    <string name="quiz_end_title">Akɔkɔ Nɔ</string>
+    <string name="quiz_end_new_high_score">Ŋwɔŋwɔ Kɔ Fofoi! 🎉</string>
+    <string name="quiz_play_again_button">Din Fofoi</string>
+    <string name="quiz_quit_button">Wa</string>
+
+    <!-- Language Names - Accessibility -->
+    <string name="lang_english">English</string>
+    <string name="lang_french">Faransifu</string>
+    <string name="lang_twi">Twi</string>
+    <string name="lang_ewe">Ewe</string>
+    <string name="lang_ga">Ga</string>
+</resources>
+

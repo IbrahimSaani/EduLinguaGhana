@@ -5,6 +5,7 @@ import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.speech.tts.TextToSpeech;
+import android.util.Log;
 import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
@@ -13,11 +14,15 @@ import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.edulinguaghana.tts.OfflineGhanaLPTtsService;
+import com.edulinguaghana.utils.LanguageConversionUtils;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Random;
 import java.util.Set;
 
@@ -33,6 +38,8 @@ public class SpeedGameActivity extends AppCompatActivity {
     private String currentCorrectAnswer;
     private CountDownTimer countDownTimer;
     private long timeLeftMs;
+    private String quizType = "letters";  // NEW: Support different quiz modes
+    private String[] alphabet;  // NEW: Language-specific alphabet
 
     private static final String PREF_NAME = "EduLinguaPrefs";
     private static final String KEY_HIGH_SCORE = "HIGH_SCORE";
@@ -40,17 +47,24 @@ public class SpeedGameActivity extends AppCompatActivity {
 
     // Timer settings (total round time)
     private static final long TOTAL_TIME_MS = 30000;  // 30s round
+    private static final int MAX_NUMBER = 50;  // NEW: For number questions
 
-    // Letters to use in the game
+    // Letters to use in the game - KEEP for compatibility
     private final String[] questions = {
             "A","B","C","D","E","F","G","H","I","J","K","L","M",
             "N","O","P","Q","R","S","T","U","V","W","X","Y","Z"
     };
 
+    // Hardcoded matching pairs for matching quiz mode
+    private final String[] matchLetters = {"A", "B", "C"};
+    private final String[] matchWords = {"Apple", "Ball", "Cat"};
+
     // TTS
     private TextToSpeech tts;
     private boolean isTtsReady = false;
     private String languageCode;   // "en", "fr", etc.
+    private OfflineGhanaLPTtsService offlineTts;  // NEW: For Ghanaian languages
+    private boolean isOfflineTtsPlaying = false;  // NEW: Track offline TTS state
 
     // SFX
     private boolean isSfxOn = true;
@@ -63,13 +77,21 @@ public class SpeedGameActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_speed_game);
 
-        // --- Get language code from intent (same as other modes) ---
+        // --- Get language code and quiz type from intent ---
         languageCode = getIntent().getStringExtra("LANG_CODE");
         if (languageCode == null) {
             languageCode = "en";
         }
 
-        // --- Init views ---
+        // NEW: Get quiz type from intent (letters, numbers, sequence, matching, mixed)
+        String rawType = getIntent().getStringExtra("QUIZ_TYPE");
+        if (rawType == null) rawType = "letters";
+        quizType = normalizeQuizType(rawType);
+
+        // NEW: Get language-specific alphabet
+        alphabet = LanguageConversionUtils.getAlphabetForLanguage(languageCode);
+
+        // ...existing code...
         tvGameTitle    = findViewById(R.id.tvGameTitle);
         tvGameTimer    = findViewById(R.id.tvGameTimer);
         tvGameScore    = findViewById(R.id.tvGameScore);
@@ -125,14 +147,15 @@ public class SpeedGameActivity extends AppCompatActivity {
     // TTS
     // -------------------------
     private void initTts() {
+        // NEW: Initialize offline TTS for Ghanaian languages
+        if (LanguageConversionUtils.isGhanaianLanguage(languageCode)) {
+            offlineTts = new OfflineGhanaLPTtsService(this);
+        }
+
+        // Initialize Android TTS for all languages
         tts = new TextToSpeech(this, status -> {
             if (status == TextToSpeech.SUCCESS) {
-                Locale locale;
-                if ("fr".equalsIgnoreCase(languageCode)) {
-                    locale = Locale.FRENCH;
-                } else {
-                    locale = Locale.ENGLISH;
-                }
+                Locale locale = LanguageConversionUtils.getLocaleForLanguage(languageCode);
                 int result = tts.setLanguage(locale);
                 if (result != TextToSpeech.LANG_MISSING_DATA &&
                         result != TextToSpeech.LANG_NOT_SUPPORTED) {
@@ -143,15 +166,63 @@ public class SpeedGameActivity extends AppCompatActivity {
     }
 
     private void playAudio() {
-        if (!isTtsReady || currentCorrectAnswer == null) return;
-        // Stop any current speech then speak
-        tts.stop();
-        tts.speak(currentCorrectAnswer, TextToSpeech.QUEUE_FLUSH, null, "speed_game_letter");
+        if (currentCorrectAnswer == null) return;
+
+        // NEW: Use offline TTS for Ghanaian languages
+        if (LanguageConversionUtils.isGhanaianLanguage(languageCode)) {
+            speakWithOfflineTts(currentCorrectAnswer);
+        } else {
+            // Use Android TTS for English/French
+            if (!isTtsReady) return;
+            tts.stop();
+            tts.speak(currentCorrectAnswer, TextToSpeech.QUEUE_FLUSH, null, "speed_game_letter");
+        }
+    }
+
+    // NEW: Speak using offline TTS
+    private void speakWithOfflineTts(String text) {
+        if (isOfflineTtsPlaying) {
+            offlineTts.stop();
+        }
+
+        // Pass raw languageCode; OfflineGhanaLPTtsService will handle normalization internally
+        offlineTts.speak(text, languageCode, new OfflineGhanaLPTtsService.PlaybackCallback() {
+            @Override
+            public void onStart() {
+                isOfflineTtsPlaying = true;
+            }
+
+            @Override
+            public void onComplete() {
+                isOfflineTtsPlaying = false;
+            }
+
+            @Override
+            public void onError(String error) {
+                isOfflineTtsPlaying = false;
+                Log.w("SpeedGameActivity", "Offline TTS error: " + error + ", falling back to Android TTS");
+                if (tts != null && isTtsReady) {
+                    tts.speak(text, TextToSpeech.QUEUE_FLUSH, null, "speed_game");
+                }
+            }
+        });
     }
 
     // -------------------------
     // GAME FLOW
     // -------------------------
+
+    // NEW: Normalize quiz type
+    private String normalizeQuizType(String raw) {
+        String t = raw.toLowerCase(Locale.ROOT);
+        if (t.contains("letter")) return "letters";
+        if (t.contains("sequ")) return "sequence";
+        if (t.contains("match")) return "matching";
+        if (t.contains("mix")) return "mixed";
+        if (t.contains("num")) return "numbers";
+        return t;
+    }
+
     private void startNewRound() {
         score = 0;
         tvGameScore.setText("Score: " + score);
@@ -164,18 +235,38 @@ public class SpeedGameActivity extends AppCompatActivity {
     }
 
     private void generateNewQuestion() {
-        // pick correct letter
-        Random rnd = new Random();
-        currentCorrectAnswer = questions[rnd.nextInt(questions.length)];
+        // NEW: Support different quiz modes
+        switch (quizType) {
+            case "numbers":
+                generateNumberQuestion();
+                break;
+            case "sequence":
+                generateSequenceQuestion();
+                break;
+            case "matching":
+                generateMatchingQuestion();
+                break;
+            case "mixed":
+                generateMixedQuestion();
+                break;
+            default:
+                generateLetterQuestion();
+        }
+    }
 
-        // build 6 unique options including correct
+    // NEW: Generate letter question
+    private void generateLetterQuestion() {
+        Random rnd = new Random();
+        currentCorrectAnswer = alphabet[rnd.nextInt(alphabet.length)];
+
+        // Build 6 unique options
         List<String> options = new ArrayList<>();
         options.add(currentCorrectAnswer);
         Set<String> used = new HashSet<>();
         used.add(currentCorrectAnswer);
 
         while (options.size() < 6) {
-            String candidate = questions[rnd.nextInt(questions.length)];
+            String candidate = alphabet[rnd.nextInt(alphabet.length)];
             if (!used.contains(candidate)) {
                 options.add(candidate);
                 used.add(candidate);
@@ -191,8 +282,153 @@ public class SpeedGameActivity extends AppCompatActivity {
         btnOption5.setText(options.get(4));
         btnOption6.setText(options.get(5));
 
-        tvGamePrompt.setText("Which letter did you hear?");
+        tvGamePrompt.setText(R.string.quiz_prompt_letter);
         tvGameFeedback.setText("");
+
+        speakWithTts(currentCorrectAnswer);
+    }
+
+    // NEW: Generate number question
+    private void generateNumberQuestion() {
+        Random rnd = new Random();
+        int correctNumber = rnd.nextInt(MAX_NUMBER) + 1;
+        currentCorrectAnswer = String.valueOf(correctNumber);
+
+        List<String> options = new ArrayList<>();
+        Set<Integer> used = new HashSet<>();
+        options.add(currentCorrectAnswer);
+        used.add(correctNumber);
+
+        while (options.size() < 6) {
+            int pick = rnd.nextInt(MAX_NUMBER) + 1;
+            if (!used.contains(pick)) {
+                options.add(String.valueOf(pick));
+                used.add(pick);
+            }
+        }
+
+        Collections.shuffle(options);
+        btnOption1.setText(options.get(0));
+        btnOption2.setText(options.get(1));
+        btnOption3.setText(options.get(2));
+        btnOption4.setText(options.get(3));
+        btnOption5.setText(options.get(4));
+        btnOption6.setText(options.get(5));
+
+        String numberWord = LanguageConversionUtils.convertNumberToWord(correctNumber, languageCode);
+        if (!numberWord.isEmpty()) {
+            tvGamePrompt.setText(R.string.quiz_prompt_number + "\n(" + numberWord + ")");
+        } else {
+            tvGamePrompt.setText(R.string.quiz_prompt_number);
+        }
+        tvGameFeedback.setText("");
+
+        speakWithTts(currentCorrectAnswer);
+    }
+
+    // NEW: Generate sequence question
+    private void generateSequenceQuestion() {
+        Random rnd = new Random();
+        int start = rnd.nextInt(20) + 1;
+        int[] seq = new int[4];
+        for (int i = 0; i < 4; i++) {
+            seq[i] = start + i;
+        }
+        int missingIndex = rnd.nextInt(2) + 1;
+        int missingValue = seq[missingIndex];
+        currentCorrectAnswer = String.valueOf(missingValue);
+
+        // Display sequence prompt without localization
+        tvGamePrompt.setText("Find the missing number: " + seq[0] + ", " + seq[1] + ", ?, " + seq[3]);
+        tvGameFeedback.setText("");
+
+        List<String> options = new ArrayList<>();
+        Set<Integer> used = new HashSet<>();
+        options.add(currentCorrectAnswer);
+        used.add(missingValue);
+
+        while (options.size() < 6) {
+            int delta = rnd.nextInt(3) + 1;
+            int candidate = rnd.nextBoolean() ? missingValue + delta : missingValue - delta;
+            if (candidate < 1) candidate = missingValue + delta + 1;
+            if (!used.contains(candidate)) {
+                options.add(String.valueOf(candidate));
+                used.add(candidate);
+            }
+        }
+
+        Collections.shuffle(options);
+        btnOption1.setText(options.get(0));
+        btnOption2.setText(options.get(1));
+        btnOption3.setText(options.get(2));
+        btnOption4.setText(options.get(3));
+        btnOption5.setText(options.get(4));
+        btnOption6.setText(options.get(5));
+
+        speakWithTts("Find the missing number");
+    }
+
+    // NEW: Generate matching question
+    private void generateMatchingQuestion() {
+        Random rnd = new Random();
+
+        // Use fallback matching with hardcoded words
+        int idx = rnd.nextInt(matchLetters.length);
+        String letter = matchLetters[idx];
+        String correctWord = matchWords[idx];
+        currentCorrectAnswer = correctWord;
+
+        // Use localized string resource for matching prompt
+        tvGamePrompt.setText(getString(R.string.quiz_prompt_matching, letter));
+        tvGameFeedback.setText("");
+
+        List<String> options = new ArrayList<>();
+        Set<Integer> used = new HashSet<>();
+        options.add(correctWord);
+        used.add(idx);
+
+        while (options.size() < 6 && used.size() < matchWords.length) {
+            int pick = rnd.nextInt(matchWords.length);
+            if (!used.contains(pick)) {
+                options.add(matchWords[pick]);
+                used.add(pick);
+            }
+        }
+
+        while (options.size() < 6) {
+            options.add(matchWords[rnd.nextInt(matchWords.length)]);
+        }
+
+        Collections.shuffle(options);
+        btnOption1.setText(options.get(0));
+        btnOption2.setText(options.get(1));
+        btnOption3.setText(options.get(2));
+        btnOption4.setText(options.get(3));
+        btnOption5.setText(options.get(4));
+        btnOption6.setText(options.get(5));
+
+        speakWithTts(letter);
+    }
+
+    // NEW: Generate mixed question
+    private void generateMixedQuestion() {
+        Random rnd = new Random();
+        if (rnd.nextBoolean()) {
+            generateLetterQuestion();
+        } else {
+            generateNumberQuestion();
+        }
+    }
+
+    // Helper method to speak with appropriate TTS
+    private void speakWithTts(String text) {
+        if (LanguageConversionUtils.isGhanaianLanguage(languageCode)) {
+            speakWithOfflineTts(text);
+        } else {
+            if (!isTtsReady) return;
+            tts.stop();
+            tts.speak(text, TextToSpeech.QUEUE_FLUSH, null, "speed_game_tts");
+        }
     }
 
     private void handleAnswerClick(Button clickedButton) {
@@ -359,6 +595,10 @@ public class SpeedGameActivity extends AppCompatActivity {
         if (tts != null) {
             tts.stop();
             tts.shutdown();
+        }
+        // NEW: Clean up offline TTS
+        if (offlineTts != null) {
+            offlineTts.stop();
         }
         if (sfxPlayer != null) {
             sfxPlayer.release();

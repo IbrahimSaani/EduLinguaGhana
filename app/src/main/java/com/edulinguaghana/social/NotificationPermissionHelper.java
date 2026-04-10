@@ -108,21 +108,24 @@ public class NotificationPermissionHelper {
      * Show rationale dialog explaining why permission is needed
      */
     private void showRationaleDialog() {
-        new AlertDialog.Builder(activity)
-            .setTitle("Enable Notifications")
-            .setMessage("Get notified when friends send you requests or challenges! " +
-                       "You can manage notification settings anytime in your device settings.")
-            .setPositiveButton("Enable", (dialog, which) -> {
+        com.edulinguaghana.StyledMenuHelper.showStyledConfirmationDialog(
+            activity,
+            "🔔",
+            "Enable Notifications",
+            "Get notified when friends send you requests or challenges! You can manage notification settings anytime in your device settings.",
+            "Enable",
+            "Not Now",
+            () -> {
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
                     requestPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS);
                 }
-            })
-            .setNegativeButton("Not Now", (dialog, which) -> {
+            },
+            () -> {
                 if (callback != null) {
                     callback.onPermissionDenied();
                 }
-            })
-            .show();
+            }
+        );
     }
 
     /**

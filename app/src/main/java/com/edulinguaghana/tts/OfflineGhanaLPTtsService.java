@@ -29,33 +29,39 @@ public class OfflineGhanaLPTtsService {
 
     /**
      * Play letter audio from res/raw
-     * Expected filename format: {language}_letter_{letter}.wav
-     * Example: twi_letter_a.wav, ewe_letter_d.wav
+     * Expected filename format: {language}_letter_{letter}.mp3
+     * Example: ewe_letter_a.mp3, gaa_letter_b.mp3
      */
     public void speakLetter(String letter, String language, PlaybackCallback callback) {
         String sanitized = sanitizeForFilename(letter);
-        String resourceName = language + "_letter_" + sanitized;
+        String audioLangCode = normalizeLanguageForAudio(language);
+        String resourceName = audioLangCode + "_letter_" + sanitized;
+        Log.d(TAG, "Speaking letter: " + letter + " in language: " + language + " (audio: " + audioLangCode + ") -> resource: " + resourceName);
         playAudioResource(resourceName, callback);
     }
 
     /**
      * Play word audio from res/raw
-     * Expected filename format: {language}_word_{word}.wav
-     * Example: twi_word_akoko.wav
+     * Expected filename format: {language}_word_{word}.mp3
+     * Example: ewe_word_apple.mp3
      */
     public void speakWord(String word, String language, PlaybackCallback callback) {
         String sanitized = sanitizeForFilename(word);
-        String resourceName = language + "_word_" + sanitized;
+        String audioLangCode = normalizeLanguageForAudio(language);
+        String resourceName = audioLangCode + "_word_" + sanitized;
+        Log.d(TAG, "Speaking word: " + word + " in language: " + language + " (audio: " + audioLangCode + ") -> resource: " + resourceName);
         playAudioResource(resourceName, callback);
     }
 
     /**
      * Play number audio from res/raw
-     * Expected filename format: {language}_number_{num}.wav
-     * Example: twi_number_001.wav, ewe_number_025.wav
+     * Expected filename format: {language}_number_{num}.mp3
+     * Example: ewe_number_001.mp3, gaa_number_025.mp3
      */
     public void speakNumber(int number, String language, PlaybackCallback callback) {
-        String resourceName = String.format(Locale.US, "%s_number_%03d", language, number);
+        String audioLangCode = normalizeLanguageForAudio(language);
+        String resourceName = String.format(Locale.US, "%s_number_%03d", audioLangCode, number);
+        Log.d(TAG, "Speaking number: " + number + " in language: " + language + " (audio: " + audioLangCode + ") -> resource: " + resourceName);
         playAudioResource(resourceName, callback);
     }
 
@@ -64,15 +70,41 @@ public class OfflineGhanaLPTtsService {
      */
     public void speak(String text, String language, PlaybackCallback callback) {
         String sanitized = sanitizeForFilename(text);
+        // Normalize language code to match audio file naming convention
+        String audioLangCode = normalizeLanguageForAudio(language);
+
+        // Check if text is a number and format it with zero-padding
+        String numberPadded = null;
+        try {
+            int num = Integer.parseInt(text.trim());
+            if (num >= 1 && num <= 100) {
+                numberPadded = String.format(Locale.US, "%03d", num);
+                Log.d(TAG, "Detected number: " + text + " -> formatted as: " + numberPadded);
+            }
+        } catch (NumberFormatException e) {
+            // Not a number, continue with text patterns
+        }
 
         // Try different resource name patterns
-        String[] patterns = {
-            language + "_" + sanitized,              // Direct match
-            language + "_word_" + sanitized,         // Word pattern
-            language + "_letter_" + sanitized,       // Letter pattern
-        };
+        String[] patterns;
+        if (numberPadded != null) {
+            // For numbers, try number patterns first
+            patterns = new String[]{
+                audioLangCode + "_number_" + numberPadded,  // Number pattern with padding
+                audioLangCode + "_" + sanitized,            // Direct match
+                audioLangCode + "_word_" + sanitized,       // Word pattern
+                audioLangCode + "_letter_" + sanitized,     // Letter pattern
+            };
+        } else {
+            patterns = new String[]{
+                audioLangCode + "_" + sanitized,              // Direct match
+                audioLangCode + "_word_" + sanitized,         // Word pattern
+                audioLangCode + "_letter_" + sanitized,       // Letter pattern
+                audioLangCode + "_number_" + sanitized,       // Number pattern
+            };
+        }
 
-        Log.d(TAG, "Attempting to speak '" + text + "' in language '" + language + "'");
+        Log.d(TAG, "Attempting to speak '" + text + "' in language '" + language + "' (audio lang: '" + audioLangCode + "')");
 
         for (String resourceName : patterns) {
             Log.d(TAG, "Trying resource pattern: " + resourceName);
@@ -205,6 +237,33 @@ public class OfflineGhanaLPTtsService {
     }
 
     /**
+     * Normalize language code to match audio file naming convention in res/raw
+     * Maps normalized codes to actual file prefixes used
+     */
+    private String normalizeLanguageForAudio(String languageCode) {
+        if (languageCode == null) return "en";
+        String normalized = languageCode.toLowerCase(Locale.ROOT);
+
+        // Map language codes to audio file prefixes
+        switch (normalized) {
+            case "ak":
+            case "twi":
+                return "twi";
+            case "ee":
+            case "ewe":
+                return "ewe";
+            case "gaa":
+            case "ga":
+                return "gaa";
+            case "fr":
+                return "fr";
+            case "en":
+            default:
+                return "en";
+        }
+    }
+
+    /**
      * Stop playback and release resources
      */
     public void stop() {
@@ -229,10 +288,12 @@ public class OfflineGhanaLPTtsService {
      */
     public boolean hasAudio(String text, String language) {
         String sanitized = sanitizeForFilename(text);
+        String audioLangCode = normalizeLanguageForAudio(language);
         String[] patterns = {
-            language + "_" + sanitized,
-            language + "_word_" + sanitized,
-            language + "_letter_" + sanitized,
+            audioLangCode + "_" + sanitized,
+            audioLangCode + "_word_" + sanitized,
+            audioLangCode + "_letter_" + sanitized,
+            audioLangCode + "_number_" + sanitized,
         };
 
         for (String resourceName : patterns) {

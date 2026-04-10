@@ -55,16 +55,20 @@
         android:id="@+id/appBarLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@color/colorPrimary"
-        android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
-        android:elevation="4dp">
+        android:background="@drawable/gradient_background"
+        android:elevation="8dp"
+        android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar">
 
-        <androidx.appcompat.widget.Toolbar
+        <com.google.android.material.appbar.MaterialToolbar
             android:id="@+id/toolbar"
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
-            app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
-            app:title="@string/alphabet_mode" />
+            android:background="@android:color/transparent"
+            android:elevation="0dp"
+            app:title="@string/alphabet_mode"
+            app:titleTextColor="@color/white"
+            app:navigationIcon="@drawable/ic_back"
+            app:navigationIconTint="@color/white" />
 
     </com.google.android.material.appbar.AppBarLayout>
 
@@ -80,59 +84,117 @@
             android:orientation="vertical"
             android:padding="16dp">
 
-            <!-- Progress Section with Icon -->
-            <RelativeLayout
+            <!-- Progress Section with Counter and Bar -->
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="16dp">
+                android:layout_marginBottom="20dp"
+                android:orientation="vertical"
+                android:spacing="12dp">
 
-                <ImageView
-                    android:id="@+id/progressIcon"
-                    android:layout_width="24dp"
-                    android:layout_height="24dp"
-                    android:layout_alignParentStart="true"
-                    android:layout_centerVertical="true"
-                    android:layout_marginEnd="8dp"
-                    android:contentDescription="@null"
-                    android:src="@drawable/ic_progress_sparkle"
-                    app:tint="@color/colorAccent" />
-
-                <com.google.android.material.progressindicator.LinearProgressIndicator
-                    android:id="@+id/progressBar"
-                    android:layout_width="match_parent"
+                <!-- Animated Progress Counter -->
+                <com.google.android.material.card.MaterialCardView
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_toEndOf="@id/progressIcon"
-                    android:progress="0"
-                    app:indicatorColor="@color/colorAccent"
-                    app:trackColor="@color/buttonSecondary"
-                    app:trackCornerRadius="8dp"
-                    app:trackThickness="8dp" />
-            </RelativeLayout>
+                    android:layout_gravity="center_horizontal"
+                    app:cardCornerRadius="20dp"
+                    app:cardElevation="6dp"
+                    app:cardBackgroundColor="@color/colorAccent">
+
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:padding="12dp"
+                        android:spacing="8dp"
+                        android:gravity="center_vertical">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="⭐"
+                            android:textSize="24sp" />
+
+                        <LinearLayout
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal"
+                            android:spacing="4dp">
+
+                            <TextView
+                                android:id="@+id/tvProgressCounter"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Letter 1 of 26"
+                                android:textColor="@android:color/white"
+                                android:textSize="16sp"
+                                android:textStyle="bold"
+                                android:fontFamily="@font/agbalumo" />
+                        </LinearLayout>
+                    </LinearLayout>
+                </com.google.android.material.card.MaterialCardView>
+
+                <!-- Progress Bar -->
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <ImageView
+                        android:id="@+id/progressIcon"
+                        android:layout_width="28dp"
+                        android:layout_height="28dp"
+                        android:layout_alignParentStart="true"
+                        android:layout_centerVertical="true"
+                        android:layout_marginEnd="8dp"
+                        android:contentDescription="@null"
+                        android:src="@drawable/ic_progress_sparkle"
+                        app:tint="@color/colorAccent" />
+
+                    <com.google.android.material.progressindicator.LinearProgressIndicator
+                        android:id="@+id/progressBar"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_toEndOf="@id/progressIcon"
+                        android:progress="0"
+                        app:indicatorColor="@color/colorAccent"
+                        app:trackColor="@color/buttonSecondary"
+                        app:trackCornerRadius="8dp"
+                        app:trackThickness="10dp" />
+                </RelativeLayout>
+            </LinearLayout>
 
             <com.google.android.material.card.MaterialCardView
                 android:id="@+id/languageCard"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="16dp"
+                android:layout_marginBottom="24dp"
                 android:foreground="@drawable/ripple_card_effect"
-                app:cardCornerRadius="16dp"
-                app:cardElevation="8dp"
-                app:strokeWidth="0dp">
+                app:cardCornerRadius="20dp"
+                app:cardElevation="10dp"
+                app:strokeWidth="2dp"
+                app:strokeColor="@color/colorAccent">
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:alpha="0.05"
+                    android:background="@drawable/bg_splash_gradient" />
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="horizontal"
-                    android:padding="16dp"
-                    android:gravity="center_vertical">
+                    android:padding="20dp"
+                    android:gravity="center_vertical"
+                    android:spacing="16dp">
 
-                    <ImageView
-                        android:id="@+id/languageIcon"
-                        android:layout_width="32dp"
-                        android:layout_height="32dp"
-                        android:layout_marginEnd="12dp"
-                        android:contentDescription="@null"
-                        android:src="@drawable/ic_flag_ghana" />
+                    <!-- Language emoji -->
+                    <TextView
+                        android:layout_width="40dp"
+                        android:layout_height="40dp"
+                        android:text="🌍"
+                        android:textSize="32sp"
+                        android:gravity="center" />
 
                     <LinearLayout
                         android:layout_width="0dp"
@@ -146,8 +208,9 @@
                             android:layout_height="wrap_content"
                             android:text="@string/language_prefix"
                             android:textColor="@color/colorPrimary"
-                            android:textSize="18sp"
-                            android:textStyle="bold" />
+                            android:textSize="20sp"
+                            android:textStyle="bold"
+                            android:fontFamily="@font/agbalumo" />
 
                         <TextView
                             android:id="@+id/tvModeLabel"
@@ -155,42 +218,46 @@
                             android:layout_height="wrap_content"
                             android:layout_marginTop="4dp"
                             android:text="@string/alphabet_mode"
-                            android:textColor="@color/textColorSecondary"
-                            android:textSize="14sp" />
+                            android:textColor="@color/colorAccent"
+                            android:textSize="14sp"
+                            android:textStyle="bold" />
                     </LinearLayout>
 
-                    <ImageView
+                    <!-- Mode emoji -->
+                    <TextView
                         android:id="@+id/modeIcon"
-                        android:layout_width="24dp"
-                        android:layout_height="24dp"
-                        android:contentDescription="@null"
-                        android:src="@drawable/ic_decorative_star"
-                        app:tint="@color/colorAccent" />
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="📖"
+                        android:textSize="32sp" />
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
 
-            <!-- Main Content Area -->
+            <!-- Main Content Area with Enhanced Visuals and Interactivity -->
             <FrameLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="16dp">
+                android:layout_marginBottom="24dp">
 
                 <com.google.android.material.card.MaterialCardView
                     android:id="@+id/letterCard"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="80dp"
-                    android:layout_marginEnd="80dp"
-                    app:cardCornerRadius="28dp"
-                    app:cardElevation="16dp"
+                    android:layout_marginStart="40dp"
+                    android:layout_marginEnd="40dp"
+                    android:foreground="?attr/selectableItemBackground"
+                    android:clickable="true"
+                    android:focusable="true"
+                    app:cardCornerRadius="32dp"
+                    app:cardElevation="20dp"
                     app:strokeColor="@color/colorPrimary"
-                    app:strokeWidth="2dp">
+                    app:strokeWidth="3dp">
 
-                    <!-- Subtle gradient background -->
+                    <!-- Gradient background -->
                     <View
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
-                        android:alpha="0.03"
+                        android:alpha="0.08"
                         android:background="@drawable/bg_splash_gradient" />
 
                     <LinearLayout
@@ -198,17 +265,56 @@
                         android:layout_height="wrap_content"
                         android:gravity="center"
                         android:orientation="vertical"
-                        android:paddingTop="40dp"
-                        android:paddingBottom="40dp"
-                        android:paddingStart="24dp"
-                        android:paddingEnd="24dp">
+                        android:paddingTop="50dp"
+                        android:paddingBottom="50dp"
+                        android:paddingStart="28dp"
+                        android:paddingEnd="28dp">
 
-                        <!-- Main letter with subtle shadow -->
+                        <!-- Celebration emoji container -->
                         <FrameLayout
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_marginBottom="20dp">
+                            android:layout_marginBottom="12dp">
 
+                            <TextView
+                                android:id="@+id/celebrationEmoji"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="✨"
+                                android:textSize="40sp" />
+                        </FrameLayout>
+
+                        <!-- Main letter with enhanced shadow and glow -->
+                        <FrameLayout
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginBottom="28dp">
+
+                            <!-- Outer glow effect (shadow) -->
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="4dp"
+                                android:layout_marginStart="4dp"
+                                android:fontFamily="@font/agbalumo"
+                                android:text="A"
+                                android:alpha="0.12"
+                                android:textColor="@color/colorAccent"
+                                android:textSize="160sp"
+                                android:textStyle="bold" />
+
+                            <!-- Main letter -->
+                            <TextView
+                                android:id="@+id/tvLetter"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:fontFamily="@font/agbalumo"
+                                android:text="A"
+                                android:textColor="@color/colorAccent"
+                                android:textSize="160sp"
+                                android:textStyle="bold" />
+
+                            <!-- Subtle shadow for depth -->
                             <TextView
                                 android:id="@+id/tvLetterShadow"
                                 android:layout_width="wrap_content"
@@ -217,81 +323,102 @@
                                 android:layout_marginStart="3dp"
                                 android:fontFamily="@font/agbalumo"
                                 android:text="A"
-                                android:alpha="0.15"
+                                android:alpha="0.08"
                                 android:textColor="@android:color/black"
-                                android:textSize="140sp"
-                                android:textStyle="bold" />
-
-                            <TextView
-                                android:id="@+id/tvLetter"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:fontFamily="@font/agbalumo"
-                                android:text="A"
-                                android:textColor="@color/colorAccent"
-                                android:textSize="140sp"
+                                android:textSize="160sp"
                                 android:textStyle="bold" />
                         </FrameLayout>
 
-                        <!-- Word display -->
-                        <TextView
-                            android:id="@+id/tvLetterWord"
+                        <!-- Word display with icon -->
+                        <LinearLayout
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_marginBottom="24dp"
-                            android:textColor="@color/colorPrimary"
-                            android:textSize="32sp"
-                            android:textStyle="bold"
-                            android:fontFamily="@font/agbalumo"
-                            tools:text="Apple" />
+                            android:layout_marginBottom="32dp"
+                            android:orientation="horizontal"
+                            android:gravity="center_vertical"
+                            android:spacing="12dp">
 
-                        <!-- Speak button -->
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="📖"
+                                android:textSize="28sp" />
+
+                            <TextView
+                                android:id="@+id/tvLetterWord"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:textColor="@color/colorPrimary"
+                                android:textSize="36sp"
+                                android:textStyle="bold"
+                                android:fontFamily="@font/agbalumo"
+                                android:letterSpacing="0.1"
+                                tools:text="Apple" />
+                        </LinearLayout>
+
+                        <!-- Speak button - Enhanced with gradient and icon -->
                         <com.google.android.material.button.MaterialButton
                             android:id="@+id/btnSpeak"
-                            style="@style/Widget.Material3.Button.Icon"
+                            style="@style/Widget.Material3.Button"
                             android:layout_width="wrap_content"
-                            android:layout_height="56dp"
-                            android:minWidth="180dp"
-                            android:paddingStart="28dp"
-                            android:paddingEnd="28dp"
+                            android:layout_height="64dp"
+                            android:minWidth="220dp"
+                            android:paddingStart="32dp"
+                            android:paddingEnd="32dp"
                             android:text="@string/speak_button"
-                            android:textSize="16sp"
-                            app:cornerRadius="28dp"
+                            android:textSize="18sp"
+                            android:textStyle="bold"
+                            app:cornerRadius="32dp"
+                            app:elevation="8dp"
                             app:icon="@drawable/ic_speak"
-                            app:iconSize="24dp" />
+                            app:iconSize="28dp"
+                            app:iconGravity="start"
+                            app:iconPadding="16dp" />
+
+                        <!-- Hint text -->
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="16dp"
+                            android:text="💡 Tap letter to hear sound!"
+                            android:textColor="@color/colorAccent"
+                            android:textSize="12sp"
+                            android:alpha="0.7" />
                     </LinearLayout>
                 </com.google.android.material.card.MaterialCardView>
 
-                <!-- Navigation Buttons Overlay -->
+                <!-- Navigation Buttons - Enhanced with gradient backgrounds -->
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/btnPrev"
                     style="@style/Widget.Material3.Button.ElevatedButton.Icon"
-                    android:layout_width="56dp"
-                    android:layout_height="56dp"
+                    android:layout_width="68dp"
+                    android:layout_height="68dp"
                     android:layout_gravity="center_vertical|start"
-                    android:layout_marginStart="8dp"
+                    android:layout_marginStart="6dp"
                     android:contentDescription="@string/content_description_previous"
-                    app:cornerRadius="28dp"
-                    app:elevation="8dp"
+                    app:cornerRadius="34dp"
+                    app:elevation="12dp"
                     app:icon="@drawable/ic_arrow_back"
                     app:iconGravity="textStart"
-                    app:iconSize="28dp"
-                    app:iconPadding="0dp" />
+                    app:iconSize="32dp"
+                    app:iconPadding="0dp"
+                    app:backgroundTint="@color/colorPrimary" />
 
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/btnNext"
                     style="@style/Widget.Material3.Button.ElevatedButton.Icon"
-                    android:layout_width="56dp"
-                    android:layout_height="56dp"
+                    android:layout_width="68dp"
+                    android:layout_height="68dp"
                     android:layout_gravity="center_vertical|end"
-                    android:layout_marginEnd="8dp"
+                    android:layout_marginEnd="6dp"
                     android:contentDescription="@string/content_description_next"
-                    app:cornerRadius="28dp"
-                    app:elevation="8dp"
+                    app:cornerRadius="34dp"
+                    app:elevation="12dp"
                     app:icon="@drawable/ic_arrow_forward"
                     app:iconGravity="textStart"
-                    app:iconSize="28dp"
-                    app:iconPadding="0dp" />
+                    app:iconSize="32dp"
+                    app:iconPadding="0dp"
+                    app:backgroundTint="@color/colorPrimary" />
             </FrameLayout>
         </LinearLayout>
     </ScrollView>

@@ -135,5 +135,72 @@ public class StyledMenuHelper {
     ) {
         return showStyledMenu(context, headerIcon, title, null, menuItems, null);
     }
+
+    /**
+     * Show a styled confirmation dialog with icon, title, message, and action buttons
+     */
+    public static AlertDialog showStyledConfirmationDialog(
+            Context context,
+            String headerIcon,
+            String title,
+            String message,
+            String positiveButtonText,
+            String negativeButtonText,
+            Runnable onPositive,
+            Runnable onNegative
+    ) {
+        // Create custom header
+        View headerView = LayoutInflater.from(context).inflate(R.layout.dialog_menu_header, null);
+        TextView tvDialogIcon = headerView.findViewById(R.id.tvDialogIcon);
+        TextView tvDialogTitle = headerView.findViewById(R.id.tvDialogTitle);
+        TextView tvDialogSubtitle = headerView.findViewById(R.id.tvDialogSubtitle);
+
+        tvDialogIcon.setText(headerIcon);
+        tvDialogTitle.setText(title);
+
+        if (message != null && !message.isEmpty()) {
+            tvDialogSubtitle.setText(message);
+            tvDialogSubtitle.setVisibility(View.VISIBLE);
+        }
+
+        // Build dialog
+        MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(context);
+        builder.setCustomTitle(headerView);
+
+        if (positiveButtonText != null) {
+            builder.setPositiveButton(positiveButtonText, (dialog, which) -> {
+                if (onPositive != null) {
+                    onPositive.run();
+                }
+            });
+        }
+
+        if (negativeButtonText != null) {
+            builder.setNegativeButton(negativeButtonText, (dialog, which) -> {
+                if (onNegative != null) {
+                    onNegative.run();
+                }
+            });
+        }
+
+        AlertDialog dialog = builder.create();
+        dialog.show();
+
+        return dialog;
+    }
+
+    /**
+     * Show a styled confirmation dialog (simple version with just Yes/No)
+     */
+    public static AlertDialog showStyledConfirmationDialog(
+            Context context,
+            String headerIcon,
+            String title,
+            String message,
+            Runnable onYes,
+            Runnable onNo
+    ) {
+        return showStyledConfirmationDialog(context, headerIcon, title, message, "Yes", "No", onYes, onNo);
+    }
 }
 

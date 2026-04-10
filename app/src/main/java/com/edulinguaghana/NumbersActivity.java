@@ -10,18 +10,22 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.media.MediaPlayer;
 import android.os.Bundle;
+import android.os.VibrationEffect;
+import android.os.Vibrator;
 import android.speech.RecognizerIntent;
 import android.speech.tts.TextToSpeech;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.Button;
-import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.material.button.MaterialButton;
+import com.google.android.material.card.MaterialCardView;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.progressindicator.LinearProgressIndicator;
 import com.edulinguaghana.tts.OfflineGhanaLPTtsService;
+import com.edulinguaghana.utils.LanguageConversionUtils;
 
 import java.util.ArrayList;
 import java.util.Locale;
@@ -29,10 +33,15 @@ import java.util.Locale;
 public class NumbersActivity extends AppCompatActivity {
 
     private TextView tvLanguageTitleNum, tvNumber, tvNumberSpelling;
-    private ImageButton btnPrevNumber, btnNextNumber;
+    private TextView tvProgressCounter;
+    private TextView celebrationEmoji;
+    private MaterialButton btnPrevNumber, btnNextNumber;
     private FloatingActionButton btnBackNumber;
     private Button btnSpeakNumber;
     private LinearProgressIndicator progressBar;
+    private MaterialCardView numberCard;
+
+    private Vibrator vibrator;  // For haptic feedback
 
     private String languageCode;
     private String languageName;
@@ -58,11 +67,17 @@ public class NumbersActivity extends AppCompatActivity {
         tvLanguageTitleNum = findViewById(R.id.tvLanguageTitleNum);
         tvNumber = findViewById(R.id.tvNumber);
         tvNumberSpelling = findViewById(R.id.tvNumberSpelling);
+        tvProgressCounter = findViewById(R.id.tvProgressCounter);
+        celebrationEmoji = findViewById(R.id.celebrationEmoji);
         btnPrevNumber = findViewById(R.id.btnPrevNumber);
         btnNextNumber = findViewById(R.id.btnNextNumber);
         btnBackNumber = findViewById(R.id.btnBackNumber);
         btnSpeakNumber = findViewById(R.id.btnSpeakNumber);
         progressBar = findViewById(R.id.progressBar);
+        numberCard = findViewById(R.id.numberCard);
+
+        // Initialize vibrator for haptic feedback
+        vibrator = (Vibrator) getSystemService(VIBRATOR_SERVICE);
 
         languageCode = getIntent().getStringExtra("LANG_CODE");
         languageName = getIntent().getStringExtra("LANG_NAME");
@@ -82,63 +97,131 @@ public class NumbersActivity extends AppCompatActivity {
         offlineTts = new OfflineGhanaLPTtsService(this);
 
         tts = new TextToSpeech(this, status -> {
-            if (status == TextToSpeech.SUCCESS) {
-                tts.setLanguage(getLocaleForLanguage(languageCode));
-                updateNumber();
-                if (isRecitalMode) {
-                    speakCurrentNumber();
+            try {
+                if (status == TextToSpeech.SUCCESS) {
+                    tts.setLanguage(LanguageConversionUtils.getLocaleForLanguage(languageCode));
+                    updateNumber();
+                    if (isRecitalMode) {
+                        speakCurrentNumber();
+                    }
+                } else {
+                    Toast.makeText(this, "TTS init failed", Toast.LENGTH_SHORT).show();
+                    updateNumber();
                 }
-            } else {
-                Toast.makeText(this, "TTS init failed", Toast.LENGTH_SHORT).show();
+            } catch (Exception e) {
+                android.util.Log.e("NumbersActivity", "Error during TTS initialization or recital playback", e);
                 updateNumber();
             }
         });
 
         btnNextNumber.setOnClickListener(v -> {
-            currentNumber++;
-            if (currentNumber > 100) currentNumber = 1;
-            updateNumber();
-            if (isRecitalMode) speakCurrentNumber();
+            try {
+                triggerHapticFeedback(30);  // Light haptic
+            } catch (Exception e) {
+                android.util.Log.w("NumbersActivity", "Haptic feedback failed", e);
+            }
+            try {
+                currentNumber++;
+                if (currentNumber > 100) currentNumber = 1;
+                updateNumber();
+                if (isRecitalMode) speakCurrentNumber();
+            } catch (Exception e) {
+                android.util.Log.e("NumbersActivity", "Error advancing number", e);
+            }
         });
 
         btnPrevNumber.setOnClickListener(v -> {
-            currentNumber--;
-            if (currentNumber < 1) currentNumber = 100;
-            updateNumber();
-            if (isRecitalMode) speakCurrentNumber();
+            try {
+                triggerHapticFeedback(30);  // Light haptic
+            } catch (Exception e) {
+                android.util.Log.w("NumbersActivity", "Haptic feedback failed", e);
+            }
+            try {
+                currentNumber--;
+                if (currentNumber < 1) currentNumber = 100;
+                updateNumber();
+                if (isRecitalMode) speakCurrentNumber();
+            } catch (Exception e) {
+                android.util.Log.e("NumbersActivity", "Error going back number", e);
+            }
         });
 
-        btnBackNumber.setOnClickListener(v -> finish());
+        btnBackNumber.setOnClickListener(v -> {
+            try {
+                triggerHapticFeedback(50);  // Medium haptic
+            } catch (Exception e) {
+                android.util.Log.w("NumbersActivity", "Haptic feedback failed", e);
+            }
+            finish();
+        });
 
         btnSpeakNumber.setOnClickListener(v -> {
-            if (isRecitalMode) {
+            try {
+                triggerHapticFeedback(50);  // Medium haptic
+                celebrateAction();  // Celebration animation
+            } catch (Exception e) {
+                android.util.Log.w("NumbersActivity", "Haptic feedback or celebration failed", e);
+            }
+            try {
+                if (isRecitalMode) {
+                    speakCurrentNumber();
+                } else {
+                    startPracticePronunciation();
+                }
+            } catch (Exception e) {
+                android.util.Log.e("NumbersActivity", "Error speaking number", e);
+            }
+        });
+
+        // Make number card tappable to speak
+        numberCard.setOnClickListener(v -> {
+            try {
+                triggerHapticFeedback(40);  // Light-medium haptic
                 speakCurrentNumber();
-            } else {
-                startPracticePronunciation();
+                celebrateAction();  // Show celebration
+            } catch (Exception e) {
+                android.util.Log.e("NumbersActivity", "Error in number card click", e);
             }
         });
     }
 
     private void updateNumber() {
-        tvNumber.setText(String.valueOf(currentNumber));
-        switch (languageCode) {
-            case "fr":
-                tvNumberSpelling.setText(convertNumberToWordFrench(currentNumber));
-                break;
-            case "ak":
-                tvNumberSpelling.setText(convertNumberToWordTwi(currentNumber));
-                break;
-            case "ee":
-                tvNumberSpelling.setText(convertNumberToWordEwe(currentNumber));
-                break;
-            case "gaa":
-                tvNumberSpelling.setText(convertNumberToWordGa(currentNumber));
-                break;
-            default:
-                tvNumberSpelling.setText(convertNumberToWord(currentNumber));
-                break;
+        try {
+            tvNumber.setText(String.valueOf(currentNumber));
+            // USE CENTRALIZED UTILITY - Remove duplicate code
+            String numberWord = LanguageConversionUtils.convertNumberToWord(currentNumber, languageCode);
+            tvNumberSpelling.setText(numberWord != null ? numberWord : "");
+            progressBar.setProgress(currentNumber);
+            updateProgressCounter();
+        } catch (Exception e) {
+            android.util.Log.e("NumbersActivity", "Error updating number display", e);
+            // Ensure display is at least partially updated
+            try {
+                tvNumber.setText(String.valueOf(currentNumber));
+            } catch (Exception ignored) {
+            }
         }
-        progressBar.setProgress(currentNumber);
+    }
+
+    private void updateProgressCounter() {
+        if (tvProgressCounter != null) {
+            String progressText = "Number " + currentNumber + " of 100";
+            tvProgressCounter.setText(progressText);
+
+            // Animate counter update
+            tvProgressCounter.animate()
+                .scaleX(1.1f)
+                .scaleY(1.1f)
+                .setDuration(100)
+                .withEndAction(() -> {
+                    tvProgressCounter.animate()
+                        .scaleX(1.0f)
+                        .scaleY(1.0f)
+                        .setDuration(100)
+                        .start();
+                })
+                .start();
+        }
     }
 
     private void animateNumber() {
@@ -147,18 +230,23 @@ public class NumbersActivity extends AppCompatActivity {
     }
 
     private void speakCurrentNumber() {
-        // Try to load audio from recorded files first
-        int resId = getNumberAudioResId(languageCode, currentNumber);
-        if (resId != 0) {
-            playAudioResource(resId);
-        } else if (isGhanaianLanguage(languageCode)) {
-            // Fallback to GhanaLP TTS if no recorded audio exists
-            speakWithGhanaLP(currentNumber);
-        } else if (tts != null) {
-            // Fallback to Android TTS for other languages
-            tts.speak(String.valueOf(currentNumber), TextToSpeech.QUEUE_FLUSH, null, "NUMBER_ID");
+        try {
+            // Try to load audio from recorded files first
+            int resId = getNumberAudioResId(languageCode, currentNumber);
+            if (resId != 0) {
+                playAudioResource(resId);  // This only plays if resId is found
+            } else if (isGhanaianLanguage(languageCode)) {
+                // Fallback to GhanaLP TTS if no recorded audio exists
+                speakWithGhanaLP(currentNumber);
+            } else if (tts != null) {
+                // Fallback to Android TTS for other languages
+                tts.speak(String.valueOf(currentNumber), TextToSpeech.QUEUE_FLUSH, null, "NUMBER_ID");
+            }
+            animateNumber();
+        } catch (Exception e) {
+            android.util.Log.e("NumbersActivity", "Error in speakCurrentNumber", e);
+            // Silently fail - don't crash the app
         }
-        animateNumber();
     }
 
     private boolean isGhanaianLanguage(String code) {
@@ -170,54 +258,79 @@ public class NumbersActivity extends AppCompatActivity {
     }
 
     private void speakWithGhanaLP(int number) {
-        if (isGhanaLpPlaying) {
-            offlineTts.stop();
-        }
+        try {
+            if (isGhanaLpPlaying) {
+                offlineTts.stop();
+            }
 
-        // Normalize language code for audio file lookup
-        String apiLangCode = normalizeLanguageCode(languageCode);
+            // Normalize language code for audio file lookup
+            String apiLangCode = normalizeLanguageCode(languageCode);
 
-        // Disable speak button during playback
-        if (btnSpeakNumber != null) {
-            btnSpeakNumber.setEnabled(false);
-        }
+            // Disable speak button during playback
+            if (btnSpeakNumber != null) {
+                btnSpeakNumber.setEnabled(false);
+            }
 
-        // Use speakNumber for numbers
-        offlineTts.speakNumber(
-            number,
-            apiLangCode,
-            new OfflineGhanaLPTtsService.PlaybackCallback() {
-                @Override
-                public void onStart() {
-                    isGhanaLpPlaying = true;
+            // Use speakNumber for numbers
+            offlineTts.speakNumber(
+                number,
+                apiLangCode,
+                new OfflineGhanaLPTtsService.PlaybackCallback() {
+                    @Override
+                    public void onStart() {
+                        isGhanaLpPlaying = true;
+                    }
+
+                    @Override
+                    public void onComplete() {
+                        isGhanaLpPlaying = false;
+                        runOnUiThread(() -> {
+                            if (btnSpeakNumber != null) {
+                                btnSpeakNumber.setEnabled(true);
+                            }
+                        });
+                    }
+
+                    @Override
+                    public void onError(String error) {
+                        // Fallback to Android TTS if no offline audio found
+                        isGhanaLpPlaying = false;
+                        runOnUiThread(() -> {
+                            if (btnSpeakNumber != null) {
+                                btnSpeakNumber.setEnabled(true);
+                            }
+                            android.util.Log.w("NumbersActivity", "No offline audio found for number: " + number);
+                            try {
+                                if (tts != null) {
+                                    tts.speak(String.valueOf(number), TextToSpeech.QUEUE_FLUSH, null, "NUMBER_ID");
+                                }
+                            } catch (Exception e) {
+                                android.util.Log.e("NumbersActivity", "Error during TTS fallback speak", e);
+                            }
+                        });
+                    }
                 }
-
-                @Override
-                public void onComplete() {
-                    isGhanaLpPlaying = false;
-                    runOnUiThread(() -> {
-                        if (btnSpeakNumber != null) {
-                            btnSpeakNumber.setEnabled(true);
-                        }
-                    });
+            );
+        } catch (Exception e) {
+            android.util.Log.e("NumbersActivity", "Error in speakWithGhanaLP", e);
+            // Try TTS as ultimate fallback
+            try {
+                if (tts != null && tts.isSpeaking()) {
+                    tts.stop();
                 }
-
-                @Override
-                public void onError(String error) {
-                    // Fallback to Android TTS if no offline audio found
-                    isGhanaLpPlaying = false;
-                    runOnUiThread(() -> {
-                        if (btnSpeakNumber != null) {
-                            btnSpeakNumber.setEnabled(true);
-                        }
-                        android.util.Log.w("NumbersActivity", "No offline audio found for number: " + number);
-                        if (tts != null) {
-                            tts.speak(String.valueOf(number), TextToSpeech.QUEUE_FLUSH, null, "NUMBER_ID");
-                        }
-                    });
+                if (tts != null) {
+                    tts.speak(String.valueOf(number), TextToSpeech.QUEUE_FLUSH, null, "NUMBER_ID");
+                }
+                if (btnSpeakNumber != null) {
+                    btnSpeakNumber.setEnabled(true);
+                }
+            } catch (Exception ttsError) {
+                android.util.Log.e("NumbersActivity", "TTS fallback also failed", ttsError);
+                if (btnSpeakNumber != null) {
+                    btnSpeakNumber.setEnabled(true);
                 }
             }
-        );
+        }
     }
 
     private String normalizeLanguageCode(String code) {
@@ -260,20 +373,46 @@ public class NumbersActivity extends AppCompatActivity {
         });
         mediaPlayer.start();
     }
-
     private void startPracticePronunciation() {
-        if (!("en".equals(languageCode) || "fr".equals(languageCode))) {
-            Toast.makeText(this, "Pronunciation grading is only available for English and French for now.", Toast.LENGTH_LONG).show();
-            speakCurrentNumber();
-            return;
-        }
-
         speakCurrentNumber();
 
-        if (!isRecordAudioPermissionGranted()) {
-            requestRecordAudioPermission();
+        // For English & French: Use speech recognition
+        if ("en".equals(languageCode) || "fr".equals(languageCode)) {
+            if (!isRecordAudioPermissionGranted()) {
+                requestRecordAudioPermission();
+            } else {
+                promptSpeechInput();
+            }
         } else {
-            promptSpeechInput();
+            // For Ghanaian languages: Show friendly message and provide audio example
+            Toast.makeText(this,
+                "🎤 Try to pronounce: " + currentNumber +
+                "\n\n📝 Listen carefully to the audio above and repeat it!\n\n" +
+                "Tap the number again to hear it.",
+                Toast.LENGTH_LONG).show();
+
+            // Show helpful tips for Ghanaian languages
+            showPronunciationTips();
+        }
+    }
+
+    private void showPronunciationTips() {
+        String tips = "";
+
+        switch (languageCode) {
+            case "ak": // Twi
+                tips = "🎤 Speak clearly and naturally in Twi";
+                break;
+            case "ee": // Ewe
+                tips = "🎤 Remember: Ewe numbers have specific tones";
+                break;
+            case "gaa": // Ga
+                tips = "🎤 Ga numbers require clear pronunciation";
+                break;
+        }
+
+        if (!tips.isEmpty()) {
+            Toast.makeText(this, "💡 Tip: " + tips, Toast.LENGTH_LONG).show();
         }
     }
 
@@ -303,21 +442,11 @@ public class NumbersActivity extends AppCompatActivity {
     }
 
     private String getSpeechLocaleCode() {
-        if ("fr".equals(languageCode)) {
-            return "fr-FR";
-        }
-        return "en-US";
+        return LanguageConversionUtils.getSpeechLocaleCode(languageCode);
     }
 
     private Locale getLocaleForLanguage(String code) {
-        if (code == null) return Locale.ENGLISH;
-        switch (code) {
-            case "fr": return Locale.FRENCH;
-            case "ak": return new Locale("ak");
-            case "ee": return new Locale("ee");
-            case "gaa": return new Locale("gaa");
-            default: return Locale.ENGLISH;
-        }
+        return LanguageConversionUtils.getLocaleForLanguage(code);
     }
 
     @Override
@@ -341,12 +470,26 @@ public class NumbersActivity extends AppCompatActivity {
         try {
             int recognizedNumber = Integer.parseInt(recognized);
             if (recognizedNumber == expected) {
-                Toast.makeText(this, "Great! Pronunciation matched (" + recognized + ")", Toast.LENGTH_LONG).show();
+                // Perfect match!
+                celebrateAction();
+                Toast.makeText(this,
+                    "🎉 Excellent! Perfect pronunciation of " + recognized +
+                    "\n✅ You got it right!",
+                    Toast.LENGTH_LONG).show();
             } else {
-                Toast.makeText(this, "It heard: \"" + recognized + "\". Expected: " + expected, Toast.LENGTH_LONG).show();
+                // Didn't match
+                Toast.makeText(this,
+                    "🎤 I heard: \"" + recognized + "\"" +
+                    "\n📝 Expected: \"" + expected + "\"" +
+                    "\n\n💡 Listen to the audio again and try once more!",
+                    Toast.LENGTH_LONG).show();
             }
         } catch (NumberFormatException e) {
-            Toast.makeText(this, "It heard: \"" + recognized + "\". Expected number: " + expected, Toast.LENGTH_LONG).show();
+            Toast.makeText(this,
+                "🎤 I heard: \"" + recognized + "\" (not a number)" +
+                "\n📝 Expected number: " + expected +
+                "\n\n💡 Try again and speak clearly!",
+                Toast.LENGTH_LONG).show();
         }
     }
 
@@ -365,140 +508,46 @@ public class NumbersActivity extends AppCompatActivity {
         }
     }
 
-    private String convertNumberToWord(int num) {
-        if (num < 1 || num > 100) {
-            return "";
-        }
-
-        String[] units = {
-                "", "One", "Two", "Three", "Four", "Five", "Six", "Seven", "Eight", "Nine", "Ten",
-                "Eleven", "Twelve", "Thirteen", "Fourteen", "Fifteen", "Sixteen", "Seventeen", "Eighteen", "Nineteen"
-        };
-
-        String[] tens = {
-                "", "", "Twenty", "Thirty", "Forty", "Fifty", "Sixty", "Seventy", "Eighty", "Ninety"
-        };
-
-        if (num < 20) {
-            return units[num];
-        } else if (num == 100) {
-            return "One Hundred";
-        } else {
-            int unit = num % 10;
-            int ten = num / 10;
-            if (unit == 0) {
-                return tens[ten];
+    /**
+     * Trigger haptic feedback (vibration)
+     * @param durationMs Duration in milliseconds (30-50 for light feedback)
+     */
+    private void triggerHapticFeedback(long durationMs) {
+        if (vibrator != null && vibrator.hasVibrator()) {
+            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+                vibrator.vibrate(VibrationEffect.createOneShot(durationMs, VibrationEffect.DEFAULT_AMPLITUDE));
             } else {
-                return tens[ten] + "-" + units[unit];
+                vibrator.vibrate(durationMs);
             }
         }
     }
 
-    private String convertNumberToWordFrench(int num) {
-        if (num < 1 || num > 100) {
-            return "";
-        }
+    /**
+     * Show celebration animation with emoji
+     */
+    private void celebrateAction() {
+        if (celebrationEmoji != null) {
+            // Celebration emoji animation
+            celebrationEmoji.animate()
+                .scaleX(1.3f)
+                .scaleY(1.3f)
+                .setDuration(150)
+                .withEndAction(() -> {
+                    celebrationEmoji.animate()
+                        .scaleX(1.0f)
+                        .scaleY(1.0f)
+                        .setDuration(150)
+                        .start();
+                })
+                .start();
 
-        String[] units = {
-                "", "Un", "Deux", "Trois", "Quatre", "Cinq", "Six", "Sept", "Huit", "Neuf", "Dix",
-                "Onze", "Douze", "Treize", "Quatorze", "Quinze", "Seize", "Dix-sept", "Dix-huit", "Dix-neuf"
-        };
-
-        String[] tens = {
-                "", "Dix", "Vingt", "Trente", "Quarante", "Cinquante", "Soixante", "Soixante-dix", "Quatre-vingts", "Quatre-vingt-dix"
-        };
-
-        if (num < 20) {
-            return units[num];
-        } else if (num == 100) {
-            return "Cent";
-        } else {
-            int unit = num % 10;
-            int ten = num / 10;
-            if (unit == 0) {
-                if (ten == 8) { // 80
-                    return "Quatre-vingts";
-                } else {
-                    return tens[ten];
-                }
-            } else {
-                if (ten == 7 || ten == 9) { // 70s, 90s
-                    return tens[ten-1] + "-" + units[10+unit];
-                } else if (ten == 8) { // 80s
-                    return tens[ten] + "-" + units[unit];
-                } else {
-                    return tens[ten] + (unit == 1 ? " et " : "-") + units[unit];
-                }
-            }
+            // Rotate emoji for extra fun
+            celebrationEmoji.animate()
+                .rotation(360)
+                .setDuration(500)
+                .start();
         }
     }
-
-    private String convertNumberToWordTwi(int num) {
-        if (num < 1 || num > 100) return "";
-        String[] units = {"", "baako", "mienu", "miɛnsa", "nan", "num", "nsia", "nson", "nwɔtwe", "nkron"};
-        String[] tens = {"", "du", "aduonu", "aduasa", "aduanan", "aduonum", "aduosia", "aduɔson", "aduɔwɔtwe", "aduɔkron"};
-
-        if (num < 10) return units[num];
-        if (num == 10) return "du";
-        if (num < 20) return "du" + units[num-10];
-        if (num % 10 == 0) {
-            if(num == 100) return "ɔha";
-            return tens[num/10];
-        }
-        return tens[num/10] + " " + units[num%10];
-    }
-
-    private String convertNumberToWordEwe(int num) {
-        if (num < 1 || num > 100) return "";
-        String[] units = {"", "ɖeka", "eve", "etɔ̃", "ene", "atɔ̃", "adẽ", "adrẽ", "enyi", "asieke"};
-
-        // Handle 1-9
-        if (num < 10) return units[num];
-
-        // Handle 10
-        if (num == 10) return "ewó";
-
-        // Handle 11-19
-        if (num < 20) return "ewóí" + units[num - 10];
-
-        // Handle 20-99
-        if (num % 10 == 0) {
-            if (num == 20) return "blaeve";
-            if (num == 30) return "blaetɔ̃";
-            if (num == 40) return "blaene";
-            if (num == 50) return "blaatɔ̃";
-            if (num == 60) return "blaadẽ";
-            if (num == 70) return "blaadrẽ";
-            if (num == 80) return "blaenyi";
-            if (num == 90) return "blaasieke";
-        }
-
-        // Handle 21-99 with remainder
-        if (num == 100) return "alakpa ɖeka";
-        return convertNumberToWordEwe(num - (num % 10)) + " kple " + units[num % 10];
-    }
-
-    private String convertNumberToWordGa(int num) {
-        if (num < 1 || num > 100) return "";
-        String[] units = {"", "ekome", "enyɔ", "etɛ", "ejwɛ", "enumɔ", "ekpaa", "kpawo", "kpaanyɔ", "nɛɛhu"};
-        if (num < 10) return units[num];
-        if (num == 10) return "nyɔŋma";
-        if (num < 20) return "nyɔŋma kɛ " + units[num-10];
-        if (num % 10 == 0) {
-            if (num == 20) return "iwuo";
-            if (num == 30) return "iwuo kɛ nyɔŋma";
-            if (num == 40) return "iwuo enyɔ";
-            if (num == 50) return "iwuo enyɔ kɛ nyɔŋma";
-            if (num == 60) return "iwuo etɛ";
-            if (num == 70) return "iwuo etɛ kɛ nyɔŋma";
-            if (num == 80) return "iwuo ejwɛ";
-            if (num == 90) return "iwuo ejwɛ kɛ nyɔŋma";
-            if (num == 100) return "ohaa";
-        }
-        return convertNumberToWordGa(num - (num % 10)) + " kɛ " + units[num % 10];
-    }
-
-
 
     @Override
     protected void onDestroy() {
