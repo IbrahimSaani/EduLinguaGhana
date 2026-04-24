@@ -12,7 +12,7 @@ public class LanguageConversionUtils {
     // Supported language codes
     public static final String LANG_ENGLISH = "en";
     public static final String LANG_FRENCH = "fr";
-    public static final String LANG_TWI = "ak";
+    public static final String LANG_TWI = "twi";
     public static final String LANG_EWE = "ee";
     public static final String LANG_GA = "gaa";
 
@@ -230,7 +230,7 @@ public class LanguageConversionUtils {
             case LANG_FRENCH:
                 return Locale.FRENCH;
             case LANG_TWI:
-                return new Locale("ak");
+                return new Locale("twi");
             case LANG_EWE:
                 return new Locale("ee");
             case LANG_GA:
@@ -282,11 +282,13 @@ public class LanguageConversionUtils {
     }
 
     /**
-     * Twi alphabet - includes both English letters and Twi-specific letters
-     * Twi uses: A, B, C, D, E, Ɛ, F, G, H, I, J, K, L, M, N, O, Ɔ, P, R, S, T, U, W, Y
+     * Twi alphabet - includes all Twi-specific letters with audio files
+     * Audio files available: A, B, D, E, Ɛ, F, G, H, I, K, L, M, N, O, Ɔ, P, R, S, T, U, W, Y
+     * Note: No audio for C and J in Twi
+     * Total: 22 letters
      */
     public static String[] getTwiAlphabet() {
-        return new String[]{"A", "B", "C", "D", "E", "Ɛ", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "Ɔ", "P", "R", "S", "T", "U", "W", "Y"};
+        return new String[]{"A", "B", "D", "E", "Ɛ", "F", "G", "H", "I", "K", "L", "M", "N", "O", "Ɔ", "P", "R", "S", "T", "U", "W", "Y"};
     }
 
     /**

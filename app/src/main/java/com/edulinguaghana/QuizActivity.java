@@ -290,12 +290,20 @@ public class QuizActivity extends AppCompatActivity {
         if (getSupportActionBar() != null) {
             getSupportActionBar().setTitle(modeLabel + " – " + languageName);
         }
-        tvStartTitle.setText(modeLabel);
-        tvStartDescription.setText(fullDescription);
-        ivWelcomeIcon.setImageResource(iconRes);
+        if (tvStartTitle != null) {
+            tvStartTitle.setText(modeLabel);
+        }
+        if (tvStartDescription != null) {
+            tvStartDescription.setText(fullDescription);
+        }
+        if (ivWelcomeIcon != null) {
+            ivWelcomeIcon.setImageResource(iconRes);
+        }
 
-        Animation startButtonAnim = AnimationUtils.loadAnimation(this, R.anim.bounce_pop);
-        btnStartQuiz.startAnimation(startButtonAnim);
+        if (btnStartQuiz != null) {
+            Animation startButtonAnim = AnimationUtils.loadAnimation(this, R.anim.bounce_pop);
+            btnStartQuiz.startAnimation(startButtonAnim);
+        }
     }
 
     /**
@@ -307,14 +315,24 @@ public class QuizActivity extends AppCompatActivity {
     }
 
     private void showQuizContent() {
-        Animation fadeIn = AnimationUtils.loadAnimation(this, R.anim.fade_in);
-        startQuizContainer.setVisibility(View.GONE);
-        quizContentContainer.setVisibility(View.VISIBLE);
-        appBarLayout.setVisibility(View.VISIBLE);
-        quizContentContainer.startAnimation(fadeIn);
-        appBarLayout.startAnimation(fadeIn);
-        startBackgroundMusic();
-        startGame();
+        try {
+            Animation fadeIn = AnimationUtils.loadAnimation(this, R.anim.fade_in);
+            if (startQuizContainer != null) {
+                startQuizContainer.setVisibility(View.GONE);
+            }
+            if (quizContentContainer != null) {
+                quizContentContainer.setVisibility(View.VISIBLE);
+                quizContentContainer.startAnimation(fadeIn);
+            }
+            if (appBarLayout != null) {
+                appBarLayout.setVisibility(View.VISIBLE);
+                appBarLayout.startAnimation(fadeIn);
+            }
+            startBackgroundMusic();
+            startGame();
+        } catch (Exception e) {
+            Log.e("QuizActivity", "Error showing quiz content", e);
+        }
     }
 
     @Override
@@ -377,7 +395,10 @@ public class QuizActivity extends AppCompatActivity {
             }
 
             // Phase 3: Check cache first
-            android.net.Uri cachedAudio = audioCacheManager.getCachedTtsAudio(currentPromptTtsText, languageCode);
+            android.net.Uri cachedAudio = null;
+            if (audioCacheManager != null) {
+                cachedAudio = audioCacheManager.getCachedTtsAudio(currentPromptTtsText, languageCode);
+            }
             if (cachedAudio != null) {
                 Log.d("QuizActivity", "Playing cached audio: " + currentPromptTtsText);
                 playAudioFile(cachedAudio);
@@ -385,13 +406,15 @@ public class QuizActivity extends AppCompatActivity {
             }
 
             Log.d("QuizActivity", "Speaking text (not cached): '" + currentPromptTtsText + "' in language: " + languageCode);
-            tts.stop();
-            tts.setSpeechRate(0.9f); // Slightly slower for clarity
+            if (tts != null) {
+                tts.stop();
+                tts.setSpeechRate(0.9f); // Slightly slower for clarity
 
-            int result = tts.speak(currentPromptTtsText, TextToSpeech.QUEUE_FLUSH, null, "quiz_tts");
+                int result = tts.speak(currentPromptTtsText, TextToSpeech.QUEUE_FLUSH, null, "quiz_tts");
 
-            if (result != TextToSpeech.SUCCESS) {
-                Log.e("QuizActivity", "TTS.speak() failed with result: " + result + " for text: " + currentPromptTtsText);
+                if (result != TextToSpeech.SUCCESS) {
+                    Log.e("QuizActivity", "TTS.speak() failed with result: " + result + " for text: " + currentPromptTtsText);
+                }
             }
         }
     }
@@ -455,8 +478,12 @@ public class QuizActivity extends AppCompatActivity {
     private void startGame() {
         score = 0;
         remainingTime = 30000L;
-        tvGameScore.setText(String.format(Locale.getDefault(), getString(R.string.quiz_score), score));
-        tvGameFeedback.setText("");
+        if (tvGameScore != null) {
+            tvGameScore.setText(String.format(Locale.getDefault(), getString(R.string.quiz_score), score));
+        }
+        if (tvGameFeedback != null) {
+            tvGameFeedback.setText("");
+        }
         generateNewQuestion();
         startTimer();
     }
@@ -484,6 +511,12 @@ public class QuizActivity extends AppCompatActivity {
     }
 
     private void generateLetterQuestion() {
+        if (alphabet == null || alphabet.length == 0) {
+            Log.e("QuizActivity", "Alphabet is null or empty for language: " + languageCode);
+            // Fallback to English alphabet
+            alphabet = new String[]{"A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z"};
+        }
+
         currentCorrectAnswer = alphabet[random.nextInt(alphabet.length)];
         android.util.Log.d("QuizActivity", "Letter quiz for " + languageCode + ": " + currentCorrectAnswer);
 
@@ -502,22 +535,24 @@ public class QuizActivity extends AppCompatActivity {
             }
         }
         Collections.shuffle(options);
-        btnOption1.setText(options.get(0));
-        btnOption2.setText(options.get(1));
-        btnOption3.setText(options.get(2));
-        btnOption4.setText(options.get(3));
-        btnOption5.setText(options.get(4));
-        btnOption6.setText(options.get(5));
+        if (btnOption1 != null) btnOption1.setText(options.get(0));
+        if (btnOption2 != null) btnOption2.setText(options.get(1));
+        if (btnOption3 != null) btnOption3.setText(options.get(2));
+        if (btnOption4 != null) btnOption4.setText(options.get(3));
+        if (btnOption5 != null) btnOption5.setText(options.get(4));
+        if (btnOption6 != null) btnOption6.setText(options.get(5));
 
         // Add accessibility descriptions for each button with the letter
-        btnOption1.setContentDescription("Letter " + options.get(0) + ", Option 1");
-        btnOption2.setContentDescription("Letter " + options.get(1) + ", Option 2");
-        btnOption3.setContentDescription("Letter " + options.get(2) + ", Option 3");
-        btnOption4.setContentDescription("Letter " + options.get(3) + ", Option 4");
-        btnOption5.setContentDescription("Letter " + options.get(4) + ", Option 5");
-        btnOption6.setContentDescription("Letter " + options.get(5) + ", Option 6");
+        if (btnOption1 != null) btnOption1.setContentDescription("Letter " + options.get(0) + ", Option 1");
+        if (btnOption2 != null) btnOption2.setContentDescription("Letter " + options.get(1) + ", Option 2");
+        if (btnOption3 != null) btnOption3.setContentDescription("Letter " + options.get(2) + ", Option 3");
+        if (btnOption4 != null) btnOption4.setContentDescription("Letter " + options.get(3) + ", Option 4");
+        if (btnOption5 != null) btnOption5.setContentDescription("Letter " + options.get(4) + ", Option 5");
+        if (btnOption6 != null) btnOption6.setContentDescription("Letter " + options.get(5) + ", Option 6");
 
-        tvGamePrompt.setText(R.string.quiz_prompt_letter);
+        if (tvGamePrompt != null) {
+            tvGamePrompt.setText(R.string.quiz_prompt_letter);
+        }
     }
 
     private void generateNumberQuestion() {
@@ -535,27 +570,29 @@ public class QuizActivity extends AppCompatActivity {
             }
         }
         Collections.shuffle(options);
-        btnOption1.setText(options.get(0));
-        btnOption2.setText(options.get(1));
-        btnOption3.setText(options.get(2));
-        btnOption4.setText(options.get(3));
-        btnOption5.setText(options.get(4));
-        btnOption6.setText(options.get(5));
+        if (btnOption1 != null) btnOption1.setText(options.get(0));
+        if (btnOption2 != null) btnOption2.setText(options.get(1));
+        if (btnOption3 != null) btnOption3.setText(options.get(2));
+        if (btnOption4 != null) btnOption4.setText(options.get(3));
+        if (btnOption5 != null) btnOption5.setText(options.get(4));
+        if (btnOption6 != null) btnOption6.setText(options.get(5));
 
         // Add accessibility descriptions for each button with the number
-        btnOption1.setContentDescription("Number " + options.get(0) + ", Option 1");
-        btnOption2.setContentDescription("Number " + options.get(1) + ", Option 2");
-        btnOption3.setContentDescription("Number " + options.get(2) + ", Option 3");
-        btnOption4.setContentDescription("Number " + options.get(3) + ", Option 4");
-        btnOption5.setContentDescription("Number " + options.get(4) + ", Option 5");
-        btnOption6.setContentDescription("Number " + options.get(5) + ", Option 6");
+        if (btnOption1 != null) btnOption1.setContentDescription("Number " + options.get(0) + ", Option 1");
+        if (btnOption2 != null) btnOption2.setContentDescription("Number " + options.get(1) + ", Option 2");
+        if (btnOption3 != null) btnOption3.setContentDescription("Number " + options.get(2) + ", Option 3");
+        if (btnOption4 != null) btnOption4.setContentDescription("Number " + options.get(3) + ", Option 4");
+        if (btnOption5 != null) btnOption5.setContentDescription("Number " + options.get(4) + ", Option 5");
+        if (btnOption6 != null) btnOption6.setContentDescription("Number " + options.get(5) + ", Option 6");
 
         // Show the number word spelling if available
         String numberWord = LanguageConversionUtils.convertNumberToWord(correctNumber, languageCode);
-        if (!numberWord.isEmpty()) {
-            tvGamePrompt.setText(getString(R.string.quiz_prompt_number) + "\n(" + numberWord + ")");
-        } else {
-            tvGamePrompt.setText(R.string.quiz_prompt_number);
+        if (tvGamePrompt != null) {
+            if (!numberWord.isEmpty()) {
+                tvGamePrompt.setText(getString(R.string.quiz_prompt_number) + "\n(" + numberWord + ")");
+            } else {
+                tvGamePrompt.setText(R.string.quiz_prompt_number);
+            }
         }
 
         // Use word form for TTS for non-Ghanaian languages (like French)
@@ -580,7 +617,9 @@ public class QuizActivity extends AppCompatActivity {
         currentCorrectAnswer = String.valueOf(missingValue);
 
         // Display sequence prompt without localization
-        tvGamePrompt.setText("Find the missing number: " + seq[0] + ", " + seq[1] + ", ?, " + seq[3]);
+        if (tvGamePrompt != null) {
+            tvGamePrompt.setText("Find the missing number: " + seq[0] + ", " + seq[1] + ", ?, " + seq[3]);
+        }
 
         List<String> options = new ArrayList<>();
         Set<Integer> used = new HashSet<>();
@@ -596,12 +635,12 @@ public class QuizActivity extends AppCompatActivity {
             }
         }
         Collections.shuffle(options);
-        btnOption1.setText(options.get(0));
-        btnOption2.setText(options.get(1));
-        btnOption3.setText(options.get(2));
-        btnOption4.setText(options.get(3));
-        btnOption5.setText(options.get(4));
-        btnOption6.setText(options.get(5));
+        if (btnOption1 != null) btnOption1.setText(options.get(0));
+        if (btnOption2 != null) btnOption2.setText(options.get(1));
+        if (btnOption3 != null) btnOption3.setText(options.get(2));
+        if (btnOption4 != null) btnOption4.setText(options.get(3));
+        if (btnOption5 != null) btnOption5.setText(options.get(4));
+        if (btnOption6 != null) btnOption6.setText(options.get(5));
         currentPromptTtsText = "Find the missing number";
     }
 
@@ -611,7 +650,9 @@ public class QuizActivity extends AppCompatActivity {
         String letter = matchLetters[idx];
         String correctWord = matchWords[idx];
         currentCorrectAnswer = correctWord;
-        tvGamePrompt.setText(getString(R.string.quiz_prompt_matching, letter));
+        if (tvGamePrompt != null) {
+            tvGamePrompt.setText(getString(R.string.quiz_prompt_matching, letter));
+        }
 
         List<String> options = new ArrayList<>();
         Set<Integer> used = new HashSet<>();
@@ -631,12 +672,12 @@ public class QuizActivity extends AppCompatActivity {
         }
 
         Collections.shuffle(options);
-        btnOption1.setText(options.get(0));
-        btnOption2.setText(options.get(1));
-        btnOption3.setText(options.get(2));
-        btnOption4.setText(options.get(3));
-        btnOption5.setText(options.get(4));
-        btnOption6.setText(options.get(5));
+        if (btnOption1 != null) btnOption1.setText(options.get(0));
+        if (btnOption2 != null) btnOption2.setText(options.get(1));
+        if (btnOption3 != null) btnOption3.setText(options.get(2));
+        if (btnOption4 != null) btnOption4.setText(options.get(3));
+        if (btnOption5 != null) btnOption5.setText(options.get(4));
+        if (btnOption6 != null) btnOption6.setText(options.get(5));
         currentPromptTtsText = letter;
     }
 
@@ -700,13 +741,17 @@ public class QuizActivity extends AppCompatActivity {
             public void onTick(long millisUntilFinished) {
                 remainingTime = millisUntilFinished;
                 long s = millisUntilFinished / 1000;
-                tvGameTimer.setText(String.format(Locale.getDefault(), getString(R.string.quiz_timer), s));
+                if (tvGameTimer != null) {
+                    tvGameTimer.setText(String.format(Locale.getDefault(), getString(R.string.quiz_timer), s));
+                }
             }
 
             @Override
             public void onFinish() {
                 remainingTime = 0;
-                tvGameTimer.setText(R.string.quiz_timer_done);
+                if (tvGameTimer != null) {
+                    tvGameTimer.setText(R.string.quiz_timer_done);
+                }
                 endQuiz();
             }
         }.start();
@@ -839,26 +884,48 @@ public class QuizActivity extends AppCompatActivity {
         } catch (Exception ignored) {}
 
         // Show end screen
-        Animation fadeIn = AnimationUtils.loadAnimation(this, R.anim.fade_in);
-        quizContentContainer.setVisibility(View.GONE);
-        appBarLayout.setVisibility(View.GONE);
-        endQuizContainer.setVisibility(View.VISIBLE);
-        endQuizContainer.startAnimation(fadeIn);
+        try {
+            Animation fadeIn = AnimationUtils.loadAnimation(this, R.anim.fade_in);
+            if (quizContentContainer != null) {
+                quizContentContainer.setVisibility(View.GONE);
+            }
+            if (appBarLayout != null) {
+                appBarLayout.setVisibility(View.GONE);
+            }
+            if (endQuizContainer != null) {
+                endQuizContainer.setVisibility(View.VISIBLE);
+                endQuizContainer.startAnimation(fadeIn);
+            }
 
-        tvFinalScore.setText(String.format(Locale.getDefault(), getString(R.string.quiz_final_score), score));
-        // Cap best score display at 10 (quiz can have scores > 10 in time-limited mode)
-        int displayBestScore = Math.min(bestScore, 10);
-        tvEndBestScore.setText(String.format(Locale.getDefault(), getString(R.string.quiz_best_score), displayBestScore));
+            if (tvFinalScore != null) {
+                tvFinalScore.setText(String.format(Locale.getDefault(), getString(R.string.quiz_final_score), score));
+            }
+            // Cap best score display at 10 (quiz can have scores > 10 in time-limited mode)
+            int displayBestScore = Math.min(bestScore, 10);
+            if (tvEndBestScore != null) {
+                tvEndBestScore.setText(String.format(Locale.getDefault(), getString(R.string.quiz_best_score), displayBestScore));
+            }
 
-        if (newHighScore) {
-            tvNewHighScore.setVisibility(View.VISIBLE);
-            Animation bouncePop = AnimationUtils.loadAnimation(this, R.anim.bounce_pop);
-            tvNewHighScore.startAnimation(bouncePop);
-            lottieAnimationView.playAnimation();
-        } else {
-            tvNewHighScore.setVisibility(View.GONE);
-            lottieAnimationView.cancelAnimation();
-            lottieAnimationView.setProgress(0f);
+            if (newHighScore) {
+                if (tvNewHighScore != null) {
+                    tvNewHighScore.setVisibility(View.VISIBLE);
+                    Animation bouncePop = AnimationUtils.loadAnimation(this, R.anim.bounce_pop);
+                    tvNewHighScore.startAnimation(bouncePop);
+                }
+                if (lottieAnimationView != null) {
+                    lottieAnimationView.playAnimation();
+                }
+            } else {
+                if (tvNewHighScore != null) {
+                    tvNewHighScore.setVisibility(View.GONE);
+                }
+                if (lottieAnimationView != null) {
+                    lottieAnimationView.cancelAnimation();
+                    lottieAnimationView.setProgress(0f);
+                }
+            }
+        } catch (Exception e) {
+            Log.e("QuizActivity", "Error showing end screen", e);
         }
     }
 
@@ -870,22 +937,26 @@ public class QuizActivity extends AppCompatActivity {
     }
 
     private void resetButtons() {
-        tvGameFeedback.setText("");
+        if (tvGameFeedback != null) {
+            tvGameFeedback.setText("");
+        }
         setButtonsEnabled(true);
         MaterialButton[] buttons = {btnOption1, btnOption2, btnOption3, btnOption4, btnOption5, btnOption6};
         for (MaterialButton button : buttons) {
-            button.setStrokeColor(ColorStateList.valueOf(ContextCompat.getColor(this, R.color.buttonSecondary)));
-            button.clearAnimation();
+            if (button != null) {
+                button.setStrokeColor(ColorStateList.valueOf(ContextCompat.getColor(this, R.color.buttonSecondary)));
+                button.clearAnimation();
+            }
         }
     }
 
     private void setButtonsEnabled(boolean enabled) {
-        btnOption1.setEnabled(enabled);
-        btnOption2.setEnabled(enabled);
-        btnOption3.setEnabled(enabled);
-        btnOption4.setEnabled(enabled);
-        btnOption5.setEnabled(enabled);
-        btnOption6.setEnabled(enabled);
+        if (btnOption1 != null) btnOption1.setEnabled(enabled);
+        if (btnOption2 != null) btnOption2.setEnabled(enabled);
+        if (btnOption3 != null) btnOption3.setEnabled(enabled);
+        if (btnOption4 != null) btnOption4.setEnabled(enabled);
+        if (btnOption5 != null) btnOption5.setEnabled(enabled);
+        if (btnOption6 != null) btnOption6.setEnabled(enabled);
     }
 
     private String getHighScoreKey() {
@@ -895,7 +966,9 @@ public class QuizActivity extends AppCompatActivity {
     private void saveHighScore() {
         SharedPreferences prefs = getSharedPreferences(PREF_NAME, MODE_PRIVATE);
         prefs.edit().putInt(getHighScoreKey(), bestScore).apply();
-        tvGameBest.setText(String.format(Locale.getDefault(), getString(R.string.quiz_best_score), bestScore));
+        if (tvGameBest != null) {
+            tvGameBest.setText(String.format(Locale.getDefault(), getString(R.string.quiz_best_score), bestScore));
+        }
     }
 
     private void animateHighScore() {

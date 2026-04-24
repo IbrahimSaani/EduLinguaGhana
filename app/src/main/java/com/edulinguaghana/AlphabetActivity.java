@@ -64,6 +64,9 @@ public class AlphabetActivity extends AppCompatActivity {
     private final String[] wordsEe = {"Ati", "Baka", "Dadi", "Ɖevi", "Eku", "Ɛfu", "Fia", "Ƒo", "Gbe", "Ɣe", "Ha", "Xɔ", "Iŋk", "Kafu", "Lá", "Me", "Nɔ", "Ŋkɔ", "Oyi", "Ɔli", "Papa", "Rɛdio", "Sɔ", "Tɔ", "Unilɔ", "Vɔ", "Ʋu", "Wó", "Yevú", "Zã"};
     private final String[] lettersGaa = {"A", "B", "D", "E", "Ɛ", "F", "G", "H", "I", "K", "L", "M", "N", "Ŋ", "O", "Ɔ", "P", "S", "T", "U", "V", "W", "Y", "Z"};
     private final String[] wordsGaa = {"Akekā", "Blɔfo", "Dade", "Enɔ", "Ɛlɛ", "Fio", "Gbekɛ", "Hejɔ", "Iŋk", "Klala", "Lala", "Maŋ", "Nuu", "Ŋmã", "Okpɔtɔ", "Ɔɔso", "Papa", "Sohaa", "Tee", "Wala", "Vinɔ", "Wɔ", "Yoomo", "Zigidi"};
+    private final String[] lettersTwi = {"A", "B", "D", "E", "Ɛ", "F", "G", "H", "I", "K", "L", "M", "N", "O", "P", "R", "S", "T", "U", "W", "Y", "Ɔ"};
+    private final String[] wordsTwi = {"Ade", "Borɔ", "Dade", "Etuo", "Ɛmo", "Fufuu", "Gari", "Hena", "Isuaa", "Kɔkɔɔ", "Lopa", "Moa", "Nom", "Okra", "Papa", "Rikisi", "Sɛn", "Toa", "Upire", "Wɔ", "Yam", "Ɔkyire"};
+
 
     private TextToSpeech tts;
     private MediaPlayer mediaPlayer;
@@ -136,6 +139,10 @@ public class AlphabetActivity extends AppCompatActivity {
             case "gaa":
                 letters = lettersGaa;
                 words = wordsGaa;
+                break;
+            case "twi":
+                letters = lettersTwi;
+                words = wordsTwi;
                 break;
             case "fr":
                 letters = lettersEnFr;
@@ -779,7 +786,8 @@ public class AlphabetActivity extends AppCompatActivity {
         String letter = letters[currentIndex];
 
         switch (languageCode) {
-            case "ak": // Twi
+            case "ak": // Twi (backward compatibility)
+            case "twi":
                 tips = getTwiPronunciationTip(letter);
                 break;
             case "ee": // Ewe
@@ -860,7 +868,8 @@ public class AlphabetActivity extends AppCompatActivity {
         if (code == null) return Locale.ENGLISH;
         switch (code) {
             case "fr": return Locale.FRENCH;
-            case "ak": return new Locale("ak");
+            case "ak":
+            case "twi": return new Locale("twi");
             case "ee": return new Locale("ee");
             case "gaa": return new Locale("gaa");
             default: return Locale.ENGLISH;

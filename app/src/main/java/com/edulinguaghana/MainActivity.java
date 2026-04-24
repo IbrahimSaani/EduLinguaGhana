@@ -89,7 +89,7 @@ public class MainActivity extends AppCompatActivity {
     private String selectedLangName = null;
 
     private String[] langNames = {"English", "French", "Twi", "Ewe", "Ga"};
-    private String[] langCodes = {"en", "fr", "ak", "ee", "gaa"};
+    private String[] langCodes = {"en", "fr", "twi", "ee", "gaa"};
     private int[] langFlags = {R.drawable.ic_flag_uk, R.drawable.ic_flag_france, R.drawable.ic_flag_ghana, R.drawable.ic_flag_ghana, R.drawable.ic_flag_ghana};
 
     @Override

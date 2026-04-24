@@ -400,7 +400,8 @@ public class NumbersActivity extends AppCompatActivity {
         String tips = "";
 
         switch (languageCode) {
-            case "ak": // Twi
+            case "ak": // Twi (backward compatibility)
+            case "twi":
                 tips = "🎤 Speak clearly and naturally in Twi";
                 break;
             case "ee": // Ewe
