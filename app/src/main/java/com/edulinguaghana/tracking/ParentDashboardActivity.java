@@ -19,7 +19,6 @@ import com.edulinguaghana.R;
 import com.edulinguaghana.roles.RoleManager;
 import com.edulinguaghana.roles.UserRelationship;
 import com.google.android.material.button.MaterialButton;
-import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
@@ -36,7 +35,6 @@ public class ParentDashboardActivity extends AppCompatActivity {
     private StudentProgressAdapter adapter;
     private ProgressBar loadingProgress;
     private TextView emptyTextView;
-    private ExtendedFloatingActionButton fabAddChild;
     private SwipeRefreshLayout swipeRefresh;
     private LinearLayout emptyStateLayout;
     private MaterialButton btnSort;
@@ -86,7 +84,6 @@ public class ParentDashboardActivity extends AppCompatActivity {
         loadingProgress = findViewById(R.id.loadingProgress);
         emptyTextView = findViewById(R.id.emptyTextView);
         emptyStateLayout = findViewById(R.id.emptyStateLayout);
-        fabAddChild = findViewById(R.id.fabAddChild);
         swipeRefresh = findViewById(R.id.swipeRefresh);
         btnSort = findViewById(R.id.btnSort);
         btnAddFirstChild = findViewById(R.id.btnAddFirstChild);
@@ -96,7 +93,6 @@ public class ParentDashboardActivity extends AppCompatActivity {
         tvAvgLevel = findViewById(R.id.tvAvgLevel);
         tvActiveToday = findViewById(R.id.tvActiveToday);
 
-        fabAddChild.setOnClickListener(v -> openRelationshipManagement());
 
         if (btnAddFirstChild != null) {
             btnAddFirstChild.setOnClickListener(v -> openRelationshipManagement());

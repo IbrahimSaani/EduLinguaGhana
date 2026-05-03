@@ -47,6 +47,11 @@ public class SplashActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        // Ensure the app respects system windows (status bar, navigation bar)
+        // Remove any fullscreen flags that might be set
+        getWindow().clearFlags(android.view.WindowManager.LayoutParams.FLAG_FULLSCREEN);
+
         setContentView(R.layout.activity_splash);
 
         // Bind views

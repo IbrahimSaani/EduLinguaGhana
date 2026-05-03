@@ -19,7 +19,6 @@ import com.edulinguaghana.R;
 import com.edulinguaghana.roles.RoleManager;
 import com.edulinguaghana.roles.UserRelationship;
 import com.google.android.material.button.MaterialButton;
-import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
@@ -37,7 +36,6 @@ public class TeacherDashboardActivity extends AppCompatActivity {
     private StudentProgressAdapter adapter;
     private ProgressBar loadingProgress;
     private TextView emptyTextView;
-    private ExtendedFloatingActionButton fabAddStudent;
     private SwipeRefreshLayout swipeRefresh;
     private LinearLayout emptyStateLayout;
     private MaterialButton btnSort;
@@ -87,7 +85,6 @@ public class TeacherDashboardActivity extends AppCompatActivity {
         loadingProgress = findViewById(R.id.loadingProgress);
         emptyTextView = findViewById(R.id.emptyTextView);
         emptyStateLayout = findViewById(R.id.emptyStateLayout);
-        fabAddStudent = findViewById(R.id.fabAddStudent);
         swipeRefresh = findViewById(R.id.swipeRefresh);
         btnSort = findViewById(R.id.btnSort);
         btnAddFirstStudent = findViewById(R.id.btnAddFirstStudent);
@@ -97,7 +94,6 @@ public class TeacherDashboardActivity extends AppCompatActivity {
         tvAvgLevel = findViewById(R.id.tvAvgLevel);
         tvActiveToday = findViewById(R.id.tvActiveToday);
 
-        fabAddStudent.setOnClickListener(v -> openRelationshipManagement());
 
         if (btnAddFirstStudent != null) {
             btnAddFirstStudent.setOnClickListener(v -> openRelationshipManagement());

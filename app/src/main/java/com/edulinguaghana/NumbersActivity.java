@@ -24,8 +24,13 @@ import com.google.android.material.button.MaterialButton;
 import com.google.android.material.card.MaterialCardView;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.progressindicator.LinearProgressIndicator;
+import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.edulinguaghana.tts.OfflineGhanaLPTtsService;
 import com.edulinguaghana.utils.LanguageConversionUtils;
+
+import android.widget.GridView;
+import android.widget.SeekBar;
+import android.widget.ArrayAdapter;
 
 import java.util.ArrayList;
 import java.util.Locale;
@@ -40,6 +45,11 @@ public class NumbersActivity extends AppCompatActivity {
     private Button btnSpeakNumber;
     private LinearProgressIndicator progressBar;
     private MaterialCardView numberCard;
+    private MaterialCardView modeBadgeCard;
+    private TextView modeBadgeIcon, modeBadgeText, modeBadgeDescription;
+    private SeekBar seekBarNavigation;  // For smooth navigation
+    private MaterialButton btnShowPicker;  // For quick number picker
+    private MaterialButton btnSpeakQuick;  // For quick speak button
 
     private Vibrator vibrator;  // For haptic feedback
 
@@ -75,6 +85,15 @@ public class NumbersActivity extends AppCompatActivity {
         btnSpeakNumber = findViewById(R.id.btnSpeakNumber);
         progressBar = findViewById(R.id.progressBar);
         numberCard = findViewById(R.id.numberCard);
+        modeBadgeCard = findViewById(R.id.modeBadgeCard);
+        modeBadgeIcon = findViewById(R.id.modeBadgeIcon);
+        modeBadgeText = findViewById(R.id.modeBadgeText);
+        modeBadgeDescription = findViewById(R.id.modeBadgeDescription);
+
+        // Initialize navigation controls
+        seekBarNavigation = findViewById(R.id.seekBarNavigation);
+        btnShowPicker = findViewById(R.id.btnShowPicker);
+        btnSpeakQuick = findViewById(R.id.btnSpeakQuick);
 
         // Initialize vibrator for haptic feedback
         vibrator = (Vibrator) getSystemService(VIBRATOR_SERVICE);
@@ -90,6 +109,7 @@ public class NumbersActivity extends AppCompatActivity {
 
         tvLanguageTitleNum.setText("Language: " + languageName);
         btnSpeakNumber.setText(isRecitalMode ? "Repeat" : "Practice");
+        updateModeBadge();
 
         progressBar.setMax(100);
 
@@ -181,6 +201,46 @@ public class NumbersActivity extends AppCompatActivity {
                 celebrateAction();  // Show celebration
             } catch (Exception e) {
                 android.util.Log.e("NumbersActivity", "Error in number card click", e);
+            }
+        });
+
+        // SeekBar navigation for smooth traversal
+        seekBarNavigation.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                if (fromUser) {
+                    currentNumber = progress + 1;  // Progress is 0-99, numbers are 1-100
+                    updateNumber();
+                    if (isRecitalMode) speakCurrentNumber();
+                }
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {}
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {}
+        });
+
+        // Quick access number picker button
+        btnShowPicker.setOnClickListener(v -> {
+            try {
+                triggerHapticFeedback(30);
+                showNumberPickerDialog();
+            } catch (Exception e) {
+                android.util.Log.e("NumbersActivity", "Error showing number picker", e);
+            }
+        });
+
+        // Quick speak button
+        btnSpeakQuick.setOnClickListener(v -> {
+            try {
+                triggerHapticFeedback(40);
+                animateButtonPress(btnSpeakQuick);
+                speakCurrentNumber();
+                celebrateAction();
+            } catch (Exception e) {
+                android.util.Log.e("NumbersActivity", "Error in quick speak button", e);
             }
         });
     }
@@ -547,6 +607,99 @@ public class NumbersActivity extends AppCompatActivity {
                 .rotation(360)
                 .setDuration(500)
                 .start();
+        }
+    }
+
+    /**
+     * Show number picker in a bottom sheet dialog
+     */
+    private void showNumberPickerDialog() {
+        BottomSheetDialog dialog = new BottomSheetDialog(this);
+        
+        // Create a custom grid view for numbers
+        GridView gridView = new GridView(this);
+        gridView.setNumColumns(10);
+        gridView.setPadding(16, 16, 16, 16);
+        gridView.setVerticalSpacing(8);
+        gridView.setHorizontalSpacing(8);
+        
+        // Create adapter for numbers 1-100
+        java.util.ArrayList<String> numberList = new java.util.ArrayList<>();
+        for (int i = 1; i <= 100; i++) {
+            numberList.add(String.valueOf(i));
+        }
+        
+        ArrayAdapter<String> adapter = new ArrayAdapter<String>(
+            this,
+            android.R.layout.simple_list_item_1,
+            numberList
+        ) {
+            @Override
+            public android.view.View getView(int position, android.view.View convertView, android.view.ViewGroup parent) {
+                android.widget.TextView textView = new android.widget.TextView(NumbersActivity.this);
+                textView.setText(getItem(position));
+                textView.setTextSize(16);
+                textView.setTextColor(currentNumber == (position + 1) ? 
+                    getColor(R.color.colorAccent) : getColor(R.color.textColorPrimary));
+                textView.setTypeface(null, android.graphics.Typeface.BOLD);
+                textView.setGravity(android.view.Gravity.CENTER);
+                textView.setPadding(8, 16, 8, 16);
+                
+                if (currentNumber == (position + 1)) {
+                    textView.setBackgroundResource(R.drawable.ripple_card_effect);
+                }
+                
+                return textView;
+            }
+        };
+        
+        gridView.setAdapter(adapter);
+        gridView.setOnItemClickListener((parent, view, position, id) -> {
+            currentNumber = position + 1;
+            seekBarNavigation.setProgress(position);
+            updateNumber();
+            if (isRecitalMode) speakCurrentNumber();
+            dialog.dismiss();
+        });
+        
+        dialog.setContentView(gridView);
+        dialog.show();
+    }
+
+    private void animateButtonPress(android.view.View button) {
+        try {
+            if (button != null) {
+                Animation bounce = AnimationUtils.loadAnimation(this, R.anim.bounce_pop);
+                button.startAnimation(bounce);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void updateModeBadge() {
+        try {
+            if (modeBadgeText != null) {
+                if (isRecitalMode) {
+                    modeBadgeIcon.setText("⭐");
+                    modeBadgeText.setText("RECITAL");
+                    modeBadgeDescription.setText("Listen & Learn");
+                    modeBadgeCard.setCardBackgroundColor(getColor(R.color.colorAccent));
+                    modeBadgeText.setTextColor(getColor(android.R.color.white));
+                    modeBadgeDescription.setTextColor(getColor(android.R.color.white));
+                    modeBadgeDescription.setAlpha(0.8f);
+                } else {
+                    modeBadgeIcon.setText("🎤");
+                    modeBadgeText.setText("PRACTICE");
+                    modeBadgeDescription.setText("Speak & Learn");
+                    modeBadgeCard.setCardBackgroundColor(getColor(R.color.colorPrimary));
+                    modeBadgeText.setTextColor(getColor(android.R.color.white));
+                    modeBadgeDescription.setTextColor(getColor(android.R.color.white));
+                    modeBadgeDescription.setAlpha(0.8f);
+                }
+            }
+        } catch (Exception e) {
+            android.util.Log.e("NumbersActivity", "Error updating mode badge", e);
         }
     }
 

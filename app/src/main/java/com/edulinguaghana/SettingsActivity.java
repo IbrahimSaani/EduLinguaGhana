@@ -14,6 +14,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
+import android.widget.SeekBar;
 import android.widget.TextView;
 import com.google.android.material.switchmaterial.SwitchMaterial;
 import android.widget.Toast;
@@ -28,6 +29,8 @@ public class SettingsActivity extends AppCompatActivity {
     private SwitchMaterial switchMusic, switchSfx;
     private SwitchMaterial switchAnimations;
     private SwitchMaterial switchLowPowerAnimations;
+    private SeekBar seekBarQuizMusicVolume;
+    private TextView tvQuizMusicVolumeValue;
     private Button btnResetProgress;
     private Button btnSyncToCloud;
     private Button btnSyncFromCloud;
@@ -40,6 +43,7 @@ public class SettingsActivity extends AppCompatActivity {
     private static final String KEY_SFX_ENABLED = "SFX_ENABLED";
     private static final String KEY_ANIMATIONS_ENABLED = "ANIMATIONS_ENABLED";
     private static final String KEY_LOW_POWER_ANIMATIONS = "LOW_POWER_ANIMATIONS";
+    private static final String KEY_QUIZ_MUSIC_VOLUME = "QUIZ_MUSIC_VOLUME";
 
     private static final String KEY_HIGH_SCORE = "HIGH_SCORE";
     private static final String KEY_TOTAL_QUIZZES = "TOTAL_QUIZZES";
@@ -67,6 +71,8 @@ public class SettingsActivity extends AppCompatActivity {
         // Direct lookups (layout contains these ids)
         switchAnimations = findViewById(R.id.switchAnimations);
         switchLowPowerAnimations = findViewById(R.id.switchLowPowerAnimations);
+        seekBarQuizMusicVolume = findViewById(R.id.seekBarQuizMusicVolume);
+        tvQuizMusicVolumeValue = findViewById(R.id.tvQuizMusicVolumeValue);
         btnResetProgress = findViewById(R.id.btnResetProgress);
         btnSyncToCloud = findViewById(R.id.btnSyncToCloud);
         btnSyncFromCloud = findViewById(R.id.btnSyncFromCloud);
@@ -89,12 +95,19 @@ public class SettingsActivity extends AppCompatActivity {
         boolean sfxEnabled = prefs.getBoolean(KEY_SFX_ENABLED, true);
         boolean animationsEnabled = prefs.getBoolean(KEY_ANIMATIONS_ENABLED, true);
         boolean lowPowerEnabled = prefs.getBoolean(KEY_LOW_POWER_ANIMATIONS, false);
+        int quizMusicVolume = prefs.getInt(KEY_QUIZ_MUSIC_VOLUME, 50);
 
         // Set UI states
         switchMusic.setChecked(musicEnabled);
         switchSfx.setChecked(sfxEnabled);
         switchAnimations.setChecked(animationsEnabled);
         switchLowPowerAnimations.setChecked(lowPowerEnabled);
+
+        // Set quiz music volume
+        if (seekBarQuizMusicVolume != null) {
+            seekBarQuizMusicVolume.setProgress(quizMusicVolume);
+            updateQuizMusicVolumeDisplay(quizMusicVolume);
+        }
 
         // Save preferences when toggles change
         switchMusic.setOnCheckedChangeListener((buttonView, isChecked) -> {
@@ -113,6 +126,31 @@ public class SettingsActivity extends AppCompatActivity {
             prefs.edit().putBoolean(KEY_LOW_POWER_ANIMATIONS, isChecked).apply();
         });
 
+        // Quiz Music Volume SeekBar listener
+        if (seekBarQuizMusicVolume != null) {
+            seekBarQuizMusicVolume.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+                @Override
+                public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                    if (fromUser) {
+                        updateQuizMusicVolumeDisplay(progress);
+                        prefs.edit().putInt(KEY_QUIZ_MUSIC_VOLUME, progress).apply();
+                    }
+                }
+
+                @Override
+                public void onStartTrackingTouch(SeekBar seekBar) {
+                    // Not used
+                }
+
+                @Override
+                public void onStopTrackingTouch(SeekBar seekBar) {
+                    // Notify QuizActivity of volume change if needed
+                    Toast.makeText(SettingsActivity.this, 
+                        "Quiz music volume updated to " + seekBar.getProgress() + "%", 
+                        Toast.LENGTH_SHORT).show();
+                }
+            });
+        }
 
         // Cloud Sync buttons
         btnSyncToCloud.setOnClickListener(v -> syncToCloud());
@@ -201,6 +239,16 @@ public class SettingsActivity extends AppCompatActivity {
             e.printStackTrace();
         }
     }
+
+    /**
+     * Update the volume display value in the settings
+     */
+    private void updateQuizMusicVolumeDisplay(int volumePercent) {
+        if (tvQuizMusicVolumeValue != null) {
+            tvQuizMusicVolumeValue.setText(volumePercent + "%");
+        }
+    }
+
 
     private void updateLastSyncTime() {
         if (tvLastSync == null) return;

@@ -43,6 +43,7 @@ public class QuizActivity extends AppCompatActivity {
     public static final String PREF_NAME = "EduLinguaPrefs";
     public static final String KEY_HIGH_SCORE_PREFIX = "high_score_";
     public static final String KEY_SFX_ENABLED = "sfx_enabled";
+    public static final String KEY_QUIZ_MUSIC_VOLUME = "QUIZ_MUSIC_VOLUME";
 
     private static final long PENALTY_TIME = 5000L;
     private static final int MAX_NUMBER = 50;
@@ -612,7 +613,8 @@ public class QuizActivity extends AppCompatActivity {
         for (int i = 0; i < 4; i++) {
             seq[i] = start + i * step;
         }
-        int missingIndex = random.nextInt(2) + 1;
+        // Always use index 2 as the missing position (shown as ?)
+        int missingIndex = 2;
         int missingValue = seq[missingIndex];
         currentCorrectAnswer = String.valueOf(missingValue);
 

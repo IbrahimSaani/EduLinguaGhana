@@ -44,7 +44,9 @@ import com.edulinguaghana.tracking.TeacherDashboardActivity;
 import com.edulinguaghana.tracking.ParentDashboardActivity;
 import com.edulinguaghana.tracking.RelationshipManagementActivity;
 
+import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -89,12 +91,17 @@ public class MainActivity extends AppCompatActivity {
     private String selectedLangName = null;
 
     private String[] langNames = {"English", "French", "Twi", "Ewe", "Ga"};
-    private String[] langCodes = {"en", "fr", "twi", "ee", "gaa"};
+    private String[] langCodes = {"en", "fr", "ak", "ee", "gaa"};
     private int[] langFlags = {R.drawable.ic_flag_uk, R.drawable.ic_flag_france, R.drawable.ic_flag_ghana, R.drawable.ic_flag_ghana, R.drawable.ic_flag_ghana};
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        // Ensure the app respects system windows (status bar, navigation bar)
+        // Remove any fullscreen flags that might be set
+        getWindow().clearFlags(android.view.WindowManager.LayoutParams.FLAG_FULLSCREEN);
+
         setContentView(R.layout.activity_main);
 
         // Initialize permission helper early (must be before STARTED state)
@@ -991,52 +998,74 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void showContentTypeDialog(String langCode, String langName, String mode) {
-        String[] options = {"Alphabet", "Numbers"};
-        String title = (mode.equals("recital") ? "Recital Mode" : "Practice Mode") + " - " + langName;
+        String modeLabel = mode.equals("recital") ? "Recital" : "Practice";
 
-        new AlertDialog.Builder(this)
-                .setTitle(title)
-                .setIcon(R.mipmap.ic_launcher_round)
-                .setItems(options, (dialog, which) -> {
-                    if (which == 0) {
-                        openAlphabetScreen(langCode, langName, mode);
-                    } else {
-                        openNumbersScreen(langCode, langName, mode);
-                    }
-                })
-                .show();
+        List<StyledMenuHelper.MenuItem> menuItems = new ArrayList<>();
+        menuItems.add(new StyledMenuHelper.MenuItem(
+                "🔤",
+                "Alphabet",
+                "Learn and hear letters",
+                () -> openAlphabetScreen(langCode, langName, mode)
+        ));
+        menuItems.add(new StyledMenuHelper.MenuItem(
+                "🔢",
+                "Numbers",
+                "Learn and hear numbers",
+                () -> openNumbersScreen(langCode, langName, mode)
+        ));
+
+        StyledMenuHelper.showStyledMenu(
+                this,
+                modeLabel.equals("Recital") ? "🎤" : "📝",
+                modeLabel + " Mode - " + langName,
+                "",
+                menuItems,
+                null
+        );
     }
 
     // UPDATED: now includes "Speed Challenge (Game)"
     private void showQuizTypeDialog(String langCode, String langName) {
-        String[] quizTypes = {
-                "Letter/Number Quiz",
+        List<StyledMenuHelper.MenuItem> menuItems = new ArrayList<>();
+        menuItems.add(new StyledMenuHelper.MenuItem(
+                "🔤",
+                "Letter Quiz",
+                "Test your letter recognition",
+                () -> openQuizScreen(langCode, langName, "basic", "beginner", "all")
+        ));
+        menuItems.add(new StyledMenuHelper.MenuItem(
+                "📊",
                 "Number Sequencing",
+                "Find the missing number",
+                () -> openQuizScreen(langCode, langName, "sequence", "beginner", "all")
+        ));
+        menuItems.add(new StyledMenuHelper.MenuItem(
+                "🎯",
                 "Matching",
+                "Match letters to words",
+                () -> openQuizScreen(langCode, langName, "matching", "beginner", "all")
+        ));
+        menuItems.add(new StyledMenuHelper.MenuItem(
+                "🎲",
                 "Mixed Mode",
-                "Speed Challenge (Game)"
-        };
+                "All question types mixed",
+                () -> openQuizScreen(langCode, langName, "mixed", "beginner", "all")
+        ));
+        menuItems.add(new StyledMenuHelper.MenuItem(
+                "🏃",
+                "Speed Challenge (Game)",
+                "Fast-paced question game",
+                () -> openSpeedGameScreen(langCode, langName)
+        ));
 
-        new AlertDialog.Builder(this)
-                .setTitle("Quiz Mode - " + langName)
-                .setIcon(R.mipmap.ic_launcher_round)
-                .setItems(quizTypes, (dialog, which) -> {
-                    if (which == 4) {
-                        // Open separate game screen
-                        openSpeedGameScreen(langCode, langName);
-                        return;
-                    }
-
-                    String quizType;
-                    if (which == 0)      quizType = "basic";
-                    else if (which == 1) quizType = "sequence";
-                    else if (which == 2) quizType = "matching";
-                    else                 quizType = "mixed";
-
-                    // Launch quiz directly with default difficulty (beginner) and category (all)
-                    openQuizScreen(langCode, langName, quizType, "beginner", "all");
-                })
-                .show();
+        StyledMenuHelper.showStyledMenu(
+                this,
+                "❓",
+                "Quiz Mode - " + langName,
+                "Choose a quiz type",
+                menuItems,
+                null
+        );
     }
 
     /**
@@ -1324,18 +1353,13 @@ public class MainActivity extends AppCompatActivity {
         // Find or create FAB for teacher dashboard
         fabRoleDashboard = findViewById(R.id.fabRoleDashboard);
         if (fabRoleDashboard == null) {
-            // FAB doesn't exist in layout, create it programmatically
-            createRoleFAB();
+            // FAB doesn't exist in layout, don't create it to avoid navbar overlap
+            return;
         }
 
         if (fabRoleDashboard != null) {
-            fabRoleDashboard.setVisibility(View.VISIBLE);
-            fabRoleDashboard.setImageResource(android.R.drawable.ic_menu_agenda);
-            fabRoleDashboard.setContentDescription("My Students");
-            fabRoleDashboard.setOnClickListener(v -> {
-                Intent intent = new Intent(MainActivity.this, TeacherDashboardActivity.class);
-                startActivity(intent);
-            });
+            // Hide FAB for teachers to avoid navbar overlap
+            fabRoleDashboard.setVisibility(View.GONE);
         }
 
         // Also add menu item if toolbar menu exists
@@ -1349,17 +1373,13 @@ public class MainActivity extends AppCompatActivity {
         // Find or create FAB for parent dashboard
         fabRoleDashboard = findViewById(R.id.fabRoleDashboard);
         if (fabRoleDashboard == null) {
-            createRoleFAB();
+            // FAB doesn't exist in layout, don't create it to avoid navbar overlap
+            return;
         }
 
         if (fabRoleDashboard != null) {
-            fabRoleDashboard.setVisibility(View.VISIBLE);
-            fabRoleDashboard.setImageResource(android.R.drawable.ic_menu_agenda);
-            fabRoleDashboard.setContentDescription("My Children");
-            fabRoleDashboard.setOnClickListener(v -> {
-                Intent intent = new Intent(MainActivity.this, ParentDashboardActivity.class);
-                startActivity(intent);
-            });
+            // Hide FAB for parents to avoid navbar overlap
+            fabRoleDashboard.setVisibility(View.GONE);
         }
 
         invalidateOptionsMenu();

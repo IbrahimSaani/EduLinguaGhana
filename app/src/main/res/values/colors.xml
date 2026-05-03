@@ -15,33 +15,33 @@
     <color name="cardBackground">#FFFFFF</color>
     <color name="card_background">#FFFFFF</color>
     <color name="card_stroke">#E0E0E0</color>
-    <color name="textColorPrimary">#263238</color>
-    <color name="textColorSecondary">#455A64</color>
-    <color name="text_secondary">#455A64</color>
-    <color name="dividerColor">#E0E0E0</color>
+    <color name="textColorPrimary">#212121</color> <!-- Darker text for better readability -->
+    <color name="textColorSecondary">#616161</color> <!-- Better contrast secondary text -->
+    <color name="text_secondary">#616161</color>
+    <color name="dividerColor">#BDBDBD</color> <!-- More visible dividers -->
 
     <!-- Buttons -->
     <color name="buttonPrimary">#1A237E</color>
     <color name="buttonSecondary">#E8EAF6</color>
     <color name="buttonTextPrimary">#FFFFFF</color>
-    <color name="buttonTextSecondary">#37474F</color>
+    <color name="buttonTextSecondary">#1A237E</color>
 
     <!-- Quiz-specific -->
     <color name="correctAnswer">#2E7D32</color>
-    <color name="wrongAnswer">#B71C1C</color>
+    <color name="wrongAnswer">#C62828</color> <!-- Darker red for better visibility -->
 
     <!-- Progress Screen -->
     <color name="progressScreenBackground">#EDE7F6</color>
     <color name="progressTitleColor">#4527A0</color>
     <color name="achievementsTextColor">#5D4037</color>
-    <color name="textPrimary">#263238</color>
-    <color name="textSecondary">#455A64</color>
-    <color name="progressTrackColor">#E0E0E0</color>
+    <color name="textPrimary">#212121</color>
+    <color name="textSecondary">#616161</color>
+    <color name="progressTrackColor">#BDBDBD</color> <!-- More visible progress bar -->
 
     <!-- Playful palette -->
-    <color name="playfulSkyStart">#FDF2FF</color>
+    <color name="playfulSkyStart">#F5F5FA</color>
     <color name="playfulSkyEnd">#E3F2FD</color>
-    <color name="playfulHeroStart">#FFE7F7</color>
+    <color name="playfulHeroStart">#FCE4EC</color>
     <color name="playfulHeroEnd">#FFF5E5</color>
     <color name="languageCardStart">#E0F7FA</color>
     <color name="languageCardEnd">#F1F8E9</color>
@@ -54,7 +54,7 @@
     <color name="modeProgressStart">#C8E6C9</color>
     <color name="modeProgressEnd">#A5D6A7</color>
     <color name="chipSurface">#FFFFFFFF</color>
-    <color name="chipStroke">#DFE7FF</color>
+    <color name="chipStroke">#E0E0E0</color>
 
     <!-- Dynamic background palette -->
     <color name="bgMorningStart">#FFF5D6</color>
@@ -77,5 +77,5 @@
     <color name="notification_streak_bg">#FFEBEE</color>
     <color name="notification_motivational_bg">#F3E5F5</color>
     <color name="notification_reminder_bg">#E8F5E9</color>
-    <color name="random_avatar_stroke_color">#4CAF50</color>
+    <color name="random_avatar_stroke_color">#2E7D32</color>
 </resources>

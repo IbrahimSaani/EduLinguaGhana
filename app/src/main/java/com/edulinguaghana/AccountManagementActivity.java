@@ -46,7 +46,8 @@ public class AccountManagementActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
         if (getSupportActionBar() != null) {
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-            getSupportActionBar().setTitle("Account Management");
+            // Title is handled by the CollapsingToolbarLayout header
+            getSupportActionBar().setTitle("");
         }
 
         initViews();
@@ -132,13 +133,39 @@ public class AccountManagementActivity extends AppCompatActivity {
 
         currentUser.updateProfile(profileUpdates)
                 .addOnCompleteListener(task -> {
+                    if (task.isSuccessful()) {
+                        // Also update the profile in Firebase Realtime Database
+                        updateProfileInDatabase(newDisplayName);
+                    } else {
+                        showProgress(false);
+                        Toast.makeText(AccountManagementActivity.this,
+                                "Failed to update profile: " + task.getException().getMessage(),
+                                Toast.LENGTH_LONG).show();
+                    }
+                });
+    }
+
+    private void updateProfileInDatabase(String displayName) {
+        com.google.firebase.database.DatabaseReference usersRef =
+                com.google.firebase.database.FirebaseDatabase.getInstance()
+                        .getReference("users")
+                        .child(currentUser.getUid());
+
+        java.util.Map<String, Object> updates = new java.util.HashMap<>();
+        updates.put("displayName", displayName);
+        updates.put("username", displayName);
+        updates.put("updatedAt", System.currentTimeMillis());
+
+        usersRef.updateChildren(updates)
+                .addOnCompleteListener(task -> {
                     showProgress(false);
                     if (task.isSuccessful()) {
                         Toast.makeText(AccountManagementActivity.this,
-                                "Profile updated successfully!", Toast.LENGTH_SHORT).show();
+                                "✓ Profile updated successfully!", Toast.LENGTH_SHORT).show();
                     } else {
                         Toast.makeText(AccountManagementActivity.this,
-                                "Failed to update profile: " + task.getException().getMessage(),
+                                "Profile updated on device, but database sync failed: " +
+                                (task.getException() != null ? task.getException().getMessage() : "Unknown error"),
                                 Toast.LENGTH_LONG).show();
                     }
                 });
@@ -186,15 +213,11 @@ public class AccountManagementActivity extends AppCompatActivity {
                         // Now update the password
                         currentUser.updatePassword(newPassword)
                                 .addOnCompleteListener(updateTask -> {
-                                    showProgress(false);
                                     if (updateTask.isSuccessful()) {
-                                        Toast.makeText(AccountManagementActivity.this,
-                                                "Password changed successfully!", Toast.LENGTH_SHORT).show();
-                                        // Clear password fields
-                                        etCurrentPassword.setText("");
-                                        etNewPassword.setText("");
-                                        etConfirmPassword.setText("");
+                                        // Log password change to database for security tracking
+                                        updatePasswordChangeInDatabase();
                                     } else {
+                                        showProgress(false);
                                         Toast.makeText(AccountManagementActivity.this,
                                                 "Failed to change password: " + updateTask.getException().getMessage(),
                                                 Toast.LENGTH_LONG).show();
@@ -204,6 +227,34 @@ public class AccountManagementActivity extends AppCompatActivity {
                         showProgress(false);
                         Toast.makeText(AccountManagementActivity.this,
                                 "Authentication failed. Please check your current password.",
+                                Toast.LENGTH_LONG).show();
+                    }
+                });
+    }
+
+    private void updatePasswordChangeInDatabase() {
+        com.google.firebase.database.DatabaseReference usersRef =
+                com.google.firebase.database.FirebaseDatabase.getInstance()
+                        .getReference("users")
+                        .child(currentUser.getUid());
+
+        java.util.Map<String, Object> updates = new java.util.HashMap<>();
+        updates.put("lastPasswordChangeAt", System.currentTimeMillis());
+
+        usersRef.updateChildren(updates)
+                .addOnCompleteListener(task -> {
+                    showProgress(false);
+                    if (task.isSuccessful()) {
+                        Toast.makeText(AccountManagementActivity.this,
+                                "🔒 Password changed successfully!", Toast.LENGTH_SHORT).show();
+                        // Clear password fields
+                        etCurrentPassword.setText("");
+                        etNewPassword.setText("");
+                        etConfirmPassword.setText("");
+                    } else {
+                        Toast.makeText(AccountManagementActivity.this,
+                                "Password changed on device, but database sync failed: " + 
+                                (task.getException() != null ? task.getException().getMessage() : "Unknown error"),
                                 Toast.LENGTH_LONG).show();
                     }
                 });
@@ -220,11 +271,44 @@ public class AccountManagementActivity extends AppCompatActivity {
                                 .setTitle("Verification Email Sent")
                                 .setMessage("A verification email has been sent to " + currentUser.getEmail() +
                                         ". Please check your inbox and verify your email address.")
-                                .setPositiveButton("OK", null)
+                                .setPositiveButton("I've Verified My Email", (dialog, which) -> {
+                                    refreshEmailVerificationStatus();
+                                })
+                                .setNegativeButton("OK", null)
                                 .show();
                     } else {
                         Toast.makeText(AccountManagementActivity.this,
                                 "Failed to send verification email: " + task.getException().getMessage(),
+                                Toast.LENGTH_LONG).show();
+                    }
+                });
+    }
+
+    private void refreshEmailVerificationStatus() {
+        showProgress(true);
+
+        // Reload the user to get the latest email verification status
+        currentUser.reload()
+                .addOnCompleteListener(task -> {
+                    showProgress(false);
+                    if (task.isSuccessful()) {
+                        // Update the current user reference
+                        currentUser = mAuth.getCurrentUser();
+                        
+                        if (currentUser != null && currentUser.isEmailVerified()) {
+                            // Email is now verified, hide the verification card
+                            emailVerificationCard.setVisibility(View.GONE);
+                            Toast.makeText(AccountManagementActivity.this,
+                                    "Email verified successfully! ✓", Toast.LENGTH_SHORT).show();
+                        } else {
+                            Toast.makeText(AccountManagementActivity.this,
+                                    "Email not verified yet. Please check your email and verify.",
+                                    Toast.LENGTH_LONG).show();
+                        }
+                    } else {
+                        Toast.makeText(AccountManagementActivity.this,
+                                "Failed to check email verification status: " + 
+                                (task.getException() != null ? task.getException().getMessage() : "Unknown error"),
                                 Toast.LENGTH_LONG).show();
                     }
                 });
@@ -252,35 +336,233 @@ public class AccountManagementActivity extends AppCompatActivity {
     }
 
     private void deleteAccount() {
+        // First, prompt for password to re-authenticate
+        showReAuthenticationDialog();
+    }
+
+    private void showReAuthenticationDialog() {
+        final TextInputEditText passwordInput = new TextInputEditText(this);
+        passwordInput.setInputType(android.text.InputType.TYPE_CLASS_TEXT | android.text.InputType.TYPE_TEXT_VARIATION_PASSWORD);
+        passwordInput.setHint("Enter your password");
+
+        new AlertDialog.Builder(this)
+                .setTitle("Confirm Your Password")
+                .setMessage("For security reasons, please enter your password to delete your account.")
+                .setView(passwordInput)
+                .setPositiveButton("Delete Account", (dialog, which) -> {
+                    String password = passwordInput.getText().toString().trim();
+                    if (TextUtils.isEmpty(password)) {
+                        Toast.makeText(AccountManagementActivity.this,
+                                "Password cannot be empty", Toast.LENGTH_SHORT).show();
+                        return;
+                    }
+                    performReAuthenticationAndDelete(password);
+                })
+                .setNegativeButton("Cancel", null)
+                .show();
+    }
+
+    private void performReAuthenticationAndDelete(String password) {
         showProgress(true);
 
+        String email = currentUser.getEmail();
+        AuthCredential credential = EmailAuthProvider.getCredential(email, password);
+
+        // Re-authenticate first
+        currentUser.reauthenticate(credential)
+                .addOnCompleteListener(reAuthTask -> {
+                    if (reAuthTask.isSuccessful()) {
+                        // Now delete user data from database before deleting auth account
+                        deleteUserDataFromDatabase(currentUser.getUid());
+                    } else {
+                        showProgress(false);
+                        Toast.makeText(AccountManagementActivity.this,
+                                "Authentication failed. Please check your password.",
+                                Toast.LENGTH_LONG).show();
+                    }
+                });
+    }
+
+    private void deleteUserDataFromDatabase(String userId) {
+        com.google.firebase.database.DatabaseReference dbRef =
+                com.google.firebase.database.FirebaseDatabase.getInstance().getReference();
+
+        // Delete from users node
+        dbRef.child("users").child(userId).removeValue()
+                .addOnCompleteListener(usersTask -> {
+                    if (usersTask.isSuccessful()) {
+                        android.util.Log.d("AccountManagement", "User data deleted from users node");
+                    } else {
+                        android.util.Log.e("AccountManagement", "Failed to delete user data", usersTask.getException());
+                    }
+                    // Continue with other deletions
+                    deleteFromLeaderboard(userId);
+                });
+    }
+
+    private void deleteFromLeaderboard(String userId) {
+        com.google.firebase.database.DatabaseReference leaderboardRef =
+                com.google.firebase.database.FirebaseDatabase.getInstance().getReference("leaderboard").child(userId);
+
+        leaderboardRef.removeValue()
+                .addOnCompleteListener(leaderboardTask -> {
+                    if (leaderboardTask.isSuccessful()) {
+                        android.util.Log.d("AccountManagement", "Leaderboard entry deleted");
+                    } else {
+                        android.util.Log.e("AccountManagement", "Failed to delete leaderboard entry", leaderboardTask.getException());
+                    }
+                    // Continue with other deletions
+                    deleteUserProgress(currentUser.getUid());
+                });
+    }
+
+    private void deleteUserProgress(String userId) {
+        com.google.firebase.database.DatabaseReference progressRef =
+                com.google.firebase.database.FirebaseDatabase.getInstance().getReference("progress").child(userId);
+
+        progressRef.removeValue()
+                .addOnCompleteListener(progressTask -> {
+                    if (progressTask.isSuccessful()) {
+                        android.util.Log.d("AccountManagement", "Progress data deleted");
+                    } else {
+                        android.util.Log.e("AccountManagement", "Failed to delete progress", progressTask.getException());
+                    }
+                    // Continue with other deletions
+                    deleteUserStats(userId);
+                });
+    }
+
+    private void deleteUserStats(String userId) {
+        com.google.firebase.database.DatabaseReference statsRef =
+                com.google.firebase.database.FirebaseDatabase.getInstance().getReference("userStats").child(userId);
+
+        statsRef.removeValue()
+                .addOnCompleteListener(statsTask -> {
+                    if (statsTask.isSuccessful()) {
+                        android.util.Log.d("AccountManagement", "User stats deleted");
+                    } else {
+                        android.util.Log.e("AccountManagement", "Failed to delete user stats", statsTask.getException());
+                    }
+                    // Continue with other deletions
+                    deleteUserAggregates(userId);
+                });
+    }
+
+    private void deleteUserAggregates(String userId) {
+        com.google.firebase.database.DatabaseReference aggregatesRef =
+                com.google.firebase.database.FirebaseDatabase.getInstance().getReference("aggregates").child(userId);
+
+        aggregatesRef.removeValue()
+                .addOnCompleteListener(aggregatesTask -> {
+                    if (aggregatesTask.isSuccessful()) {
+                        android.util.Log.d("AccountManagement", "User aggregates deleted");
+                    } else {
+                        android.util.Log.e("AccountManagement", "Failed to delete aggregates", aggregatesTask.getException());
+                    }
+                    // Continue with other deletions
+                    deleteMilestones(userId);
+                });
+    }
+
+    private void deleteMilestones(String userId) {
+        com.google.firebase.database.DatabaseReference milestonesRef =
+                com.google.firebase.database.FirebaseDatabase.getInstance().getReference("milestones").child(userId);
+
+        milestonesRef.removeValue()
+                .addOnCompleteListener(milestonesTask -> {
+                    if (milestonesTask.isSuccessful()) {
+                        android.util.Log.d("AccountManagement", "User milestones deleted");
+                    } else {
+                        android.util.Log.e("AccountManagement", "Failed to delete milestones", milestonesTask.getException());
+                    }
+                    // Continue with other deletions
+                    deleteRelationships(userId);
+                });
+    }
+
+    private void deleteRelationships(String userId) {
+        // Delete all relationships involving this user
+        com.google.firebase.database.DatabaseReference relationshipsRef =
+                com.google.firebase.database.FirebaseDatabase.getInstance().getReference("relationships");
+
+        relationshipsRef.addListenerForSingleValueEvent(new com.google.firebase.database.ValueEventListener() {
+            @Override
+            public void onDataChange(com.google.firebase.database.DataSnapshot snapshot) {
+                for (com.google.firebase.database.DataSnapshot childSnapshot : snapshot.getChildren()) {
+                    String relationshipId = childSnapshot.getKey();
+                    if (relationshipId != null && relationshipId.contains(userId)) {
+                        childSnapshot.getRef().removeValue();
+                    }
+                }
+                android.util.Log.d("AccountManagement", "User relationships deleted");
+                deleteUserChallenges(userId);
+            }
+
+            @Override
+            public void onCancelled(com.google.firebase.database.DatabaseError error) {
+                android.util.Log.e("AccountManagement", "Failed to delete relationships", error.toException());
+                deleteUserChallenges(userId);
+            }
+        });
+    }
+
+    private void deleteUserChallenges(String userId) {
+        // Delete all challenges involving this user
+        com.google.firebase.database.DatabaseReference challengesRef =
+                com.google.firebase.database.FirebaseDatabase.getInstance().getReference("challenges");
+
+        challengesRef.addListenerForSingleValueEvent(new com.google.firebase.database.ValueEventListener() {
+            @Override
+            public void onDataChange(com.google.firebase.database.DataSnapshot snapshot) {
+                for (com.google.firebase.database.DataSnapshot childSnapshot : snapshot.getChildren()) {
+                    com.google.firebase.database.DataSnapshot initiatorSnapshot = childSnapshot.child("initiatorId");
+                    com.google.firebase.database.DataSnapshot participantSnapshot = childSnapshot.child("participantId");
+
+                    boolean isInvolved = false;
+                    if (initiatorSnapshot.exists() && userId.equals(initiatorSnapshot.getValue(String.class))) {
+                        isInvolved = true;
+                    }
+                    if (participantSnapshot.exists() && userId.equals(participantSnapshot.getValue(String.class))) {
+                        isInvolved = true;
+                    }
+
+                    if (isInvolved) {
+                        childSnapshot.getRef().removeValue();
+                    }
+                }
+                android.util.Log.d("AccountManagement", "User challenges deleted");
+                // Finally delete the Firebase Auth account
+                deleteFirebaseAuthUser();
+            }
+
+            @Override
+            public void onCancelled(com.google.firebase.database.DatabaseError error) {
+                android.util.Log.e("AccountManagement", "Failed to delete challenges", error.toException());
+                // Continue anyway
+                deleteFirebaseAuthUser();
+            }
+        });
+    }
+
+    private void deleteFirebaseAuthUser() {
         currentUser.delete()
                 .addOnCompleteListener(task -> {
                     showProgress(false);
                     if (task.isSuccessful()) {
                         Toast.makeText(AccountManagementActivity.this,
                                 "Account deleted successfully", Toast.LENGTH_SHORT).show();
-                        // Return to main activity
-                        finishAffinity(); // Close all activities
+                        // Sign out and return to main activity
+                        mAuth.signOut();
+                        finishAffinity();
                         android.content.Intent intent = new android.content.Intent(AccountManagementActivity.this, MainActivity.class);
+                        intent.setFlags(android.content.Intent.FLAG_ACTIVITY_NEW_TASK | android.content.Intent.FLAG_ACTIVITY_CLEAR_TASK);
                         startActivity(intent);
                     } else {
-                        // If deletion fails, user might need to re-authenticate
                         String errorMessage = task.getException() != null ?
                                 task.getException().getMessage() : "Unknown error";
-
-                        if (errorMessage.contains("recent login")) {
-                            new AlertDialog.Builder(this)
-                                    .setTitle("Re-authentication Required")
-                                    .setMessage("For security reasons, you need to sign in again before deleting your account. " +
-                                            "Please sign out and sign in again, then try deleting your account.")
-                                    .setPositiveButton("OK", null)
-                                    .show();
-                        } else {
-                            Toast.makeText(AccountManagementActivity.this,
-                                    "Failed to delete account: " + errorMessage,
-                                    Toast.LENGTH_LONG).show();
-                        }
+                        Toast.makeText(AccountManagementActivity.this,
+                                "Failed to delete account: " + errorMessage,
+                                Toast.LENGTH_LONG).show();
                     }
                 });
     }
@@ -295,6 +577,36 @@ public class AccountManagementActivity extends AppCompatActivity {
         // Reload avatar when returning from editor
         if (avatarView != null) {
             avatarView.updateAvatar();
+        }
+
+        // Refresh email verification status and load latest avatar from database
+        if (currentUser != null) {
+            currentUser.reload()
+                    .addOnCompleteListener(task -> {
+                        if (task.isSuccessful()) {
+                            currentUser = mAuth.getCurrentUser();
+                            if (currentUser != null) {
+                                boolean isEmailVerified = currentUser.isEmailVerified();
+                                boolean hasPasswordProvider = false;
+
+                                if (currentUser.getProviderData() != null) {
+                                    for (com.google.firebase.auth.UserInfo profile : currentUser.getProviderData()) {
+                                        if (profile.getProviderId().equals("password")) {
+                                            hasPasswordProvider = true;
+                                            break;
+                                        }
+                                    }
+                                }
+
+                                // Update email verification card visibility
+                                if (!isEmailVerified && hasPasswordProvider) {
+                                    emailVerificationCard.setVisibility(View.VISIBLE);
+                                } else {
+                                    emailVerificationCard.setVisibility(View.GONE);
+                                }
+                            }
+                        }
+                    });
         }
     }
 

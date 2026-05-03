@@ -175,11 +175,12 @@ public class LanguageConversionUtilsTest {
     @Test
     public void testTwiAlphabet() {
         String[] alphabet = LanguageConversionUtils.getAlphabetForLanguage("ak");
-        assertEquals(24, alphabet.length);
+        assertEquals(22, alphabet.length);
         assertTrue(contains(alphabet, "A"));
         assertTrue(contains(alphabet, "Ɛ"));
         assertTrue(contains(alphabet, "Ɔ"));
         assertFalse(contains(alphabet, "Q"));
+        assertFalse(contains(alphabet, "V"));
         assertFalse(contains(alphabet, "X"));
         assertFalse(contains(alphabet, "Z"));
     }

@@ -124,7 +124,18 @@ public class FirebaseSocialRepository implements SocialRepository {
 
     @Override
     public List<Challenge> getChallengesForUser(String userId) {
-        return new ArrayList<>();
+        // Note: This method is synchronous but Firebase operations are async
+        // For real-time updates, use Firebase listeners directly in UI layer
+        // This returns empty list immediately; consider using callback pattern for async operations
+        List<Challenge> challenges = new ArrayList<>();
+
+        // To properly implement this, you should use the FirebaseDatabase listeners
+        // in the UI rather than relying on this synchronous method.
+        // Example in UI:
+        // DatabaseReference ref = FirebaseDatabase.getInstance().getReference("challenges");
+        // ref.orderByChild("challengedId").equalTo(userId).addListenerForSingleValueEvent(...)
+
+        return challenges;
     }
 
     @Override

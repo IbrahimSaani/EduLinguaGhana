@@ -87,21 +87,4 @@
         android:background="@color/appBackground"
         app:layout_behavior="@string/appbar_scrolling_view_behavior" />
 
-    <!-- Floating Action Button for Creating New Challenge -->
-    <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
-        android:id="@+id/fab_new_challenge"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="bottom|end"
-        android:layout_margin="16dp"
-        android:text="New Challenge"
-        android:textColor="@color/white"
-        android:textStyle="bold"
-        app:icon="@drawable/ic_add"
-        app:iconTint="@color/white"
-        app:backgroundTint="@color/colorPrimary"
-        app:elevation="6dp"
-        app:borderWidth="0dp"
-        android:contentDescription="Create new challenge" />
-
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

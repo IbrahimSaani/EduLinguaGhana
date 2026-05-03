@@ -119,48 +119,93 @@ public class SignUpActivity extends AppCompatActivity {
     }
 
     private void signUpWithEmail() {
-        String name = etName.getText().toString().trim();
-        String email = etEmail.getText().toString().trim();
-        String password = etPassword.getText().toString().trim();
-        String confirmPassword = etConfirmPassword.getText().toString().trim();
+         String name = etName.getText().toString().trim();
+         String email = etEmail.getText().toString().trim();
+         String password = etPassword.getText().toString().trim();
+         String confirmPassword = etConfirmPassword.getText().toString().trim();
 
-        if (!validateInput(name, email, password, confirmPassword)) {
-            return;
-        }
+         if (!validateInput(name, email, password, confirmPassword)) {
+             return;
+         }
 
-        btnSignUp.setEnabled(false);
+         btnSignUp.setEnabled(false);
 
-        mAuth.createUserWithEmailAndPassword(email, password)
-                .addOnCompleteListener(this, task -> {
-                    btnSignUp.setEnabled(true);
-                    if (task.isSuccessful()) {
-                        FirebaseUser user = mAuth.getCurrentUser();
+         // Check if email already exists before attempting to create account
+         checkEmailExists(email, exists -> {
+             if (exists) {
+                 btnSignUp.setEnabled(true);
+                 etEmail.setError("This email is already registered");
+                 etEmail.requestFocus();
+                 Toast.makeText(SignUpActivity.this,
+                         "Email address is already in use. Please use a different email or log in.",
+                         Toast.LENGTH_LONG).show();
+                 return;
+             }
 
-                        // Update user profile with name
-                        UserProfileChangeRequest profileUpdates = new UserProfileChangeRequest.Builder()
-                                .setDisplayName(name)
-                                .build();
+             // Email doesn't exist, proceed with account creation
+             mAuth.createUserWithEmailAndPassword(email, password)
+                     .addOnCompleteListener(this, task -> {
+                         btnSignUp.setEnabled(true);
+                         if (task.isSuccessful()) {
+                             FirebaseUser user = mAuth.getCurrentUser();
 
-                        user.updateProfile(profileUpdates)
-                                .addOnCompleteListener(updateTask -> {
-                                    if (updateTask.isSuccessful()) {
-                                        // Save user to database for friend lookups
-                                        saveUserToDatabase(user);
-                                        Toast.makeText(SignUpActivity.this,
-                                                "Account created successfully!",
-                                                Toast.LENGTH_SHORT).show();
-                                        navigateToMain();
-                                    }
-                                });
-                    } else {
-                        Toast.makeText(SignUpActivity.this,
-                                "Sign up failed: " + task.getException().getMessage(),
-                                Toast.LENGTH_LONG).show();
-                    }
-                });
-    }
+                             // Update user profile with name
+                             UserProfileChangeRequest profileUpdates = new UserProfileChangeRequest.Builder()
+                                     .setDisplayName(name)
+                                     .build();
 
-    private void signUpWithGoogle() {
+                             user.updateProfile(profileUpdates)
+                                     .addOnCompleteListener(updateTask -> {
+                                         if (updateTask.isSuccessful()) {
+                                             // Save user to database for friend lookups
+                                             saveUserToDatabase(user);
+                                             Toast.makeText(SignUpActivity.this,
+                                                     "Account created successfully!",
+                                                     Toast.LENGTH_SHORT).show();
+                                             navigateToMain();
+                                         }
+                                     });
+                         } else {
+                             Toast.makeText(SignUpActivity.this,
+                                     "Sign up failed: " + task.getException().getMessage(),
+                                     Toast.LENGTH_LONG).show();
+                         }
+                     });
+         });
+     }
+
+     /**
+      * Check if an email address already exists in Firebase Authentication
+      * Uses Firebase's fetchSignInMethodsForEmail() which returns sign-in methods for the email
+      * If the returned list is empty, the email is available
+      * If the returned list is not empty, the email is already registered
+      */
+     private void checkEmailExists(String email, EmailCheckCallback callback) {
+         mAuth.fetchSignInMethodsForEmail(email)
+                 .addOnCompleteListener(task -> {
+                     if (task.isSuccessful()) {
+                         // If providers list is empty, email doesn't exist
+                         boolean emailExists = !task.getResult().getSignInMethods().isEmpty();
+                         callback.onEmailCheckComplete(emailExists);
+                     } else {
+                         // If there's an error, assume email doesn't exist and allow signup
+                         // User will get better error message from createUserWithEmailAndPassword
+                         android.util.Log.e("SignUp", "Error checking email: " + 
+                             (task.getException() != null ? task.getException().getMessage() : "Unknown error"));
+                         callback.onEmailCheckComplete(false);
+                     }
+                 });
+     }
+
+     /**
+      * Callback interface for email existence check
+      */
+     @FunctionalInterface
+     private interface EmailCheckCallback {
+         void onEmailCheckComplete(boolean emailExists);
+     }
+
+     private void signUpWithGoogle() {
         Intent signInIntent = mGoogleSignInClient.getSignInIntent();
         startActivityForResult(signInIntent, RC_GOOGLE_SIGN_IN);
     }
@@ -168,7 +213,7 @@ public class SignUpActivity extends AppCompatActivity {
     private void signUpWithFacebook() {
         LoginManager.getInstance().logInWithReadPermissions(
                 this,
-                Arrays.asList("email", "public_profile")
+                Arrays.asList("public_profile")
         );
 
         LoginManager.getInstance().registerCallback(mCallbackManager,

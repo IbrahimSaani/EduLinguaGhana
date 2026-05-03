@@ -42,6 +42,8 @@ public class BadgeManager {
 
     private static List<Badge> generateDefaultBadges() {
         List<Badge> list = new ArrayList<>();
+
+        // First practice badge
         Badge b1 = new Badge();
         b1.id = "first_practice";
         b1.title = "First Practice";
@@ -51,6 +53,7 @@ public class BadgeManager {
         b1.unlockedAt = 0;
         list.add(b1);
 
+        // 7 Day Streak badge
         Badge b2 = new Badge();
         b2.id = "seven_days";
         b2.title = "7 Day Streak";
@@ -59,6 +62,66 @@ public class BadgeManager {
         b2.unlocked = false;
         b2.unlockedAt = 0;
         list.add(b2);
+
+        // 30 Day Streak badge
+        Badge b3 = new Badge();
+        b3.id = "thirty_days";
+        b3.title = "30 Day Streak";
+        b3.description = "Practice for 30 consecutive days.";
+        b3.iconName = "ic_badge_thirty";
+        b3.unlocked = false;
+        b3.unlockedAt = 0;
+        list.add(b3);
+
+        // Quiz Master badge
+        Badge b4 = new Badge();
+        b4.id = "quiz_master";
+        b4.title = "Quiz Master";
+        b4.description = "Complete 20 quizzes.";
+        b4.iconName = "ic_badge_quiz";
+        b4.unlocked = false;
+        b4.unlockedAt = 0;
+        list.add(b4);
+
+        // Perfect Score badge
+        Badge b5 = new Badge();
+        b5.id = "perfect_score";
+        b5.title = "Perfect Score";
+        b5.description = "Get a perfect score in a quiz.";
+        b5.iconName = "ic_badge_perfect";
+        b5.unlocked = false;
+        b5.unlockedAt = 0;
+        list.add(b5);
+
+        // Multilingual badge
+        Badge b6 = new Badge();
+        b6.id = "multilingual";
+        b6.title = "Multilingual";
+        b6.description = "Complete practice in 3 different languages.";
+        b6.iconName = "ic_badge_languages";
+        b6.unlocked = false;
+        b6.unlockedAt = 0;
+        list.add(b6);
+
+        // Speed Champion badge
+        Badge b7 = new Badge();
+        b7.id = "speed_champion";
+        b7.title = "Speed Champion";
+        b7.description = "Win a speed challenge game.";
+        b7.iconName = "ic_badge_speed";
+        b7.unlocked = false;
+        b7.unlockedAt = 0;
+        list.add(b7);
+
+        // Achievement Collector badge
+        Badge b8 = new Badge();
+        b8.id = "achievement_collector";
+        b8.title = "Achievement Collector";
+        b8.description = "Unlock 5 achievements.";
+        b8.iconName = "ic_badge_achievements";
+        b8.unlocked = false;
+        b8.unlockedAt = 0;
+        list.add(b8);
 
         return list;
     }

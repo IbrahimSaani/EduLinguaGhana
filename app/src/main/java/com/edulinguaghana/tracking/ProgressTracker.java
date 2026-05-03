@@ -304,19 +304,23 @@ public class ProgressTracker {
      * Get progress aggregate for a student
      */
     public void getProgressAggregate(String userId, ProgressAggregateCallback callback) {
+        Log.d(TAG, "Fetching progress aggregate for userId: " + userId);
         aggregatesRef.child(userId).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot snapshot) {
                 ProgressAggregate aggregate = snapshot.getValue(ProgressAggregate.class);
                 if (aggregate == null) {
+                    Log.d(TAG, "No aggregate found for user, creating default");
                     aggregate = new ProgressAggregate();
                     aggregate.setUserId(userId);
                 }
+                Log.d(TAG, "Progress aggregate retrieved successfully for " + userId);
                 callback.onAggregateRetrieved(aggregate);
             }
 
             @Override
             public void onCancelled(DatabaseError error) {
+                Log.e(TAG, "Failed to fetch progress aggregate: " + error.getMessage() + " (Code: " + error.getCode() + ")");
                 callback.onError(error.getMessage());
             }
         });

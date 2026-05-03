@@ -47,6 +47,8 @@ public class QuestManager {
     // Made public so pure unit tests can verify generation logic without Android
     public static List<Quest> generateDefaultDailyQuests() {
         List<Quest> list = new ArrayList<>();
+
+        // Quest 1: Practice once
         Quest q1 = new Quest();
         q1.id = "daily_practice";
         q1.title = "Practice once";
@@ -58,6 +60,7 @@ public class QuestManager {
         q1.expiresAt = System.currentTimeMillis() + 24L*60*60*1000L;
         list.add(q1);
 
+        // Quest 2: Do a quiz
         Quest q2 = new Quest();
         q2.id = "daily_quiz";
         q2.title = "Do a quiz";
@@ -69,6 +72,7 @@ public class QuestManager {
         q2.expiresAt = System.currentTimeMillis() + 24L*60*60*1000L;
         list.add(q2);
 
+        // Quest 3: Try a challenge
         Quest q3 = new Quest();
         q3.id = "daily_challenge";
         q3.title = "Try a challenge";
@@ -79,6 +83,66 @@ public class QuestManager {
         q3.progress = 0;
         q3.expiresAt = System.currentTimeMillis() + 24L*60*60*1000L;
         list.add(q3);
+
+        // Quest 4: Multiple practices ← NEW
+        Quest q4 = new Quest();
+        q4.id = "practice_streak";
+        q4.title = "Practice 3 times";
+        q4.description = "Complete 3 practice sessions.";
+        q4.xpReward = 30;
+        q4.completed = false;
+        q4.target = 3;
+        q4.progress = 0;
+        q4.expiresAt = System.currentTimeMillis() + 24L*60*60*1000L;
+        list.add(q4);
+
+        // Quest 5: Multiple quizzes ← NEW
+        Quest q5 = new Quest();
+        q5.id = "quiz_multiple";
+        q5.title = "Complete 2 quizzes";
+        q5.description = "Finish 2 different quiz types.";
+        q5.xpReward = 25;
+        q5.completed = false;
+        q5.target = 2;
+        q5.progress = 0;
+        q5.expiresAt = System.currentTimeMillis() + 24L*60*60*1000L;
+        list.add(q5);
+
+        // Quest 6: Speed game ← NEW
+        Quest q6 = new Quest();
+        q6.id = "speed_game";
+        q6.title = "Play speed game";
+        q6.description = "Try the speed challenge game.";
+        q6.xpReward = 35;
+        q6.completed = false;
+        q6.target = 1;
+        q6.progress = 0;
+        q6.expiresAt = System.currentTimeMillis() + 24L*60*60*1000L;
+        list.add(q6);
+
+        // Quest 7: Language learning ← NEW
+        Quest q7 = new Quest();
+        q7.id = "language_explorer";
+        q7.title = "Practice 2 languages";
+        q7.description = "Practice with 2 different languages.";
+        q7.xpReward = 40;
+        q7.completed = false;
+        q7.target = 2;
+        q7.progress = 0;
+        q7.expiresAt = System.currentTimeMillis() + 24L*60*60*1000L;
+        list.add(q7);
+
+        // Quest 8: Marathon session ← NEW
+        Quest q8 = new Quest();
+        q8.id = "marathon_learner";
+        q8.title = "Study marathon";
+        q8.description = "Complete 5 total activities.";
+        q8.xpReward = 50;
+        q8.completed = false;
+        q8.target = 5;
+        q8.progress = 0;
+        q8.expiresAt = System.currentTimeMillis() + 24L*60*60*1000L;
+        list.add(q8);
 
         return list;
     }

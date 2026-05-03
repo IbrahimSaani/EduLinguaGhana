@@ -20,10 +20,15 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.card.MaterialCardView;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.progressindicator.LinearProgressIndicator;
+
+import android.widget.GridView;
+import android.widget.SeekBar;
+import android.widget.ArrayAdapter;
 
 import java.util.ArrayList;
 import java.util.Locale;
@@ -38,10 +43,15 @@ public class AlphabetActivity extends AppCompatActivity {
     private FloatingActionButton btnBack;
     private LinearProgressIndicator progressBar;
     private MaterialCardView letterCard, languageCard;
+    private MaterialCardView modeBadgeCard;
+    private TextView modeBadgeIcon, modeBadgeText, modeBadgeDescription;
     private ImageView decorativeShape1, decorativeShape2, decorativeShape3, decorativeShape4;
     private ImageView progressIcon;
     private TextView modeIcon;  // Changed to TextView for emoji
     private TextView celebrationEmoji;  // For celebration animations
+    private SeekBar seekBarNavigation;  // For smooth navigation
+    private MaterialButton btnShowGrid;  // For quick access grid
+    private MaterialButton btnSpeakQuick;  // For quick speak button
 
     private Vibrator vibrator;  // For haptic feedback
 
@@ -101,6 +111,10 @@ public class AlphabetActivity extends AppCompatActivity {
         progressBar = findViewById(R.id.progressBar);
         letterCard = findViewById(R.id.letterCard);
         languageCard = findViewById(R.id.languageCard);
+        modeBadgeCard = findViewById(R.id.modeBadgeCard);
+        modeBadgeIcon = findViewById(R.id.modeBadgeIcon);
+        modeBadgeText = findViewById(R.id.modeBadgeText);
+        modeBadgeDescription = findViewById(R.id.modeBadgeDescription);
 
         // Initialize decorative elements
         decorativeShape1 = findViewById(R.id.decorativeShape1);
@@ -109,6 +123,11 @@ public class AlphabetActivity extends AppCompatActivity {
         decorativeShape4 = findViewById(R.id.decorativeShape4);
         progressIcon = findViewById(R.id.progressIcon);
         modeIcon = findViewById(R.id.modeIcon);
+        
+        // Initialize navigation controls
+        seekBarNavigation = findViewById(R.id.seekBarNavigation);
+        btnShowGrid = findViewById(R.id.btnShowGrid);
+        btnSpeakQuick = findViewById(R.id.btnSpeakQuick);
 
         // Initialize vibrator for haptic feedback
         vibrator = (Vibrator) getSystemService(VIBRATOR_SERVICE);
@@ -125,6 +144,7 @@ public class AlphabetActivity extends AppCompatActivity {
 
         tvLanguageTitle.setText("Language: " + languageName);
         btnSpeak.setText(isRecitalMode ? "Repeat" : "Practice");
+        updateModeBadge();
 
         // --- DYNAMICALLY SET ALPHABET & WORDS ---
         switch (languageCode) {
@@ -259,6 +279,53 @@ public class AlphabetActivity extends AppCompatActivity {
                 celebrateAction();  // Show celebration
             } catch (Exception e) {
                 android.util.Log.e("AlphabetActivity", "Error in letter card click", e);
+            }
+        });
+
+        // SeekBar navigation for smooth traversal
+        seekBarNavigation.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            private boolean isUserChanging = false;
+
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                if (fromUser) {
+                    isUserChanging = true;
+                    currentIndex = progress;
+                    updateLetterWithAnimation();
+                    if (isRecitalMode) speakCurrentLetter();
+                }
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+                isUserChanging = true;
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+                isUserChanging = false;
+            }
+        });
+
+        // Quick access grid button
+        btnShowGrid.setOnClickListener(v -> {
+            try {
+                triggerHapticFeedback(30);
+                showLetterPickerDialog();
+            } catch (Exception e) {
+                android.util.Log.e("AlphabetActivity", "Error showing letter picker", e);
+            }
+        });
+
+        // Quick speak button
+        btnSpeakQuick.setOnClickListener(v -> {
+            try {
+                triggerHapticFeedback(40);
+                animateButtonPress(btnSpeakQuick);
+                speakCurrentLetter();
+                celebrateAction();
+            } catch (Exception e) {
+                android.util.Log.e("AlphabetActivity", "Error in quick speak button", e);
             }
         });
     }
@@ -979,6 +1046,91 @@ public class AlphabetActivity extends AppCompatActivity {
                 .rotation(360)
                 .setDuration(500)
                 .start();
+        }
+    }
+
+    /**
+     * Show letter picker in a bottom sheet dialog
+     */
+    private void showLetterPickerDialog() {
+        BottomSheetDialog dialog = new BottomSheetDialog(this);
+        
+        android.view.View bottomSheetView = android.view.LayoutInflater.from(this)
+            .inflate(android.R.layout.simple_list_item_1, null);
+        
+        // Create a custom grid view for letters
+        GridView gridView = new GridView(this);
+        gridView.setNumColumns(6);
+        gridView.setPadding(16, 16, 16, 16);
+        gridView.setVerticalSpacing(8);
+        gridView.setHorizontalSpacing(8);
+        
+        // Create adapter for letters
+        java.util.ArrayList<String> letterList = new java.util.ArrayList<>();
+        for (String letter : letters) {
+            letterList.add(letter);
+        }
+        
+        ArrayAdapter<String> adapter = new ArrayAdapter<String>(
+            this,
+            android.R.layout.simple_list_item_1,
+            letterList
+        ) {
+            @Override
+            public android.view.View getView(int position, android.view.View convertView, android.view.ViewGroup parent) {
+                android.widget.TextView textView = new android.widget.TextView(AlphabetActivity.this);
+                textView.setText(getItem(position));
+                textView.setTextSize(20);
+                textView.setTextColor(currentIndex == position ? 
+                    getColor(R.color.colorAccent) : getColor(R.color.textColorPrimary));
+                textView.setTypeface(null, android.graphics.Typeface.BOLD);
+                textView.setGravity(android.view.Gravity.CENTER);
+                textView.setPadding(16, 24, 16, 24);
+                
+                if (currentIndex == position) {
+                    textView.setBackgroundResource(R.drawable.ripple_card_effect);
+                }
+                
+                return textView;
+            }
+        };
+        
+        gridView.setAdapter(adapter);
+        gridView.setOnItemClickListener((parent, view, position, id) -> {
+            currentIndex = position;
+            seekBarNavigation.setProgress(position);
+            updateLetterWithAnimation();
+            if (isRecitalMode) speakCurrentLetter();
+            dialog.dismiss();
+        });
+        
+        dialog.setContentView(gridView);
+        dialog.show();
+    }
+
+    private void updateModeBadge() {
+        try {
+            if (modeBadgeText != null) {
+                if (isRecitalMode) {
+                    modeBadgeIcon.setText("⭐");
+                    modeBadgeText.setText("RECITAL");
+                    modeBadgeDescription.setText("Listen & Learn");
+                    modeBadgeCard.setCardBackgroundColor(getColor(R.color.colorAccent));
+                    modeBadgeText.setTextColor(getColor(android.R.color.white));
+                    modeBadgeDescription.setTextColor(getColor(android.R.color.white));
+                    modeBadgeDescription.setAlpha(0.8f);
+                } else {
+                    modeBadgeIcon.setText("🎤");
+                    modeBadgeText.setText("PRACTICE");
+                    modeBadgeDescription.setText("Speak & Learn");
+                    modeBadgeCard.setCardBackgroundColor(getColor(R.color.colorPrimary));
+                    modeBadgeText.setTextColor(getColor(android.R.color.white));
+                    modeBadgeDescription.setTextColor(getColor(android.R.color.white));
+                    modeBadgeDescription.setAlpha(0.8f);
+                }
+            }
+        } catch (Exception e) {
+            android.util.Log.e("AlphabetActivity", "Error updating mode badge", e);
         }
     }
 

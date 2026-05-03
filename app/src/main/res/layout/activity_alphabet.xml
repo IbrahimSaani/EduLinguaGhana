@@ -88,38 +88,51 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="20dp"
+                android:layout_marginBottom="24dp"
                 android:orientation="vertical"
-                android:spacing="12dp">
+                android:spacing="16dp"
+                android:paddingStart="8dp"
+                android:paddingEnd="8dp">
 
-                <!-- Animated Progress Counter -->
+                <!-- Animated Progress Counter with Enhanced Design -->
                 <com.google.android.material.card.MaterialCardView
-                    android:layout_width="wrap_content"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center_horizontal"
-                    app:cardCornerRadius="20dp"
-                    app:cardElevation="6dp"
-                    app:cardBackgroundColor="@color/colorAccent">
+                    app:cardCornerRadius="24dp"
+                    app:cardElevation="8dp"
+                    app:cardBackgroundColor="@color/colorAccent"
+                    app:strokeWidth="2dp"
+                    app:strokeColor="@color/colorPrimary">
 
                     <LinearLayout
-                        android:layout_width="wrap_content"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:orientation="horizontal"
-                        android:padding="12dp"
-                        android:spacing="8dp"
+                        android:padding="16dp"
+                        android:spacing="12dp"
                         android:gravity="center_vertical">
 
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="⭐"
-                            android:textSize="24sp" />
+                            android:textSize="28sp" />
 
                         <LinearLayout
-                            android:layout_width="wrap_content"
+                            android:layout_width="0dp"
                             android:layout_height="wrap_content"
-                            android:orientation="horizontal"
+                            android:layout_weight="1"
+                            android:orientation="vertical"
                             android:spacing="4dp">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Progress"
+                                android:textColor="@android:color/white"
+                                android:textSize="12sp"
+                                android:alpha="0.8" />
 
                             <TextView
                                 android:id="@+id/tvProgressCounter"
@@ -127,22 +140,93 @@
                                 android:layout_height="wrap_content"
                                 android:text="Letter 1 of 26"
                                 android:textColor="@android:color/white"
-                                android:textSize="16sp"
+                                android:textSize="18sp"
                                 android:textStyle="bold"
                                 android:fontFamily="@font/agbalumo" />
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:orientation="vertical"
+                            android:gravity="center">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="📊"
+                                android:textSize="24sp" />
                         </LinearLayout>
                     </LinearLayout>
                 </com.google.android.material.card.MaterialCardView>
 
-                <!-- Progress Bar -->
+                <!-- Enhanced SeekBar Section with better styling -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="12dp"
+                    android:background="@drawable/ripple_card_effect"
+                    android:elevation="4dp">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:spacing="8dp"
+                        android:gravity="center_vertical"
+                        android:layout_marginBottom="8dp">
+
+                        <ImageView
+                            android:layout_width="20dp"
+                            android:layout_height="20dp"
+                            android:contentDescription="@null"
+                            android:src="@drawable/ic_arrow_forward"
+                            app:tint="@color/colorAccent" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Quick Navigation"
+                            android:textColor="@color/colorPrimary"
+                            android:textSize="12sp"
+                            android:textStyle="bold"
+                            android:alpha="0.8" />
+                    </LinearLayout>
+
+                    <SeekBar
+                        android:id="@+id/seekBarNavigation"
+                        android:layout_width="match_parent"
+                        android:layout_height="40dp"
+                        android:max="25"
+                        android:progress="0"
+                        android:progressBackgroundTint="@color/buttonSecondary"
+                        android:progressTint="@color/colorAccent"
+                        android:thumbTint="@color/colorPrimary"
+                        android:scaleY="1.2" />
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="💡 Slide smoothly to jump between letters"
+                        android:textColor="@color/textColorSecondary"
+                        android:textSize="11sp"
+                        android:gravity="center"
+                        android:layout_marginTop="8dp"
+                        android:alpha="0.75" />
+                </LinearLayout>
+
+                <!-- Progress Bar with Enhanced Visual -->
                 <RelativeLayout
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content">
+                    android:layout_height="wrap_content"
+                    android:paddingStart="4dp"
+                    android:paddingEnd="4dp">
 
                     <ImageView
                         android:id="@+id/progressIcon"
-                        android:layout_width="28dp"
-                        android:layout_height="28dp"
+                        android:layout_width="24dp"
+                        android:layout_height="24dp"
                         android:layout_alignParentStart="true"
                         android:layout_centerVertical="true"
                         android:layout_marginEnd="8dp"
@@ -153,107 +237,67 @@
                     <com.google.android.material.progressindicator.LinearProgressIndicator
                         android:id="@+id/progressBar"
                         android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
+                        android:layout_height="12dp"
                         android:layout_toEndOf="@id/progressIcon"
                         android:progress="0"
                         app:indicatorColor="@color/colorAccent"
                         app:trackColor="@color/buttonSecondary"
-                        app:trackCornerRadius="8dp"
-                        app:trackThickness="10dp" />
+                        app:trackCornerRadius="6dp"
+                        app:trackThickness="12dp" />
                 </RelativeLayout>
-            </LinearLayout>
 
-            <com.google.android.material.card.MaterialCardView
-                android:id="@+id/languageCard"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="24dp"
-                android:foreground="@drawable/ripple_card_effect"
-                app:cardCornerRadius="20dp"
-                app:cardElevation="10dp"
-                app:strokeWidth="2dp"
-                app:strokeColor="@color/colorAccent">
-
-                <View
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:alpha="0.05"
-                    android:background="@drawable/bg_splash_gradient" />
-
+                <!-- Quick Access Grid and Picker Button with Enhanced Styling -->
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="horizontal"
-                    android:padding="20dp"
-                    android:gravity="center_vertical"
-                    android:spacing="16dp">
+                    android:spacing="8dp">
 
-                    <!-- Language emoji -->
-                    <TextView
-                        android:layout_width="40dp"
-                        android:layout_height="40dp"
-                        android:text="🌍"
-                        android:textSize="32sp"
-                        android:gravity="center" />
-
-                    <LinearLayout
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btnShowGrid"
+                        style="@style/Widget.Material3.Button"
                         android:layout_width="0dp"
-                        android:layout_height="wrap_content"
                         android:layout_weight="1"
-                        android:orientation="vertical">
+                        android:layout_height="52dp"
+                        android:text="📋 Grid"
+                        android:textSize="13sp"
+                        app:cornerRadius="14dp"
+                        app:elevation="6dp"
+                        app:icon="@drawable/ic_arrow_forward"
+                        app:iconSize="20dp" />
 
-                        <TextView
-                            android:id="@+id/tvLanguageTitle"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="@string/language_prefix"
-                            android:textColor="@color/colorPrimary"
-                            android:textSize="20sp"
-                            android:textStyle="bold"
-                            android:fontFamily="@font/agbalumo" />
-
-                        <TextView
-                            android:id="@+id/tvModeLabel"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginTop="4dp"
-                            android:text="@string/alphabet_mode"
-                            android:textColor="@color/colorAccent"
-                            android:textSize="14sp"
-                            android:textStyle="bold" />
-                    </LinearLayout>
-
-                    <!-- Mode emoji -->
-                    <TextView
-                        android:id="@+id/modeIcon"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="📖"
-                        android:textSize="32sp" />
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btnSpeakQuick"
+                        style="@style/Widget.Material3.Button.OutlinedButton"
+                        android:layout_width="0dp"
+                        android:layout_weight="1"
+                        android:layout_height="52dp"
+                        android:text="🎤 Speak"
+                        android:textSize="13sp"
+                        app:cornerRadius="14dp"
+                        app:strokeWidth="2dp"
+                        app:icon="@drawable/ic_speak"
+                        app:iconSize="20dp" />
                 </LinearLayout>
-            </com.google.android.material.card.MaterialCardView>
+            </LinearLayout>
 
-            <!-- Main Content Area with Enhanced Visuals and Interactivity -->
-            <FrameLayout
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="24dp">
+                android:orientation="vertical"
+                android:spacing="12dp"
+                android:layout_marginBottom="28dp">
 
                 <com.google.android.material.card.MaterialCardView
-                    android:id="@+id/letterCard"
+                    android:id="@+id/languageCard"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="40dp"
-                    android:layout_marginEnd="40dp"
-                    android:foreground="?attr/selectableItemBackground"
-                    android:clickable="true"
-                    android:focusable="true"
-                    app:cardCornerRadius="32dp"
-                    app:cardElevation="20dp"
-                    app:strokeColor="@color/colorPrimary"
-                    app:strokeWidth="3dp">
+                    android:foreground="@drawable/ripple_card_effect"
+                    app:cardCornerRadius="24dp"
+                    app:cardElevation="12dp"
+                    app:strokeWidth="3dp"
+                    app:strokeColor="@color/colorAccent">
 
-                    <!-- Gradient background -->
                     <View
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
@@ -263,32 +307,199 @@
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:padding="24dp"
+                        android:gravity="center_vertical"
+                        android:spacing="20dp">
+
+                        <!-- Language emoji -->
+                        <com.google.android.material.card.MaterialCardView
+                            android:layout_width="56dp"
+                            android:layout_height="56dp"
+                            app:cardCornerRadius="28dp"
+                            app:cardElevation="8dp"
+                            app:cardBackgroundColor="@color/colorAccent">
+
+                            <TextView
+                                android:layout_width="match_parent"
+                                android:layout_height="match_parent"
+                                android:text="🌍"
+                                android:textSize="32sp"
+                                android:gravity="center" />
+                        </com.google.android.material.card.MaterialCardView>
+
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:orientation="vertical"
+                            android:spacing="6dp">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Language"
+                                android:textColor="@color/textColorSecondary"
+                                android:textSize="11sp"
+                                android:textStyle="bold"
+                                android:alpha="0.7" />
+
+                            <TextView
+                                android:id="@+id/tvLanguageTitle"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="@string/language_prefix"
+                                android:textColor="@color/colorPrimary"
+                                android:textSize="22sp"
+                                android:textStyle="bold"
+                                android:fontFamily="@font/agbalumo" />
+
+                            <TextView
+                                android:id="@+id/tvModeLabel"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="@string/alphabet_mode"
+                                android:textColor="@color/colorAccent"
+                                android:textSize="12sp"
+                                android:textStyle="bold" />
+                        </LinearLayout>
+
+                        <!-- Mode emoji -->
+                        <com.google.android.material.card.MaterialCardView
+                            android:layout_width="56dp"
+                            android:layout_height="56dp"
+                            app:cardCornerRadius="28dp"
+                            app:cardElevation="8dp"
+                            app:cardBackgroundColor="@color/colorPrimary">
+
+                            <TextView
+                                android:id="@+id/modeIcon"
+                                android:layout_width="match_parent"
+                                android:layout_height="match_parent"
+                                android:text="📖"
+                                android:textSize="32sp"
+                                android:gravity="center" />
+                        </com.google.android.material.card.MaterialCardView>
+                    </LinearLayout>
+                </com.google.android.material.card.MaterialCardView>
+
+                <!-- Mode Badge - Shows RECITAL or PRACTICE -->
+                <com.google.android.material.card.MaterialCardView
+                    android:id="@+id/modeBadgeCard"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:cardCornerRadius="16dp"
+                    app:cardElevation="6dp">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:padding="12dp"
+                        android:spacing="8dp"
+                        android:gravity="center_vertical">
+
+                        <TextView
+                            android:id="@+id/modeBadgeIcon"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="⭐"
+                            android:textSize="20sp" />
+
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:orientation="vertical"
+                            android:spacing="2dp">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Current Mode"
+                                android:textColor="@color/colorPrimary"
+                                android:textSize="10sp"
+                                android:alpha="0.7" />
+
+                            <TextView
+                                android:id="@+id/modeBadgeText"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="RECITAL"
+                                android:textColor="@color/colorPrimary"
+                                android:textSize="14sp"
+                                android:textStyle="bold" />
+                        </LinearLayout>
+
+                        <TextView
+                            android:id="@+id/modeBadgeDescription"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Listen &amp; Learn"
+                            android:textColor="@color/textColorSecondary"
+                            android:textSize="11sp"
+                            android:alpha="0.8"
+                            android:layout_marginEnd="8dp" />
+                    </LinearLayout>
+                </com.google.android.material.card.MaterialCardView>
+            </LinearLayout>
+
+            <!-- Main Content Area with Enhanced Visuals and Interactivity -->
+            <FrameLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="28dp">
+
+                <com.google.android.material.card.MaterialCardView
+                    android:id="@+id/letterCard"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="32dp"
+                    android:layout_marginEnd="32dp"
+                    android:foreground="?attr/selectableItemBackground"
+                    android:clickable="true"
+                    android:focusable="true"
+                    app:cardCornerRadius="36dp"
+                    app:cardElevation="24dp"
+                    app:strokeColor="@color/colorPrimary"
+                    app:strokeWidth="4dp">
+
+                    <!-- Gradient background -->
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:alpha="0.1"
+                        android:background="@drawable/bg_splash_gradient" />
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
                         android:gravity="center"
                         android:orientation="vertical"
-                        android:paddingTop="50dp"
-                        android:paddingBottom="50dp"
-                        android:paddingStart="28dp"
-                        android:paddingEnd="28dp">
+                        android:paddingTop="60dp"
+                        android:paddingBottom="60dp"
+                        android:paddingStart="32dp"
+                        android:paddingEnd="32dp">
 
-                        <!-- Celebration emoji container -->
+                        <!-- Celebration emoji container with animation support -->
                         <FrameLayout
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_marginBottom="12dp">
+                            android:layout_marginBottom="16dp">
 
                             <TextView
                                 android:id="@+id/celebrationEmoji"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:text="✨"
-                                android:textSize="40sp" />
+                                android:textSize="44sp" />
                         </FrameLayout>
 
                         <!-- Main letter with enhanced shadow and glow -->
                         <FrameLayout
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_marginBottom="28dp">
+                            android:layout_marginBottom="32dp">
 
                             <!-- Outer glow effect (shadow) -->
                             <TextView
@@ -298,9 +509,9 @@
                                 android:layout_marginStart="4dp"
                                 android:fontFamily="@font/agbalumo"
                                 android:text="A"
-                                android:alpha="0.12"
+                                android:alpha="0.15"
                                 android:textColor="@color/colorAccent"
-                                android:textSize="160sp"
+                                android:textSize="170sp"
                                 android:textStyle="bold" />
 
                             <!-- Main letter -->
@@ -311,7 +522,7 @@
                                 android:fontFamily="@font/agbalumo"
                                 android:text="A"
                                 android:textColor="@color/colorAccent"
-                                android:textSize="160sp"
+                                android:textSize="170sp"
                                 android:textStyle="bold" />
 
                             <!-- Subtle shadow for depth -->
@@ -323,37 +534,59 @@
                                 android:layout_marginStart="3dp"
                                 android:fontFamily="@font/agbalumo"
                                 android:text="A"
-                                android:alpha="0.08"
+                                android:alpha="0.1"
                                 android:textColor="@android:color/black"
-                                android:textSize="160sp"
+                                android:textSize="170sp"
                                 android:textStyle="bold" />
                         </FrameLayout>
 
-                        <!-- Word display with icon -->
+                        <!-- Word display with enhanced styling -->
                         <LinearLayout
-                            android:layout_width="wrap_content"
+                            android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:layout_marginBottom="32dp"
-                            android:orientation="horizontal"
-                            android:gravity="center_vertical"
+                            android:layout_marginBottom="36dp"
+                            android:layout_marginStart="24dp"
+                            android:layout_marginEnd="24dp"
+                            android:orientation="vertical"
+                            android:gravity="center_horizontal"
                             android:spacing="12dp">
 
-                            <TextView
+                            <LinearLayout
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="📖"
-                                android:textSize="28sp" />
+                                android:orientation="horizontal"
+                                android:spacing="6dp"
+                                android:gravity="center">
+
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="📖"
+                                    android:textSize="16sp" />
+
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="Word Example"
+                                    android:textColor="@color/textColorSecondary"
+                                    android:textSize="12sp"
+                                    android:textStyle="bold"
+                                    android:alpha="0.75" />
+                            </LinearLayout>
 
                             <TextView
                                 android:id="@+id/tvLetterWord"
-                                android:layout_width="wrap_content"
+                                android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
                                 android:textColor="@color/colorPrimary"
-                                android:textSize="36sp"
+                                android:textSize="34sp"
                                 android:textStyle="bold"
                                 android:fontFamily="@font/agbalumo"
-                                android:letterSpacing="0.1"
-                                tools:text="Apple" />
+                                android:letterSpacing="0.05"
+                                android:gravity="center"
+                                android:maxLines="3"
+                                android:ellipsize="end"
+                                tools:text="A-pple" />
                         </LinearLayout>
 
                         <!-- Speak button - Enhanced with gradient and icon -->
@@ -361,15 +594,15 @@
                             android:id="@+id/btnSpeak"
                             style="@style/Widget.Material3.Button"
                             android:layout_width="wrap_content"
-                            android:layout_height="64dp"
-                            android:minWidth="220dp"
-                            android:paddingStart="32dp"
-                            android:paddingEnd="32dp"
+                            android:layout_height="68dp"
+                            android:minWidth="240dp"
+                            android:paddingStart="36dp"
+                            android:paddingEnd="36dp"
                             android:text="@string/speak_button"
                             android:textSize="18sp"
                             android:textStyle="bold"
-                            app:cornerRadius="32dp"
-                            app:elevation="8dp"
+                            app:cornerRadius="34dp"
+                            app:elevation="10dp"
                             app:icon="@drawable/ic_speak"
                             app:iconSize="28dp"
                             app:iconGravity="start"
@@ -379,11 +612,12 @@
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_marginTop="16dp"
-                            android:text="💡 Tap letter to hear sound!"
+                            android:layout_marginTop="18dp"
+                            android:text="✨ Tap to hear the pronunciation!"
                             android:textColor="@color/colorAccent"
-                            android:textSize="12sp"
-                            android:alpha="0.7" />
+                            android:textSize="11sp"
+                            android:alpha="0.75"
+                            android:textStyle="bold" />
                     </LinearLayout>
                 </com.google.android.material.card.MaterialCardView>
 
@@ -391,32 +625,32 @@
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/btnPrev"
                     style="@style/Widget.Material3.Button.ElevatedButton.Icon"
-                    android:layout_width="68dp"
-                    android:layout_height="68dp"
+                    android:layout_width="72dp"
+                    android:layout_height="72dp"
                     android:layout_gravity="center_vertical|start"
-                    android:layout_marginStart="6dp"
+                    android:layout_marginStart="8dp"
                     android:contentDescription="@string/content_description_previous"
-                    app:cornerRadius="34dp"
-                    app:elevation="12dp"
+                    app:cornerRadius="36dp"
+                    app:elevation="14dp"
                     app:icon="@drawable/ic_arrow_back"
                     app:iconGravity="textStart"
-                    app:iconSize="32dp"
+                    app:iconSize="36dp"
                     app:iconPadding="0dp"
                     app:backgroundTint="@color/colorPrimary" />
 
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/btnNext"
                     style="@style/Widget.Material3.Button.ElevatedButton.Icon"
-                    android:layout_width="68dp"
-                    android:layout_height="68dp"
+                    android:layout_width="72dp"
+                    android:layout_height="72dp"
                     android:layout_gravity="center_vertical|end"
-                    android:layout_marginEnd="6dp"
+                    android:layout_marginEnd="8dp"
                     android:contentDescription="@string/content_description_next"
-                    app:cornerRadius="34dp"
-                    app:elevation="12dp"
+                    app:cornerRadius="36dp"
+                    app:elevation="14dp"
                     app:icon="@drawable/ic_arrow_forward"
                     app:iconGravity="textStart"
-                    app:iconSize="32dp"
+                    app:iconSize="36dp"
                     app:iconPadding="0dp"
                     app:backgroundTint="@color/colorPrimary" />
             </FrameLayout>

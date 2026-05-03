@@ -16,8 +16,26 @@
         <!-- Status bar color. -->
         <item name="android:statusBarColor">@color/colorPrimaryDark</item>
         <item name="android:navigationBarColor">@color/appBackground</item>
+        <!-- Disable fullscreen mode - ensure status bar is always visible -->
+        <item name="android:windowFullscreen">false</item>
+        <!-- Text colors for proper dark mode support -->
+        <item name="android:textColorPrimary">@color/textColorPrimary</item>
+        <item name="android:textColorSecondary">@color/textColorSecondary</item>
+        <!-- Material3 colors for better theme support in dark mode -->
+        <item name="colorError">#F2B8B5</item>
+        <item name="colorErrorContainer">#8C1D18</item>
+        <item name="colorOnError">#601410</item>
         <!-- Customize your theme here. -->
     </style>
 
     <style name="Theme.EduLinguaGhana" parent="Base.Theme.EduLinguaGhana" />
+
+    <!-- Toolbar Title Style for Dark Mode -->
+    <style name="ToolbarTitleStyle" parent="TextAppearance.Widget.AppCompat.Toolbar.Title">
+        <item name="android:textSize">20sp</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:fontFamily">@font/agbalumo</item>
+        <item name="android:letterSpacing">0.02</item>
+        <item name="android:textColor">?attr/colorOnPrimary</item>
+    </style>
 </resources>

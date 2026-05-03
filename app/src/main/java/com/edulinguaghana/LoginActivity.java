@@ -160,7 +160,7 @@ public class LoginActivity extends AppCompatActivity {
     private void signInWithFacebook() {
         LoginManager.getInstance().logInWithReadPermissions(
                 this,
-                Arrays.asList("email", "public_profile")
+                Arrays.asList("public_profile")
         );
 
         LoginManager.getInstance().registerCallback(mCallbackManager,

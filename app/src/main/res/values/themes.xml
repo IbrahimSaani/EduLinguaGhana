@@ -16,6 +16,15 @@
         <!-- Status bar color. -->
         <item name="android:statusBarColor">@color/colorPrimaryDark</item>
         <item name="android:navigationBarColor">@color/white</item>
+        <!-- Disable fullscreen mode - ensure status bar is always visible -->
+        <item name="android:windowFullscreen">false</item>
+        <!-- Text colors for proper dark mode support -->
+        <item name="android:textColorPrimary">@color/textColorPrimary</item>
+        <item name="android:textColorSecondary">@color/textColorSecondary</item>
+        <!-- Material3 colors for better theme support -->
+        <item name="colorError">#B3261E</item>
+        <item name="colorErrorContainer">#F9DEDC</item>
+        <item name="colorOnError">#FFFFFF</item>
         <!-- Customize your theme here. -->
     </style>
 
@@ -27,6 +36,7 @@
         <item name="android:textStyle">bold</item>
         <item name="android:fontFamily">@font/agbalumo</item>
         <item name="android:letterSpacing">0.02</item>
+        <item name="android:textColor">?attr/colorOnPrimary</item>
     </style>
 
     <!-- Tab Text Style -->

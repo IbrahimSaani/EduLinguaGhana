@@ -273,17 +273,6 @@
 
     </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
 
-    <!-- Floating Action Button -->
-    <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
-        android:id="@+id/fabAddChild"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="bottom|end"
-        android:layout_margin="16dp"
-        android:text="Add Child"
-        app:icon="@android:drawable/ic_input_add"
-        app:iconTint="@android:color/white"
-        app:backgroundTint="@color/colorPrimary"/>
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>
 

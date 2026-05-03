@@ -1,30 +1,43 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <!-- App-specific branding -->
-    <color name="colorPrimary">#7E57C2</color> <!-- A lighter, more vibrant purple for dark mode -->
-    <color name="colorPrimaryDark">#5E35B1</color>
-    <color name="colorAccent">#FFD54F</color> <!-- A brighter, more visible accent for dark mode -->
+    <!-- Basic colors -->
+    <color name="black">#FF000000</color>
+    <color name="white">#FFFFFFFF</color>
 
-    <!-- UI elements -->
-    <color name="appBackground">#121212</color> <!-- A standard dark theme background -->
-    <color name="cardBackground">#1E1E1E</color> <!-- A slightly lighter card background -->
-    <color name="textColorPrimary">#FFFFFF</color>
-    <color name="textColorSecondary">#B0BEC5</color>
+    <!-- App-specific branding - optimized for dark mode -->
+    <color name="colorPrimary">#9575CD</color> <!-- Lighter purple for visibility in dark mode -->
+    <color name="primary">#9575CD</color>
+    <color name="colorPrimaryDark">#7E57C2</color>
+    <color name="colorPrimaryLight">#4527A0</color>
+    <color name="colorAccent">#FFD54F</color> <!-- Brighter yellow for better contrast -->
 
-    <!-- Buttons -->
-    <color name="buttonPrimary">#7E57C2</color>
+    <!-- UI elements - optimized for dark mode -->
+    <color name="appBackground">#121212</color> <!-- Material Design standard dark background -->
+    <color name="cardBackground">#1E1E1E</color> <!-- Elevated card background - slightly lighter than app bg -->
+    <color name="card_background">#1E1E1E</color>
+    <color name="card_stroke">#373737</color> <!-- Visible stroke for dark mode -->
+    <color name="textColorPrimary">#FFFFFF</color> <!-- Pure white for maximum contrast -->
+    <color name="textColorSecondary">#B0BEC5</color> <!-- Light blue-gray for secondary text -->
+    <color name="text_secondary">#B0BEC5</color>
+    <color name="dividerColor">#373737</color> <!-- Visible dividers in dark mode -->
+
+    <!-- Buttons - optimized for dark mode -->
+    <color name="buttonPrimary">#9575CD</color>
     <color name="buttonSecondary">#373737</color>
     <color name="buttonTextPrimary">#FFFFFF</color>
-    <color name="buttonTextSecondary">#ECEFF1</color>
+    <color name="buttonTextSecondary">#E0E0E0</color>
 
-    <!-- Quiz-specific -->
-    <color name="correctAnswer">#81C784</color>
-    <color name="wrongAnswer">#E57373</color>
+    <!-- Quiz-specific - better contrast in dark mode -->
+    <color name="correctAnswer">#81C784</color> <!-- Brighter green for visibility -->
+    <color name="wrongAnswer">#EF5350</color> <!-- Brighter red for visibility -->
 
-    <!-- Progress Screen -->
+    <!-- Progress Screen - optimized for dark mode -->
     <color name="progressScreenBackground">#1E1E1E</color>
     <color name="progressTitleColor">#9575CD</color>
     <color name="achievementsTextColor">#BCAAA4</color>
+    <color name="textPrimary">#FFFFFF</color>
+    <color name="textSecondary">#B0BEC5</color>
+    <color name="progressTrackColor">#424242</color> <!-- Visible progress track -->
 
     <!-- Playful palette for dark mode -->
     <color name="playfulSkyStart">#2C1B47</color>
@@ -33,10 +46,10 @@
     <color name="playfulHeroEnd">#4A148C</color>
     <color name="languageCardStart">#004D40</color>
     <color name="languageCardEnd">#1B5E20</color>
-    <color name="modeRecitalStart">#4A3200</color>
-    <color name="modeRecitalEnd">#5D4037</color>
+    <color name="modeRecitalStart">#5D4037</color>
+    <color name="modeRecitalEnd">#6D4C41</color>
     <color name="modePracticeStart">#4527A0</color>
-    <color name="modePracticeEnd">#5E35B1</color>
+    <color name="modePracticeEnd">#6A1B9A</color>
     <color name="modeQuizStart">#006064</color>
     <color name="modeQuizEnd">#00838F</color>
     <color name="modeProgressStart">#1B5E20</color>
@@ -45,16 +58,25 @@
     <color name="chipStroke">#424242</color>
 
     <!-- Dynamic background palette for dark mode -->
-    <color name="bgMorningStart">#3E2723</color>
-    <color name="bgMorningMid">#4A148C</color>
-    <color name="bgMorningEnd">#311B92</color>
+    <color name="bgMorningStart">#4A148C</color>
+    <color name="bgMorningMid">#6A1B9A</color>
+    <color name="bgMorningEnd">#7B1FA2</color>
     <color name="bgDayStart">#1A237E</color>
     <color name="bgDayMid">#283593</color>
     <color name="bgDayEnd">#303F9F</color>
     <color name="bgNightStart">#0A0E1A</color>
     <color name="bgNightMid">#0D1B3D</color>
     <color name="bgNightEnd">#1A237E</color>
-    <color name="sparkleCore">#AAFFFFFF</color>
-    <color name="sparkleHalo">#88FFD8A8</color>
-    <color name="sparkleHaloSecondary">#884FC3F7</color>
+    <color name="sparkleCore">#CCFFFFFF</color> <!-- More visible sparkle in dark -->
+    <color name="sparkleHalo">#99FFD8A8</color>
+    <color name="sparkleHaloSecondary">#994FC3F7</color>
+
+    <!-- Notifications - optimized for dark mode -->
+    <color name="notification_unread_bg">#1B237E</color>
+    <color name="notification_achievement_bg">#4A3200</color>
+    <color name="notification_milestone_bg">#004D40</color>
+    <color name="notification_streak_bg">#4A1A1A</color>
+    <color name="notification_motivational_bg">#4527A0</color>
+    <color name="notification_reminder_bg">#1B5E20</color>
+    <color name="random_avatar_stroke_color">#81C784</color>
 </resources>

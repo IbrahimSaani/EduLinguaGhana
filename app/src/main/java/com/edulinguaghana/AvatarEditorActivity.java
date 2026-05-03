@@ -247,10 +247,38 @@ public class AvatarEditorActivity extends AppCompatActivity {
             }).start();
 
         builder.saveConfig(this);
+
+        // Save avatar to database
+        saveAvatarToDatabase();
+
         Toast.makeText(this, "Avatar saved successfully! ✨", Toast.LENGTH_SHORT).show();
 
         // Delay finish to show animation
         avatarPreview.postDelayed(this::finish, 500);
+    }
+
+    private void saveAvatarToDatabase() {
+        com.google.firebase.auth.FirebaseUser currentUser = com.google.firebase.auth.FirebaseAuth.getInstance().getCurrentUser();
+        if (currentUser == null) return;
+
+        com.google.firebase.database.DatabaseReference usersRef =
+                com.google.firebase.database.FirebaseDatabase.getInstance()
+                        .getReference("users")
+                        .child(currentUser.getUid());
+
+        java.util.Map<String, Object> updates = new java.util.HashMap<>();
+        updates.put("avatar", config.toMap());
+        updates.put("avatarUpdatedAt", System.currentTimeMillis());
+
+        usersRef.updateChildren(updates)
+                .addOnCompleteListener(task -> {
+                    if (task.isSuccessful()) {
+                        android.util.Log.d("AvatarEditor", "Avatar saved to database successfully");
+                    } else {
+                        android.util.Log.e("AvatarEditor", "Failed to save avatar to database: " +
+                            (task.getException() != null ? task.getException().getMessage() : "Unknown error"));
+                    }
+                });
     }
 
     @Override

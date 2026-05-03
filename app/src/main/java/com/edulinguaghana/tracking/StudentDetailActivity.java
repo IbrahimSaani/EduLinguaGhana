@@ -1,6 +1,7 @@
 package com.edulinguaghana.tracking;
 
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -26,6 +27,8 @@ import java.util.Locale;
  * Detailed view of a student's progress with charts and statistics
  */
 public class StudentDetailActivity extends AppCompatActivity {
+
+    private static final String TAG = "StudentDetailActivity";
 
     private String studentId;
     private String studentName;
@@ -132,19 +135,30 @@ public class StudentDetailActivity extends AppCompatActivity {
         loadingProgress.setVisibility(View.VISIBLE);
         statsCard.setVisibility(View.GONE);
 
+        Log.d(TAG, "Loading progress for student: " + studentId);
+
         progressTracker.getProgressAggregate(studentId, new ProgressTracker.ProgressAggregateCallback() {
             @Override
             public void onAggregateRetrieved(ProgressAggregate aggregate) {
                 loadingProgress.setVisibility(View.GONE);
                 statsCard.setVisibility(View.VISIBLE);
+                Log.d(TAG, "Progress loaded successfully");
                 displayProgress(aggregate);
             }
 
             @Override
             public void onError(String error) {
                 loadingProgress.setVisibility(View.GONE);
-                Toast.makeText(StudentDetailActivity.this,
-                             "Error loading progress: " + error, Toast.LENGTH_SHORT).show();
+                Log.e(TAG, "Failed to load progress: " + error);
+
+                String errorMessage = "Error loading progress";
+                if (error != null && error.contains("Permission denied")) {
+                    errorMessage = "Permission denied. Please ensure the teacher-student relationship is accepted.";
+                } else if (error != null) {
+                    errorMessage = "Error loading progress: " + error;
+                }
+
+                Toast.makeText(StudentDetailActivity.this, errorMessage, Toast.LENGTH_LONG).show();
             }
         });
     }
