@@ -30,7 +30,6 @@ import androidx.core.content.ContextCompat;
 import androidx.core.widget.ImageViewCompat;
 import androidx.core.widget.NestedScrollView;
 
-import com.airbnb.lottie.LottieAnimationView;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.card.MaterialCardView;
 import com.google.android.material.chip.Chip;

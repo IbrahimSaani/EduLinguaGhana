@@ -15,29 +15,34 @@ public class BadgeManager {
     private static final String KEY_BADGES = "badges";
 
     public static List<Badge> getAllBadges(Context ctx) {
-        SharedPreferences p = ctx.getSharedPreferences(PREFS, Context.MODE_PRIVATE);
-        String j = p.getString(KEY_BADGES, null);
-        List<Badge> out = new ArrayList<>();
-        if (j == null) {
-            out = generateDefaultBadges();
-            saveBadges(ctx, out);
+        synchronized (BadgeManager.class) {
+            SharedPreferences p = ctx.getSharedPreferences(PREFS, Context.MODE_PRIVATE);
+            String j = p.getString(KEY_BADGES, null);
+            List<Badge> out = new ArrayList<>();
+            if (j == null) {
+                out = generateDefaultBadges();
+                saveBadges(ctx, out);
+                return out;
+            }
+            try {
+                JSONArray arr = new JSONArray(j);
+                for (int i = 0; i < arr.length(); i++) out.add(Badge.fromJson(arr.getJSONObject(i)));
+            } catch (JSONException e) {
+                out = generateDefaultBadges();
+                saveBadges(ctx, out);
+            }
             return out;
         }
-        try {
-            JSONArray arr = new JSONArray(j);
-            for (int i = 0; i < arr.length(); i++) out.add(Badge.fromJson(arr.getJSONObject(i)));
-        } catch (JSONException e) {
-            out = generateDefaultBadges();
-            saveBadges(ctx, out);
-        }
-        return out;
     }
 
     public static void saveBadges(Context ctx, List<Badge> badges) {
-        JSONArray arr = new JSONArray();
-        for (Badge b : badges) arr.put(b.toJson());
-        SharedPreferences p = ctx.getSharedPreferences(PREFS, Context.MODE_PRIVATE);
-        p.edit().putString(KEY_BADGES, arr.toString()).apply();
+        synchronized (BadgeManager.class) {
+            JSONArray arr = new JSONArray();
+            for (Badge b : badges) arr.put(b.toJson());
+            SharedPreferences p = ctx.getSharedPreferences(PREFS, Context.MODE_PRIVATE);
+            // Use commit() instead of apply() for critical badge data to ensure synchronous write
+            p.edit().putString(KEY_BADGES, arr.toString()).commit();
+        }
     }
 
     private static List<Badge> generateDefaultBadges() {
@@ -127,24 +132,28 @@ public class BadgeManager {
     }
 
     public static void unlockBadge(Context ctx, String badgeId) {
-        List<Badge> list = getAllBadges(ctx);
-        boolean changed = false;
-        for (Badge b : list) {
-            if (b.id.equals(badgeId) && !b.unlocked) {
-                b.unlocked = true;
-                b.unlockedAt = System.currentTimeMillis();
-                changed = true;
-                // grant xp for unlocking badge
-                XPManager.awardXP(ctx, 25, "badge:" + badgeId);
+        synchronized (BadgeManager.class) {
+            List<Badge> list = getAllBadges(ctx);
+            boolean changed = false;
+            for (Badge b : list) {
+                if (b.id.equals(badgeId) && !b.unlocked) {
+                    b.unlocked = true;
+                    b.unlockedAt = System.currentTimeMillis();
+                    changed = true;
+                    // grant xp for unlocking badge
+                    XPManager.awardXP(ctx, 25, "badge:" + badgeId);
+                }
             }
+            if (changed) saveBadges(ctx, list);
         }
-        if (changed) saveBadges(ctx, list);
     }
 
     public static boolean isUnlocked(Context ctx, String badgeId) {
-        List<Badge> list = getAllBadges(ctx);
-        for (Badge b : list) if (b.id.equals(badgeId)) return b.unlocked;
-        return false;
+        synchronized (BadgeManager.class) {
+            List<Badge> list = getAllBadges(ctx);
+            for (Badge b : list) if (b.id.equals(badgeId)) return b.unlocked;
+            return false;
+        }
     }
 }
 

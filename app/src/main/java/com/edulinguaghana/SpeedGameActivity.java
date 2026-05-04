@@ -22,7 +22,6 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
-import java.util.Map;
 import java.util.Random;
 import java.util.Set;
 
@@ -115,8 +114,8 @@ public class SpeedGameActivity extends AppCompatActivity {
         bestScore = prefs.getInt(KEY_HIGH_SCORE, 0);
         isSfxOn   = prefs.getBoolean(KEY_SFX_ENABLED, true);
 
-        tvGameBest.setText("Best: " + bestScore);
-        tvGameScore.setText("Score: 0");
+        tvGameBest.setText(getString(R.string.quiz_best_score, bestScore));
+        tvGameScore.setText(getString(R.string.quiz_score, 0));
         tvGameFeedback.setText("");
 
         // --- Init TTS ---
@@ -225,10 +224,10 @@ public class SpeedGameActivity extends AppCompatActivity {
 
     private void startNewRound() {
         score = 0;
-        tvGameScore.setText("Score: " + score);
+        tvGameScore.setText(getString(R.string.quiz_score, score));
         tvGameFeedback.setText("");
         timeLeftMs = TOTAL_TIME_MS;
-        tvGameTimer.setText("Time: " + (timeLeftMs / 1000) + "s");
+        tvGameTimer.setText(getString(R.string.quiz_timer, (timeLeftMs / 1000)));
 
         generateNewQuestion();
         startTimer();
@@ -316,10 +315,11 @@ public class SpeedGameActivity extends AppCompatActivity {
         btnOption6.setText(options.get(5));
 
         String numberWord = LanguageConversionUtils.convertNumberToWord(correctNumber, languageCode);
+        // Show localized prompt; append the spoken number word in parentheses when available
         if (!numberWord.isEmpty()) {
-            tvGamePrompt.setText(R.string.quiz_prompt_number + "\n(" + numberWord + ")");
+            tvGamePrompt.setText(getString(R.string.quiz_prompt_number) + "\n(" + numberWord + ")");
         } else {
-            tvGamePrompt.setText(R.string.quiz_prompt_number);
+            tvGamePrompt.setText(getString(R.string.quiz_prompt_number));
         }
         tvGameFeedback.setText("");
 
@@ -338,8 +338,8 @@ public class SpeedGameActivity extends AppCompatActivity {
         int missingValue = seq[missingIndex];
         currentCorrectAnswer = String.valueOf(missingValue);
 
-        // Display sequence prompt without localization
-        tvGamePrompt.setText("Find the missing number: " + seq[0] + ", " + seq[1] + ", ?, " + seq[3]);
+        // Build a short sequence prompt. Use localized base question and add numbers.
+        tvGamePrompt.setText(getString(R.string.quiz_prompt_number) + " " + seq[0] + ", " + seq[1] + ", ?, " + seq[3]);
         tvGameFeedback.setText("");
 
         List<String> options = new ArrayList<>();
@@ -437,20 +437,20 @@ public class SpeedGameActivity extends AppCompatActivity {
 
         if (correct) {
             score++;
-            tvGameFeedback.setText("✅ Correct!");
-            tvGameScore.setText("Score: " + score);
+                    tvGameFeedback.setText(getString(R.string.quiz_feedback_correct));
+                    tvGameScore.setText(getString(R.string.quiz_score, score));
 
             playSfx(true);
             playCorrectAnimation(clickedButton);
 
             if (score > bestScore) {
                 bestScore = score;
-                tvGameBest.setText("Best: " + bestScore);
+                tvGameBest.setText(getString(R.string.quiz_best_score, bestScore));
                 saveHighScore(bestScore);
                 playHighScoreCelebration();
             }
         } else {
-            tvGameFeedback.setText("❌ Wrong! Correct: " + currentCorrectAnswer);
+            tvGameFeedback.setText(getString(R.string.quiz_feedback_wrong, currentCorrectAnswer));
             playSfx(false);
             playWrongAnimation(clickedButton);
         }
@@ -468,14 +468,14 @@ public class SpeedGameActivity extends AppCompatActivity {
             @Override
             public void onTick(long millisUntilFinished) {
                 timeLeftMs = millisUntilFinished;
-                tvGameTimer.setText("Time: " + (millisUntilFinished / 1000) + "s");
+                tvGameTimer.setText(getString(R.string.quiz_timer, (millisUntilFinished / 1000)));
             }
 
             @Override
             public void onFinish() {
                 timeLeftMs = 0;
-                tvGameTimer.setText("Time: 0s");
-                tvGameFeedback.setText("⏰ Time's up! Final score: " + score);
+                tvGameTimer.setText(getString(R.string.quiz_timer_done));
+                tvGameFeedback.setText(getString(R.string.quiz_final_score, score));
 
                 // Disable buttons
                 setOptionsEnabled(false);

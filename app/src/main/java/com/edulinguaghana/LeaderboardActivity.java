@@ -1,9 +1,13 @@
 package com.edulinguaghana;
 
 import android.content.Intent;
+import android.media.MediaPlayer;
 import android.os.Bundle;
+import android.os.Handler;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -46,6 +50,7 @@ public class LeaderboardActivity extends AppCompatActivity {
     private List<LeaderboardEntry> leaderboardList;
     private LeaderboardAdapter adapter;
     private FirebaseUser currentUser;
+    private MediaPlayer sfxPlayer;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -94,6 +99,7 @@ public class LeaderboardActivity extends AppCompatActivity {
         if (swipeRefreshLayout != null) {
             swipeRefreshLayout.setOnRefreshListener(() -> {
                 // When user pulls to refresh, reload leaderboard
+                playSfx(true);
                 loadLeaderboard();
             });
             // Use same color as accent for the refresh spinner
@@ -313,6 +319,7 @@ public class LeaderboardActivity extends AppCompatActivity {
         }
 
         if (leaderboardList.isEmpty()) {
+            animateEmptyState();
             emptyStateLayout.setVisibility(View.VISIBLE);
             mainContentLayout.setVisibility(View.GONE);
             tvYourRank.setText("#--");
@@ -323,13 +330,19 @@ public class LeaderboardActivity extends AppCompatActivity {
         } else {
             emptyStateLayout.setVisibility(View.GONE);
             mainContentLayout.setVisibility(View.VISIBLE);
+
+            // Animate the leaderboard content entrance
+            animateLeaderboardEntrance();
             adapter.notifyDataSetChanged();
 
-            // Update user's rank and score
+            // Update user's rank and score with celebration
             updateUserRank();
 
+            // Play success sound
+            playSfx(true);
+
             if (swipeTriggered) {
-                Snackbar.make(findViewById(android.R.id.content), "Leaderboard updated", Snackbar.LENGTH_SHORT).show();
+                Snackbar.make(findViewById(android.R.id.content), "Leaderboard updated! 🏆", Snackbar.LENGTH_SHORT).show();
             }
         }
     }
@@ -358,6 +371,14 @@ public class LeaderboardActivity extends AppCompatActivity {
         if (rank > 0) {
             tvYourRank.setText("#" + rank);
             tvYourScore.setText(String.valueOf(userScore));
+
+            // Animate rank update with celebration
+            animateRankUpdate(rank);
+
+            // Play celebratory sound if top 10
+            if (rank <= 10) {
+                playRankCelebration();
+            }
         } else {
             tvYourRank.setText("#--");
             tvYourScore.setText("0");
@@ -371,5 +392,75 @@ public class LeaderboardActivity extends AppCompatActivity {
             return true;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    // ========== ANIMATION METHODS ==========
+
+    private void animateEmptyState() {
+        try {
+            LinearLayout emptyLayout = findViewById(R.id.emptyStateLayout);
+            if (emptyLayout != null) {
+                Animation fadeIn = AnimationUtils.loadAnimation(this, R.anim.fade_in);
+                emptyLayout.startAnimation(fadeIn);
+            }
+        } catch (Exception ignored) {}
+    }
+
+    private void animateLeaderboardEntrance() {
+        try {
+            Animation slideUp = AnimationUtils.loadAnimation(this, R.anim.slide_up_fade_in);
+            mainContentLayout.startAnimation(slideUp);
+        } catch (Exception ignored) {}
+    }
+
+    private void animateRankUpdate(int rank) {
+        try {
+            // Rainbow shine effect for user's rank card
+            Animation shine = AnimationUtils.loadAnimation(this, R.anim.rainbow_shine);
+            tvYourRank.startAnimation(shine);
+
+            // Bounce pop for score
+            Animation bounce = AnimationUtils.loadAnimation(this, R.anim.bounce_pop);
+            tvYourScore.startAnimation(bounce);
+        } catch (Exception ignored) {}
+    }
+
+    private void playRankCelebration() {
+        try {
+            // Screen shake for top 10 celebration
+            Animation shake = AnimationUtils.loadAnimation(this, R.anim.screen_shake);
+            View root = findViewById(android.R.id.content);
+            if (root != null) {
+                root.startAnimation(shake);
+            }
+        } catch (Exception ignored) {}
+    }
+
+    private void playSfx(boolean isCorrect) {
+        try {
+            if (sfxPlayer != null) {
+                sfxPlayer.release();
+                sfxPlayer = null;
+            }
+            int resId = isCorrect ? R.raw.correct : R.raw.wrong;
+            sfxPlayer = MediaPlayer.create(this, resId);
+            if (sfxPlayer != null) {
+                sfxPlayer.setVolume(0.3f, 0.3f);
+                sfxPlayer.setOnCompletionListener(mp -> {
+                    mp.release();
+                    sfxPlayer = null;
+                });
+                sfxPlayer.start();
+            }
+        } catch (Exception ignored) {}
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if (sfxPlayer != null) {
+            sfxPlayer.release();
+            sfxPlayer = null;
+        }
     }
 }

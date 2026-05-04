@@ -15,33 +15,38 @@ public class QuestManager {
     private static final String KEY_QUESTS = "quests";
 
     public static List<Quest> getDailyQuests(Context ctx) {
-        SharedPreferences p = ctx.getSharedPreferences(PREFS, Context.MODE_PRIVATE);
-        String j = p.getString(KEY_QUESTS, null);
-        List<Quest> out = new ArrayList<>();
-        if (j == null) {
-            // generate default daily quests
-            out = generateDefaultDailyQuests();
-            saveQuests(ctx, out);
+        synchronized (QuestManager.class) {
+            SharedPreferences p = ctx.getSharedPreferences(PREFS, Context.MODE_PRIVATE);
+            String j = p.getString(KEY_QUESTS, null);
+            List<Quest> out = new ArrayList<>();
+            if (j == null) {
+                // generate default daily quests
+                out = generateDefaultDailyQuests();
+                saveQuests(ctx, out);
+                return out;
+            }
+            try {
+                JSONArray arr = new JSONArray(j);
+                for (int i = 0; i < arr.length(); i++) {
+                    JSONObject o = arr.getJSONObject(i);
+                    out.add(Quest.fromJson(o));
+                }
+            } catch (JSONException e) {
+                out = generateDefaultDailyQuests();
+                saveQuests(ctx, out);
+            }
             return out;
         }
-        try {
-            JSONArray arr = new JSONArray(j);
-            for (int i = 0; i < arr.length(); i++) {
-                JSONObject o = arr.getJSONObject(i);
-                out.add(Quest.fromJson(o));
-            }
-        } catch (JSONException e) {
-            out = generateDefaultDailyQuests();
-            saveQuests(ctx, out);
-        }
-        return out;
     }
 
     public static void saveQuests(Context ctx, List<Quest> quests) {
-        JSONArray arr = new JSONArray();
-        for (Quest q : quests) arr.put(q.toJson());
-        SharedPreferences p = ctx.getSharedPreferences(PREFS, Context.MODE_PRIVATE);
-        p.edit().putString(KEY_QUESTS, arr.toString()).apply();
+        synchronized (QuestManager.class) {
+            JSONArray arr = new JSONArray();
+            for (Quest q : quests) arr.put(q.toJson());
+            SharedPreferences p = ctx.getSharedPreferences(PREFS, Context.MODE_PRIVATE);
+            // Use commit() instead of apply() for critical quest data to ensure synchronous write
+            p.edit().putString(KEY_QUESTS, arr.toString()).commit();
+        }
     }
 
     // Made public so pure unit tests can verify generation logic without Android
@@ -148,37 +153,41 @@ public class QuestManager {
     }
 
     public static boolean completeQuest(Context ctx, String questId) {
-        List<Quest> list = getDailyQuests(ctx);
-        boolean changed = false;
-        for (Quest q : list) {
-            if (q.id.equals(questId) && !q.completed) {
-                // Only complete if progress has reached target
-                if (q.progress >= q.target) {
-                    q.completed = true;
-                    changed = true;
-                    // award xp
-                    XPManager.awardXP(ctx, q.xpReward, "quest:" + q.id);
+        synchronized (QuestManager.class) {
+            List<Quest> list = getDailyQuests(ctx);
+            boolean changed = false;
+            for (Quest q : list) {
+                if (q.id.equals(questId) && !q.completed) {
+                    // Only complete if progress has reached target
+                    if (q.progress >= q.target) {
+                        q.completed = true;
+                        changed = true;
+                        // award xp
+                        XPManager.awardXP(ctx, q.xpReward, "quest:" + q.id);
+                    }
                 }
             }
+            if (changed) saveQuests(ctx, list);
+            return changed;
         }
-        if (changed) saveQuests(ctx, list);
-        return changed;
     }
 
     public static void progressQuest(Context ctx, String questId, int delta) {
-        List<Quest> list = getDailyQuests(ctx);
-        boolean changed = false;
-        for (Quest q : list) {
-            if (q.id.equals(questId) && !q.completed) {
-                q.progress += delta;
-                if (q.progress >= q.target) {
-                    q.completed = true;
-                    XPManager.awardXP(ctx, q.xpReward, "quest:" + q.id);
+        synchronized (QuestManager.class) {
+            List<Quest> list = getDailyQuests(ctx);
+            boolean changed = false;
+            for (Quest q : list) {
+                if (q.id.equals(questId) && !q.completed) {
+                    q.progress += delta;
+                    if (q.progress >= q.target) {
+                        q.completed = true;
+                        XPManager.awardXP(ctx, q.xpReward, "quest:" + q.id);
+                    }
+                    changed = true;
                 }
-                changed = true;
             }
+            if (changed) saveQuests(ctx, list);
         }
-        if (changed) saveQuests(ctx, list);
     }
 
     // Pure in-memory helper to mark a quest completed in a list (no Android APIs) - useful for unit testing

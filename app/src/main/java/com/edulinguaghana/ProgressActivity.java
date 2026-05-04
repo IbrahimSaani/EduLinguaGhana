@@ -3,6 +3,7 @@ package com.edulinguaghana;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
+import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
@@ -11,6 +12,7 @@ import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.android.material.appbar.MaterialToolbar;
 import com.google.android.material.button.MaterialButton;
@@ -25,6 +27,8 @@ public class ProgressActivity extends AppCompatActivity {
     private CircularProgressIndicator progressAccuracy;
     private MaterialToolbar toolbar;
     private MaterialCardView cardStats, cardAccuracy, cardAchievements;
+    private MediaPlayer sfxPlayer;
+    private TextView tvAccuracyPercentage;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,6 +49,7 @@ public class ProgressActivity extends AppCompatActivity {
         btnCloseProgress   = findViewById(R.id.btnCloseProgress);
         btnShareProgress   = findViewById(R.id.btnShareProgress);
         progressAccuracy   = findViewById(R.id.progressAccuracy);
+        tvAccuracyPercentage = findViewById(R.id.tvAccuracyPercentage);
         cardStats          = findViewById(R.id.cardStats);
         cardAccuracy       = findViewById(R.id.cardAccuracy);
         cardAchievements   = findViewById(R.id.cardAchievements);
@@ -71,6 +76,7 @@ public class ProgressActivity extends AppCompatActivity {
 
         // --- Animate elements ---
         Log.d(TAG, "onCreate: Starting animations.");
+        playSfx(true); // Play success sound on load
         animateProgress(percentage);
         animateCards();
 
@@ -79,24 +85,82 @@ public class ProgressActivity extends AppCompatActivity {
 
         // --- Button listeners ---
         btnCloseProgress.setOnClickListener(v -> finish());
-        btnShareProgress.setOnClickListener(v -> shareProgress(highScore, totalQuizzes, totalCorrect, percentage, tvAchievements.getText().toString()));
+        btnShareProgress.setOnClickListener(v -> {
+            shareProgress(highScore, totalQuizzes, totalCorrect, percentage, tvAchievements.getText().toString());
+            playShareAnimation();
+        });
     }
 
     private void animateProgress(int targetProgress) {
         Log.d(TAG, "animateProgress: Animating to " + targetProgress);
         new Handler().postDelayed(() -> {
             Log.d(TAG, "animateProgress: Handler running for progress bar.");
-            progressAccuracy.setProgressCompat(targetProgress, true);
+            // Animate the progress bar with a smooth progression
+            animateProgressValue(targetProgress);
+            
+            // Add pulse effect to the progress bar
+            try {
+                Animation pulse = AnimationUtils.loadAnimation(this, R.anim.level_up_pulse);
+                progressAccuracy.startAnimation(pulse);
+            } catch (Exception ignored) {}
         }, 300);
+    }
+
+    private void animateProgressValue(int targetProgress) {
+        final int animationDuration = 1000; // 1 second animation
+        final long startTime = System.currentTimeMillis();
+        final Handler handler = new Handler();
+        
+        handler.post(new Runnable() {
+            @Override
+            public void run() {
+                long elapsed = System.currentTimeMillis() - startTime;
+                int progress = (int) ((targetProgress * elapsed) / animationDuration);
+                
+                if (progress < targetProgress) {
+                    progressAccuracy.setProgressCompat(progress, true);
+                    tvAccuracyPercentage.setText(progress + "%");
+                    handler.postDelayed(this, 16); // 60fps
+                } else {
+                    progressAccuracy.setProgressCompat(targetProgress, true);
+                    tvAccuracyPercentage.setText(targetProgress + "%");
+                }
+            }
+        });
     }
 
     private void animateCards() {
         Log.d(TAG, "animateCards: Preparing card animations.");
         Animation slideIn = AnimationUtils.loadAnimation(this, R.anim.slide_in_bottom);
+        Animation levelUp = AnimationUtils.loadAnimation(this, R.anim.level_up_pulse);
+        Animation sparkle = AnimationUtils.loadAnimation(this, R.anim.sparkle_bounce);
+
         Handler handler = new Handler();
+
+        // Stats card - slide in and glow
         startAnimation(handler, cardStats, slideIn, 0);
-        startAnimation(handler, cardAccuracy, slideIn, 200);
-        startAnimation(handler, cardAchievements, slideIn, 400);
+        handler.postDelayed(() -> {
+            try {
+                cardStats.startAnimation(levelUp);
+            } catch (Exception ignored) {}
+        }, 300);
+
+        // Accuracy card - slide in and pulse
+        startAnimation(handler, cardAccuracy, slideIn, 150);
+        handler.postDelayed(() -> {
+            try {
+                Animation glow = AnimationUtils.loadAnimation(this, R.anim.glow_pulse);
+                cardAccuracy.startAnimation(glow);
+            } catch (Exception ignored) {}
+        }, 450);
+
+        // Achievements card - slide in with sparkle for celebration
+        startAnimation(handler, cardAchievements, slideIn, 300);
+        handler.postDelayed(() -> {
+            try {
+                cardAchievements.startAnimation(sparkle);
+            } catch (Exception ignored) {}
+        }, 600);
     }
 
     private void startAnimation(Handler handler, final View view, final Animation animation, int delay) {
@@ -183,6 +247,33 @@ public class ProgressActivity extends AppCompatActivity {
         startActivity(shareIntent);
     }
 
+    private void playShareAnimation() {
+        try {
+            Animation bounce = AnimationUtils.loadAnimation(this, R.anim.bounce_pop);
+            btnShareProgress.startAnimation(bounce);
+            Toast.makeText(this, "Progress shared! 🎉", Toast.LENGTH_SHORT).show();
+        } catch (Exception ignored) {}
+    }
+
+    private void playSfx(boolean isCorrect) {
+        try {
+            if (sfxPlayer != null) {
+                sfxPlayer.release();
+                sfxPlayer = null;
+            }
+            int resId = isCorrect ? R.raw.correct : R.raw.wrong;
+            sfxPlayer = MediaPlayer.create(this, resId);
+            if (sfxPlayer != null) {
+                sfxPlayer.setVolume(0.5f, 0.5f);
+                sfxPlayer.setOnCompletionListener(mp -> {
+                    mp.release();
+                    sfxPlayer = null;
+                });
+                sfxPlayer.start();
+            }
+        } catch (Exception ignored) {}
+    }
+
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         if (item.getItemId() == android.R.id.home) {
@@ -190,5 +281,14 @@ public class ProgressActivity extends AppCompatActivity {
             return true;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if (sfxPlayer != null) {
+            sfxPlayer.release();
+            sfxPlayer = null;
+        }
     }
 }

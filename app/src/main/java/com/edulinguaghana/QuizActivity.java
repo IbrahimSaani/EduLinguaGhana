@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.ColorStateList;
 import android.media.MediaPlayer;
+import android.media.AudioManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.CountDownTimer;
@@ -21,7 +22,7 @@ import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 
-import com.airbnb.lottie.LottieAnimationView;
+// removed Lottie dependency for end screen; using a lightweight TextView emoji instead
 import com.google.android.material.appbar.AppBarLayout;
 import com.google.android.material.appbar.MaterialToolbar;
 import com.google.android.material.button.MaterialButton;
@@ -67,7 +68,7 @@ public class QuizActivity extends AppCompatActivity {
     // End screen
     private TextView tvFinalScore, tvEndBestScore, tvNewHighScore;
     private MaterialButton btnPlayAgain, btnEndQuit;
-    private LottieAnimationView lottieAnimationView;
+    private TextView tvEndCelebrationEmoji; // lightweight replacement for Lottie
 
     private String quizType, languageCode, languageName;
     private String difficulty = "beginner";  // Default difficulty level
@@ -97,6 +98,9 @@ public class QuizActivity extends AppCompatActivity {
     // Background music
     private MediaPlayer backgroundMusicPlayer;
     private static final String KEY_BACKGROUND_MUSIC_ENABLED = "background_music_enabled";
+    // Audio focus management
+    private AudioManager audioManager;
+    private AudioManager.OnAudioFocusChangeListener afChangeListener;
 
     private String[] alphabet; // Will be set based on language
     private final String[] matchLetters = {"A", "B", "C"};
@@ -176,7 +180,11 @@ public class QuizActivity extends AppCompatActivity {
 
         // End screen buttons
         btnPlayAgain.setOnClickListener(v -> {
-            lottieAnimationView.cancelAnimation();
+            if (tvEndCelebrationEmoji != null) {
+                tvEndCelebrationEmoji.animate().cancel();
+                tvEndCelebrationEmoji.setVisibility(View.GONE);
+                tvEndCelebrationEmoji.setRotation(0f);
+            }
             endQuizContainer.setVisibility(View.GONE);
             showQuizContent();
         });
@@ -219,7 +227,7 @@ public class QuizActivity extends AppCompatActivity {
         btnPlayAgain = findViewById(R.id.btnPlayAgain);
         btnEndQuit = findViewById(R.id.btnEndQuit);
         tvNewHighScore = findViewById(R.id.tvNewHighScore);
-        lottieAnimationView = findViewById(R.id.lottieAnimationView);
+        tvEndCelebrationEmoji = findViewById(R.id.tvEndCelebrationEmoji);
     }
 
     private void setupAccessibility() {
@@ -914,16 +922,29 @@ public class QuizActivity extends AppCompatActivity {
                     Animation bouncePop = AnimationUtils.loadAnimation(this, R.anim.bounce_pop);
                     tvNewHighScore.startAnimation(bouncePop);
                 }
-                if (lottieAnimationView != null) {
-                    lottieAnimationView.playAnimation();
+                if (tvEndCelebrationEmoji != null) {
+                    tvEndCelebrationEmoji.setVisibility(View.VISIBLE);
+                    tvEndCelebrationEmoji.setScaleX(0.8f);
+                    tvEndCelebrationEmoji.setScaleY(0.8f);
+                    tvEndCelebrationEmoji.animate()
+                        .scaleX(1.3f)
+                        .scaleY(1.3f)
+                        .rotationBy(360f)
+                        .setDuration(700)
+                        .withEndAction(() -> {
+                            // Reset rotation to keep view stable
+                            tvEndCelebrationEmoji.setRotation(0f);
+                        })
+                        .start();
                 }
             } else {
                 if (tvNewHighScore != null) {
                     tvNewHighScore.setVisibility(View.GONE);
                 }
-                if (lottieAnimationView != null) {
-                    lottieAnimationView.cancelAnimation();
-                    lottieAnimationView.setProgress(0f);
+                if (tvEndCelebrationEmoji != null) {
+                    tvEndCelebrationEmoji.animate().cancel();
+                    tvEndCelebrationEmoji.setVisibility(View.GONE);
+                    tvEndCelebrationEmoji.setRotation(0f);
                 }
             }
         } catch (Exception e) {
@@ -1054,12 +1075,57 @@ public class QuizActivity extends AppCompatActivity {
         try {
             SharedPreferences prefs = getSharedPreferences(PREF_NAME, MODE_PRIVATE);
             boolean backgroundMusicEnabled = prefs.getBoolean(KEY_BACKGROUND_MUSIC_ENABLED, true);
+            // The settings screen saves QUIZ_MUSIC_VOLUME as an int percentage (0-100).
+            // Read int if present and convert to 0.0-1.0 range; fall back to float for older installs.
+            float _prefTmp;
+            if (prefs.contains(KEY_QUIZ_MUSIC_VOLUME)) {
+                try {
+                    int percent = prefs.getInt(KEY_QUIZ_MUSIC_VOLUME, -1);
+                    if (percent >= 0) {
+                        _prefTmp = Math.max(0f, Math.min(1f, percent / 100f));
+                    } else {
+                        _prefTmp = prefs.getFloat(KEY_QUIZ_MUSIC_VOLUME, 0.3f);
+                    }
+                } catch (ClassCastException e) {
+                    _prefTmp = prefs.getFloat(KEY_QUIZ_MUSIC_VOLUME, 0.3f);
+                }
+            } else {
+                _prefTmp = 0.3f;
+            }
+            final float prefVolume = _prefTmp;
 
-            if (backgroundMusicEnabled) {
+            // Prepare AudioManager and a simple focus change listener
+            audioManager = (AudioManager) getSystemService(AUDIO_SERVICE);
+            afChangeListener = focusChange -> {
+                try {
+                    if (backgroundMusicPlayer == null) return;
+                    switch (focusChange) {
+                        case AudioManager.AUDIOFOCUS_GAIN:
+                            if (!backgroundMusicPlayer.isPlaying()) backgroundMusicPlayer.start();
+                            backgroundMusicPlayer.setVolume(prefVolume, prefVolume);
+                            break;
+                        case AudioManager.AUDIOFOCUS_LOSS:
+                            if (backgroundMusicPlayer.isPlaying()) backgroundMusicPlayer.pause();
+                            break;
+                        case AudioManager.AUDIOFOCUS_LOSS_TRANSIENT:
+                            if (backgroundMusicPlayer.isPlaying()) backgroundMusicPlayer.pause();
+                            break;
+                        case AudioManager.AUDIOFOCUS_LOSS_TRANSIENT_CAN_DUCK:
+                            backgroundMusicPlayer.setVolume(prefVolume * 0.2f, prefVolume * 0.2f);
+                            break;
+                    }
+                } catch (Exception e) {
+                    Log.w("QuizActivity", "Audio focus change handling failed", e);
+                }
+            };
+
+            if (backgroundMusicEnabled && prefVolume > 0f) {
                 backgroundMusicPlayer = MediaPlayer.create(this, R.raw.quiz_music);
                 if (backgroundMusicPlayer != null) {
+                    // Ensure playback uses the music stream and is looped
                     backgroundMusicPlayer.setLooping(true);
-                    backgroundMusicPlayer.setVolume(0.3f, 0.3f); // Set to 30% volume
+                    // Respect saved preference volume (0.0 - 1.0)
+                    backgroundMusicPlayer.setVolume(prefVolume, prefVolume);
                 }
             }
         } catch (Exception e) {
@@ -1072,8 +1138,63 @@ public class QuizActivity extends AppCompatActivity {
      */
     private void startBackgroundMusic() {
         try {
-            if (backgroundMusicPlayer != null && !backgroundMusicPlayer.isPlaying()) {
-                backgroundMusicPlayer.start();
+            if (backgroundMusicPlayer == null) return;
+
+            // Respect system media volume: if the device media stream is muted (0) do not start music
+            if (audioManager == null) audioManager = (AudioManager) getSystemService(AUDIO_SERVICE);
+            if (audioManager != null) {
+                int vol = audioManager.getStreamVolume(AudioManager.STREAM_MUSIC);
+                if (vol == 0) {
+                    Log.d("QuizActivity", "Not starting background music because STREAM_MUSIC volume is 0");
+                    return;
+                }
+            }
+
+            // Check preference volume and request audio focus before starting
+            SharedPreferences prefs = getSharedPreferences(PREF_NAME, MODE_PRIVATE);
+            boolean backgroundMusicEnabled = prefs.getBoolean(KEY_BACKGROUND_MUSIC_ENABLED, true);
+            // Read preference volume (stored as int percent 0-100 in SettingsActivity) and convert to 0.0-1.0
+            float prefVolume;
+            if (prefs.contains(KEY_QUIZ_MUSIC_VOLUME)) {
+                try {
+                    int percent = prefs.getInt(KEY_QUIZ_MUSIC_VOLUME, -1);
+                    if (percent >= 0) {
+                        prefVolume = Math.max(0f, Math.min(1f, percent / 100f));
+                    } else {
+                        prefVolume = prefs.getFloat(KEY_QUIZ_MUSIC_VOLUME, 0.3f);
+                    }
+                } catch (ClassCastException e) {
+                    prefVolume = prefs.getFloat(KEY_QUIZ_MUSIC_VOLUME, 0.3f);
+                }
+            } else {
+                prefVolume = 0.3f;
+            }
+            if (!backgroundMusicEnabled || prefVolume <= 0f) {
+                Log.d("QuizActivity", "Background music disabled or volume set to 0 in preferences");
+                return;
+            }
+
+            // Request audio focus
+            int focusResult = AudioManager.AUDIOFOCUS_REQUEST_GRANTED;
+            try {
+                if (audioManager != null) {
+                    focusResult = audioManager.requestAudioFocus(afChangeListener,
+                            AudioManager.STREAM_MUSIC,
+                            AudioManager.AUDIOFOCUS_GAIN);
+                }
+            } catch (Exception e) {
+                Log.w("QuizActivity", "Audio focus request failed", e);
+            }
+
+            if (focusResult == AudioManager.AUDIOFOCUS_REQUEST_GRANTED) {
+                try {
+                    backgroundMusicPlayer.setVolume(prefVolume, prefVolume);
+                    if (!backgroundMusicPlayer.isPlaying()) backgroundMusicPlayer.start();
+                } catch (Exception e) {
+                    Log.e("QuizActivity", "Error starting background music: " + e.getMessage());
+                }
+            } else {
+                Log.d("QuizActivity", "Audio focus not granted, not starting background music");
             }
         } catch (Exception e) {
             Log.e("QuizActivity", "Error starting background music: " + e.getMessage());
@@ -1104,6 +1225,13 @@ public class QuizActivity extends AppCompatActivity {
                 }
                 backgroundMusicPlayer.release();
                 backgroundMusicPlayer = null;
+            }
+            if (audioManager != null && afChangeListener != null) {
+                try {
+                    audioManager.abandonAudioFocus(afChangeListener);
+                } catch (Exception e) {
+                    Log.w("QuizActivity", "Failed to abandon audio focus", e);
+                }
             }
         } catch (Exception e) {
             Log.e("QuizActivity", "Error stopping background music: " + e.getMessage());

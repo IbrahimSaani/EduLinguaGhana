@@ -68,6 +68,9 @@ public class NumbersActivity extends AppCompatActivity {
 
     private static final int REQ_CODE_SPEECH_INPUT = 300;
     private static final int REQ_CODE_RECORD_AUDIO = 400;
+    // Speech recognition retry state
+    private int speechRetryCount = 0;
+    private static final int MAX_SPEECH_RETRIES = 2;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -495,6 +498,19 @@ public class NumbersActivity extends AppCompatActivity {
                 RecognizerIntent.LANGUAGE_MODEL_FREE_FORM);
         intent.putExtra(RecognizerIntent.EXTRA_PROMPT, "Please repeat the number");
 
+        // Improve recognition behavior: allow multiple results, set brief silence timeouts
+        intent.putExtra(RecognizerIntent.EXTRA_MAX_RESULTS, 3);
+        intent.putExtra(RecognizerIntent.EXTRA_PREFER_OFFLINE, false);
+        // Shorten the silence thresholds so recognition completes sooner when user pauses
+        intent.putExtra("android.speech.extra.GET_AUDIO_FORMAT", "PCM"); // best-effort hint
+        try {
+            // Some providers accept these extra keys for silence length
+            intent.putExtra(RecognizerIntent.EXTRA_SPEECH_INPUT_COMPLETE_SILENCE_LENGTH_MILLIS, 1200L);
+            intent.putExtra(RecognizerIntent.EXTRA_SPEECH_INPUT_MINIMUM_LENGTH_MILLIS, 800L);
+        } catch (Exception e) {
+            // Ignore if provider doesn't support them
+        }
+
         try {
             startActivityForResult(intent, REQ_CODE_SPEECH_INPUT);
         } catch (Exception e) {
@@ -514,15 +530,106 @@ public class NumbersActivity extends AppCompatActivity {
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
-        if (requestCode == REQ_CODE_SPEECH_INPUT && resultCode == RESULT_OK && data != null) {
-            ArrayList<String> result = data.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS);
-            if (result != null && !result.isEmpty()) {
-                String recognized = result.get(0).trim();
-                evaluatePronunciation(recognized);
+        if (requestCode == REQ_CODE_SPEECH_INPUT) {
+            if (resultCode == RESULT_OK && data != null) {
+                ArrayList<String> result = data.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS);
+                if (result != null && !result.isEmpty()) {
+                    // Try to find an accepted candidate from the results
+                    int expected = currentNumber;
+                    String accepted = findAcceptedResult(result, expected);
+                    if (accepted != null) {
+                        // Success
+                        speechRetryCount = 0;
+                        evaluatePronunciation(accepted);
+                    } else {
+                        // No candidate matched; retry automatically up to MAX_SPEECH_RETRIES
+                        if (speechRetryCount < MAX_SPEECH_RETRIES) {
+                            speechRetryCount++;
+                            Toast.makeText(this, "Didn't catch that — please try again.", Toast.LENGTH_SHORT).show();
+                            promptSpeechInput();
+                        } else {
+                            speechRetryCount = 0;
+                            Toast.makeText(this, "Couldn't recognize your pronunciation. Try again manually.", Toast.LENGTH_LONG).show();
+                        }
+                    }
+                } else {
+                    if (speechRetryCount < MAX_SPEECH_RETRIES) {
+                        speechRetryCount++;
+                        Toast.makeText(this, "Could not hear you. Try again.", Toast.LENGTH_SHORT).show();
+                        promptSpeechInput();
+                    } else {
+                        speechRetryCount = 0;
+                        Toast.makeText(this, "Could not hear you. Try again later.", Toast.LENGTH_LONG).show();
+                    }
+                }
             } else {
-                Toast.makeText(this, "Could not hear you. Try again.", Toast.LENGTH_SHORT).show();
+                // User cancelled or failure
+                speechRetryCount = 0;
             }
         }
+    }
+
+    /**
+     * Iterate recognition candidates and return the first accepted textual candidate, or null.
+     */
+    private String findAcceptedResult(ArrayList<String> candidates, int expectedNumber) {
+        if (candidates == null || candidates.isEmpty()) return null;
+        for (String cand : candidates) {
+            if (cand == null) continue;
+            String cleaned = cand.trim();
+            Integer parsed = parseRecognizedToNumber(cleaned);
+            if (parsed != null && parsed == expectedNumber) {
+                return cleaned;
+            }
+            // Also check if the recognized string contains the expected digit textually (e.g., "four" contains "four")
+            String normalized = cleaned.toLowerCase();
+            String expectedWord = LanguageConversionUtils.convertNumberToWord(expectedNumber, "en");
+            if (expectedWord != null && !expectedWord.isEmpty() && normalized.contains(expectedWord.toLowerCase())) {
+                return cleaned;
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Try to parse the recognized string into an Integer. Handles numeric words for common cases.
+     */
+    private Integer parseRecognizedToNumber(String recognized) {
+        if (recognized == null) return null;
+        String cleaned = recognized.replaceAll("[^0-9a-zA-Z\\s-]", "").trim();
+        // Try direct parse
+        try {
+            return Integer.parseInt(cleaned);
+        } catch (NumberFormatException ignored) {}
+
+        // Try to parse common english words (one..twenty, tens, hundred)
+        String lower = cleaned.toLowerCase();
+        java.util.Map<String, Integer> map = new java.util.HashMap<>();
+        map.put("one", 1); map.put("two", 2); map.put("three", 3); map.put("four", 4); map.put("for", 4);
+        map.put("five", 5); map.put("six", 6); map.put("seven", 7); map.put("eight", 8); map.put("nine", 9);
+        map.put("ten", 10); map.put("eleven", 11); map.put("twelve", 12); map.put("thirteen", 13);
+        map.put("fourteen", 14); map.put("fifteen", 15); map.put("sixteen", 16); map.put("seventeen", 17);
+        map.put("eighteen", 18); map.put("nineteen", 19); map.put("twenty", 20); map.put("thirty", 30);
+        map.put("forty", 40); map.put("fifty", 50); map.put("sixty", 60); map.put("seventy", 70);
+        map.put("eighty", 80); map.put("ninety", 90); map.put("hundred", 100);
+
+        // Handle compound like 'twenty one' or 'twenty-one'
+        String[] parts = lower.split("[\\s-]+");
+        int total = 0;
+        boolean found = false;
+        for (String p : parts) {
+            if (map.containsKey(p)) {
+                int val = map.get(p);
+                if (val == 100) {
+                    total = (total == 0 ? 100 : total * 100);
+                } else {
+                    total += val;
+                }
+                found = true;
+            }
+        }
+        if (found) return total > 0 ? total : null;
+        return null;
     }
 
     private void evaluatePronunciation(String recognized) {

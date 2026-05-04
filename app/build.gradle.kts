@@ -45,7 +45,6 @@ dependencies {
     implementation(libs.constraintlayout)
     implementation("androidx.cardview:cardview:1.0.0")
     implementation("androidx.annotation:annotation:1.7.0")
-    implementation("com.airbnb.android:lottie:6.7.1")
     implementation("com.google.code.gson:gson:2.10.1")
 
     // HTTP client for GhanaLP TTS API
