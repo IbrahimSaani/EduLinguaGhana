@@ -539,6 +539,9 @@
                                 android:gravity="center"
                                 android:maxLines="4"
                                 android:ellipsize="end"
+                                android:breakStrategy="balanced"
+                                android:hyphenationFrequency="none"
+                                android:justificationMode="inter_word"
                                 tools:text="One" />
                         </LinearLayout>
 

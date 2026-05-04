@@ -72,10 +72,10 @@ public class AlphabetActivity extends AppCompatActivity {
     private final String[] wordsAk = {"Akokɔ", "Borɔdeɛ", "Duku", "Etuo", "Ɛmo", "Forosie", "Gari", "Hweaa", "Isu", "Kube", "Lɔre", "Maame", "Nsuo", "Odwan", "Ɔkraman", "Pono", "Prako", "Sika", "Tɛkyerɛma", "Uniwesiti", "Wura", "Yareɛ"};
     private final String[] lettersEe = {"A", "B", "D", "Ɖ", "E", "Ɛ", "F", "Ƒ", "G", "Ɣ", "H", "X", "I", "K", "L", "M", "N", "Ŋ", "O", "Ɔ", "P", "R", "S", "T", "U", "V", "Ʋ", "W", "Y", "Z"};
     private final String[] wordsEe = {"Ati", "Baka", "Dadi", "Ɖevi", "Eku", "Ɛfu", "Fia", "Ƒo", "Gbe", "Ɣe", "Ha", "Xɔ", "Iŋk", "Kafu", "Lá", "Me", "Nɔ", "Ŋkɔ", "Oyi", "Ɔli", "Papa", "Rɛdio", "Sɔ", "Tɔ", "Unilɔ", "Vɔ", "Ʋu", "Wó", "Yevú", "Zã"};
-    private final String[] lettersGaa = {"A", "B", "D", "E", "Ɛ", "F", "G", "H", "I", "K", "L", "M", "N", "Ŋ", "O", "Ɔ", "P", "S", "T", "U", "V", "W", "Y", "Z"};
-    private final String[] wordsGaa = {"Akekā", "Blɔfo", "Dade", "Enɔ", "Ɛlɛ", "Fio", "Gbekɛ", "Hejɔ", "Iŋk", "Klala", "Lala", "Maŋ", "Nuu", "Ŋmã", "Okpɔtɔ", "Ɔɔso", "Papa", "Sohaa", "Tee", "Wala", "Vinɔ", "Wɔ", "Yoomo", "Zigidi"};
-    private final String[] lettersTwi = {"A", "B", "D", "E", "Ɛ", "F", "G", "H", "I", "K", "L", "M", "N", "O", "P", "R", "S", "T", "U", "W", "Y", "Ɔ"};
-    private final String[] wordsTwi = {"Ade", "Borɔ", "Dade", "Etuo", "Ɛmo", "Fufuu", "Gari", "Hena", "Isuaa", "Kɔkɔɔ", "Lopa", "Moa", "Nom", "Okra", "Papa", "Rikisi", "Sɛn", "Toa", "Upire", "Wɔ", "Yam", "Ɔkyire"};
+    private final String[] lettersGaa = {"A", "B", "D", "E", "Ɛ", "F", "G", "H", "I", "J", "K", "L", "M", "N", "Ŋ", "O", "Ɔ", "P", "R", "S", "T", "V", "W", "Y", "Z"};
+    private final String[] wordsGaa = {"Akekā", "Blɔfo", "Dade", "Enɔ", "Ɛlɛ", "Fio", "Gbekɛ", "Hejɔ", "Iŋk", "Jɔ", "Klala", "Lala", "Maŋ", "Nuu", "Ŋmã", "Okpɔtɔ", "Ɔɔso", "Papa", "Rugu", "Sohaa", "Tee", "Vinɔ", "Wɔ", "Yoomo", "Zigidi"};
+    private final String[] lettersTwi = {"A", "B", "D", "E", "Ɛ", "F", "G", "H", "I", "K", "L", "M", "N", "O", "Ɔ", "P", "R", "S", "T", "U", "W", "Y"};
+    private final String[] wordsTwi = {"Ade", "Borɔ", "Dade", "Etuo", "Ɛmo", "Fufuu", "Gari", "Hena", "Isuaa", "Kɔkɔɔ", "Lopa", "Moa", "Nom", "Okra", "Ɔkyire", "Papa", "Rikisi", "Sɛn", "Toa", "Upire", "Wɔ", "Yam"};
 
 
     private TextToSpeech tts;
@@ -545,7 +545,7 @@ public class AlphabetActivity extends AppCompatActivity {
                 speakWithGhanaLP(letter);
             } else if (tts != null) {
                 // Use language-specific pronunciation for letters
-                String textToSpeak = getFrenchLetterPronunciation(letter);
+                String textToSpeak = getLetterPronunciation(letter);
                 tts.speak(textToSpeak, TextToSpeech.QUEUE_FLUSH, null, "LETTER_ID");
             }
 
@@ -578,13 +578,12 @@ public class AlphabetActivity extends AppCompatActivity {
                 btnSpeak.setEnabled(false);
             }
 
-            // IMPROVEMENT: Speak the example WORD instead of the letter
-            // This works better because word pronunciations are correct
-            // The word demonstrates the letter sound in context
-            String wordToSpeak = words[currentIndex];
+            // Speak the LETTER for recital mode (not the word)
+            // For recital, we want to speak the individual letter
+            String letterToSpeak = text;
 
-            offlineTts.speakWord(
-                wordToSpeak,
+            offlineTts.speakLetter(
+                letterToSpeak,
                 apiLangCode,
                 new OfflineGhanaLPTtsService.PlaybackCallback() {
                     @Override
@@ -770,6 +769,52 @@ public class AlphabetActivity extends AppCompatActivity {
 
         String fileName = langLower + "_letter_" + sanitizedLetter;
         return getResources().getIdentifier(fileName, "raw", getPackageName());
+    }
+
+    /**
+     * Get pronunciation for a letter based on language
+     * Returns appropriate pronunciation for English, French, etc.
+     */
+    private String getLetterPronunciation(String letter) {
+        if (letter == null || letter.isEmpty()) {
+            return letter;
+        }
+
+        if ("fr".equals(languageCode)) {
+            return getFrenchLetterPronunciation(letter);
+        } else {
+            // Default to English pronunciation
+            return getEnglishLetterPronunciation(letter);
+        }
+    }
+
+    /**
+     * Get English pronunciation for a letter
+     */
+    private String getEnglishLetterPronunciation(String letter) {
+        if (letter == null || letter.isEmpty()) {
+            return letter;
+        }
+
+        switch (letter.toUpperCase()) {
+            // Vowels
+            case "A": return "ay";
+            case "E": return "ee";
+            case "I": return "eye";
+            case "O": return "oh";
+            case "U": return "you";
+            case "Y": return "why";
+
+            // Consonants that need special pronunciation
+            case "H": return "aitch";
+            case "W": return "double you";
+            case "X": return "eks";
+            case "Z": return "zee";
+
+            // For all other letters, just return as is
+            default:
+                return letter;
+        }
     }
 
     /**
@@ -1132,6 +1177,12 @@ public class AlphabetActivity extends AppCompatActivity {
         } catch (Exception e) {
             android.util.Log.e("AlphabetActivity", "Error updating mode badge", e);
         }
+    }
+
+    @Override
+    public boolean onSupportNavigateUp() {
+        getOnBackPressedDispatcher().onBackPressed();
+        return true;
     }
 
     @Override

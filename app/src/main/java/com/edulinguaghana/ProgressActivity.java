@@ -54,10 +54,10 @@ public class ProgressActivity extends AppCompatActivity {
         cardAccuracy       = findViewById(R.id.cardAccuracy);
         cardAchievements   = findViewById(R.id.cardAchievements);
 
-        // Hide cards initially for animation
-        cardStats.setVisibility(View.INVISIBLE);
-        cardAccuracy.setVisibility(View.INVISIBLE);
-        cardAchievements.setVisibility(View.INVISIBLE);
+        // Show cards immediately (no animation)
+        cardStats.setVisibility(View.VISIBLE);
+        cardAccuracy.setVisibility(View.VISIBLE);
+        cardAchievements.setVisibility(View.VISIBLE);
 
         // Set initial data
         final int highScore     = ProgressManager.getHighScore(this);
@@ -74,11 +74,10 @@ public class ProgressActivity extends AppCompatActivity {
         tvStatAccuracy.setText("Overall accuracy: " + percentage + "%");
         progressAccuracy.setMax(100);
 
-        // --- Animate elements ---
-        Log.d(TAG, "onCreate: Starting animations.");
-        playSfx(true); // Play success sound on load
-        animateProgress(percentage);
-        animateCards();
+        // --- Set progress immediately (no animation) ---
+        Log.d(TAG, "onCreate: Skipping animations.");
+        progressAccuracy.setProgressCompat(percentage, true);
+        tvAccuracyPercentage.setText(percentage + "%");
 
         // --- Set achievement text ---
         setupAchievements(totalCorrect, totalQuizzes, percentage);
@@ -87,7 +86,6 @@ public class ProgressActivity extends AppCompatActivity {
         btnCloseProgress.setOnClickListener(v -> finish());
         btnShareProgress.setOnClickListener(v -> {
             shareProgress(highScore, totalQuizzes, totalCorrect, percentage, tvAchievements.getText().toString());
-            playShareAnimation();
         });
     }
 

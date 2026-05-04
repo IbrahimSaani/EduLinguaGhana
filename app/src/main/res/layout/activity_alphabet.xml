@@ -587,6 +587,9 @@
                                 android:gravity="center"
                                 android:maxLines="3"
                                 android:ellipsize="end"
+                                android:breakStrategy="balanced"
+                                android:hyphenationFrequency="none"
+                                android:justificationMode="inter_word"
                                 tools:text="A-pple" />
                         </LinearLayout>
 

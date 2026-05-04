@@ -40,6 +40,7 @@ public class TeacherDashboardActivity extends AppCompatActivity {
     private LinearLayout emptyStateLayout;
     private MaterialButton btnSort;
     private MaterialButton btnAddFirstStudent;
+    private MaterialButton btnRemoveStudent;
 
     // Statistics views
     private TextView tvTotalStudents;
@@ -88,6 +89,7 @@ public class TeacherDashboardActivity extends AppCompatActivity {
         swipeRefresh = findViewById(R.id.swipeRefresh);
         btnSort = findViewById(R.id.btnSort);
         btnAddFirstStudent = findViewById(R.id.btnAddFirstStudent);
+        btnRemoveStudent = findViewById(R.id.btnRemoveStudent);
 
         // Statistics views
         tvTotalStudents = findViewById(R.id.tvTotalStudents);
@@ -97,6 +99,10 @@ public class TeacherDashboardActivity extends AppCompatActivity {
 
         if (btnAddFirstStudent != null) {
             btnAddFirstStudent.setOnClickListener(v -> openRelationshipManagement());
+        }
+
+        if (btnRemoveStudent != null) {
+            btnRemoveStudent.setOnClickListener(v -> showRemoveStudentDialog());
         }
 
         if (btnSort != null) {
@@ -299,6 +305,76 @@ public class TeacherDashboardActivity extends AppCompatActivity {
         if (tvActiveToday != null) {
             tvActiveToday.setText(String.valueOf(activeToday));
         }
+    }
+
+    private void showRemoveStudentDialog() {
+        if (allStudents.isEmpty()) {
+            Toast.makeText(this, "No students to remove", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        String[] studentNames = new String[allStudents.size()];
+        for (int i = 0; i < allStudents.size(); i++) {
+            studentNames[i] = allStudents.get(i).getStudentName();
+        }
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Remove Student")
+            .setItems(studentNames, (dialog, which) -> {
+                StudentProgressItem selectedStudent = allStudents.get(which);
+                confirmRemoveStudent(selectedStudent);
+            })
+            .setNegativeButton("Cancel", null)
+            .show();
+    }
+
+    private void confirmRemoveStudent(StudentProgressItem student) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Remove Student?")
+            .setMessage("Are you sure you want to remove " + student.getStudentName() + " from your class?")
+            .setPositiveButton("Remove", (dialog, which) -> {
+                removeStudentFromClass(student.getStudentId(), student.getStudentName());
+            })
+            .setNegativeButton("Cancel", null)
+            .show();
+    }
+
+    private void removeStudentFromClass(String studentId, String studentName) {
+        // Find the relationship ID for this student
+        roleManager.getStudents(currentUserId, new RoleManager.RelationshipCallback() {
+            @Override
+            public void onRelationshipsRetrieved(List<UserRelationship> relationships) {
+                for (UserRelationship rel : relationships) {
+                    if (rel.getStudentId().equals(studentId)) {
+                        // Found the relationship, now remove it
+                        roleManager.removeRelationship(rel.getId(),
+                            new RoleManager.RelationshipActionCallback() {
+                                @Override
+                                public void onSuccess(UserRelationship relationship) {
+                                    Toast.makeText(TeacherDashboardActivity.this,
+                                        studentName + " removed from your class", Toast.LENGTH_SHORT).show();
+                                    loadStudents(); // Refresh the list
+                                }
+
+                                @Override
+                                public void onError(String error) {
+                                    Toast.makeText(TeacherDashboardActivity.this,
+                                        "Failed to remove student: " + error, Toast.LENGTH_SHORT).show();
+                                }
+                            });
+                        return;
+                    }
+                }
+                Toast.makeText(TeacherDashboardActivity.this,
+                    "Could not find student relationship", Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void onError(String error) {
+                Toast.makeText(TeacherDashboardActivity.this,
+                    "Failed to remove student: " + error, Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 
     @Override

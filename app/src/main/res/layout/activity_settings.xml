@@ -5,6 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@drawable/bg_main_day"
+    android:fitsSystemWindows="true"
     tools:context=".SettingsActivity">
 
     <com.google.android.material.appbar.AppBarLayout
@@ -13,6 +14,7 @@
         android:layout_height="wrap_content"
         android:background="@drawable/gradient_background"
         android:elevation="8dp"
+        android:fitsSystemWindows="true"
         android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar">
 
         <androidx.appcompat.widget.Toolbar

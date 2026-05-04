@@ -811,6 +811,12 @@ public class NumbersActivity extends AppCompatActivity {
     }
 
     @Override
+    public boolean onSupportNavigateUp() {
+        getOnBackPressedDispatcher().onBackPressed();
+        return true;
+    }
+
+    @Override
     protected void onDestroy() {
         super.onDestroy();
         if (tts != null) {
