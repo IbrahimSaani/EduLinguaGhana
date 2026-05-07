@@ -59,6 +59,7 @@ public class QuestAdapter extends RecyclerView.Adapter<QuestAdapter.QuestViewHol
         TextView tvQuestPoints;
         LinearProgressIndicator progressQuest;
         View claimIndicator;
+        TextView completionCheckmark;
 
         public QuestViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -68,6 +69,7 @@ public class QuestAdapter extends RecyclerView.Adapter<QuestAdapter.QuestViewHol
             tvQuestPoints = itemView.findViewById(R.id.tv_quest_points);
             progressQuest = itemView.findViewById(R.id.progress_quest);
             claimIndicator = itemView.findViewById(R.id.claimIndicator);
+            completionCheckmark = itemView.findViewById(R.id.completionCheckmark);
         }
 
         public void bind(Quest quest, OnQuestClickListener listener) {

@@ -48,7 +48,8 @@
                 tools:text="⚡" />
 
             <!-- Completion Checkmark (for completed quests) -->
-            <view
+            <!-- Completion Checkmark (for completed quests) -->
+            <TextView
                 android:id="@+id/completionCheckmark"
                 android:layout_width="20dp"
                 android:layout_height="20dp"
@@ -56,14 +57,6 @@
                 android:layout_marginEnd="-4dp"
                 android:layout_marginBottom="-4dp"
                 android:background="@drawable/circle_background"
-                android:visibility="gone" />
-
-            <TextView
-                android:layout_width="20dp"
-                android:layout_height="20dp"
-                android:layout_gravity="bottom|end"
-                android:layout_marginEnd="-4dp"
-                android:layout_marginBottom="-4dp"
                 android:text="✓"
                 android:textSize="12sp"
                 android:textColor="@android:color/white"
