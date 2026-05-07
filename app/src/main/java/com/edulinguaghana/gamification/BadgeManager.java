@@ -144,7 +144,21 @@ public class BadgeManager {
                     XPManager.awardXP(ctx, 25, "badge:" + badgeId);
                 }
             }
-            if (changed) saveBadges(ctx, list);
+            if (changed) {
+                saveBadges(ctx, list);
+
+                // Check if achievement_collector should be unlocked (when 5 badges are unlocked)
+                int unlockedCount = 0;
+                for (Badge b : list) {
+                    if (b.unlocked) {
+                        unlockedCount++;
+                    }
+                }
+                if (unlockedCount == 5 && !badgeId.equals("achievement_collector")) {
+                    // Recursively unlock achievement_collector
+                    unlockBadge(ctx, "achievement_collector");
+                }
+            }
         }
     }
 

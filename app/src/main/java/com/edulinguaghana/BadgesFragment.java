@@ -15,10 +15,11 @@ import com.edulinguaghana.gamification.BadgeManager;
 import com.google.android.material.progressindicator.LinearProgressIndicator;
 import android.widget.TextView;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class BadgesFragment extends Fragment {
+
+    private BadgeAdapter badgeAdapter;
 
     @Nullable
     @Override
@@ -31,28 +32,26 @@ public class BadgesFragment extends Fragment {
         // Get all badges
         List<Badge> badges = BadgeManager.getAllBadges(getContext());
 
-        List<SimpleListAdapter.Item> items = new ArrayList<>();
-        int unlockedCount = 0;
-
-        for (Badge b : badges) {
-            int icon = b.unlocked ? R.drawable.ic_badge_unlocked : R.drawable.ic_badge_locked;
-            items.add(new SimpleListAdapter.Item(icon, b.title, b.description));
-            if (b.unlocked) {
-                unlockedCount++;
-            }
-        }
-
-        SimpleListAdapter adapter = new SimpleListAdapter(items);
-        rv.setAdapter(adapter);
+        // Setup adapter with enhanced badge display
+        badgeAdapter = new BadgeAdapter(badges);
+        rv.setAdapter(badgeAdapter);
 
         // Update progress display
-        updateProgressDisplay(root, unlockedCount, badges.size());
+        updateProgressDisplay(root, badges);
 
         return root;
     }
 
-    private void updateProgressDisplay(View root, int unlockedCount, int totalCount) {
+    private void updateProgressDisplay(View root, List<Badge> badges) {
         try {
+            int unlockedCount = 0;
+            for (Badge b : badges) {
+                if (b.unlocked) {
+                    unlockedCount++;
+                }
+            }
+            int totalCount = badges.size();
+
             // Update progress text (e.g., "8/12")
             TextView tvProgress = root.findViewById(R.id.tv_badge_progress);
             if (tvProgress != null) {
@@ -86,6 +85,17 @@ public class BadgesFragment extends Fragment {
             }
         } catch (Exception e) {
             android.util.Log.e("BadgesFragment", "Error updating progress display", e);
+        }
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        // Refresh badges when fragment becomes visible
+        if (getView() != null && badgeAdapter != null) {
+            List<Badge> badges = BadgeManager.getAllBadges(getContext());
+            badgeAdapter.updateBadges(badges);
+            updateProgressDisplay(getView(), badges);
         }
     }
 }

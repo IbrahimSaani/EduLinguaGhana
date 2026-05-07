@@ -479,6 +479,26 @@ public class SpeedGameActivity extends AppCompatActivity {
 
                 // Disable buttons
                 setOptionsEnabled(false);
+
+                // --- Gamification: Progress quests for speed game completion ---
+                try {
+                    com.edulinguaghana.gamification.QuestManager.progressQuest(SpeedGameActivity.this, "speed_game", 1);        // Quest 6
+                    com.edulinguaghana.gamification.QuestManager.progressQuest(SpeedGameActivity.this, "marathon_learner", 1);  // Quest 8
+
+                    // Unlock speed champion badge when speed game is won
+                    com.edulinguaghana.gamification.BadgeManager.unlockBadge(SpeedGameActivity.this, "speed_champion");
+
+                    // Award XP for completing speed game
+                    int xpAward = score + (score > 20 ? 10 : 0); // Bonus XP for good performance
+                    com.edulinguaghana.gamification.XPManager.awardXP(SpeedGameActivity.this, xpAward, "speed_game_complete");
+
+                    // Record practice for streak and language tracking
+                    StreakManager streakManager = new StreakManager(SpeedGameActivity.this);
+                    streakManager.recordPractice();
+
+                    // Track language usage for language_explorer quest
+                    ProgressManager.trackLanguageUsage(SpeedGameActivity.this, languageCode);
+                } catch (Exception ignored) { }
             }
         }.start();
     }

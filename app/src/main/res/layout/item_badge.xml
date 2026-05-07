@@ -2,53 +2,84 @@
 <com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/badgeCard"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_margin="6dp"
-    app:cardCornerRadius="16dp"
-    app:cardElevation="4dp"
+    android:layout_margin="8dp"
+    app:cardCornerRadius="20dp"
+    app:cardElevation="6dp"
     app:cardBackgroundColor="@color/white"
-    app:strokeWidth="0dp">
+    app:strokeWidth="1dp"
+    app:strokeColor="@color/dividerColor"
+    android:clickable="true"
+    android:focusable="true"
+    android:foreground="?attr/selectableItemBackground">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:padding="16dp"
+        android:padding="20dp"
         android:gravity="center">
 
-        <!-- Badge Icon -->
+        <!-- Badge Icon Container -->
         <FrameLayout
-            android:layout_width="80dp"
-            android:layout_height="80dp"
-            android:layout_marginBottom="8dp">
+            android:layout_width="90dp"
+            android:layout_height="90dp"
+            android:layout_marginBottom="12dp">
 
-            <!-- Background Circle -->
+            <!-- Glow Background (for unlocked badges) -->
             <View
-                android:id="@+id/badge_bg"
+                android:id="@+id/badge_glow"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:background="@drawable/circle_background" />
+                android:background="@drawable/circle_background"
+                android:visibility="visible" />
 
-            <!-- Badge Emoji/Icon -->
+            <!-- Badge Icon / Emoji -->
             <TextView
                 android:id="@+id/tv_badge_icon"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:text="🏆"
-                android:textSize="48sp"
+                android:textSize="56sp"
                 android:gravity="center"
                 tools:text="🏆" />
+
+            <!-- Unlock Badge (corner indicator) -->
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/unlockBadge"
+                android:layout_width="32dp"
+                android:layout_height="32dp"
+                android:layout_gravity="top|end"
+                android:layout_marginTop="-4dp"
+                android:layout_marginEnd="-4dp"
+                app:cardCornerRadius="16dp"
+                app:cardElevation="3dp"
+                app:cardBackgroundColor="@color/correctAnswer"
+                android:visibility="gone">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:text="✓"
+                    android:textSize="20sp"
+                    android:textColor="@android:color/white"
+                    android:gravity="center"
+                    android:textStyle="bold" />
+
+            </com.google.android.material.card.MaterialCardView>
 
             <!-- Lock Overlay for Locked Badges -->
             <ImageView
                 android:id="@+id/iv_badge_lock"
-                android:layout_width="24dp"
-                android:layout_height="24dp"
+                android:layout_width="36dp"
+                android:layout_height="36dp"
                 android:layout_gravity="bottom|end"
                 android:src="@drawable/ic_lock"
                 android:visibility="gone"
-                android:contentDescription="Locked badge" />
+                android:contentDescription="Locked badge"
+                android:alpha="0.8" />
 
         </FrameLayout>
 
@@ -58,13 +89,13 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             tools:text="First Quiz"
-            android:textSize="14sp"
+            android:textSize="16sp"
             android:textStyle="bold"
             android:textColor="@color/textPrimary"
             android:gravity="center"
             android:maxLines="2"
             android:ellipsize="end"
-            android:layout_marginBottom="4dp" />
+            android:layout_marginBottom="6dp" />
 
         <!-- Badge Description -->
         <TextView
@@ -72,11 +103,48 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             tools:text="Complete your first quiz"
-            android:textSize="11sp"
+            android:textSize="12sp"
             android:textColor="@color/textSecondary"
             android:gravity="center"
             android:maxLines="2"
-            android:ellipsize="end" />
+            android:ellipsize="end"
+            android:layout_marginBottom="10dp" />
+
+        <!-- Unlock Date (for unlocked badges) -->
+        <TextView
+            android:id="@+id/tv_unlock_date"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            tools:text="Unlocked: Today"
+            android:textSize="11sp"
+            android:textColor="@color/colorAccent"
+            android:gravity="center"
+            android:visibility="gone"
+            android:textStyle="italic" />
+
+        <!-- Locked State badge -->
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/lockedBadge"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:cardCornerRadius="8dp"
+            app:cardElevation="0dp"
+            app:cardBackgroundColor="@color/textSecondary"
+            android:visibility="gone">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="🔒 Locked"
+                android:textSize="11sp"
+                android:textColor="@android:color/white"
+                android:textStyle="bold"
+                android:paddingStart="8dp"
+                android:paddingEnd="8dp"
+                android:paddingTop="3dp"
+                android:paddingBottom="3dp" />
+
+        </com.google.android.material.card.MaterialCardView>
 
     </LinearLayout>
 

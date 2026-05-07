@@ -71,18 +71,9 @@ public class QuestAdapter extends RecyclerView.Adapter<QuestAdapter.QuestViewHol
         }
 
         public void bind(Quest quest, OnQuestClickListener listener) {
-            // Set quest icon based on type or status
-            if (quest.completed) {
-                tvQuestIcon.setText("✅");
-            } else if (quest.id.contains("practice")) {
-                tvQuestIcon.setText("📚");
-            } else if (quest.id.contains("quiz")) {
-                tvQuestIcon.setText("🎯");
-            } else if (quest.id.contains("challenge")) {
-                tvQuestIcon.setText("⚡");
-            } else {
-                tvQuestIcon.setText("🎮");
-            }
+            // Set quest icon based on quest ID with emoji mapping
+            String icon = getQuestEmoji(quest.id);
+            tvQuestIcon.setText(icon);
 
             // Set quest title
             tvQuestTitle.setText(quest.title);
@@ -102,36 +93,36 @@ public class QuestAdapter extends RecyclerView.Adapter<QuestAdapter.QuestViewHol
                 tvQuestProgress.setText("Completed!");
                 tvQuestProgress.setTextColor(itemView.getContext().getColor(R.color.correctAnswer));
                 claimIndicator.setVisibility(View.GONE);
+                itemView.setAlpha(0.7f);
             } else if (quest.progress >= quest.target) {
                 // Quest is ready to claim
                 tvQuestProgress.setText(quest.progress + "/" + quest.target);
                 tvQuestProgress.setTextColor(itemView.getContext().getColor(R.color.correctAnswer));
                 claimIndicator.setVisibility(View.VISIBLE);
+                itemView.setAlpha(1.0f);
             } else {
                 // Quest in progress
                 tvQuestProgress.setText(quest.progress + "/" + quest.target);
                 tvQuestProgress.setTextColor(itemView.getContext().getColor(R.color.colorPrimary));
                 claimIndicator.setVisibility(View.GONE);
+                itemView.setAlpha(1.0f);
             }
 
             // Set points
             tvQuestPoints.setText("+" + quest.xpReward);
 
-            // Set click listener
+            // Set click listener with enhanced feedback
             itemView.setOnClickListener(v -> {
                 if (listener != null) {
                     int position = getAdapterPosition();
                     if (position != RecyclerView.NO_POSITION) {
                         if (quest.completed) {
-                            // Already completed, just show message
                             Toast.makeText(v.getContext(),
-                                "✅ Quest already completed!",
+                                "✅ Quest already completed! Great job!",
                                 Toast.LENGTH_SHORT).show();
                         } else if (quest.progress >= quest.target) {
-                            // Progress met, can claim reward
                             listener.onQuestClick(quest, position);
                         } else {
-                            // Not enough progress
                             int remaining = quest.target - quest.progress;
                             String message = "Keep going! You need " + remaining + " more to complete this quest.";
                             Toast.makeText(v.getContext(), message, Toast.LENGTH_SHORT).show();
@@ -139,21 +130,29 @@ public class QuestAdapter extends RecyclerView.Adapter<QuestAdapter.QuestViewHol
                     }
                 }
             });
+        }
 
-            // Visual state for completed quests
-            if (quest.completed) {
-                itemView.setAlpha(0.6f);
-                itemView.setClickable(true); // Still clickable to show message
-            } else if (quest.progress >= quest.target) {
-                // Ready to claim - make it prominent
-                itemView.setAlpha(1.0f);
-                itemView.setClickable(true);
-            } else {
-                // In progress
-                itemView.setAlpha(1.0f);
-                itemView.setClickable(true);
+        private String getQuestEmoji(String questId) {
+            switch (questId) {
+                case "daily_practice":
+                    return "📚";
+                case "daily_quiz":
+                    return "🎯";
+                case "daily_challenge":
+                    return "⚡";
+                case "practice_streak":
+                    return "🔥";
+                case "quiz_multiple":
+                    return "🧠";
+                case "speed_game":
+                    return "💨";
+                case "language_explorer":
+                    return "🌍";
+                case "marathon_learner":
+                    return "🏋️";
+                default:
+                    return "🎮";
             }
         }
     }
 }
-

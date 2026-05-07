@@ -16,6 +16,7 @@ public class ProgressManager {
     private static final String KEY_HIGH_SCORE = "HIGH_SCORE";
     private static final String KEY_TOTAL_QUIZZES = "TOTAL_QUIZZES";
     private static final String KEY_TOTAL_CORRECT = "TOTAL_CORRECT";
+    private static final String KEY_LANGUAGES_USED = "LANGUAGES_USED"; // Track distinct languages for language_explorer quest
 
     // Update global progress stats
     public static void updateProgress(Context context, String mode, int score, int correctCount) {
@@ -45,8 +46,24 @@ public class ProgressManager {
         try {
             int xpAward = Math.max(5, correctCount * 2 + score / 5); // conservative formula
             XPManager.awardXP(context, xpAward, "quiz_complete");
+
             // progress the daily_quiz quest by 1
             QuestManager.progressQuest(context, "daily_quiz", 1);
+
+            // Progress other quiz-related quests
+            QuestManager.progressQuest(context, "quiz_multiple", 1);         // Quest 5 - Complete 2 quizzes
+            QuestManager.progressQuest(context, "marathon_learner", 1);      // Quest 8 - accumulate all activities
+
+            // Check for perfect score achievement
+            if (score == 100) {
+                com.edulinguaghana.gamification.BadgeManager.unlockBadge(context, "perfect_score");
+            }
+
+            // Check for quiz master badge (20 quizzes completed)
+            // Note: totalQuizzes was incremented above, so check if it reaches 20
+            if (totalQuizzes + 1 >= 20) {
+                com.edulinguaghana.gamification.BadgeManager.unlockBadge(context, "quiz_master");
+            }
         } catch (Exception ignored) { }
 
         // --- Real-time Progress Tracking: Log to Firebase ---
@@ -61,6 +78,66 @@ public class ProgressManager {
             // Silently fail if Firebase is not available
             android.util.Log.e("ProgressManager", "Failed to log to Firebase", e);
         }
+    }
+
+    // Update progress with language tracking for language_explorer quest
+    public static void updateProgressWithLanguage(Context context, String mode, int score, int correctCount, String languageCode) {
+        updateProgress(context, mode, score, correctCount, 10); // Default 10 questions
+
+        // Track language usage for language_explorer quest
+        try {
+            SharedPreferences prefs = context.getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE);
+            String languagesUsedStr = prefs.getString(KEY_LANGUAGES_USED, "");
+
+            // Parse existing languages
+            java.util.Set<String> languagesUsed = new java.util.HashSet<>();
+            if (!languagesUsedStr.isEmpty()) {
+                languagesUsed.addAll(java.util.Arrays.asList(languagesUsedStr.split(",")));
+            }
+
+            // Add current language
+            boolean isNewLanguage = languagesUsed.add(languageCode);
+
+            // Save updated languages
+            String updatedLanguages = String.join(",", languagesUsed);
+            prefs.edit().putString(KEY_LANGUAGES_USED, updatedLanguages).apply();
+
+            // If new language is added, progress the quest
+            if (isNewLanguage && languagesUsed.size() <= 2) {
+                QuestManager.progressQuest(context, "language_explorer", 1); // Quest 7
+            }
+        } catch (Exception ignored) { }
+    }
+
+    // Track distinct languages used for language_explorer quest
+    public static void trackLanguageUsage(Context context, String languageCode) {
+        try {
+            SharedPreferences prefs = context.getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE);
+            String languagesUsedStr = prefs.getString(KEY_LANGUAGES_USED, "");
+            
+            // Parse existing languages
+            java.util.Set<String> languagesUsed = new java.util.HashSet<>();
+            if (!languagesUsedStr.isEmpty()) {
+                languagesUsed.addAll(java.util.Arrays.asList(languagesUsedStr.split(",")));
+            }
+            
+            // Add current language
+            boolean isNewLanguage = languagesUsed.add(languageCode);
+            
+            // Save updated languages
+            String updatedLanguages = String.join(",", languagesUsed);
+            prefs.edit().putString(KEY_LANGUAGES_USED, updatedLanguages).apply();
+            
+            // If new language is added, progress the quest
+            if (isNewLanguage && languagesUsed.size() <= 2) {
+                com.edulinguaghana.gamification.QuestManager.progressQuest(context, "language_explorer", 1); // Quest 7
+            }
+
+            // Unlock multilingual badge when 3 languages are practiced
+            if (languagesUsed.size() >= 3) {
+                com.edulinguaghana.gamification.BadgeManager.unlockBadge(context, "multilingual");
+            }
+        } catch (Exception ignored) { }
     }
 
     // Get total quizzes taken

@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="24dp"
+    android:background="@color/white">
+
+    <!-- Language Selection -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:layout_marginBottom="16dp">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="🌍 Select Language"
+            android:textSize="14sp"
+            android:textStyle="bold"
+            android:textColor="@color/colorPrimary"
+            android:layout_marginBottom="8dp" />
+
+        <Spinner
+            android:id="@+id/spinnerLanguage"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:padding="12dp" />
+
+    </LinearLayout>
+
+    <!-- Quiz Type Selection -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:layout_marginBottom="16dp">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="📝 Quiz Type"
+            android:textSize="14sp"
+            android:textStyle="bold"
+            android:textColor="@color/colorPrimary"
+            android:layout_marginBottom="8dp" />
+
+        <Spinner
+            android:id="@+id/spinnerQuizType"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:padding="12dp" />
+
+    </LinearLayout>
+
+    <!-- Challenge Duration -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:layout_marginBottom="8dp">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="⏱️ Time Limit"
+            android:textSize="14sp"
+            android:textStyle="bold"
+            android:textColor="@color/colorPrimary"
+            android:layout_marginBottom="8dp" />
+
+        <Spinner
+            android:id="@+id/spinnerDuration"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:padding="12dp" />
+
+    </LinearLayout>
+
+    <!-- Information Card -->
+    <com.google.android.material.card.MaterialCardView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        app:cardCornerRadius="12dp"
+        app:cardElevation="0dp"
+        app:strokeWidth="1dp"
+        app:strokeColor="@color/colorPrimary"
+        app:cardBackgroundColor="#F0F7FF">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="12dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="💡 Challenge Info"
+                android:textSize="12sp"
+                android:textStyle="bold"
+                android:textColor="@color/colorPrimary"
+                android:layout_marginBottom="6dp" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="• Both players will attempt the same quiz"
+                android:textSize="11sp"
+                android:textColor="@color/textSecondary"
+                android:layout_marginBottom="4dp" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="• Highest score wins the challenge"
+                android:textSize="11sp"
+                android:textColor="@color/textSecondary"
+                android:layout_marginBottom="4dp" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="• Winner stats will be tracked"
+                android:textSize="11sp"
+                android:textColor="@color/textSecondary" />
+
+        </LinearLayout>
+
+    </com.google.android.material.card.MaterialCardView>
+
+</LinearLayout>
+

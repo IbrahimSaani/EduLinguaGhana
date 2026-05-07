@@ -84,9 +84,22 @@ public class StreakManager {
             // award small xp for practicing
             XPManager.awardXP(context, 10, "daily_practice");
             QuestManager.progressQuest(context, "daily_practice", 1);
+
+            // Progress other practice-related quests
+            QuestManager.progressQuest(context, "practice_streak", 1);        // Quest 4
+            QuestManager.progressQuest(context, "marathon_learner", 1);       // Quest 8 - accumulate all activities
+
             // unlock first practice badge if this is the first practice
             if (totalPracticeDays == 1) {
                 BadgeManager.unlockBadge(context, "first_practice");
+            }
+
+            // Unlock streak milestone badges
+            if (longestStreak == 7) {
+                BadgeManager.unlockBadge(context, "seven_days");
+            }
+            if (longestStreak == 30) {
+                BadgeManager.unlockBadge(context, "thirty_days");
             }
         } catch (Exception ignored) { }
 

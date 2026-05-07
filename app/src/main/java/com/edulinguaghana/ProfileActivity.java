@@ -1125,25 +1125,79 @@ public class ProfileActivity extends AppCompatActivity {
     // Helper: show dialog to choose a user to challenge
     private void presentChallengeDialog(String currentUserId) {
         android.app.AlertDialog.Builder builder = new android.app.AlertDialog.Builder(this);
-        builder.setTitle("Challenge a Friend");
+        builder.setTitle("⚔️ Challenge a Friend");
         final EditText input = new EditText(this);
-        input.setHint("Enter user id to challenge");
+        input.setHint("Enter friend's user ID");
         input.setInputType(InputType.TYPE_CLASS_TEXT);
         builder.setView(input);
-        builder.setPositiveButton("Send Challenge", (dialog, which) -> {
+        builder.setPositiveButton("Next", (dialog, which) -> {
             String target = input.getText() != null ? input.getText().toString().trim() : "";
             if (target.isEmpty()) {
-                Toast.makeText(this, "Please enter a user id", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, "Please enter a user ID", Toast.LENGTH_SHORT).show();
                 return;
             }
             if (target.equals(currentUserId)) {
                 Toast.makeText(this, "You can't challenge yourself", Toast.LENGTH_SHORT).show();
                 return;
             }
-            performCreateChallenge(currentUserId, target);
+            performCreateChallengeWithDialog(currentUserId, target);
         });
         builder.setNegativeButton("Cancel", (dialog, which) -> dialog.cancel());
         builder.show();
+    }
+
+    private void performCreateChallengeWithDialog(String currentUserId, String targetUserId) {
+        // Validate target user exists
+        com.google.firebase.database.DatabaseReference usersRef =
+            com.google.firebase.database.FirebaseDatabase.getInstance().getReference("users");
+
+        usersRef.child(targetUserId).addListenerForSingleValueEvent(new com.google.firebase.database.ValueEventListener() {
+            @Override
+            public void onDataChange(com.google.firebase.database.DataSnapshot snapshot) {
+                if (!snapshot.exists()) {
+                    Toast.makeText(ProfileActivity.this, "User not found: " + targetUserId, Toast.LENGTH_LONG).show();
+                    return;
+                }
+
+                // User exists, show challenge creation dialog
+                ChallengeCreationDialog dialog = new ChallengeCreationDialog(
+                    ProfileActivity.this,
+                    currentUserId,
+                    targetUserId,
+                    (language, quizType, durationMinutes, targetId) -> {
+                        performCreateChallenge(currentUserId, targetId, language, quizType, durationMinutes);
+                    }
+                );
+                dialog.show();
+            }
+
+            @Override
+            public void onCancelled(com.google.firebase.database.DatabaseError error) {
+                Toast.makeText(ProfileActivity.this, "Failed to validate user: " + error.getMessage(), Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    private void performCreateChallenge(String fromUserId, String toUserId, String language,
+                                       String quizType, Long durationMinutes) {
+        com.edulinguaghana.social.ChallengeManager challengeManager = new com.edulinguaghana.social.ChallengeManager();
+
+        challengeManager.createChallenge(fromUserId, toUserId, language, quizType, durationMinutes,
+            new com.edulinguaghana.social.ChallengeManager.ChallengeCreationCallback() {
+                @Override
+                public void onSuccess(com.edulinguaghana.social.Challenge challenge) {
+                    Toast.makeText(ProfileActivity.this,
+                        "⚔️ Challenge sent to " + toUserId + "!\n" +
+                        "Language: " + language + " | Quiz: " + quizType + " | Time: " + durationMinutes + " min",
+                        Toast.LENGTH_LONG).show();
+                }
+
+                @Override
+                public void onFailure(String error) {
+                    Toast.makeText(ProfileActivity.this, "Failed to create challenge: " + error, Toast.LENGTH_SHORT).show();
+                }
+            }
+        );
     }
 
     private void performSendFriendRequest(String fromUserId, String toUserId) {
@@ -1189,47 +1243,6 @@ public class ProfileActivity extends AppCompatActivity {
             @Override
             public void onCancelled(com.google.firebase.database.DatabaseError error) {
                 android.util.Log.e("ProfileActivity", "Validation error: " + error.getMessage());
-                Toast.makeText(ProfileActivity.this, "Failed to validate user: " + error.getMessage(), Toast.LENGTH_SHORT).show();
-            }
-        });
-    }
-
-    private void performCreateChallenge(String fromUserId, String toUserId) {
-        SocialRepository repo = SocialProvider.get();
-        if (repo == null) {
-            Toast.makeText(this, "Social features unavailable", Toast.LENGTH_SHORT).show();
-            return;
-        }
-
-        // First validate that the target user exists in Firebase
-        Toast.makeText(this, "Validating user...", Toast.LENGTH_SHORT).show();
-
-        com.google.firebase.database.DatabaseReference usersRef =
-            com.google.firebase.database.FirebaseDatabase.getInstance().getReference("users");
-
-        usersRef.child(toUserId).addListenerForSingleValueEvent(new com.google.firebase.database.ValueEventListener() {
-            @Override
-            public void onDataChange(com.google.firebase.database.DataSnapshot snapshot) {
-                if (!snapshot.exists()) {
-                    Toast.makeText(ProfileActivity.this, "User not found: " + toUserId, Toast.LENGTH_LONG).show();
-                    return;
-                }
-
-                // User exists, proceed with challenge creation
-                com.edulinguaghana.social.Challenge ch = new com.edulinguaghana.social.Challenge();
-                ch.quizId = "default_quiz";
-                ch.challengerId = fromUserId;
-                ch.challengedId = toUserId;
-                try {
-                    repo.createChallenge(ch);
-                    Toast.makeText(ProfileActivity.this, "Challenge sent!", Toast.LENGTH_SHORT).show();
-                } catch (Exception ex) {
-                    Toast.makeText(ProfileActivity.this, "Failed to send challenge: " + ex.getMessage(), Toast.LENGTH_SHORT).show();
-                }
-            }
-
-            @Override
-            public void onCancelled(com.google.firebase.database.DatabaseError error) {
                 Toast.makeText(ProfileActivity.this, "Failed to validate user: " + error.getMessage(), Toast.LENGTH_SHORT).show();
             }
         });
@@ -1402,7 +1415,7 @@ public class ProfileActivity extends AppCompatActivity {
             "⚔️",
             "Challenge",
             "Send a challenge",
-            () -> performCreateChallenge(currentUserId, friend.friendUserId)
+            () -> performCreateChallengeWithDialog(currentUserId, friend.friendUserId)
         ));
 
         menuItems.add(new StyledMenuHelper.MenuItem(
@@ -1467,7 +1480,7 @@ public class ProfileActivity extends AppCompatActivity {
                     .setNeutralButton("Challenge", (dialog, which) -> {
                         FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
                         if (currentUser != null) {
-                            performCreateChallenge(currentUser.getUid(), friendUserId);
+                            performCreateChallengeWithDialog(currentUser.getUid(), friendUserId);
                         }
                     })
                     .show();

@@ -773,8 +773,8 @@ public class QuizActivity extends AppCompatActivity {
 
         boolean newHighScore = score > 0 && score >= bestScore;
 
-        // Update overall progress
-        ProgressManager.updateProgress(this, quizType, score, score);
+        // Update overall progress with language tracking
+        ProgressManager.updateProgressWithLanguage(this, quizType, score, score, languageCode);
 
         // Record practice for streak
         StreakManager streakManager = new StreakManager(this);
@@ -809,6 +809,11 @@ public class QuizActivity extends AppCompatActivity {
         // Save challenge result if in challenge mode
         if (isChallengeMode && challengeId != null) {
             saveChallengeResult();
+            
+            // Progress challenge quest when challenge is attempted
+            try {
+                com.edulinguaghana.gamification.QuestManager.progressQuest(this, "daily_challenge", 1); // Quest 3
+            } catch (Exception ignored) { }
         }
 
         if (score == 100) {

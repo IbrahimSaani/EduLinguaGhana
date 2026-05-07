@@ -22,8 +22,8 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="16dp"
-                app:cardCornerRadius="16dp"
-                app:cardElevation="4dp"
+                app:cardCornerRadius="18dp"
+                app:cardElevation="5dp"
                 app:cardBackgroundColor="@color/cardBackground"
                 app:strokeWidth="0dp">
 
@@ -39,27 +39,42 @@
                         android:layout_height="wrap_content"
                         android:orientation="horizontal"
                         android:gravity="center_vertical"
-                        android:layout_marginBottom="8dp">
+                        android:layout_marginBottom="12dp">
 
                         <TextView
-                            android:layout_width="40dp"
-                            android:layout_height="40dp"
+                            android:layout_width="48dp"
+                            android:layout_height="48dp"
                             android:text="🏅"
-                            android:textSize="32sp"
+                            android:textSize="36sp"
                             android:gravity="center"
-                            android:layout_marginEnd="12dp" />
+                            android:layout_marginEnd="14dp" />
 
-                        <TextView
-                            android:id="@+id/tv_badges_title"
+                        <LinearLayout
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
-                            android:text="@string/badges_title"
-                            android:textSize="22sp"
-                            android:textStyle="bold"
-                            android:fontFamily="@font/agbalumo"
-                            android:textColor="@color/colorPrimary"
-                            android:letterSpacing="0.02" />
+                            android:orientation="vertical">
+
+                            <TextView
+                                android:id="@+id/tv_badges_title"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="@string/badges_title"
+                                android:textSize="24sp"
+                                android:textStyle="bold"
+                                android:fontFamily="@font/agbalumo"
+                                android:textColor="@color/colorPrimary"
+                                android:letterSpacing="0.02" />
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Unlock badges by completing achievements"
+                                android:textSize="12sp"
+                                android:textColor="@color/textSecondary"
+                                android:layout_marginTop="2dp" />
+
+                        </LinearLayout>
 
                     </LinearLayout>
 
@@ -69,7 +84,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:text="@string/badges_description"
-                        android:textSize="14sp"
+                        android:textSize="13sp"
                         android:textColor="@color/textSecondary"
                         android:lineSpacingExtra="2dp" />
 
@@ -82,8 +97,8 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="16dp"
-                app:cardCornerRadius="16dp"
-                app:cardElevation="4dp"
+                app:cardCornerRadius="18dp"
+                app:cardElevation="5dp"
                 app:cardBackgroundColor="@color/colorPrimaryLight"
                 app:strokeWidth="0dp">
 
@@ -125,11 +140,12 @@
                     <com.google.android.material.progressindicator.LinearProgressIndicator
                         android:id="@+id/progress_badges"
                         android:layout_width="match_parent"
-                        android:layout_height="8dp"
+                        android:layout_height="10dp"
+                        android:layout_marginBottom="14dp"
                         app:indicatorColor="@color/colorPrimary"
                         app:trackColor="@color/progressTrackColor"
-                        app:trackCornerRadius="4dp"
-                        app:trackThickness="8dp"
+                        app:trackCornerRadius="5dp"
+                        app:trackThickness="10dp"
                         tools:progress="67" />
 
                     <!-- Stats Row -->
@@ -137,7 +153,6 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:orientation="horizontal"
-                        android:layout_marginTop="16dp"
                         android:baselineAligned="false">
 
                         <!-- Unlocked Badges -->
@@ -146,14 +161,15 @@
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
                             android:orientation="vertical"
-                            android:gravity="center">
+                            android:gravity="center"
+                            android:padding="8dp">
 
                             <TextView
                                 android:id="@+id/tv_unlocked_count"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 tools:text="8"
-                                android:textSize="24sp"
+                                android:textSize="28sp"
                                 android:textStyle="bold"
                                 android:textColor="@color/correctAnswer" />
 
@@ -161,10 +177,11 @@
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:text="Unlocked"
-                                android:textSize="11sp"
+                                android:textSize="10sp"
                                 android:textColor="@color/textSecondary"
                                 android:textAllCaps="true"
-                                android:layout_marginTop="4dp" />
+                                android:layout_marginTop="4dp"
+                                android:letterSpacing="0.05" />
 
                         </LinearLayout>
 
@@ -174,14 +191,15 @@
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
                             android:orientation="vertical"
-                            android:gravity="center">
+                            android:gravity="center"
+                            android:padding="8dp">
 
                             <TextView
                                 android:id="@+id/tv_locked_count"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 tools:text="4"
-                                android:textSize="24sp"
+                                android:textSize="28sp"
                                 android:textStyle="bold"
                                 android:textColor="@color/textSecondary" />
 
@@ -189,10 +207,11 @@
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:text="Locked"
-                                android:textSize="11sp"
+                                android:textSize="10sp"
                                 android:textColor="@color/textSecondary"
                                 android:textAllCaps="true"
-                                android:layout_marginTop="4dp" />
+                                android:layout_marginTop="4dp"
+                                android:letterSpacing="0.05" />
 
                         </LinearLayout>
 
@@ -202,14 +221,15 @@
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
                             android:orientation="vertical"
-                            android:gravity="center">
+                            android:gravity="center"
+                            android:padding="8dp">
 
                             <TextView
                                 android:id="@+id/tv_completion_percentage"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 tools:text="67%"
-                                android:textSize="24sp"
+                                android:textSize="28sp"
                                 android:textStyle="bold"
                                 android:textColor="@color/colorPrimary" />
 
@@ -217,10 +237,11 @@
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:text="Complete"
-                                android:textSize="11sp"
+                                android:textSize="10sp"
                                 android:textColor="@color/textSecondary"
                                 android:textAllCaps="true"
-                                android:layout_marginTop="4dp" />
+                                android:layout_marginTop="4dp"
+                                android:letterSpacing="0.05" />
 
                         </LinearLayout>
 
