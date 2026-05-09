@@ -35,6 +35,8 @@ public class SettingsActivity extends AppCompatActivity {
     private Button btnSyncToCloud;
     private Button btnSyncFromCloud;
     private Button btnChangeRole;
+    private View btnAboutApp;
+    private View btnPrivacyPolicy;
     private TextView tvLastSync;
     private TextView tvCurrentRole;
 
@@ -77,6 +79,8 @@ public class SettingsActivity extends AppCompatActivity {
         btnSyncToCloud = findViewById(R.id.btnSyncToCloud);
         btnSyncFromCloud = findViewById(R.id.btnSyncFromCloud);
         btnChangeRole = findViewById(R.id.btnChangeRole);
+        btnAboutApp = findViewById(R.id.btnAboutApp);
+        btnPrivacyPolicy = findViewById(R.id.btnPrivacyPolicy);
         tvLastSync = findViewById(R.id.tvLastSync);
         tvCurrentRole = findViewById(R.id.tvCurrentRole);
 
@@ -188,6 +192,15 @@ public class SettingsActivity extends AppCompatActivity {
                     null
             );
         });
+
+        // About & Privacy listeners
+        if (btnAboutApp != null) {
+            btnAboutApp.setOnClickListener(v -> showAboutDialog());
+        }
+
+        if (btnPrivacyPolicy != null) {
+            btnPrivacyPolicy.setOnClickListener(v -> showPrivacyPolicy());
+        }
     }
 
     @Override
@@ -225,19 +238,45 @@ public class SettingsActivity extends AppCompatActivity {
             TextView tvAudioHeader = findViewById(R.id.tvAudioHeader);
             TextView tvVisualHeader = findViewById(R.id.tvVisualHeader);
             TextView tvProgressHeader = findViewById(R.id.tvProgressHeader);
+            TextView tvAccountHeader = findViewById(R.id.tvAccountHeader);
+            TextView tvCloudHeader = findViewById(R.id.tvCloudHeader);
+            TextView tvAboutHeader = findViewById(R.id.tvAboutHeader);
 
-            if (tvAudioHeader != null) {
-                tvAudioHeader.setTypeface(typeface, android.graphics.Typeface.BOLD);
-            }
-            if (tvVisualHeader != null) {
-                tvVisualHeader.setTypeface(typeface, android.graphics.Typeface.BOLD);
-            }
-            if (tvProgressHeader != null) {
-                tvProgressHeader.setTypeface(typeface, android.graphics.Typeface.BOLD);
-            }
+            if (tvAudioHeader != null) tvAudioHeader.setTypeface(typeface, android.graphics.Typeface.BOLD);
+            if (tvVisualHeader != null) tvVisualHeader.setTypeface(typeface, android.graphics.Typeface.BOLD);
+            if (tvProgressHeader != null) tvProgressHeader.setTypeface(typeface, android.graphics.Typeface.BOLD);
+            if (tvAccountHeader != null) tvAccountHeader.setTypeface(typeface, android.graphics.Typeface.BOLD);
+            if (tvCloudHeader != null) tvCloudHeader.setTypeface(typeface, android.graphics.Typeface.BOLD);
+            if (tvAboutHeader != null) tvAboutHeader.setTypeface(typeface, android.graphics.Typeface.BOLD);
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    private void showAboutDialog() {
+        StyledMenuHelper.showStyledConfirmationDialog(
+            this,
+            "🇬🇭",
+            "About EduLingua Ghana",
+            "EduLingua Ghana is a language learning platform dedicated to preserving and teaching Ghanaian languages like Twi, Ga, and Ewe.\n\nOur mission is to make language learning fun and accessible for everyone.\n\nDeveloped with ❤️ for Ghana.",
+            "Great!",
+            null,
+            null,
+            null
+        );
+    }
+
+    private void showPrivacyPolicy() {
+        StyledMenuHelper.showStyledConfirmationDialog(
+            this,
+            "🔒",
+            "Privacy Policy",
+            "Your privacy is important to us. EduLingua Ghana collects minimal data to sync your progress and provide a personalized experience.\n\nWe do not share your personal information with third parties.\n\nYour learning data is securely stored on Google Firebase.",
+            "I Understand",
+            null,
+            null,
+            null
+        );
     }
 
     /**
