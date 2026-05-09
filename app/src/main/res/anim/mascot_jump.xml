@@ -1,1 +1,68 @@
-﻿<?xml version="1.0" encoding="utf-8"?><set xmlns:android="http://schemas.android.com/apk/res/android"><translate android:fromYDelta="0%" android:toYDelta="-10%" android:duration="300" android:interpolator="@android:anim/decelerate_interpolator" android:repeatCount="1" android:repeatMode="reverse" /><scale android:fromXScale="1.0" android:toXScale="0.95" android:fromYScale="1.0" android:toYScale="1.1" android:pivotX="50%" android:pivotY="100%" android:duration="300" android:repeatCount="1" android:repeatMode="reverse" /></set>
+﻿<?xml version="1.0" encoding="utf-8"?>
+<set xmlns:android="http://schemas.android.com/apk/res/android"
+    android:shareInterpolator="false">
+
+    <!-- Anticipation (Squash) -->
+    <scale
+        android:duration="150"
+        android:fromXScale="1.0"
+        android:fromYScale="1.0"
+        android:pivotX="50%"
+        android:pivotY="100%"
+        android:toXScale="1.15"
+        android:toYScale="0.85"
+        android:interpolator="@android:anim/accelerate_interpolator" />
+
+    <!-- Upward Movement -->
+    <translate
+        android:duration="350"
+        android:startOffset="150"
+        android:fromYDelta="0"
+        android:toYDelta="-60"
+        android:interpolator="@android:anim/decelerate_interpolator" />
+
+    <!-- Stretch during jump -->
+    <scale
+        android:duration="350"
+        android:startOffset="150"
+        android:fromXScale="1.15"
+        android:fromYScale="0.85"
+        android:pivotX="50%"
+        android:pivotY="100%"
+        android:toXScale="0.9"
+        android:toYScale="1.2"
+        android:interpolator="@android:anim/decelerate_interpolator" />
+
+    <!-- Fall back down -->
+    <translate
+        android:duration="300"
+        android:startOffset="500"
+        android:fromYDelta="0"
+        android:toYDelta="60"
+        android:interpolator="@android:anim/accelerate_interpolator" />
+
+    <!-- Landing (Squash again) -->
+    <scale
+        android:duration="200"
+        android:startOffset="800"
+        android:fromXScale="0.9"
+        android:fromYScale="1.2"
+        android:pivotX="50%"
+        android:pivotY="100%"
+        android:toXScale="1.1"
+        android:toYScale="0.9"
+        android:interpolator="@android:anim/decelerate_interpolator" />
+
+    <!-- Return to normal -->
+    <scale
+        android:duration="150"
+        android:startOffset="1000"
+        android:fromXScale="1.1"
+        android:fromYScale="0.9"
+        android:pivotX="50%"
+        android:pivotY="100%"
+        android:toXScale="1.0"
+        android:toYScale="1.0"
+        android:interpolator="@android:anim/decelerate_interpolator" />
+
+</set>

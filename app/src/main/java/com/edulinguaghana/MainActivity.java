@@ -292,8 +292,16 @@ public class MainActivity extends AppCompatActivity {
     private void setupMascot() {
         if (mascotView == null) return;
 
-        // Start idle animation
-        startMascotIdleAnimation();
+        // Entrance animation: Peek from bottom
+        mascotView.setAlpha(0f);
+        mascotView.setTranslationY(100f);
+        mascotView.animate()
+                .alpha(1f)
+                .translationY(0f)
+                .setDuration(1000)
+                .setInterpolator(new android.view.animation.OvershootInterpolator())
+                .withEndAction(this::startMascotIdleAnimation)
+                .start();
 
         // Set up interactive click listener
         mascotView.setOnClickListener(v -> {
@@ -303,6 +311,7 @@ public class MainActivity extends AppCompatActivity {
         // Set up long click for special animation
         mascotView.setOnLongClickListener(v -> {
             playMascotCelebration();
+            showMascotMessage("I love learning with you! ✨");
             return true;
         });
     }

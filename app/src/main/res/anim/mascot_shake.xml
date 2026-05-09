@@ -1,1 +1,28 @@
-﻿<?xml version="1.0" encoding="utf-8"?><set xmlns:android="http://schemas.android.com/apk/res/android"><rotate android:fromDegrees="-10" android:toDegrees="10" android:pivotX="50%" android:pivotY="50%" android:duration="100" android:interpolator="@android:anim/linear_interpolator" android:repeatCount="5" android:repeatMode="reverse" /></set>
+﻿<?xml version="1.0" encoding="utf-8"?>
+<set xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <!-- Giggle wobble -->
+    <rotate
+        android:duration="80"
+        android:fromDegrees="-5"
+        android:pivotX="50%"
+        android:pivotY="50%"
+        android:repeatCount="8"
+        android:repeatMode="reverse"
+        android:toDegrees="5"
+        android:interpolator="@android:anim/linear_interpolator" />
+
+    <!-- Slight bounce while shaking -->
+    <scale
+        android:duration="160"
+        android:fromXScale="1.0"
+        android:fromYScale="1.0"
+        android:pivotX="50%"
+        android:pivotY="100%"
+        android:repeatCount="4"
+        android:repeatMode="reverse"
+        android:toXScale="1.05"
+        android:toYScale="0.95"
+        android:interpolator="@android:anim/accelerate_decelerate_interpolator" />
+
+</set>

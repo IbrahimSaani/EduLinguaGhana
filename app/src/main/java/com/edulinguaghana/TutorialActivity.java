@@ -157,11 +157,21 @@ public class TutorialActivity extends AppCompatActivity {
 
     private void startFloatingAnimations() {
         if (animatedShapesContainer == null) return;
-        Animation floatAnim = AnimationUtils.loadAnimation(this, R.anim.floating_element);
+        
         for (int i = 0; i < animatedShapesContainer.getChildCount(); i++) {
             View child = animatedShapesContainer.getChildAt(i);
-            floatAnim.setStartOffset(i * 500L);
-            child.startAnimation(floatAnim);
+            
+            // Assign different animations based on index for a more organic feel
+            int animRes;
+            int type = i % 4;
+            if (type == 0) animRes = R.anim.float_up_slow;
+            else if (type == 1) animRes = R.anim.float_up_medium;
+            else if (type == 2) animRes = R.anim.floating_element;
+            else animRes = R.anim.float_up_fast;
+
+            Animation anim = AnimationUtils.loadAnimation(this, animRes);
+            anim.setStartOffset(i * 300L); // Stagger them
+            child.startAnimation(anim);
         }
     }
 
@@ -243,6 +253,13 @@ public class TutorialActivity extends AppCompatActivity {
                 Animation jump = AnimationUtils.loadAnimation(context, R.anim.mascot_jump);
                 jump.setStartOffset(1000);
                 holder.ivMascot.startAnimation(jump);
+                
+                // Add idle animation after entrance
+                holder.ivMascot.postDelayed(() -> {
+                    if (holder.ivMascot.getAnimation() == null || !holder.ivMascot.getAnimation().hasStarted()) {
+                         holder.ivMascot.startAnimation(AnimationUtils.loadAnimation(context, R.anim.mascot_idle));
+                    }
+                }, 2500);
             }
 
             // Interactive emoji

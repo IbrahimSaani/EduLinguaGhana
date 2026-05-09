@@ -18,9 +18,20 @@
         android:id="@+id/animatedShapesContainer"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
-        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="✨" android:textSize="24sp" android:layout_marginTop="100dp" android:layout_marginStart="50dp" android:alpha="0.3" />
-        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="⭕" android:textSize="30sp" android:layout_marginTop="400dp" android:layout_marginStart="300dp" android:alpha="0.2" />
-        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="⭐" android:textSize="20sp" android:layout_marginTop="600dp" android:layout_marginStart="80dp" android:alpha="0.3" />
+        <!-- Letters -->
+        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="A" android:textSize="32sp" android:textColor="@color/colorPrimary" android:alpha="0.2" android:layout_marginTop="80dp" android:layout_marginStart="40dp" android:fontFamily="@font/agbalumo" />
+        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="B" android:textSize="40sp" android:textColor="@color/colorPrimary" android:alpha="0.15" android:layout_marginTop="450dp" android:layout_marginStart="20dp" android:fontFamily="@font/agbalumo" />
+        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="C" android:textSize="28sp" android:textColor="@color/colorPrimary" android:alpha="0.2" android:layout_marginTop="200dp" android:layout_marginStart="320dp" android:fontFamily="@font/agbalumo" />
+
+        <!-- Numbers -->
+        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="1" android:textSize="36sp" android:textColor="@color/colorAccent" android:alpha="0.2" android:layout_marginTop="600dp" android:layout_marginStart="50dp" android:fontFamily="@font/agbalumo" />
+        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="2" android:textSize="44sp" android:textColor="@color/colorAccent" android:alpha="0.15" android:layout_marginTop="150dp" android:layout_marginStart="280dp" android:fontFamily="@font/agbalumo" />
+        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="5" android:textSize="30sp" android:textColor="@color/colorAccent" android:alpha="0.2" android:layout_marginTop="750dp" android:layout_marginStart="300dp" android:fontFamily="@font/agbalumo" />
+
+        <!-- Shapes -->
+        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="✨" android:textSize="24sp" android:layout_marginTop="350dp" android:layout_marginStart="150dp" android:alpha="0.3" />
+        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="⭕" android:textSize="30sp" android:layout_marginTop="50dp" android:layout_marginStart="200dp" android:alpha="0.2" />
+        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="⭐" android:textSize="20sp" android:layout_marginTop="680dp" android:layout_marginStart="180dp" android:alpha="0.3" />
     </FrameLayout>
 
     <androidx.viewpager2.widget.ViewPager2

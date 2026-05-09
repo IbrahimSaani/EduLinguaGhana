@@ -1,104 +1,182 @@
 <?xml version="1.0" encoding="utf-8"?>
 <vector xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:aapt="http://schemas.android.com/aapt"
     android:width="200dp"
     android:height="200dp"
     android:viewportWidth="200"
     android:viewportHeight="200">
 
-    <!-- Owl Body -->
+    <!-- Shadow for depth -->
     <path
-        android:fillColor="#FF8F6B"
-        android:pathData="M100,40 Q130,40 140,70 L140,130 Q140,150 120,155 L80,155 Q60,150 60,130 L60,70 Q70,40 100,40 Z" />
+        android:fillColor="#1A000000"
+        android:pathData="M100,165 A40,10 0 1,1 100,185 A40,10 0 1,1 100,165 Z" />
 
-    <!-- Belly -->
+    <!-- Owl Body with Gradient -->
     <path
-        android:fillColor="#FFB596"
-        android:pathData="M100,80 Q115,80 120,100 L120,140 Q115,150 100,150 Q85,150 80,140 L80,100 Q85,80 100,80 Z" />
+        android:pathData="M100,40 Q130,40 140,70 L140,130 Q140,150 120,155 L80,155 Q60,150 60,130 L60,70 Q70,40 100,40 Z">
+        <aapt:attr name="android:fillColor">
+            <gradient
+                android:centerX="100"
+                android:centerY="100"
+                android:gradientRadius="80"
+                android:type="radial">
+                <item android:color="#FFAB91" android:offset="0" />
+                <item android:color="#FF8F6B" android:offset="0.7" />
+                <item android:color="#E64A19" android:offset="1" />
+            </gradient>
+        </aapt:attr>
+    </path>
 
-    <!-- Left Eye Background (white circle) -->
+    <!-- Belly with soft glow -->
+    <path
+        android:pathData="M100,80 Q115,80 120,100 L120,140 Q115,150 100,150 Q85,150 80,140 L80,100 Q85,80 100,80 Z">
+        <aapt:attr name="android:fillColor">
+            <gradient
+                android:startX="100"
+                android:startY="80"
+                android:endX="100"
+                android:endY="150"
+                android:type="linear">
+                <item android:color="#FFFFFF" android:offset="0" />
+                <item android:color="#FFCCBC" android:offset="1" />
+            </gradient>
+        </aapt:attr>
+    </path>
+
+    <!-- Eyes (More depth) -->
+    <!-- Left Eye white -->
     <path
         android:fillColor="#FFFFFF"
         android:pathData="M80,52 A18,18 0 1,1 80,88 A18,18 0 1,1 80,52 Z" />
+    <!-- Inner eye shadow -->
+    <path
+        android:fillColor="#12000000"
+        android:pathData="M80,54 A14,14 0 1,1 80,82 A14,14 0 1,1 80,54 Z" />
 
-    <!-- Right Eye Background (white circle) -->
+    <!-- Right Eye white -->
     <path
         android:fillColor="#FFFFFF"
         android:pathData="M120,52 A18,18 0 1,1 120,88 A18,18 0 1,1 120,52 Z" />
-
-    <!-- Left Pupil -->
+    <!-- Inner eye shadow -->
     <path
-        android:fillColor="#3D3D3D"
+        android:fillColor="#12000000"
+        android:pathData="M120,54 A14,14 0 1,1 120,82 A14,14 0 1,1 120,54 Z" />
+
+    <!-- Pupils with subtle gradient -->
+    <path
+        android:fillColor="#212121"
         android:pathData="M80,60 A10,10 0 1,1 80,80 A10,10 0 1,1 80,60 Z" />
-
-    <!-- Right Pupil -->
     <path
-        android:fillColor="#3D3D3D"
+        android:fillColor="#212121"
         android:pathData="M120,60 A10,10 0 1,1 120,80 A10,10 0 1,1 120,60 Z" />
 
-    <!-- Left Eye Shine -->
+    <!-- Eye Highlights (Glistening) -->
     <path
         android:fillColor="#FFFFFF"
-        android:pathData="M83,63 A4,4 0 1,1 83,71 A4,4 0 1,1 83,63 Z" />
-
-    <!-- Right Eye Shine -->
+        android:pathData="M83,63 A5,5 0 1,1 83,73 A5,5 0 1,1 83,63 Z" />
     <path
         android:fillColor="#FFFFFF"
-        android:pathData="M123,63 A4,4 0 1,1 123,71 A4,4 0 1,1 123,63 Z" />
-
-    <!-- Beak -->
+        android:pathData="M123,63 A5,5 0 1,1 123,73 A5,5 0 1,1 123,63 Z" />
+    <!-- Secondary reflections -->
     <path
-        android:fillColor="#FFB84D"
-        android:pathData="M100,85 L90,95 L110,95 Z" />
-
-    <!-- Left Wing -->
+        android:fillColor="#80FFFFFF"
+        android:pathData="M76,72 A2.5,2.5 0 1,1 76,77 A2.5,2.5 0 1,1 76,72 Z" />
     <path
-        android:fillColor="#FF7A52"
-        android:pathData="M60,100 Q50,110 55,120 L65,115 Q62,108 60,100 Z" />
-
-    <!-- Right Wing -->
+        android:fillColor="#80FFFFFF"
+        android:pathData="M116,72 A2.5,2.5 0 1,1 116,77 A2.5,2.5 0 1,1 116,72 Z" />
+    <!-- Glossy sheen on top of body -->
     <path
-        android:fillColor="#FF7A52"
-        android:pathData="M140,100 Q150,110 145,120 L135,115 Q138,108 140,100 Z" />
+        android:fillColor="#33FFFFFF"
+        android:pathData="M100,45 Q120,45 125,60 Q100,55 75,60 Q80,45 100,45 Z" />
 
-    <!-- Left Ear Tuft -->
+    <!-- Beak with gradient -->
+    <path
+        android:pathData="M100,85 L90,98 L110,98 Z">
+        <aapt:attr name="android:fillColor">
+            <gradient
+                android:startX="90"
+                android:startY="85"
+                android:endX="110"
+                android:endY="98"
+                android:type="linear">
+                <item android:color="#FFD54F" android:offset="0" />
+                <item android:color="#FF8F00" android:offset="1" />
+            </gradient>
+        </aapt:attr>
+    </path>
+
+    <!-- Wings (Dynamic shapes) -->
+    <path
+        android:pathData="M60,100 Q45,115 55,130 L65,125 Q55,115 60,100 Z">
+        <aapt:attr name="android:fillColor">
+            <gradient
+                android:centerX="60"
+                android:centerY="115"
+                android:gradientRadius="30"
+                android:type="radial">
+                <item android:color="#FF8F6B" android:offset="0" />
+                <item android:color="#D84315" android:offset="1" />
+            </gradient>
+        </aapt:attr>
+    </path>
+    <path
+        android:pathData="M140,100 Q155,115 145,130 L135,125 Q145,115 140,100 Z">
+        <aapt:attr name="android:fillColor">
+            <gradient
+                android:centerX="140"
+                android:centerY="115"
+                android:gradientRadius="30"
+                android:type="radial">
+                <item android:color="#FF8F6B" android:offset="0" />
+                <item android:color="#D84315" android:offset="1" />
+            </gradient>
+        </aapt:attr>
+    </path>
+
+    <!-- Ear Tufts -->
     <path
         android:fillColor="#FF8F6B"
-        android:pathData="M70,35 L65,20 L75,30 Z" />
-
-    <!-- Right Ear Tuft -->
+        android:pathData="M70,35 L60,15 L78,32 Z" />
     <path
         android:fillColor="#FF8F6B"
-        android:pathData="M130,35 L135,20 L125,30 Z" />
+        android:pathData="M130,35 L140,15 L122,32 Z" />
 
-    <!-- Left Foot -->
+    <!-- Feet (Realistic claws) -->
     <path
-        android:fillColor="#FFB84D"
-        android:pathData="M85,153 Q77,153 77,158 Q77,163 85,163 Q93,163 93,158 Q93,153 85,153 Z" />
-
-    <!-- Right Foot -->
+        android:fillColor="#FFB300"
+        android:pathData="M85,153 Q80,153 78,160 Q80,165 85,163 Q90,165 92,160 Q90,153 85,153 Z" />
     <path
-        android:fillColor="#FFB84D"
-        android:pathData="M115,153 Q107,153 107,158 Q107,163 115,163 Q123,163 123,158 Q123,153 115,153 Z" />
+        android:fillColor="#FFB300"
+        android:pathData="M115,153 Q110,153 108,160 Q110,165 115,163 Q120,165 122,160 Q120,153 115,153 Z" />
 
-    <!-- Book in wings -->
+    <!-- Book (Educational companion) -->
+    <path
+        android:fillColor="#F5F5F5"
+        android:pathData="M82,115 L118,115 L118,140 L82,140 Z" />
     <path
         android:fillColor="#4CAF50"
-        android:pathData="M85,110 L85,135 L115,135 L115,110 Z" />
-
-    <!-- Book spine -->
+        android:pathData="M82,115 L100,115 L100,140 L82,140 Z" />
     <path
         android:fillColor="#2E7D32"
-        android:pathData="M99,110 L99,135 L101,135 L101,110 Z" />
+        android:pathData="M100,115 L118,115 L118,140 L100,140 Z" />
+    <!-- Pages lines -->
+    <path
+        android:fillColor="#BDBDBD"
+        android:pathData="M85,120 L95,120 L95,121 L85,121 Z M85,125 L95,125 L95,126 L85,126 Z M85,130 L95,130 L95,131 L85,131 Z" />
 
-    <!-- Graduation Cap -->
+    <!-- Academic Cap (Realistic) -->
     <path
         android:fillColor="#1A237E"
-        android:pathData="M70,38 L130,38 L125,45 L75,45 Z" />
-
-    <!-- Cap Tassel (circle) -->
+        android:pathData="M65,35 L135,35 L135,40 L65,40 Z" />
+    <path
+        android:fillColor="#0D1146"
+        android:pathData="M80,40 L120,40 L115,48 L85,48 Z" />
+    <!-- Tassel -->
     <path
         android:fillColor="#FFAB40"
-        android:pathData="M130,34 A4,4 0 1,1 130,42 A4,4 0 1,1 130,34 Z" />
+        android:pathData="M135,37 L145,50 L142,52 L132,37 Z" />
+    <path
+        android:fillColor="#FFD180"
+        android:pathData="M142,50 A3,3 0 1,1 142,56 A3,3 0 1,1 142,50 Z" />
 
 </vector>
-
