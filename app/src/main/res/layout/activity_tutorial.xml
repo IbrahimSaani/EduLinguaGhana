@@ -43,6 +43,18 @@
         app:layout_constraintBottom_toTopOf="@+id/layoutBottom"
         app:layout_constraintTop_toTopOf="parent" />
 
+    <!-- Progress Indicator at Top -->
+    <ProgressBar
+        android:id="@+id/progressBarTutorial"
+        style="?android:attr/progressBarStyleHorizontal"
+        android:layout_width="match_parent"
+        android:layout_height="8dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginStart="32dp"
+        android:layout_marginEnd="32dp"
+        android:progressDrawable="@drawable/progress_splash_track"
+        app:layout_constraintTop_toTopOf="parent" />
+
     <LinearLayout
         android:id="@+id/layoutBottom"
         android:layout_width="match_parent"

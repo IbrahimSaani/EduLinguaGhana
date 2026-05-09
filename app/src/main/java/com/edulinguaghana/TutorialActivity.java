@@ -1,6 +1,8 @@
 package com.edulinguaghana;
 
 import android.animation.ArgbEvaluator;
+import android.animation.ObjectAnimator;
+import android.animation.ValueAnimator;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -16,6 +18,7 @@ import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.view.animation.OvershootInterpolator;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -36,8 +39,10 @@ public class TutorialActivity extends AppCompatActivity {
     private MaterialButton btnNext;
     private MaterialButton btnSkip;
     private TabLayout tabLayout;
+    private ProgressBar progressBar;
     private View viewBackground;
     private ViewGroup animatedShapesContainer;
+    private List<TutorialSlide> slides;
     
     private static final String PREF_NAME = "EduLinguaPrefs";
     private static final String KEY_SEEN_INTRO = "SEEN_INTRO";
@@ -71,10 +76,11 @@ public class TutorialActivity extends AppCompatActivity {
         btnNext = findViewById(R.id.btnNext);
         btnSkip = findViewById(R.id.btnSkip);
         tabLayout = findViewById(R.id.tabLayoutIndicator);
+        progressBar = findViewById(R.id.progressBarTutorial);
         viewBackground = findViewById(R.id.viewBackground);
         animatedShapesContainer = findViewById(R.id.animatedShapesContainer);
 
-        List<TutorialSlide> slides = new ArrayList<>();
+        slides = new ArrayList<>();
         slides.add(new TutorialSlide("🇬🇭", "Hi! I'm Kojo!", "Welcome to EduLingua! I'm so excited to help you learn our beautiful languages!"));
         slides.add(new TutorialSlide("🎤", "Listen & Speak", "I'll say a word, and you repeat it. It's like talking with a friend!"));
         slides.add(new TutorialSlide("📝", "Fun Challenges", "We have cool puzzles and games. Can you get the highest score?"));
@@ -106,6 +112,7 @@ public class TutorialActivity extends AppCompatActivity {
             @Override
             public void onPageSelected(int position) {
                 updateButtonState(position, slides.size());
+                updateProgressBar(position, slides.size());
                 vibrate(30);
             }
         });
@@ -128,11 +135,44 @@ public class TutorialActivity extends AppCompatActivity {
         }
         
         startFloatingAnimations();
+        
+        // Welcome progress
+        updateProgressBar(0, slides.size());
+    }
+
+    private void updateProgressBar(int position, int total) {
+        if (progressBar == null) return;
+        int progress = (int) (((float)(position + 1) / total) * 100);
+        
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
+            progressBar.setProgress(progress, true);
+        } else {
+            progressBar.setProgress(progress);
+        }
     }
 
     private void celebrateAndFinish() {
         vibrate(100);
-        btnNext.animate().scaleX(1.5f).scaleY(1.5f).alpha(0f).setDuration(500).withEndAction(this::finishTutorial).start();
+        
+        // Burst animation for all background shapes
+        if (animatedShapesContainer != null) {
+            for (int i = 0; i < animatedShapesContainer.getChildCount(); i++) {
+                View child = animatedShapesContainer.getChildAt(i);
+                child.animate()
+                    .scaleX(3f).scaleY(3f)
+                    .alpha(0f)
+                    .setDuration(800)
+                    .start();
+            }
+        }
+        
+        // Final "Pop" effect for the button
+        btnNext.animate()
+            .scaleX(2f).scaleY(2f)
+            .alpha(0f)
+            .setDuration(600)
+            .withEndAction(this::finishTutorial)
+            .start();
     }
 
     private void vibrate(int ms) {
@@ -172,6 +212,15 @@ public class TutorialActivity extends AppCompatActivity {
             Animation anim = AnimationUtils.loadAnimation(this, animRes);
             anim.setStartOffset(i * 300L); // Stagger them
             child.startAnimation(anim);
+            
+            // Add subtle rotation to alphabets and numbers
+            if (child instanceof TextView) {
+                ObjectAnimator rotate = ObjectAnimator.ofFloat(child, "rotation", -15f, 15f);
+                rotate.setDuration(3000 + ((long) i * 100));
+                rotate.setRepeatCount(ValueAnimator.INFINITE);
+                rotate.setRepeatMode(ValueAnimator.REVERSE);
+                rotate.start();
+            }
         }
     }
 
@@ -274,6 +323,14 @@ public class TutorialActivity extends AppCompatActivity {
                 
                 vibrate(30);
             });
+            
+            // Also make mascot interactive
+            if (holder.ivMascot != null) {
+                holder.ivMascot.setOnClickListener(v -> {
+                    v.startAnimation(AnimationUtils.loadAnimation(context, R.anim.mascot_jump));
+                    vibrate(30);
+                });
+            }
         }
 
         private void vibrate(int ms) {
