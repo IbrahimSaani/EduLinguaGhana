@@ -39,6 +39,8 @@ public class ParentDashboardActivity extends AppCompatActivity {
     private LinearLayout emptyStateLayout;
     private MaterialButton btnSort;
     private MaterialButton btnAddFirstChild;
+    private MaterialButton btnAddChildBottom;
+    private MaterialButton btnRemoveChild;
 
     // Statistics views
     private TextView tvTotalChildren;
@@ -87,6 +89,8 @@ public class ParentDashboardActivity extends AppCompatActivity {
         swipeRefresh = findViewById(R.id.swipeRefresh);
         btnSort = findViewById(R.id.btnSort);
         btnAddFirstChild = findViewById(R.id.btnAddFirstChild);
+        btnAddChildBottom = findViewById(R.id.btnAddChildBottom);
+        btnRemoveChild = findViewById(R.id.btnRemoveChild);
 
         // Statistics views
         tvTotalChildren = findViewById(R.id.tvTotalChildren);
@@ -96,6 +100,14 @@ public class ParentDashboardActivity extends AppCompatActivity {
 
         if (btnAddFirstChild != null) {
             btnAddFirstChild.setOnClickListener(v -> openRelationshipManagement());
+        }
+
+        if (btnAddChildBottom != null) {
+            btnAddChildBottom.setOnClickListener(v -> openRelationshipManagement());
+        }
+
+        if (btnRemoveChild != null) {
+            btnRemoveChild.setOnClickListener(v -> showRemoveChildDialog());
         }
 
         if (btnSort != null) {
@@ -171,11 +183,19 @@ public class ParentDashboardActivity extends AppCompatActivity {
     }
 
     private void setupRecyclerView() {
-        adapter = new StudentProgressAdapter(new ArrayList<>(), studentId -> {
-            // Open detailed view for this child
-            Intent intent = new Intent(ParentDashboardActivity.this, StudentDetailActivity.class);
-            intent.putExtra("studentId", studentId);
-            startActivity(intent);
+        adapter = new StudentProgressAdapter(new ArrayList<>(), new StudentProgressAdapter.OnStudentClickListener() {
+            @Override
+            public void onStudentClick(String studentId) {
+                // Open detailed view for this child
+                Intent intent = new Intent(ParentDashboardActivity.this, StudentDetailActivity.class);
+                intent.putExtra("studentId", studentId);
+                startActivity(intent);
+            }
+
+            @Override
+            public void onRemoveStudent(StudentProgressItem student) {
+                confirmRemoveChild(student);
+            }
         });
 
         childrenRecyclerView.setLayoutManager(new LinearLayoutManager(this));
@@ -298,6 +318,72 @@ public class ParentDashboardActivity extends AppCompatActivity {
         if (tvActiveToday != null) {
             tvActiveToday.setText(String.valueOf(activeToday));
         }
+    }
+
+    private void showRemoveChildDialog() {
+        if (allChildren.isEmpty()) {
+            Toast.makeText(this, "No children to remove", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        String[] childNames = new String[allChildren.size()];
+        for (int i = 0; i < allChildren.size(); i++) {
+            childNames[i] = allChildren.get(i).getStudentName();
+        }
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Remove Child")
+            .setItems(childNames, (dialog, which) -> {
+                StudentProgressItem selectedChild = allChildren.get(which);
+                confirmRemoveChild(selectedChild);
+            })
+            .setNegativeButton("Cancel", null)
+            .show();
+    }
+
+    private void confirmRemoveChild(StudentProgressItem child) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Remove Child?")
+            .setMessage("Are you sure you want to stop tracking " + child.getStudentName() + "'s progress?")
+            .setPositiveButton("Remove", (dialog, which) -> {
+                removeChildConnection(child.getStudentId(), child.getStudentName());
+            })
+            .setNegativeButton("Cancel", null)
+            .show();
+    }
+
+    private void removeChildConnection(String studentId, String studentName) {
+        roleManager.getStudents(currentUserId, new RoleManager.RelationshipCallback() {
+            @Override
+            public void onRelationshipsRetrieved(List<UserRelationship> relationships) {
+                for (UserRelationship rel : relationships) {
+                    if (rel.getStudentId().equals(studentId)) {
+                        roleManager.removeRelationship(rel.getId(),
+                            new RoleManager.RelationshipActionCallback() {
+                                @Override
+                                public void onSuccess(UserRelationship relationship) {
+                                    Toast.makeText(ParentDashboardActivity.this,
+                                        studentName + " removed from your dashboard", Toast.LENGTH_SHORT).show();
+                                    loadChildren();
+                                }
+
+                                @Override
+                                public void onError(String error) {
+                                    Toast.makeText(ParentDashboardActivity.this,
+                                        "Failed to remove: " + error, Toast.LENGTH_SHORT).show();
+                                }
+                            });
+                        return;
+                    }
+                }
+            }
+
+            @Override
+            public void onError(String error) {
+                Toast.makeText(ParentDashboardActivity.this,
+                    "Failed to remove: " + error, Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 
     @Override

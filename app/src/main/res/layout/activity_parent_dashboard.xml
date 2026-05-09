@@ -268,6 +268,41 @@
 
                 </FrameLayout>
 
+                <!-- Action Buttons -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:padding="16dp"
+                    android:gravity="center"
+                    android:background="@android:color/white"
+                    android:elevation="4dp">
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btnAddChildBottom"
+                        android:layout_width="0dp"
+                        android:layout_height="56dp"
+                        android:layout_weight="1"
+                        android:text="➕ Add Child"
+                        android:textStyle="bold"
+                        app:cornerRadius="28dp"
+                        android:layout_marginEnd="8dp"/>
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btnRemoveChild"
+                        style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                        android:layout_width="0dp"
+                        android:layout_height="56dp"
+                        android:layout_weight="1"
+                        android:text="🗑️ Remove Child"
+                        android:textStyle="bold"
+                        android:textColor="@color/colorPrimary"
+                        app:strokeColor="@color/colorPrimary"
+                        app:cornerRadius="28dp"
+                        android:layout_marginStart="8dp"/>
+
+                </LinearLayout>
+
             </LinearLayout>
 
         </androidx.core.widget.NestedScrollView>

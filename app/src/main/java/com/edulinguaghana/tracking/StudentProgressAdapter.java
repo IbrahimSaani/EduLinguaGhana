@@ -23,6 +23,7 @@ public class StudentProgressAdapter extends RecyclerView.Adapter<StudentProgress
 
     public interface OnStudentClickListener {
         void onStudentClick(String studentId);
+        void onRemoveStudent(StudentProgressItem student);
     }
 
     public StudentProgressAdapter(List<StudentProgressItem> students, OnStudentClickListener listener) {
@@ -65,6 +66,7 @@ public class StudentProgressAdapter extends RecyclerView.Adapter<StudentProgress
         private TextView tvLastActive;
         private View streakLayout;
         private View btnViewDetails;
+        private View btnRemove;
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -78,6 +80,7 @@ public class StudentProgressAdapter extends RecyclerView.Adapter<StudentProgress
             tvLastActive = itemView.findViewById(R.id.tvLastActive);
             streakLayout = itemView.findViewById(R.id.streakLayout);
             btnViewDetails = itemView.findViewById(R.id.btnViewDetails);
+            btnRemove = itemView.findViewById(R.id.btnRemove);
         }
 
         public void bind(StudentProgressItem item, OnStudentClickListener listener) {
@@ -126,6 +129,14 @@ public class StudentProgressAdapter extends RecyclerView.Adapter<StudentProgress
                 btnViewDetails.setOnClickListener(v -> {
                     if (listener != null) {
                         listener.onStudentClick(item.getStudentId());
+                    }
+                });
+            }
+
+            if (btnRemove != null) {
+                btnRemove.setOnClickListener(v -> {
+                    if (listener != null) {
+                        listener.onRemoveStudent(item);
                     }
                 });
             }

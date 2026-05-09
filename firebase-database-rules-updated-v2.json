@@ -36,11 +36,48 @@
     "challenges": {
       ".read": "auth != null",
       ".write": "auth != null",
-      ".indexOn": ["state", "challengedId", "challengerId", "completedAt"],
+      ".indexOn": ["state", "challengedId", "challengerId", "completedAt", "createdAt"],
       "$challengeId": {
         ".read": "auth != null",
         ".write": "auth != null",
-        ".validate": "newData.hasChildren(['challengerId', 'challengedId', 'state']) && newData.child('state').isString() && (newData.child('state').val() === 'pending' || newData.child('state').val() === 'in_progress' || newData.child('state').val() === 'completed' || newData.child('state').val() === 'PENDING' || newData.child('state').val() === 'ONGOING' || newData.child('state').val() === 'COMPLETED' || newData.child('state').val() === 'EXPIRED' || newData.child('state').val() === 'CANCELLED')"
+        ".validate": "newData.hasChildren(['challengerId', 'challengedId', 'state']) && newData.child('state').isString() && (newData.child('state').val() === 'pending' || newData.child('state').val() === 'in_progress' || newData.child('state').val() === 'completed' || newData.child('state').val() === 'PENDING' || newData.child('state').val() === 'ONGOING' || newData.child('state').val() === 'COMPLETED' || newData.child('state').val() === 'EXPIRED' || newData.child('state').val() === 'CANCELLED') && newData.child('challengerId').isString() && newData.child('challengedId').isString() && newData.child('createdAt').isNumber() && newData.child('language').isString() && newData.child('quizType').isString() && newData.child('durationMinutes').isNumber()",
+        "challengerScore": {
+          ".validate": "newData.isNumber() || !newData.exists()"
+        },
+        "challengedScore": {
+          ".validate": "newData.isNumber() || !newData.exists()"
+        },
+        "winnerId": {
+          ".validate": "newData.isString() || !newData.exists()"
+        }
+      }
+    },
+    "challengeStats": {
+      ".read": "auth != null",
+      ".write": "auth != null",
+      ".indexOn": ["userId", "winRate", "totalChallenges"],
+      "$userId": {
+        ".read": "auth != null",
+        ".write": "$userId === auth.uid || auth != null",
+        ".validate": "newData.hasChildren(['userId', 'challengesWon', 'challengesLost', 'challengesTied', 'totalChallenges', 'winRate']) && newData.child('userId').val() === $userId && newData.child('challengesWon').isNumber() && newData.child('challengesLost').isNumber() && newData.child('challengesTied').isNumber() && newData.child('totalChallenges').isNumber() && newData.child('winRate').isNumber()",
+        "challengesWon": {
+          ".validate": "newData.isNumber()"
+        },
+        "challengesLost": {
+          ".validate": "newData.isNumber()"
+        },
+        "challengesTied": {
+          ".validate": "newData.isNumber()"
+        },
+        "totalChallenges": {
+          ".validate": "newData.isNumber()"
+        },
+        "winRate": {
+          ".validate": "newData.isNumber()"
+        },
+        "lastChallengeTime": {
+          ".validate": "newData.isNumber()"
+        }
       }
     },
     "relationships": {
@@ -48,7 +85,7 @@
       ".indexOn": ["supervisorId", "studentId", "status"],
       "$relationshipId": {
         ".read": "auth != null",
-        ".write": "auth != null && (root.child('relationships').child($relationshipId).child('supervisorId').val() === auth.uid || !data.exists())",
+        ".write": "auth != null && (data.child('supervisorId').val() === auth.uid || data.child('studentId').val() === auth.uid || !data.exists())",
         ".validate": "newData.hasChildren(['supervisorId', 'studentId', 'status', 'type']) || !newData.exists()"
       }
     },
@@ -104,4 +141,3 @@
     }
   }
 }
-

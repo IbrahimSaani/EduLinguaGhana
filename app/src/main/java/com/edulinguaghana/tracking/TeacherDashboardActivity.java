@@ -40,6 +40,7 @@ public class TeacherDashboardActivity extends AppCompatActivity {
     private LinearLayout emptyStateLayout;
     private MaterialButton btnSort;
     private MaterialButton btnAddFirstStudent;
+    private MaterialButton btnAddStudentBottom;
     private MaterialButton btnRemoveStudent;
 
     // Statistics views
@@ -89,6 +90,7 @@ public class TeacherDashboardActivity extends AppCompatActivity {
         swipeRefresh = findViewById(R.id.swipeRefresh);
         btnSort = findViewById(R.id.btnSort);
         btnAddFirstStudent = findViewById(R.id.btnAddFirstStudent);
+        btnAddStudentBottom = findViewById(R.id.btnAddStudentBottom);
         btnRemoveStudent = findViewById(R.id.btnRemoveStudent);
 
         // Statistics views
@@ -99,6 +101,10 @@ public class TeacherDashboardActivity extends AppCompatActivity {
 
         if (btnAddFirstStudent != null) {
             btnAddFirstStudent.setOnClickListener(v -> openRelationshipManagement());
+        }
+
+        if (btnAddStudentBottom != null) {
+            btnAddStudentBottom.setOnClickListener(v -> openRelationshipManagement());
         }
 
         if (btnRemoveStudent != null) {
@@ -178,11 +184,19 @@ public class TeacherDashboardActivity extends AppCompatActivity {
     }
 
     private void setupRecyclerView() {
-        adapter = new StudentProgressAdapter(new ArrayList<>(), studentId -> {
-            // Open detailed view for this student
-            Intent intent = new Intent(TeacherDashboardActivity.this, StudentDetailActivity.class);
-            intent.putExtra("studentId", studentId);
-            startActivity(intent);
+        adapter = new StudentProgressAdapter(new ArrayList<>(), new StudentProgressAdapter.OnStudentClickListener() {
+            @Override
+            public void onStudentClick(String studentId) {
+                // Open detailed view for this student
+                Intent intent = new Intent(TeacherDashboardActivity.this, StudentDetailActivity.class);
+                intent.putExtra("studentId", studentId);
+                startActivity(intent);
+            }
+
+            @Override
+            public void onRemoveStudent(StudentProgressItem student) {
+                confirmRemoveStudent(student);
+            }
         });
 
         studentsRecyclerView.setLayoutManager(new LinearLayoutManager(this));
