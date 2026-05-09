@@ -886,20 +886,12 @@ public class MainActivity extends AppCompatActivity {
         boolean seenIntro = prefs.getBoolean(KEY_SEEN_INTRO, false);
         if (seenIntro) return;
 
-        new AlertDialog.Builder(this)
-                .setTitle("Welcome to EduLingua Ghana")
-                .setMessage(
-                        "• Recital Mode – listen to letters and numbers in your chosen language.\n\n" +
-                                "• Practice Mode – repeat after the app and practice pronunciation.\n\n" +
-                                "• Quiz Mode – answer fun questions and play Speed Challenge.\n\n" +
-                                "• Progress Tracker – see your best score and learning stats."
-                )
-                .setPositiveButton("Got it", (d, w) -> {
-                    SharedPreferences.Editor ed = prefs.edit();
-                    ed.putBoolean(KEY_SEEN_INTRO, true);
-                    ed.apply();
-                })
-                .show();
+        Intent intent = new Intent(this, TutorialActivity.class);
+        startActivity(intent);
+        // We don't finish() here because user can skip and come back, 
+        // but TutorialActivity will finish itself and return to a NEW MainActivity instance or just finish.
+        // Actually TutorialActivity starts a NEW MainActivity. To avoid duplicates:
+        finish();
     }
 
     // ---------------- LANGUAGE ----------------

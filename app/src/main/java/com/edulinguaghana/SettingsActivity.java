@@ -36,6 +36,7 @@ public class SettingsActivity extends AppCompatActivity {
     private Button btnSyncFromCloud;
     private Button btnChangeRole;
     private View btnAboutApp;
+    private View btnAppTutorial;
     private View btnPrivacyPolicy;
     private TextView tvLastSync;
     private TextView tvCurrentRole;
@@ -80,6 +81,7 @@ public class SettingsActivity extends AppCompatActivity {
         btnSyncFromCloud = findViewById(R.id.btnSyncFromCloud);
         btnChangeRole = findViewById(R.id.btnChangeRole);
         btnAboutApp = findViewById(R.id.btnAboutApp);
+        btnAppTutorial = findViewById(R.id.btnAppTutorial);
         btnPrivacyPolicy = findViewById(R.id.btnPrivacyPolicy);
         tvLastSync = findViewById(R.id.tvLastSync);
         tvCurrentRole = findViewById(R.id.tvCurrentRole);
@@ -196,6 +198,13 @@ public class SettingsActivity extends AppCompatActivity {
         // About & Privacy listeners
         if (btnAboutApp != null) {
             btnAboutApp.setOnClickListener(v -> showAboutDialog());
+        }
+
+        if (btnAppTutorial != null) {
+            btnAppTutorial.setOnClickListener(v -> {
+                Intent intent = new Intent(this, TutorialActivity.class);
+                startActivity(intent);
+            });
         }
 
         if (btnPrivacyPolicy != null) {
