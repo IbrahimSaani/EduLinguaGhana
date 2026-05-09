@@ -66,6 +66,17 @@ public class SocialNotificationHelper {
     public void showFriendRequestNotification(String fromUserId, String displayName) {
         if (!canShowNotification()) return;
 
+        String fromName = displayName != null ? displayName : fromUserId;
+        
+        // Add to in-app notification manager
+        com.edulinguaghana.NotificationManager inAppManager = new com.edulinguaghana.NotificationManager(context);
+        inAppManager.addNotification(
+            "New Friend Request",
+            fromName + " wants to be your friend!",
+            "👥",
+            com.edulinguaghana.Notification.NotificationType.MOTIVATIONAL
+        );
+
         Intent intent = new Intent(context, ProfileActivity.class);
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
 
@@ -99,6 +110,17 @@ public class SocialNotificationHelper {
     public void showChallengeNotification(String fromUserId, String displayName, String quizType) {
         if (!canShowNotification()) return;
 
+        String fromName = displayName != null ? displayName : fromUserId;
+
+        // Add to in-app notification manager
+        com.edulinguaghana.NotificationManager inAppManager = new com.edulinguaghana.NotificationManager(context);
+        inAppManager.addNotification(
+            "New Challenge ⚔️",
+            fromName + " challenged you to " + quizType + "!",
+            "⚔️",
+            com.edulinguaghana.Notification.NotificationType.MOTIVATIONAL
+        );
+
         Intent intent = new Intent(context, ProfileActivity.class);
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
 
@@ -127,6 +149,17 @@ public class SocialNotificationHelper {
     public void showFriendAcceptedNotification(String friendUserId, String displayName) {
         if (!canShowNotification()) return;
 
+        String friendName = displayName != null ? displayName : friendUserId;
+
+        // Add to in-app notification manager
+        com.edulinguaghana.NotificationManager inAppManager = new com.edulinguaghana.NotificationManager(context);
+        inAppManager.addNotification(
+            "Friend Request Accepted ✅",
+            friendName + " is now your friend!",
+            "✅",
+            com.edulinguaghana.Notification.NotificationType.ACHIEVEMENT
+        );
+
         Intent intent = new Intent(context, ProfileActivity.class);
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
 
@@ -149,11 +182,54 @@ public class SocialNotificationHelper {
     }
 
     /**
+     * Show a generic notification
+     */
+    @SuppressLint("MissingPermission")
+    public void showGenericNotification(String title, String message, String tag) {
+        if (!canShowNotification()) return;
+
+        Intent intent = new Intent(context, com.edulinguaghana.MainActivity.class);
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+
+        PendingIntent pendingIntent = PendingIntent.getActivity(
+            context,
+            4,
+            intent,
+            PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE
+        );
+
+        NotificationCompat.Builder builder = new NotificationCompat.Builder(context, CHANNEL_ID)
+            .setSmallIcon(R.drawable.ic_notifications)
+            .setContentTitle(title)
+            .setContentText(message)
+            .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+            .setContentIntent(pendingIntent)
+            .setAutoCancel(true);
+
+        notificationManager.notify(tag.hashCode(), builder.build());
+    }
+
+    /**
      * Show notification when challenge is completed
      */
     @SuppressLint("MissingPermission")
     public void showChallengeCompletedNotification(String opponentId, String displayName, boolean won) {
         if (!canShowNotification()) return;
+
+        String opponentName = displayName != null ? displayName : opponentId;
+        String title = won ? "Challenge Won! 🏆" : "Challenge Completed";
+        String message = won ?
+            "You beat " + opponentName + "!" :
+            "Challenge with " + opponentName + " completed!";
+
+        // Add to in-app notification manager
+        com.edulinguaghana.NotificationManager inAppManager = new com.edulinguaghana.NotificationManager(context);
+        inAppManager.addNotification(
+            title,
+            message,
+            won ? "🏆" : "🎯",
+            won ? com.edulinguaghana.Notification.NotificationType.ACHIEVEMENT : com.edulinguaghana.Notification.NotificationType.MILESTONE
+        );
 
         Intent intent = new Intent(context, ProfileActivity.class);
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
@@ -164,11 +240,6 @@ public class SocialNotificationHelper {
             intent,
             PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE
         );
-
-        String title = won ? "Challenge Won! 🏆" : "Challenge Completed";
-        String message = won ?
-            "You beat " + (displayName != null ? displayName : opponentId) + "!" :
-            "Challenge with " + (displayName != null ? displayName : opponentId) + " completed!";
 
         NotificationCompat.Builder builder = new NotificationCompat.Builder(context, CHANNEL_ID)
             .setSmallIcon(R.drawable.ic_notifications)

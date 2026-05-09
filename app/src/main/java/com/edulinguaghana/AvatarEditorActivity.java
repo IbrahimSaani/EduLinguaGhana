@@ -17,7 +17,9 @@ import com.google.android.material.tabs.TabLayout;
 import com.google.android.material.tabs.TabLayoutMediator;
 
 import androidx.core.content.ContextCompat;
+import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.List;
 
 public class AvatarEditorActivity extends AppCompatActivity {
 
@@ -211,18 +213,29 @@ public class AvatarEditorActivity extends AppCompatActivity {
     }
 
     private void showBackgroundColorPicker() {
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setTitle("🎨 Choose Background Color");
+        List<StyledMenuHelper.MenuItem> menuItems = new ArrayList<>();
+        for (int i = 0; i < backgroundNames.length; i++) {
+            final int index = i;
+            menuItems.add(new StyledMenuHelper.MenuItem(
+                "🎨",
+                backgroundNames[i],
+                () -> {
+                    config.backgroundColor = backgroundColors[index];
+                    updateAvatarPreview();
+                    Toast.makeText(this, "Background changed to " + backgroundNames[index] + "! ✨",
+                        Toast.LENGTH_SHORT).show();
+                }
+            ));
+        }
 
-        builder.setItems(backgroundNames, (dialog, which) -> {
-            config.backgroundColor = backgroundColors[which];
-            updateAvatarPreview();
-            Toast.makeText(this, "Background changed to " + backgroundNames[which] + "! ✨",
-                Toast.LENGTH_SHORT).show();
-        });
-
-        builder.setNegativeButton("Cancel", null);
-        builder.show();
+        StyledMenuHelper.showStyledMenu(
+            this,
+            "🎨",
+            "Background Color",
+            "Choose a color for your avatar",
+            menuItems,
+            null
+        );
     }
 
     private void updateAvatarPreview() {

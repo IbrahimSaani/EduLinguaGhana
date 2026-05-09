@@ -18,6 +18,7 @@ public class NotificationManager {
     private static final String KEY_NOTIFICATIONS = "NOTIFICATIONS_LIST";
     private static final String KEY_LAST_CHECK = "LAST_CHECK_TIME";
     private static final String KEY_STREAK_NOTIF_SHOWN = "STREAK_NOTIF_SHOWN";
+    private static final String KEY_INACTIVITY_NOTIF_SHOWN = "INACTIVITY_NOTIF_SHOWN";
 
     private Context context;
     private SharedPreferences prefs;
@@ -133,6 +134,32 @@ public class NotificationManager {
         generateProgressNotifications();
         generateStreakNotifications();
         generateMotivationalNotifications();
+        generateInactivityNotifications();
+    }
+
+    private void generateInactivityNotifications() {
+        SharedPreferences streakPrefs = context.getSharedPreferences("StreakPrefs", Context.MODE_PRIVATE);
+        long lastPracticeTime = streakPrefs.getLong("LAST_PRACTICE_TIMESTAMP", 0);
+        
+        if (lastPracticeTime == 0) return; // Never practiced, handled by welcome
+
+        long now = System.currentTimeMillis();
+        long daysInactive = (now - lastPracticeTime) / (24 * 60 * 60 * 1000);
+
+        if (daysInactive >= 3) {
+            String lastShownId = prefs.getString(KEY_INACTIVITY_NOTIF_SHOWN, "");
+            String currentInactivityId = "inactivity_" + (daysInactive / 3); // Trigger every 3 days
+
+            if (lastShownId == null || !lastShownId.equals(currentInactivityId)) {
+                addNotification(
+                    "We miss you! 🦉",
+                    "It's been " + daysInactive + " days since your last lesson. Kojo is waiting to learn with you!",
+                    "🦉",
+                    Notification.NotificationType.MOTIVATIONAL
+                );
+                prefs.edit().putString(KEY_INACTIVITY_NOTIF_SHOWN, currentInactivityId).apply();
+            }
+        }
     }
 
     private void generateProgressNotifications() {

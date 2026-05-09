@@ -508,23 +508,29 @@ public class ProfileActivity extends AppCompatActivity {
     }
 
     private void showSearchByUsernameDialog(String currentUserId) {
-        android.app.AlertDialog.Builder builder = new android.app.AlertDialog.Builder(this);
-        builder.setTitle("Add Friend by Username");
         final EditText input = new EditText(this);
         input.setHint("Enter username");
         input.setInputType(InputType.TYPE_CLASS_TEXT);
-        builder.setView(input);
-        builder.setPositiveButton("Search", (dialog, which) -> {
-            String username = input.getText() != null ? input.getText().toString().trim() : "";
-            if (username.isEmpty()) {
-                Toast.makeText(this, "Please enter a username", Toast.LENGTH_SHORT).show();
-                return;
-            }
-            searchHistory.addUsernameSearch(username);
-            searchUserByUsername(username, currentUserId);
-        });
-        builder.setNegativeButton("Cancel", (dialog, which) -> dialog.cancel());
-        builder.show();
+        
+        StyledMenuHelper.showStyledCustomDialog(
+            this,
+            "👤",
+            "Add Friend",
+            "Enter your friend's username",
+            input,
+            "Search",
+            "Cancel",
+            () -> {
+                String username = input.getText() != null ? input.getText().toString().trim() : "";
+                if (username.isEmpty()) {
+                    Toast.makeText(this, "Please enter a username", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+                searchHistory.addUsernameSearch(username);
+                searchUserByUsername(username, currentUserId);
+            },
+            null
+        );
     }
 
     private void searchUserByUsername(String username, String currentUserId) {
@@ -542,12 +548,17 @@ public class ProfileActivity extends AppCompatActivity {
 
                     if (!snapshot.exists()) {
                         android.util.Log.e("ProfileActivity", "No user found with username: " + username);
-                        new AlertDialog.Builder(ProfileActivity.this)
-                            .setTitle("User Not Found")
-                            .setMessage("No user found with username:\n" + username +
-                                      "\n\nTry searching by email or user ID instead.")
-                            .setPositiveButton("OK", null)
-                            .show();
+                        StyledMenuHelper.showStyledConfirmationDialog(
+                            ProfileActivity.this,
+                            "🔍",
+                            "User Not Found",
+                            "No user found with username:\n" + username +
+                                "\n\nTry searching by email or user ID instead.",
+                            "OK",
+                            null,
+                            null,
+                            null
+                        );
                         return;
                     }
 
@@ -577,54 +588,62 @@ public class ProfileActivity extends AppCompatActivity {
     }
 
     private void showSearchByEmailDialog(String currentUserId) {
-        android.app.AlertDialog.Builder builder = new android.app.AlertDialog.Builder(this);
-        builder.setTitle("Add Friend by Email");
         final EditText input = new EditText(this);
         input.setHint("Enter email address");
         input.setInputType(InputType.TYPE_TEXT_VARIATION_EMAIL_ADDRESS);
-        builder.setView(input);
-        builder.setPositiveButton("Search", (dialog, which) -> {
-            String email = input.getText() != null ? input.getText().toString().trim() : "";
-            if (email.isEmpty()) {
-                Toast.makeText(this, "Please enter an email", Toast.LENGTH_SHORT).show();
-                return;
-            }
-            searchHistory.addEmailSearch(email);
-            searchUserByEmail(email, currentUserId);
-        });
-        builder.setNegativeButton("Cancel", (dialog, which) -> dialog.cancel());
-        builder.show();
+        
+        StyledMenuHelper.showStyledCustomDialog(
+            this,
+            "📧",
+            "Add Friend",
+            "Enter your friend's email",
+            input,
+            "Search",
+            "Cancel",
+            () -> {
+                String email = input.getText() != null ? input.getText().toString().trim() : "";
+                if (email.isEmpty()) {
+                    Toast.makeText(this, "Please enter an email", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+                searchHistory.addEmailSearch(email);
+                searchUserByEmail(email, currentUserId);
+            },
+            null
+        );
     }
 
     private void showSearchByIdDialog(String currentUserId) {
-        android.app.AlertDialog.Builder builder = new android.app.AlertDialog.Builder(this);
-        builder.setTitle("Add Friend by ID");
-
-        // Add button to show all users for debugging
-        builder.setNeutralButton("Show All Users", (dialog, which) -> {
-            showAllUsersInDatabase();
-        });
-
         final EditText input = new EditText(this);
         input.setHint("Enter user ID");
         input.setInputType(InputType.TYPE_CLASS_TEXT);
-        builder.setView(input);
-        builder.setPositiveButton("Search", (dialog, which) -> {
-            String target = input.getText() != null ? input.getText().toString().trim() : "";
-            if (target.isEmpty()) {
-                Toast.makeText(this, "Please enter a user id", Toast.LENGTH_SHORT).show();
-                return;
-            }
-            if (target.equals(currentUserId)) {
-                Toast.makeText(this, "You can't add yourself", Toast.LENGTH_SHORT).show();
-                return;
-            }
-            searchHistory.addUidSearch(target);
-            // Validate user exists before sending request
-            validateAndAddFriendById(currentUserId, target);
-        });
-        builder.setNegativeButton("Cancel", (dialog, which) -> dialog.cancel());
-        builder.show();
+        
+        StyledMenuHelper.showStyledCustomDialog(
+            this,
+            "🆔",
+            "Add Friend",
+            "Enter your friend's user ID",
+            input,
+            "Search",
+            "Cancel",
+            "Show All Users",
+            () -> {
+                String target = input.getText() != null ? input.getText().toString().trim() : "";
+                if (target.isEmpty()) {
+                    Toast.makeText(this, "Please enter a user id", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+                if (target.equals(currentUserId)) {
+                    Toast.makeText(this, "You can't add yourself", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+                searchHistory.addUidSearch(target);
+                // Validate user exists before sending request
+                validateAndAddFriendById(currentUserId, target);
+            },
+            null,
+            this::showAllUsersInDatabase
+        );
     }
 
     private void showQRCodeScanner(String currentUserId) {
@@ -664,17 +683,21 @@ public class ProfileActivity extends AppCompatActivity {
                 Toast.makeText(this, "Camera permission is required to scan QR codes", Toast.LENGTH_LONG).show();
 
                 // Show dialog explaining why permission is needed
-                new AlertDialog.Builder(this)
-                    .setTitle("Camera Permission Required")
-                    .setMessage("To scan QR codes and add friends quickly, this app needs access to your camera.\n\nYou can grant permission in Settings.")
-                    .setPositiveButton("Settings", (dialog, which) -> {
+                StyledMenuHelper.showStyledConfirmationDialog(
+                    this,
+                    "📷",
+                    "Camera Permission Required",
+                    "To scan QR codes and add friends quickly, this app needs access to your camera.\n\nYou can grant permission in Settings.",
+                    "Settings",
+                    "Cancel",
+                    () -> {
                         // Open app settings
                         Intent intent = new Intent(android.provider.Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
                         intent.setData(android.net.Uri.fromParts("package", getPackageName(), null));
                         startActivity(intent);
-                    })
-                    .setNegativeButton("Cancel", null)
-                    .show();
+                    },
+                    null
+                );
             }
         }
     }
@@ -732,11 +755,16 @@ public class ProfileActivity extends AppCompatActivity {
                     progressDialog.dismiss();
 
                     if (!snapshot.exists()) {
-                        new AlertDialog.Builder(ProfileActivity.this)
-                            .setTitle("Invalid QR Code")
-                            .setMessage("This QR code doesn't belong to any registered user.")
-                            .setPositiveButton("OK", null)
-                            .show();
+                        StyledMenuHelper.showStyledConfirmationDialog(
+                            ProfileActivity.this,
+                            "❌",
+                            "Invalid QR Code",
+                            "This QR code doesn't belong to any registered user.",
+                            "OK",
+                            null,
+                            null,
+                            null
+                        );
                         return;
                     }
 
@@ -1985,25 +2013,29 @@ public class ProfileActivity extends AppCompatActivity {
     }
 
     private void showSignOutDialog() {
-        new AlertDialog.Builder(this)
-                .setTitle("Sign Out")
-                .setMessage("Are you sure you want to sign out?")
-                .setPositiveButton("Sign Out", (dialog, which) -> {
-                    // Clear avatar cache before signing out
-                    AvatarBuilder.clearCache(this);
+        StyledMenuHelper.showStyledConfirmationDialog(
+            this,
+            "🚪",
+            "Sign Out",
+            "Are you sure you want to sign out?",
+            "Sign Out",
+            "Cancel",
+            () -> {
+                // Clear avatar cache before signing out
+                AvatarBuilder.clearCache(this);
 
-                    // Clear role cache
-                    RoleManager roleManager = new RoleManager();
-                    roleManager.clearCache(this);
+                // Clear role cache
+                RoleManager roleManager = new RoleManager();
+                roleManager.clearCache(this);
 
-                    // Sign out from Firebase
-                    mAuth.signOut();
+                // Sign out from Firebase
+                mAuth.signOut();
 
-                    Toast.makeText(ProfileActivity.this, "Signed out successfully", Toast.LENGTH_SHORT).show();
-                    setupProfile(); // Refresh the UI
-                })
-                .setNegativeButton("Cancel", null)
-                .show();
+                Toast.makeText(ProfileActivity.this, "Signed out successfully", Toast.LENGTH_SHORT).show();
+                setupProfile(); // Refresh the UI
+            },
+            null
+        );
     }
 
     @Override

@@ -87,12 +87,16 @@ public class AchievementsActivity extends AppCompatActivity {
     }
 
     private void showOfflineMessage() {
-        new AlertDialog.Builder(this)
-            .setTitle("Internet Required")
-            .setMessage("Achievements require an internet connection. Please connect and try again.")
-            .setPositiveButton("OK", (dialog, which) -> finish())
-            .setCancelable(false)
-            .show();
+        StyledMenuHelper.showStyledConfirmationDialog(
+            this,
+            "📶",
+            "Internet Required",
+            "Achievements require an internet connection. Please connect and try again.",
+            "OK",
+            null,
+            this::finish,
+            null
+        );
     }
 
     private void setupRecyclerView() {

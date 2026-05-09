@@ -109,32 +109,39 @@ public class NotificationsActivity extends AppCompatActivity implements Notifica
         loadNotifications();
 
         // Show details in a styled dialog
-        String title = notification.getEmoji() + " " + notification.getTitle();
-        new AlertDialog.Builder(this)
-                .setTitle(title)
-                .setMessage(notification.getMessage())
-                .setPositiveButton("Got it!", null)
-                .setIcon(android.R.drawable.ic_dialog_info)
-                .show();
+        StyledMenuHelper.showStyledConfirmationDialog(
+            this,
+            notification.getEmoji(),
+            notification.getTitle(),
+            notification.getMessage(),
+            "Got it!",
+            null,
+            null,
+            null
+        );
     }
 
     @Override
     public void onNotificationDelete(Notification notification) {
         // Show confirmation dialog
-        new AlertDialog.Builder(this)
-                .setTitle("Delete Notification")
-                .setMessage("Remove this notification?")
-                .setPositiveButton("Delete", (dialog, which) -> {
-                    // Delete notification
-                    notificationManager.deleteNotification(notification.getId());
+        StyledMenuHelper.showStyledConfirmationDialog(
+            this,
+            "🗑️",
+            "Delete Notification",
+            "Remove this notification?",
+            "Delete",
+            "Cancel",
+            () -> {
+                // Delete notification
+                notificationManager.deleteNotification(notification.getId());
 
-                    // Refresh the list
-                    loadNotifications();
+                // Refresh the list
+                loadNotifications();
 
-                    Toast.makeText(this, "Notification deleted", Toast.LENGTH_SHORT).show();
-                })
-                .setNegativeButton("Cancel", null)
-                .show();
+                Toast.makeText(this, "Notification deleted", Toast.LENGTH_SHORT).show();
+            },
+            null
+        );
     }
 
     @Override
@@ -156,16 +163,20 @@ public class NotificationsActivity extends AppCompatActivity implements Notifica
             Toast.makeText(this, "All notifications marked as read", Toast.LENGTH_SHORT).show();
             return true;
         } else if (item.getItemId() == R.id.action_clear_all) {
-            new AlertDialog.Builder(this)
-                    .setTitle("Clear All Notifications")
-                    .setMessage("Are you sure you want to delete all notifications?")
-                    .setPositiveButton("Clear", (dialog, which) -> {
-                        notificationManager.clearAllNotifications();
-                        loadNotifications();
-                        Toast.makeText(this, "All notifications cleared", Toast.LENGTH_SHORT).show();
-                    })
-                    .setNegativeButton("Cancel", null)
-                    .show();
+            StyledMenuHelper.showStyledConfirmationDialog(
+                this,
+                "🗑️",
+                "Clear All Notifications",
+                "Are you sure you want to delete all notifications?",
+                "Clear",
+                "Cancel",
+                () -> {
+                    notificationManager.clearAllNotifications();
+                    loadNotifications();
+                    Toast.makeText(this, "All notifications cleared", Toast.LENGTH_SHORT).show();
+                },
+                null
+            );
             return true;
         }
         return super.onOptionsItemSelected(item);

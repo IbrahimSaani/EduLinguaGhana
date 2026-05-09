@@ -97,14 +97,14 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        // Initialize permission helper early (must be before STARTED state)
+        permissionHelper = new com.edulinguaghana.social.NotificationPermissionHelper(this);
+
         // Ensure the app respects system windows (status bar, navigation bar)
         // Remove any fullscreen flags that might be set
         getWindow().clearFlags(android.view.WindowManager.LayoutParams.FLAG_FULLSCREEN);
 
         setContentView(R.layout.activity_main);
-
-        // Initialize permission helper early (must be before STARTED state)
-        permissionHelper = new com.edulinguaghana.social.NotificationPermissionHelper(this);
 
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -224,25 +224,34 @@ public class MainActivity extends AppCompatActivity {
 
         // Check if user is logged in
         if (!offlineManager.isLoggedIn()) {
-            new AlertDialog.Builder(this)
-                .setTitle("Login Required 🔒")
-                .setMessage(offlineManager.getLoginRequiredMessage("Achievements"))
-                .setPositiveButton("Sign In", (dialog, which) -> {
+            StyledMenuHelper.showStyledConfirmationDialog(
+                this,
+                "🔒",
+                "Login Required",
+                offlineManager.getLoginRequiredMessage("Achievements"),
+                "Sign In",
+                "Cancel",
+                () -> {
                     Intent intent = new Intent(this, LoginActivity.class);
                     startActivity(intent);
-                })
-                .setNegativeButton("Cancel", null)
-                .show();
+                },
+                null
+            );
             return;
         }
 
         // Check internet connection
         if (!offlineManager.isOnline()) {
-            new AlertDialog.Builder(this)
-                .setTitle("Internet Required 📶")
-                .setMessage("Achievements require an internet connection. Please connect and try again.")
-                .setPositiveButton("OK", null)
-                .show();
+            StyledMenuHelper.showStyledConfirmationDialog(
+                this,
+                "📶",
+                "Internet Required",
+                "Achievements require an internet connection. Please connect and try again.",
+                "OK",
+                null,
+                null,
+                null
+            );
             return;
         }
 
@@ -872,14 +881,16 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void showExitDialog() {
-        new AlertDialog.Builder(this)
-                .setTitle("Exit App")
-                .setMessage("Exit EduLingua Ghana?")
-                .setPositiveButton("Yes", (dialog, which) -> {
-                    playAppExitSoundAndExit();
-                })
-                .setNegativeButton("No", null)
-                .show();
+        StyledMenuHelper.showStyledConfirmationDialog(
+            this,
+            "🚪",
+            "Exit App",
+            "Exit EduLingua Ghana?",
+            "Yes",
+            "No",
+            this::playAppExitSoundAndExit,
+            null
+        );
     }
 
     private void playAppExitSoundAndExit() {
@@ -1271,25 +1282,34 @@ public class MainActivity extends AppCompatActivity {
 
         // Check if user is logged in
         if (!offlineManager.isLoggedIn()) {
-            new AlertDialog.Builder(this)
-                .setTitle("Login Required 🔒")
-                .setMessage("Sign in to compete on the leaderboard and see global rankings!")
-                .setPositiveButton("Sign In", (dialog, which) -> {
+            StyledMenuHelper.showStyledConfirmationDialog(
+                this,
+                "🔒",
+                "Login Required",
+                "Sign in to compete on the leaderboard and see global rankings!",
+                "Sign In",
+                "Cancel",
+                () -> {
                     Intent intent = new Intent(this, LoginActivity.class);
                     startActivity(intent);
-                })
-                .setNegativeButton("Cancel", null)
-                .show();
+                },
+                null
+            );
             return;
         }
 
         // Check internet connection
         if (!offlineManager.isOnline()) {
-            new AlertDialog.Builder(this)
-                .setTitle("Internet Required 📶")
-                .setMessage("Leaderboard requires an internet connection to show global rankings.")
-                .setPositiveButton("OK", null)
-                .show();
+            StyledMenuHelper.showStyledConfirmationDialog(
+                this,
+                "📶",
+                "Internet Required",
+                "Leaderboard requires an internet connection to show global rankings.",
+                "OK",
+                null,
+                null,
+                null
+            );
             return;
         }
 

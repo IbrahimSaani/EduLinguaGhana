@@ -16,6 +16,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.edulinguaghana.R;
+import com.edulinguaghana.StyledMenuHelper;
 import com.edulinguaghana.roles.RoleManager;
 import com.edulinguaghana.roles.UserRelationship;
 import com.google.android.material.button.MaterialButton;
@@ -326,30 +327,36 @@ public class ParentDashboardActivity extends AppCompatActivity {
             return;
         }
 
-        String[] childNames = new String[allChildren.size()];
-        for (int i = 0; i < allChildren.size(); i++) {
-            childNames[i] = allChildren.get(i).getStudentName();
+        List<StyledMenuHelper.MenuItem> menuItems = new ArrayList<>();
+        for (StudentProgressItem child : allChildren) {
+            menuItems.add(new StyledMenuHelper.MenuItem(
+                "👤",
+                child.getStudentName(),
+                () -> confirmRemoveChild(child)
+            ));
         }
 
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setTitle("Remove Child")
-            .setItems(childNames, (dialog, which) -> {
-                StudentProgressItem selectedChild = allChildren.get(which);
-                confirmRemoveChild(selectedChild);
-            })
-            .setNegativeButton("Cancel", null)
-            .show();
+        StyledMenuHelper.showStyledMenu(
+            this,
+            "🗑️",
+            "Remove Child",
+            "Select a child to stop tracking",
+            menuItems,
+            null
+        );
     }
 
     private void confirmRemoveChild(StudentProgressItem child) {
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setTitle("Remove Child?")
-            .setMessage("Are you sure you want to stop tracking " + child.getStudentName() + "'s progress?")
-            .setPositiveButton("Remove", (dialog, which) -> {
-                removeChildConnection(child.getStudentId(), child.getStudentName());
-            })
-            .setNegativeButton("Cancel", null)
-            .show();
+        StyledMenuHelper.showStyledConfirmationDialog(
+            this,
+            "❓",
+            "Remove Child?",
+            "Are you sure you want to stop tracking " + child.getStudentName() + "'s progress?",
+            "Remove",
+            "Cancel",
+            () -> removeChildConnection(child.getStudentId(), child.getStudentName()),
+            null
+        );
     }
 
     private void removeChildConnection(String studentId, String studentName) {

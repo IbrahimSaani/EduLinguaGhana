@@ -16,6 +16,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.edulinguaghana.R;
+import com.edulinguaghana.StyledMenuHelper;
 import com.edulinguaghana.roles.RoleManager;
 import com.edulinguaghana.roles.UserRelationship;
 import com.google.android.material.button.MaterialButton;
@@ -327,30 +328,36 @@ public class TeacherDashboardActivity extends AppCompatActivity {
             return;
         }
 
-        String[] studentNames = new String[allStudents.size()];
-        for (int i = 0; i < allStudents.size(); i++) {
-            studentNames[i] = allStudents.get(i).getStudentName();
+        List<StyledMenuHelper.MenuItem> menuItems = new ArrayList<>();
+        for (StudentProgressItem student : allStudents) {
+            menuItems.add(new StyledMenuHelper.MenuItem(
+                "👤",
+                student.getStudentName(),
+                () -> confirmRemoveStudent(student)
+            ));
         }
 
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setTitle("Remove Student")
-            .setItems(studentNames, (dialog, which) -> {
-                StudentProgressItem selectedStudent = allStudents.get(which);
-                confirmRemoveStudent(selectedStudent);
-            })
-            .setNegativeButton("Cancel", null)
-            .show();
+        StyledMenuHelper.showStyledMenu(
+            this,
+            "🗑️",
+            "Remove Student",
+            "Select a student to remove",
+            menuItems,
+            null
+        );
     }
 
     private void confirmRemoveStudent(StudentProgressItem student) {
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setTitle("Remove Student?")
-            .setMessage("Are you sure you want to remove " + student.getStudentName() + " from your class?")
-            .setPositiveButton("Remove", (dialog, which) -> {
-                removeStudentFromClass(student.getStudentId(), student.getStudentName());
-            })
-            .setNegativeButton("Cancel", null)
-            .show();
+        StyledMenuHelper.showStyledConfirmationDialog(
+            this,
+            "❓",
+            "Remove Student?",
+            "Are you sure you want to remove " + student.getStudentName() + " from your class?",
+            "Remove",
+            "Cancel",
+            () -> removeStudentFromClass(student.getStudentId(), student.getStudentName()),
+            null
+        );
     }
 
     private void removeStudentFromClass(String studentId, String studentName) {

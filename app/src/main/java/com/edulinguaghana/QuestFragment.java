@@ -98,17 +98,18 @@ public class QuestFragment extends Fragment {
     private void showClaimDialog(Quest quest) {
         if (getContext() == null) return;
 
-        new AlertDialog.Builder(getContext())
-            .setTitle("🎉 Quest Complete!")
-            .setMessage("Congratulations! You've completed:\n\n" +
+        StyledMenuHelper.showStyledConfirmationDialog(
+            getContext(),
+            "🎉",
+            "Quest Complete!",
+            "Congratulations! You've completed:\n\n" +
                        quest.title + "\n\n" +
-                       "Claim your reward: +" + quest.xpReward + " XP")
-            .setPositiveButton("Claim Reward", (dialog, which) -> {
-                claimQuestReward(quest);
-            })
-            .setNegativeButton("Later", null)
-            .setCancelable(true)
-            .show();
+                       "Claim your reward: +" + quest.xpReward + " XP",
+            "Claim Reward",
+            "Later",
+            () -> claimQuestReward(quest),
+            null
+        );
     }
 
     private void claimQuestReward(Quest quest) {

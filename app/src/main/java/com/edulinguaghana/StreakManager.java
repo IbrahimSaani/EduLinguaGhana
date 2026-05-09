@@ -15,6 +15,7 @@ public class StreakManager {
     private static final String KEY_LONGEST_STREAK = "LONGEST_STREAK";
     private static final String KEY_LAST_PRACTICE_DATE = "LAST_PRACTICE_DATE";
     private static final String KEY_LAST_PRACTICE_DAY = "LAST_PRACTICE_DAY";
+    private static final String KEY_LAST_PRACTICE_TIMESTAMP = "LAST_PRACTICE_TIMESTAMP";
     private static final String KEY_TOTAL_PRACTICE_DAYS = "TOTAL_PRACTICE_DAYS";
 
     private Context context;
@@ -76,6 +77,7 @@ public class StreakManager {
         editor.putInt(KEY_LONGEST_STREAK, longestStreak);
         editor.putString(KEY_LAST_PRACTICE_DATE, todayDate);
         editor.putInt(KEY_LAST_PRACTICE_DAY, currentDay);
+        editor.putLong(KEY_LAST_PRACTICE_TIMESTAMP, System.currentTimeMillis());
         editor.putInt(KEY_TOTAL_PRACTICE_DAYS, totalPracticeDays);
         editor.apply();
 

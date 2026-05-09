@@ -124,12 +124,16 @@ public class LeaderboardActivity extends AppCompatActivity {
     }
 
     private void showOfflineMessage() {
-        new AlertDialog.Builder(this)
-                .setTitle("Internet Required")
-                .setMessage("Leaderboard requires an internet connection. Please connect and try again.")
-                .setPositiveButton("OK", (dialog, which) -> finish())
-                .setCancelable(false)
-                .show();
+        StyledMenuHelper.showStyledConfirmationDialog(
+            this,
+            "📶",
+            "Internet Required",
+            "Leaderboard requires an internet connection. Please connect and try again.",
+            "OK",
+            null,
+            this::finish,
+            null
+        );
     }
 
     private void setupRecyclerView() {

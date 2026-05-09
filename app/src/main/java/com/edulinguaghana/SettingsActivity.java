@@ -510,11 +510,21 @@ public class SettingsActivity extends AppCompatActivity {
         input.setInputType(android.text.InputType.TYPE_CLASS_NUMBER);
         input.setHint("Enter score (0-100)");
         input.setText("75");
+        
+        // Wrap input in a container for padding
+        android.widget.FrameLayout container = new android.widget.FrameLayout(this);
+        android.widget.FrameLayout.LayoutParams params = new  android.widget.FrameLayout.LayoutParams(
+            android.view.ViewGroup.LayoutParams.MATCH_PARENT, android.view.ViewGroup.LayoutParams.WRAP_CONTENT);
+        int margin = (int) (20 * getResources().getDisplayMetrics().density);
+        params.leftMargin = margin;
+        params.rightMargin = margin;
+        input.setLayoutParams(params);
+        container.addView(input);
 
-        new AlertDialog.Builder(this)
+        new com.google.android.material.dialog.MaterialAlertDialogBuilder(this)
             .setTitle("Test Upload Score")
             .setMessage("Upload a test score to the leaderboard:")
-            .setView(input)
+            .setView(container)
             .setPositiveButton("Upload", (dialog, which) -> {
                 try {
                     int testScore = Integer.parseInt(input.getText().toString());

@@ -31,13 +31,9 @@ public class ChallengeCreationDialog {
     }
 
     public void show() {
-        AlertDialog.Builder builder = new AlertDialog.Builder(context);
-        builder.setTitle("⚔️ Create Challenge");
-
         // Create custom view
         LayoutInflater inflater = LayoutInflater.from(context);
         View dialogView = inflater.inflate(R.layout.dialog_challenge_creation, null);
-        builder.setView(dialogView);
 
         // Get UI elements
         Spinner languageSpinner = dialogView.findViewById(R.id.spinnerLanguage);
@@ -66,21 +62,25 @@ public class ChallengeCreationDialog {
         durationSpinner.setAdapter(durationAdapter);
         durationSpinner.setSelection(1);  // Default to 10 minutes
 
-        // Set positive button
-        builder.setPositiveButton("Create Challenge", (dialog, which) -> {
-            String language = getLanguageCode((String) languageSpinner.getSelectedItem());
-            String quizType = (String) quizTypeSpinner.getSelectedItem();
-            Long duration = parseDuration((String) durationSpinner.getSelectedItem());
+        StyledMenuHelper.showStyledCustomDialog(
+            context,
+            "⚔️",
+            "Create Challenge",
+            "Choose settings for your challenge",
+            dialogView,
+            "Create Challenge",
+            "Cancel",
+            () -> {
+                String language = getLanguageCode((String) languageSpinner.getSelectedItem());
+                String quizType = (String) quizTypeSpinner.getSelectedItem();
+                Long duration = parseDuration((String) durationSpinner.getSelectedItem());
 
-            if (listener != null) {
-                listener.onChallengeCreated(language, quizType, duration, targetUserId);
-            }
-        });
-
-        // Set negative button
-        builder.setNegativeButton("Cancel", (dialog, which) -> dialog.dismiss());
-
-        builder.show();
+                if (listener != null) {
+                    listener.onChallengeCreated(language, quizType, duration, targetUserId);
+                }
+            },
+            null
+        );
     }
 
     private String getLanguageCode(String languageName) {

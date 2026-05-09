@@ -267,15 +267,17 @@ public class AccountManagementActivity extends AppCompatActivity {
                 .addOnCompleteListener(task -> {
                     showProgress(false);
                     if (task.isSuccessful()) {
-                        new AlertDialog.Builder(this)
-                                .setTitle("Verification Email Sent")
-                                .setMessage("A verification email has been sent to " + currentUser.getEmail() +
-                                        ". Please check your inbox and verify your email address.")
-                                .setPositiveButton("I've Verified My Email", (dialog, which) -> {
-                                    refreshEmailVerificationStatus();
-                                })
-                                .setNegativeButton("OK", null)
-                                .show();
+                        StyledMenuHelper.showStyledConfirmationDialog(
+                            this,
+                            "📧",
+                            "Verification Email Sent",
+                            "A verification email has been sent to " + currentUser.getEmail() +
+                                ". Please check your inbox and verify your email address.",
+                            "Verified My Email",
+                            "OK",
+                            this::refreshEmailVerificationStatus,
+                            null
+                        );
                     } else {
                         Toast.makeText(AccountManagementActivity.this,
                                 "Failed to send verification email: " + task.getException().getMessage(),
@@ -315,24 +317,32 @@ public class AccountManagementActivity extends AppCompatActivity {
     }
 
     private void showDeleteAccountDialog() {
-        new AlertDialog.Builder(this)
-                .setTitle("⚠️ Delete Account")
-                .setMessage("Are you absolutely sure you want to delete your account?\n\n" +
+        StyledMenuHelper.showStyledConfirmationDialog(
+            this,
+            "⚠️",
+            "Delete Account",
+            "Are you absolutely sure you want to delete your account?\n\n" +
                         "This action is permanent and cannot be undone. All your progress, " +
-                        "achievements, and data will be permanently deleted.")
-                .setPositiveButton("Delete", (dialog, which) -> confirmDeleteAccount())
-                .setNegativeButton("Cancel", null)
-                .show();
+                        "achievements, and data will be permanently deleted.",
+            "Delete",
+            "Cancel",
+            this::confirmDeleteAccount,
+            null
+        );
     }
 
     private void confirmDeleteAccount() {
         // Show a second confirmation dialog
-        new AlertDialog.Builder(this)
-                .setTitle("Final Confirmation")
-                .setMessage("This is your last chance. Do you really want to delete your account?")
-                .setPositiveButton("Yes, Delete Forever", (dialog, which) -> deleteAccount())
-                .setNegativeButton("No, Keep My Account", null)
-                .show();
+        StyledMenuHelper.showStyledConfirmationDialog(
+            this,
+            "🛑",
+            "Final Confirmation",
+            "This is your last chance. Do you really want to delete your account?",
+            "Yes, Delete Forever",
+            "No, Keep My Account",
+            this::deleteAccount,
+            null
+        );
     }
 
     private void deleteAccount() {
@@ -345,21 +355,25 @@ public class AccountManagementActivity extends AppCompatActivity {
         passwordInput.setInputType(android.text.InputType.TYPE_CLASS_TEXT | android.text.InputType.TYPE_TEXT_VARIATION_PASSWORD);
         passwordInput.setHint("Enter your password");
 
-        new AlertDialog.Builder(this)
-                .setTitle("Confirm Your Password")
-                .setMessage("For security reasons, please enter your password to delete your account.")
-                .setView(passwordInput)
-                .setPositiveButton("Delete Account", (dialog, which) -> {
-                    String password = passwordInput.getText().toString().trim();
-                    if (TextUtils.isEmpty(password)) {
-                        Toast.makeText(AccountManagementActivity.this,
-                                "Password cannot be empty", Toast.LENGTH_SHORT).show();
-                        return;
-                    }
-                    performReAuthenticationAndDelete(password);
-                })
-                .setNegativeButton("Cancel", null)
-                .show();
+        StyledMenuHelper.showStyledCustomDialog(
+            this,
+            "🔑",
+            "Confirm Password",
+            "For security reasons, please enter your password to delete your account.",
+            passwordInput,
+            "Delete Account",
+            "Cancel",
+            () -> {
+                String password = passwordInput.getText().toString().trim();
+                if (TextUtils.isEmpty(password)) {
+                    Toast.makeText(AccountManagementActivity.this,
+                            "Password cannot be empty", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+                performReAuthenticationAndDelete(password);
+            },
+            null
+        );
     }
 
     private void performReAuthenticationAndDelete(String password) {

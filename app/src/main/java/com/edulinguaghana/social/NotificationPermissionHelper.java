@@ -8,14 +8,17 @@ import android.util.Log;
 
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
+import androidx.lifecycle.DefaultLifecycleObserver;
+import androidx.lifecycle.LifecycleOwner;
 
 /**
  * Helper class to request notification permission on Android 13+
  */
-public class NotificationPermissionHelper {
+public class NotificationPermissionHelper implements DefaultLifecycleObserver {
     private static final String TAG = "NotificationPermission";
 
     private final AppCompatActivity activity;
@@ -29,10 +32,11 @@ public class NotificationPermissionHelper {
 
     public NotificationPermissionHelper(AppCompatActivity activity) {
         this.activity = activity;
-        setupPermissionLauncher();
+        activity.getLifecycle().addObserver(this);
     }
 
-    private void setupPermissionLauncher() {
+    @Override
+    public void onCreate(@NonNull LifecycleOwner owner) {
         requestPermissionLauncher = activity.registerForActivityResult(
             new ActivityResultContracts.RequestPermission(),
             isGranted -> {
@@ -75,6 +79,8 @@ public class NotificationPermissionHelper {
      * Request notification permission with explanation
      */
     public void requestPermission(PermissionCallback callback) {
+        if (activity.isFinishing() || activity.isDestroyed()) return;
+
         this.callback = callback;
 
         if (!isPermissionNeeded()) {
@@ -99,7 +105,11 @@ public class NotificationPermissionHelper {
                 showRationaleDialog();
             } else {
                 // Request permission directly
-                requestPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS);
+                if (requestPermissionLauncher != null) {
+                    requestPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS);
+                } else {
+                    Log.e(TAG, "Launcher not initialized yet");
+                }
             }
         }
     }
@@ -117,7 +127,9 @@ public class NotificationPermissionHelper {
             "Not Now",
             () -> {
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                    requestPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS);
+                    if (requestPermissionLauncher != null) {
+                        requestPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS);
+                    }
                 }
             },
             () -> {

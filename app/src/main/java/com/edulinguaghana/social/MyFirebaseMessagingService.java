@@ -59,16 +59,41 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
                     notificationHelper.showChallengeCompletedNotification(fromUserId, displayName, won);
                     break;
 
+                case "update":
+                    String updateTitle = remoteMessage.getData().get("title");
+                    String updateMessage = remoteMessage.getData().get("message");
+                    showGeneralNotification(updateTitle, updateMessage, "🚀", com.edulinguaghana.Notification.NotificationType.MILESTONE);
+                    break;
+
+                case "broadcast":
+                    String bTitle = remoteMessage.getData().get("title");
+                    String bMessage = remoteMessage.getData().get("message");
+                    String bEmoji = remoteMessage.getData().get("emoji");
+                    showGeneralNotification(bTitle, bMessage, bEmoji != null ? bEmoji : "📢", com.edulinguaghana.Notification.NotificationType.MOTIVATIONAL);
+                    break;
+
                 default:
                     Log.w(TAG, "Unknown notification type: " + type);
             }
         }
     }
 
+    private void showGeneralNotification(String title, String message, String emoji, com.edulinguaghana.Notification.NotificationType type) {
+        // Add to in-app notifications
+        com.edulinguaghana.NotificationManager inAppManager = new com.edulinguaghana.NotificationManager(this);
+        inAppManager.addNotification(title, message, emoji, type);
+
+        // Show system notification
+        SocialNotificationHelper helper = new SocialNotificationHelper(this);
+        helper.showGenericNotification(title, message, "general_" + System.currentTimeMillis());
+    }
+
     private void handleNotification(RemoteMessage remoteMessage) {
         // Notification payload is automatically displayed by Firebase
         // We can add custom handling here if needed
-        Log.d(TAG, "Notification handled automatically by Firebase");
+        if (remoteMessage.getNotification() != null) {
+            Log.d(TAG, "Notification title: " + remoteMessage.getNotification().getTitle());
+        }
     }
 
     @Override
