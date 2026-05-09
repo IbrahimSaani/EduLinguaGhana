@@ -59,7 +59,9 @@
             android:fontFamily="@font/agbalumo"
             android:text="Next"
             android:textSize="18sp"
-            android:elevation="4dp"
+            android:elevation="6dp"
+            android:textColor="@color/white"
+            app:backgroundTint="@color/colorPrimary"
             app:cornerRadius="30dp" />
 
         <com.google.android.material.button.MaterialButton

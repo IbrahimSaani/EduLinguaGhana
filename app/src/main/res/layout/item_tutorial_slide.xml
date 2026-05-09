@@ -1,68 +1,102 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:gravity="center"
-    android:orientation="vertical"
-    android:padding="32dp">
+    android:padding="24dp">
 
-    <!-- Slide Visual -->
-    <FrameLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="32dp">
-
-        <TextView
-            android:id="@+id/tvSlideEmoji"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:text="🌍"
-            android:textSize="120sp" />
-
-        <!-- Mascot peek -->
-        <ImageView
-            android:id="@+id/ivMascotTutorial"
-            android:layout_width="60dp"
-            android:layout_height="60dp"
-            android:layout_gravity="bottom|end"
-            android:layout_marginEnd="40dp"
-            android:src="@drawable/mascot_owl"
-            android:contentDescription="Mascot"
-            android:visibility="visible" />
-    </FrameLayout>
-
+    <!-- Big Playful Emoji -->
     <TextView
-        android:id="@+id/tvSlideTitle"
+        android:id="@+id/tvSlideEmoji"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:fontFamily="@font/agbalumo"
-        android:gravity="center"
-        android:text="Welcome"
-        android:textColor="@color/colorPrimary"
-        android:textSize="32sp"
-        android:textStyle="bold" />
+        android:text="🌍"
+        android:textSize="130sp"
+        app:layout_constraintBottom_toTopOf="@+id/guideline"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.4" />
 
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guideline"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_percent="0.45" />
+
+    <!-- Mascot Presenter -->
+    <ImageView
+        android:id="@+id/ivMascotTutorial"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        android:layout_marginStart="16dp"
+        android:src="@drawable/mascot_owl"
+        android:contentDescription="Mascot"
+        app:layout_constraintBottom_toTopOf="@+id/bubbleCard"
+        app:layout_constraintStart_toStartOf="parent"
+        android:translationY="20dp"
+        android:elevation="6dp"/>
+
+    <!-- Speech Bubble Card -->
     <com.google.android.material.card.MaterialCardView
+        android:id="@+id/bubbleCard"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="24dp"
-        app:cardCornerRadius="16dp"
-        app:cardElevation="0dp"
-        app:cardBackgroundColor="#1A000000">
+        app:cardCornerRadius="24dp"
+        app:cardElevation="4dp"
+        app:strokeWidth="3dp"
+        app:strokeColor="@color/colorPrimary"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/guideline"
+        app:layout_constraintVertical_bias="0.2">
 
-        <TextView
-            android:id="@+id/tvSlideDescription"
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:padding="20dp"
-            android:gravity="center"
-            android:lineSpacingExtra="6dp"
-            android:text="Learn Ghanaian languages with ease and fun."
-            android:textColor="@color/textColorPrimary"
-            android:textSize="17sp" />
+            android:orientation="vertical"
+            android:padding="24dp">
 
+            <TextView
+                android:id="@+id/tvSlideTitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/agbalumo"
+                android:text="Welcome"
+                android:textColor="@color/colorPrimary"
+                android:textSize="28sp"
+                android:textStyle="bold"
+                android:layout_marginBottom="12dp"/>
+
+            <TextView
+                android:id="@+id/tvSlideDescription"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:lineSpacingExtra="6dp"
+                android:text="Learn Ghanaian languages with ease and fun."
+                android:textColor="@color/textColorPrimary"
+                android:textSize="17sp" />
+
+        </LinearLayout>
     </com.google.android.material.card.MaterialCardView>
 
-</LinearLayout>
+    <!-- Decorative Sparkles -->
+    <TextView
+        android:id="@+id/tvSparkle1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="✨"
+        android:textSize="24sp"
+        app:layout_constraintEnd_toEndOf="@+id/tvSlideEmoji"
+        app:layout_constraintTop_toTopOf="@+id/tvSlideEmoji" />
+
+    <TextView
+        android:id="@+id/tvSparkle2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="🌟"
+        android:textSize="20sp"
+        app:layout_constraintBottom_toBottomOf="@+id/tvSlideEmoji"
+        app:layout_constraintStart_toStartOf="@+id/tvSlideEmoji" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>
