@@ -1,14 +1,34 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/tutorialRoot"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/gradient_background_light">
+    android:background="#FFFFFF">
+
+    <!-- Dynamic Background Layer -->
+    <View
+        android:id="@+id/viewBackground"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@drawable/gradient_background_light" />
+
+    <!-- Animated Shapes Layer (for "Liveness") -->
+    <FrameLayout
+        android:id="@+id/animatedShapesContainer"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="✨" android:textSize="24sp" android:layout_marginTop="100dp" android:layout_marginStart="50dp" android:alpha="0.3" />
+        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="⭕" android:textSize="30sp" android:layout_marginTop="400dp" android:layout_marginStart="300dp" android:alpha="0.2" />
+        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="⭐" android:textSize="20sp" android:layout_marginTop="600dp" android:layout_marginStart="80dp" android:alpha="0.3" />
+    </FrameLayout>
 
     <androidx.viewpager2.widget.ViewPager2
         android:id="@+id/viewPagerTutorial"
         android:layout_width="match_parent"
         android:layout_height="0dp"
+        android:clipChildren="false"
+        android:clipToPadding="false"
         app:layout_constraintBottom_toTopOf="@+id/layoutBottom"
         app:layout_constraintTop_toTopOf="parent" />
 
@@ -39,6 +59,7 @@
             android:fontFamily="@font/agbalumo"
             android:text="Next"
             android:textSize="18sp"
+            android:elevation="4dp"
             app:cornerRadius="30dp" />
 
         <com.google.android.material.button.MaterialButton
