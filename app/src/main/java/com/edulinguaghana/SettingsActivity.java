@@ -9,6 +9,7 @@ import androidx.core.content.res.ResourcesCompat;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Typeface;
+import android.net.Uri;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
@@ -38,6 +39,7 @@ public class SettingsActivity extends AppCompatActivity {
     private View btnAboutApp;
     private View btnAppTutorial;
     private View btnPrivacyPolicy;
+    private View btnContactUs;
     private TextView tvLastSync;
     private TextView tvCurrentRole;
 
@@ -83,6 +85,7 @@ public class SettingsActivity extends AppCompatActivity {
         btnAboutApp = findViewById(R.id.btnAboutApp);
         btnAppTutorial = findViewById(R.id.btnAppTutorial);
         btnPrivacyPolicy = findViewById(R.id.btnPrivacyPolicy);
+        btnContactUs = findViewById(R.id.btnContactUs);
         tvLastSync = findViewById(R.id.tvLastSync);
         tvCurrentRole = findViewById(R.id.tvCurrentRole);
 
@@ -210,6 +213,10 @@ public class SettingsActivity extends AppCompatActivity {
         if (btnPrivacyPolicy != null) {
             btnPrivacyPolicy.setOnClickListener(v -> showPrivacyPolicy());
         }
+
+        if (btnContactUs != null) {
+            btnContactUs.setOnClickListener(v -> contactDevelopers());
+        }
     }
 
     @Override
@@ -286,6 +293,17 @@ public class SettingsActivity extends AppCompatActivity {
             null,
             null
         );
+    }
+
+    private void contactDevelopers() {
+        Intent intent = new Intent(Intent.ACTION_SENDTO);
+        intent.setData(Uri.parse("mailto:edulinguaghana4@gmail.com"));
+        intent.putExtra(Intent.EXTRA_SUBJECT, "Feedback for EduLingua Ghana");
+        try {
+            startActivity(Intent.createChooser(intent, "Send Email"));
+        } catch (android.content.ActivityNotFoundException ex) {
+            Toast.makeText(this, "There are no email clients installed.", Toast.LENGTH_SHORT).show();
+        }
     }
 
     /**

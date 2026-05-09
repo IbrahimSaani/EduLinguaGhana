@@ -705,6 +705,38 @@
                         android:layout_height="1dp"
                         android:background="@color/dividerColor" />
 
+                    <!-- Contact Us -->
+                    <LinearLayout
+                        android:id="@+id/btnContactUs"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical"
+                        android:padding="12dp"
+                        android:background="?attr/selectableItemBackground"
+                        android:clickable="true"
+                        android:focusable="true">
+
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="Contact Developers"
+                            android:textColor="@color/textColorPrimary"
+                            android:textSize="15sp" />
+
+                        <ImageView
+                            android:layout_width="20dp"
+                            android:layout_height="20dp"
+                            android:src="@drawable/ic_arrow_forward"
+                            app:tint="@color/textColorSecondary" />
+                    </LinearLayout>
+
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="1dp"
+                        android:background="@color/dividerColor" />
+
                     <!-- Version Info -->
                     <TextView
                         android:layout_width="match_parent"
