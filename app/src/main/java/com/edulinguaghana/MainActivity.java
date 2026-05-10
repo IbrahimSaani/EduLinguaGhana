@@ -95,10 +95,14 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        // Initialize permission helper before super.onCreate to ensure early registration
+        // of the ActivityResultLauncher before the activity is started.
+        permissionHelper = new com.edulinguaghana.social.NotificationPermissionHelper(this);
+
         super.onCreate(savedInstanceState);
 
-        // Initialize permission helper early (must be before STARTED state)
-        permissionHelper = new com.edulinguaghana.social.NotificationPermissionHelper(this);
+        // Re-initialize FCM token in MainActivity to ensure it's logged correctly
+        new com.edulinguaghana.social.FCMTokenManager(this).initializeFCMToken();
 
         // Ensure the app respects system windows (status bar, navigation bar)
         // Remove any fullscreen flags that might be set

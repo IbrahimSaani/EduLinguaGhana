@@ -1,6 +1,7 @@
 {
   "project_info": {
     "project_number": "340016497126",
+    "firebase_url": "https://edulinguaghana-7522e68f-default-rtdb.firebaseio.com",
     "project_id": "edulinguaghana-7522e68f",
     "storage_bucket": "edulinguaghana-7522e68f.firebasestorage.app"
   },
@@ -12,7 +13,28 @@
           "package_name": "com.edulinguaghana"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "340016497126-3etanbcoaukgk6pfkgf5547a1g5d08da.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.edulinguaghana",
+            "certificate_hash": "2040ed49266723a55d715b62b99a3facc933fd04"
+          }
+        },
+        {
+          "client_id": "340016497126-vhls1cnlt0rsuipga2i3e0mn7ofi2qpb.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.edulinguaghana",
+            "certificate_hash": "49d30000f0185bac210f5acb3270e9201c3b39e7"
+          }
+        },
+        {
+          "client_id": "340016497126-2k1gekp5ntr5vj5bmhe14265bb5h1897.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
           "current_key": "AIzaSyC8CmWHIAOhfq1yOcnX8G4iXvvlSzojsGU"
@@ -20,7 +42,12 @@
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "340016497126-2k1gekp5ntr5vj5bmhe14265bb5h1897.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
         }
       }
     }

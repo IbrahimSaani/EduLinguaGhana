@@ -12,17 +12,15 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
-import androidx.lifecycle.DefaultLifecycleObserver;
-import androidx.lifecycle.LifecycleOwner;
 
 /**
  * Helper class to request notification permission on Android 13+
  */
-public class NotificationPermissionHelper implements DefaultLifecycleObserver {
+public class NotificationPermissionHelper {
     private static final String TAG = "NotificationPermission";
 
     private final AppCompatActivity activity;
-    private ActivityResultLauncher<String> requestPermissionLauncher;
+    private final ActivityResultLauncher<String> requestPermissionLauncher;
     private PermissionCallback callback;
 
     public interface PermissionCallback {
@@ -32,12 +30,9 @@ public class NotificationPermissionHelper implements DefaultLifecycleObserver {
 
     public NotificationPermissionHelper(AppCompatActivity activity) {
         this.activity = activity;
-        activity.getLifecycle().addObserver(this);
-    }
-
-    @Override
-    public void onCreate(@NonNull LifecycleOwner owner) {
-        requestPermissionLauncher = activity.registerForActivityResult(
+        // Register the launcher directly in the constructor.
+        // This must be called when the activity is being initialized (before it is started).
+        this.requestPermissionLauncher = activity.registerForActivityResult(
             new ActivityResultContracts.RequestPermission(),
             isGranted -> {
                 if (isGranted) {
@@ -105,10 +100,10 @@ public class NotificationPermissionHelper implements DefaultLifecycleObserver {
                 showRationaleDialog();
             } else {
                 // Request permission directly
-                if (requestPermissionLauncher != null) {
+                try {
                     requestPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS);
-                } else {
-                    Log.e(TAG, "Launcher not initialized yet");
+                } catch (IllegalStateException e) {
+                    Log.e(TAG, "Failed to launch permission request: " + e.getMessage());
                 }
             }
         }
@@ -127,8 +122,10 @@ public class NotificationPermissionHelper implements DefaultLifecycleObserver {
             "Not Now",
             () -> {
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                    if (requestPermissionLauncher != null) {
+                    try {
                         requestPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS);
+                    } catch (IllegalStateException e) {
+                        Log.e(TAG, "Failed to launch permission request from dialog: " + e.getMessage());
                     }
                 }
             },
@@ -157,4 +154,3 @@ public class NotificationPermissionHelper implements DefaultLifecycleObserver {
         });
     }
 }
-

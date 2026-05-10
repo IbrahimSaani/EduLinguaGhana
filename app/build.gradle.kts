@@ -10,7 +10,7 @@ android {
 
     defaultConfig {
         applicationId = "com.edulinguaghana"
-        minSdk = 21
+        minSdk = 23
         targetSdk = 36
         versionCode = 1
         versionName = "1.0"
@@ -56,11 +56,12 @@ dependencies {
     implementation("com.journeyapps:zxing-android-embedded:4.3.0")
 
     // Firebase Authentication
-    implementation(platform("com.google.firebase:firebase-bom:32.7.0"))
+    implementation(platform("com.google.firebase:firebase-bom:33.10.0"))
     implementation("com.google.firebase:firebase-auth")
     implementation("com.google.firebase:firebase-database")
     implementation("com.google.firebase:firebase-crashlytics")
     implementation("com.google.firebase:firebase-messaging")
+    implementation("com.google.firebase:firebase-installations")
     implementation("com.google.android.gms:play-services-auth:20.7.0")
 
     // Facebook Login

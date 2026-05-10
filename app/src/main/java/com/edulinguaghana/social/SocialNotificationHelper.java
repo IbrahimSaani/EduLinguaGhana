@@ -53,8 +53,10 @@ public class SocialNotificationHelper {
 
     private boolean canShowNotification() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            return ActivityCompat.checkSelfPermission(context, Manifest.permission.POST_NOTIFICATIONS)
+            boolean granted = ActivityCompat.checkSelfPermission(context, Manifest.permission.POST_NOTIFICATIONS)
                 == PackageManager.PERMISSION_GRANTED;
+            android.util.Log.d("SocialNotification", "Notification permission granted: " + granted);
+            return granted;
         }
         return true; // No permission needed for older versions
     }

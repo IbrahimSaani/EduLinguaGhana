@@ -17,18 +17,25 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
     public void onMessageReceived(@NonNull RemoteMessage remoteMessage) {
         super.onMessageReceived(remoteMessage);
 
+        Log.d(TAG, "FCM Message Received!");
         Log.d(TAG, "From: " + remoteMessage.getFrom());
+        Log.d(TAG, "Message ID: " + remoteMessage.getMessageId());
 
         // Check if message contains data payload
         if (!remoteMessage.getData().isEmpty()) {
             Log.d(TAG, "Message data payload: " + remoteMessage.getData());
             handleDataMessage(remoteMessage);
+        } else {
+            Log.d(TAG, "No data payload in message");
         }
 
         // Check if message contains notification payload
         if (remoteMessage.getNotification() != null) {
+            Log.d(TAG, "Message Notification Title: " + remoteMessage.getNotification().getTitle());
             Log.d(TAG, "Message Notification Body: " + remoteMessage.getNotification().getBody());
             handleNotification(remoteMessage);
+        } else {
+            Log.d(TAG, "No notification payload in message");
         }
     }
 
@@ -36,6 +43,8 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
         String type = remoteMessage.getData().get("type");
         String fromUserId = remoteMessage.getData().get("fromUserId");
         String displayName = remoteMessage.getData().get("displayName");
+
+        Log.d(TAG, "Handling data message of type: " + type);
 
         SocialNotificationHelper notificationHelper = new SocialNotificationHelper(this);
 

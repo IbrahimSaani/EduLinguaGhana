@@ -11,6 +11,8 @@ import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.messaging.FirebaseMessaging;
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.GoogleApiAvailability;
 
 /**
  * Helper class to manage FCM tokens
@@ -30,16 +32,36 @@ public class FCMTokenManager {
      * Get the current FCM token and save it to Firebase
      */
     public void initializeFCMToken() {
+        Log.d(TAG, "🚀 Initializing FCM token...");
+
+        // Check Google Play Services
+        GoogleApiAvailability apiAvailability = GoogleApiAvailability.getInstance();
+        int resultCode = apiAvailability.isGooglePlayServicesAvailable(context);
+        if (resultCode != ConnectionResult.SUCCESS) {
+            Log.e(TAG, "❌ Google Play Services not available: " + apiAvailability.getErrorString(resultCode));
+            return;
+        }
+
         FirebaseMessaging.getInstance().getToken()
             .addOnCompleteListener(task -> {
                 if (!task.isSuccessful()) {
-                    Log.w(TAG, "Fetching FCM registration token failed", task.getException());
+                    Exception e = task.getException();
+                    String errorMsg = (e != null ? e.getMessage() : "Unknown error");
+                    Log.e(TAG, "❌ Fetching FCM registration token failed: " + errorMsg, e);
+                    
+                    if (errorMsg != null && errorMsg.contains("FIS_AUTH_ERROR")) {
+                        Log.e(TAG, "🚨 FIS_AUTH_ERROR detected. This is usually due to missing Firebase Installations API or incorrect API restrictions in Google Cloud Console.");
+                    } else if (errorMsg != null && errorMsg.contains("SERVICE_NOT_AVAILABLE")) {
+                        Log.e(TAG, "🚨 SERVICE_NOT_AVAILABLE. This might be a temporary network issue or Google Play Services issue. Will retry later.");
+                    }
                     return;
                 }
 
                 // Get new FCM registration token
                 String token = task.getResult();
+                Log.d(TAG, "✅ FCM TOKEN GENERATED SUCCESSFULLY!");
                 Log.d(TAG, "FCM Token: " + token);
+                Log.d(TAG, "--------------------------------------------------");
 
                 // Save token locally
                 saveTokenLocally(token);
@@ -78,13 +100,13 @@ public class FCMTokenManager {
 
             tokenRef.setValue(token)
                 .addOnSuccessListener(aVoid -> {
-                    Log.d(TAG, "FCM token saved to Firebase for user: " + currentUser.getUid());
+                    Log.d(TAG, "👤 FCM token saved to Firebase for user: " + currentUser.getUid());
                 })
                 .addOnFailureListener(e -> {
-                    Log.e(TAG, "Failed to save FCM token to Firebase", e);
+                    Log.e(TAG, "❌ Failed to save FCM token to Firebase", e);
                 });
         } else {
-            Log.w(TAG, "No authenticated user, token not saved to Firebase");
+            Log.w(TAG, "⚠️ No authenticated user, token not saved to Firebase");
         }
     }
 
@@ -125,4 +147,3 @@ public class FCMTokenManager {
             });
     }
 }
-
