@@ -20,10 +20,14 @@ import java.util.List;
 
 public class NotificationsActivity extends AppCompatActivity implements NotificationsAdapter.OnNotificationClickListener {
 
+    private com.edulinguaghana.DynamicBackgroundView dynamicBackground;
+    private com.edulinguaghana.AnimatedAvatarView emptyStateAvatar;
     private RecyclerView notificationsRecyclerView;
     private LinearLayout emptyStateLayout;
     private SwipeRefreshLayout swipeRefresh;
     private MaterialButton btnStartLearning;
+    private com.google.android.material.card.MaterialCardView unreadBadge;
+    private android.widget.TextView tvUnreadCount;
     private NotificationsAdapter adapter;
     private NotificationManager notificationManager;
     private List<Notification> notifications;
@@ -41,10 +45,17 @@ public class NotificationsActivity extends AppCompatActivity implements Notifica
         }
 
         // Initialize views
+        dynamicBackground = findViewById(R.id.dynamicBackground);
+        emptyStateAvatar = findViewById(R.id.emptyStateAvatar);
         notificationsRecyclerView = findViewById(R.id.notificationsRecyclerView);
         emptyStateLayout = findViewById(R.id.emptyStateLayout);
         swipeRefresh = findViewById(R.id.swipeRefresh);
         btnStartLearning = findViewById(R.id.btnStartLearning);
+        unreadBadge = findViewById(R.id.unreadBadge);
+        tvUnreadCount = findViewById(R.id.tvUnreadCount);
+
+        // Setup background
+        setupBackground();
 
         // Initialize notification manager
         notificationManager = new NotificationManager(this);
@@ -60,6 +71,9 @@ public class NotificationsActivity extends AppCompatActivity implements Notifica
             finish(); // Go back to main activity
         });
 
+        // Setup mascot if in empty state
+        setupMascot();
+
         // Check and generate notifications based on user progress
         notificationManager.checkAndGenerateNotifications();
 
@@ -70,33 +84,106 @@ public class NotificationsActivity extends AppCompatActivity implements Notifica
         loadNotifications();
     }
 
+    private void setupBackground() {
+        if (dynamicBackground == null) return;
+        
+        int hour = java.util.Calendar.getInstance().get(java.util.Calendar.HOUR_OF_DAY);
+        int colorStart, colorMid, colorEnd;
+
+        if (hour >= 5 && hour < 11) {
+            colorStart = androidx.core.content.ContextCompat.getColor(this, R.color.bgMorningStart);
+            colorMid = androidx.core.content.ContextCompat.getColor(this, R.color.bgMorningMid);
+            colorEnd = androidx.core.content.ContextCompat.getColor(this, R.color.bgMorningEnd);
+        } else if (hour >= 11 && hour < 17) {
+            colorStart = androidx.core.content.ContextCompat.getColor(this, R.color.bgDayStart);
+            colorMid = androidx.core.content.ContextCompat.getColor(this, R.color.bgDayMid);
+            colorEnd = androidx.core.content.ContextCompat.getColor(this, R.color.bgDayEnd);
+        } else {
+            colorStart = androidx.core.content.ContextCompat.getColor(this, R.color.bgNightStart);
+            colorMid = androidx.core.content.ContextCompat.getColor(this, R.color.bgNightMid);
+            colorEnd = androidx.core.content.ContextCompat.getColor(this, R.color.bgNightEnd);
+        }
+
+        dynamicBackground.setColors(colorStart, colorMid, colorEnd);
+    }
+
+    private void setupMascot() {
+        if (emptyStateAvatar == null) return;
+        
+        // Setup Kojo as the default empty state mascot
+        emptyStateAvatar.setDefaultAvatar();
+    }
+
     private void setupRecyclerView() {
         notificationsRecyclerView.setLayoutManager(new LinearLayoutManager(this));
         notificationsRecyclerView.setHasFixedSize(true);
-
-        // Add fade-in animation when activity opens
-        notificationsRecyclerView.setAlpha(0f);
-        notificationsRecyclerView.animate()
-            .alpha(1f)
-            .setDuration(500)
-            .setStartDelay(100)
-            .start();
     }
 
     private void loadNotifications() {
         notifications = notificationManager.getAllNotifications();
 
+        // Update unread count badge
+        updateUnreadBadge();
+
         if (notifications.isEmpty()) {
             // Show empty state
             emptyStateLayout.setVisibility(View.VISIBLE);
             swipeRefresh.setVisibility(View.GONE);
+            
+            // Animate empty state
+            emptyStateLayout.setAlpha(0f);
+            emptyStateLayout.setScaleX(0.8f);
+            emptyStateLayout.setScaleY(0.8f);
+            emptyStateLayout.animate()
+                .alpha(1f)
+                .scaleX(1f)
+                .scaleY(1f)
+                .setDuration(500)
+                .setInterpolator(new android.view.animation.OvershootInterpolator())
+                .start();
         } else {
             // Show notifications
             emptyStateLayout.setVisibility(View.GONE);
             swipeRefresh.setVisibility(View.VISIBLE);
 
-            adapter = new NotificationsAdapter(this, notifications, this);
-            notificationsRecyclerView.setAdapter(adapter);
+            if (adapter == null) {
+                adapter = new NotificationsAdapter(this, notifications, this);
+                notificationsRecyclerView.setAdapter(adapter);
+                
+                // Entrance animation
+                notificationsRecyclerView.setAlpha(0f);
+                notificationsRecyclerView.setTranslationY(50f);
+                notificationsRecyclerView.animate()
+                    .alpha(1f)
+                    .translationY(0f)
+                    .setDuration(500)
+                    .start();
+            } else {
+                adapter.updateNotifications(notifications);
+            }
+        }
+        
+        // Refresh menu to show/hide "Mark all as read"
+        invalidateOptionsMenu();
+    }
+
+    private void updateUnreadBadge() {
+        int unreadCount = notificationManager.getUnreadCount();
+        if (unreadCount > 0) {
+            unreadBadge.setVisibility(View.VISIBLE);
+            tvUnreadCount.setText(String.valueOf(unreadCount));
+            
+            // Pulse animation for badge
+            unreadBadge.setScaleX(0.8f);
+            unreadBadge.setScaleY(0.8f);
+            unreadBadge.animate()
+                .scaleX(1f)
+                .scaleY(1f)
+                .setDuration(300)
+                .setInterpolator(new android.view.animation.OvershootInterpolator())
+                .start();
+        } else {
+            unreadBadge.setVisibility(View.GONE);
         }
     }
 

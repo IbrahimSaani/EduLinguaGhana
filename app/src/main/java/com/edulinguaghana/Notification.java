@@ -15,7 +15,8 @@ public class Notification {
         STREAK,
         NEW_CONTENT,
         MOTIVATIONAL,
-        MILESTONE
+        MILESTONE,
+        SYSTEM
     }
 
     public Notification() {

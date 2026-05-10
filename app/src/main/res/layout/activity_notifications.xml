@@ -7,6 +7,12 @@
     android:fitsSystemWindows="true"
     android:background="@color/appBackground">
 
+    <!-- Dynamic Background -->
+    <com.edulinguaghana.DynamicBackgroundView
+        android:id="@+id/dynamicBackground"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+
     <com.google.android.material.appbar.AppBarLayout
         android:id="@+id/appBarLayout"
         android:layout_width="match_parent"
@@ -96,43 +102,17 @@
             android:gravity="center"
             android:padding="40dp">
 
-            <!-- Animated Bell Icon Container -->
-            <com.google.android.material.card.MaterialCardView
-                android:layout_width="140dp"
-                android:layout_height="140dp"
-                app:cardCornerRadius="70dp"
-                app:cardElevation="8dp"
-                app:strokeWidth="4dp"
-                app:strokeColor="@color/colorPrimary"
-                app:cardBackgroundColor="#E8EAF6">
-
-                <FrameLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:padding="20dp">
-
-                    <!-- Background pulse effect -->
-                    <View
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:background="@color/colorPrimary"
-                        android:alpha="0.1" />
-
-                    <TextView
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:text="🔔"
-                        android:textSize="72sp"
-                        android:gravity="center" />
-                </FrameLayout>
-
-            </com.google.android.material.card.MaterialCardView>
+            <!-- Animated Avatar for Empty State -->
+            <com.edulinguaghana.AnimatedAvatarView
+                android:id="@+id/emptyStateAvatar"
+                android:layout_width="180dp"
+                android:layout_height="180dp" />
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="28dp"
-                android:text="📭 No Notifications"
+                android:layout_marginTop="24dp"
+                android:text="📭 All Caught Up!"
                 android:textSize="26sp"
                 android:textStyle="bold"
                 android:fontFamily="@font/agbalumo"
@@ -141,39 +121,37 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="12dp"
-                android:text="You're all caught up!"
+                android:layout_marginTop="8dp"
+                android:text="No new notifications right now."
                 android:textSize="18sp"
-                android:textColor="@color/correctAnswer"
-                android:textStyle="bold"
+                android:textColor="@color/textColorSecondary"
                 android:gravity="center" />
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
-                android:text="Complete more activities to receive\nachievements and milestone updates"
+                android:layout_marginTop="12dp"
+                android:text="Kojo will let you know when you get\nfriend requests or earn achievements!"
                 android:textSize="15sp"
                 android:textColor="@color/textColorSecondary"
                 android:lineSpacingExtra="4dp"
-                android:gravity="center" />
+                android:gravity="center"
+                android:alpha="0.8" />
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/btnStartLearning"
-                style="@style/Widget.Material3.Button.OutlinedButton"
+                style="@style/Widget.Material3.Button.TonalButton"
                 android:layout_width="wrap_content"
                 android:layout_height="56dp"
                 android:layout_marginTop="32dp"
                 android:text="Start Learning"
                 android:textSize="16sp"
                 android:textStyle="bold"
-                android:paddingStart="40dp"
-                android:paddingEnd="40dp"
+                android:paddingStart="32dp"
+                android:paddingEnd="32dp"
                 app:icon="@android:drawable/ic_media_play"
                 app:iconSize="20dp"
-                app:cornerRadius="28dp"
-                app:strokeWidth="2dp"
-                app:strokeColor="@color/colorPrimary" />
+                app:cornerRadius="28dp" />
 
         </LinearLayout>
 
@@ -188,7 +166,7 @@
                 android:id="@+id/notificationsRecyclerView"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:paddingTop="8dp"
+                android:paddingTop="12dp"
                 android:paddingBottom="16dp"
                 android:paddingStart="8dp"
                 android:paddingEnd="8dp"
@@ -201,4 +179,3 @@
     </FrameLayout>
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>
-

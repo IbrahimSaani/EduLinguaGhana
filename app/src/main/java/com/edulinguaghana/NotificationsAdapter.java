@@ -57,44 +57,66 @@ public class NotificationsAdapter extends RecyclerView.Adapter<NotificationsAdap
         );
         holder.tvTime.setText(timeAgo);
 
-        // Enhanced visual styling based on read status and notification type
+        // Styling based on unread status
         if (notification.isRead()) {
-            holder.cardView.setCardBackgroundColor(ContextCompat.getColor(context, android.R.color.white));
             holder.cardView.setCardElevation(2f);
+            holder.cardView.setStrokeColor(ContextCompat.getColor(context, R.color.dividerColor));
+            holder.unreadDot.setVisibility(View.GONE);
+            holder.tvNewTag.setVisibility(View.GONE);
             holder.tvTitle.setAlpha(0.7f);
             holder.tvMessage.setAlpha(0.7f);
-            holder.tvEmoji.setAlpha(0.7f);
+            holder.emojiBg.setAlpha(0.5f);
         } else {
-            // Set background color based on notification type
-            int backgroundColor;
-            switch (notification.getType()) {
-                case ACHIEVEMENT:
-                    backgroundColor = R.color.notification_achievement_bg;
-                    break;
-                case MILESTONE:
-                    backgroundColor = R.color.notification_milestone_bg;
-                    break;
-                case STREAK:
-                    backgroundColor = R.color.notification_streak_bg;
-                    break;
-                case MOTIVATIONAL:
-                    backgroundColor = R.color.notification_motivational_bg;
-                    break;
-                case REMINDER:
-                    backgroundColor = R.color.notification_reminder_bg;
-                    break;
-                default:
-                    backgroundColor = R.color.notification_unread_bg;
-                    break;
-            }
-            holder.cardView.setCardBackgroundColor(ContextCompat.getColor(context, backgroundColor));
-            holder.cardView.setCardElevation(4f);
+            holder.cardView.setCardElevation(6f);
+            holder.cardView.setStrokeColor(ContextCompat.getColor(context, R.color.colorPrimary));
+            holder.unreadDot.setVisibility(View.VISIBLE);
+            holder.tvNewTag.setVisibility(View.VISIBLE);
             holder.tvTitle.setAlpha(1.0f);
             holder.tvMessage.setAlpha(1.0f);
-            holder.tvEmoji.setAlpha(1.0f);
+            holder.emojiBg.setAlpha(1.0f);
+            
+            // Pulse animation for the "NEW" tag
+            holder.tvNewTag.setScaleX(0.8f);
+            holder.tvNewTag.setScaleY(0.8f);
+            holder.tvNewTag.animate()
+                .scaleX(1.1f)
+                .scaleY(1.1f)
+                .setDuration(400)
+                .setInterpolator(new android.view.animation.CycleInterpolator(1))
+                .start();
         }
 
-        // Click listeners with visual feedback
+        // Background color for emoji bubble based on type
+        int emojiBgColor;
+        switch (notification.getType()) {
+            case ACHIEVEMENT:
+                emojiBgColor = ContextCompat.getColor(context, R.color.notification_achievement_bg);
+                break;
+            case MILESTONE:
+                emojiBgColor = ContextCompat.getColor(context, R.color.notification_milestone_bg);
+                break;
+            case STREAK:
+                emojiBgColor = ContextCompat.getColor(context, R.color.notification_streak_bg);
+                break;
+            case MOTIVATIONAL:
+                emojiBgColor = ContextCompat.getColor(context, R.color.notification_motivational_bg);
+                break;
+            case REMINDER:
+                emojiBgColor = ContextCompat.getColor(context, R.color.notification_reminder_bg);
+                break;
+            case NEW_CONTENT:
+                emojiBgColor = ContextCompat.getColor(context, R.color.notification_milestone_bg);
+                break;
+            case SYSTEM:
+                emojiBgColor = ContextCompat.getColor(context, R.color.colorPrimaryLight);
+                break;
+            default:
+                emojiBgColor = ContextCompat.getColor(context, R.color.colorPrimaryLight);
+                break;
+        }
+        holder.emojiBg.setCardBackgroundColor(emojiBgColor);
+
+        // Click listeners
         holder.cardView.setOnClickListener(v -> {
             if (listener != null) {
                 listener.onNotificationClick(notification);
@@ -107,13 +129,13 @@ public class NotificationsAdapter extends RecyclerView.Adapter<NotificationsAdap
             }
         });
 
-        // Add entrance animation
+        // Entrance animation
         holder.itemView.setAlpha(0f);
-        holder.itemView.setTranslationX(100f);
+        holder.itemView.setTranslationY(30f);
         holder.itemView.animate()
             .alpha(1f)
-            .translationX(0f)
-            .setDuration(300)
+            .translationY(0f)
+            .setDuration(400)
             .setStartDelay(position * 50L)
             .start();
     }
@@ -130,21 +152,26 @@ public class NotificationsAdapter extends RecyclerView.Adapter<NotificationsAdap
 
     static class NotificationViewHolder extends RecyclerView.ViewHolder {
         MaterialCardView cardView;
+        MaterialCardView emojiBg;
         TextView tvEmoji;
         TextView tvTitle;
         TextView tvMessage;
         TextView tvTime;
+        TextView tvNewTag;
+        View unreadDot;
         MaterialCardView btnDelete;
 
         public NotificationViewHolder(@NonNull View itemView) {
             super(itemView);
-            cardView = (MaterialCardView) itemView;
+            cardView = itemView.findViewById(R.id.cardView);
+            emojiBg = itemView.findViewById(R.id.emojiBg);
             tvEmoji = itemView.findViewById(R.id.tvEmoji);
             tvTitle = itemView.findViewById(R.id.tvTitle);
             tvMessage = itemView.findViewById(R.id.tvMessage);
             tvTime = itemView.findViewById(R.id.tvTime);
+            tvNewTag = itemView.findViewById(R.id.tvNewTag);
+            unreadDot = itemView.findViewById(R.id.unreadDot);
             btnDelete = itemView.findViewById(R.id.btnDelete);
         }
     }
 }
-

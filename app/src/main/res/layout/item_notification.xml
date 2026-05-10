@@ -2,47 +2,49 @@
 <com.google.android.material.card.MaterialCardView
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/cardView"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_marginBottom="8dp"
-    android:layout_marginStart="8dp"
-    android:layout_marginEnd="8dp"
+    android:layout_marginBottom="12dp"
+    android:layout_marginStart="12dp"
+    android:layout_marginEnd="12dp"
     android:layout_marginTop="4dp"
-    app:cardCornerRadius="16dp"
-    app:cardElevation="3dp"
+    app:cardCornerRadius="20dp"
+    app:cardElevation="4dp"
     app:strokeWidth="1dp"
     app:strokeColor="@color/dividerColor"
     android:clickable="true"
     android:focusable="true"
     android:foreground="?attr/selectableItemBackground">
 
-    <LinearLayout
+    <androidx.constraintlayout.widget.ConstraintLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:padding="16dp"
-        android:gravity="center_vertical"
-        android:minHeight="88dp">
+        android:padding="16dp">
 
-        <!-- Emoji Icon with gradient background -->
+        <!-- Emoji Bubble with Background -->
         <FrameLayout
-            android:layout_width="64dp"
-            android:layout_height="64dp">
+            android:id="@+id/emojiContainer"
+            android:layout_width="60dp"
+            android:layout_height="60dp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent">
 
             <com.google.android.material.card.MaterialCardView
+                android:id="@+id/emojiBg"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                app:cardCornerRadius="32dp"
-                app:cardElevation="2dp"
-                app:strokeWidth="2dp"
-                app:strokeColor="@color/colorPrimary"
+                app:cardCornerRadius="30dp"
+                app:cardElevation="0dp"
                 app:cardBackgroundColor="@color/colorPrimaryLight">
 
                 <View
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:background="@color/colorPrimary"
-                    android:alpha="0.1" />
+                    android:background="@color/white"
+                    android:alpha="0.3" />
             </com.google.android.material.card.MaterialCardView>
 
             <TextView
@@ -51,94 +53,112 @@
                 android:layout_height="match_parent"
                 android:gravity="center"
                 android:text="🎉"
-                android:textSize="36sp" />
+                android:textSize="32sp" />
+
+            <!-- Unread Dot -->
+            <View
+                android:id="@+id/unreadDot"
+                android:layout_width="12dp"
+                android:layout_height="12dp"
+                android:layout_gravity="top|end"
+                android:background="@drawable/notification_badge"
+                android:visibility="gone" />
 
         </FrameLayout>
 
         <!-- Notification Content -->
         <LinearLayout
+            android:id="@+id/contentLayout"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
             android:layout_marginStart="16dp"
-            android:orientation="vertical">
+            android:layout_marginEnd="8dp"
+            android:orientation="vertical"
+            app:layout_constraintStart_toEndOf="@id/emojiContainer"
+            app:layout_constraintEnd_toStartOf="@id/btnDelete"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent">
 
-            <TextView
-                android:id="@+id/tvTitle"
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Achievement Unlocked!"
-                android:textSize="16sp"
-                android:textStyle="bold"
-                android:textColor="@color/textColorPrimary"
-                android:fontFamily="@font/agbalumo"
-                android:maxLines="2"
-                android:ellipsize="end"
-                android:lineSpacingExtra="2dp" />
+                android:orientation="horizontal"
+                android:gravity="center_vertical">
+
+                <TextView
+                    android:id="@+id/tvTitle"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Achievement Unlocked!"
+                    android:textSize="16sp"
+                    android:textStyle="bold"
+                    android:textColor="@color/textColorPrimary"
+                    android:fontFamily="@font/agbalumo"
+                    android:maxLines="1"
+                    android:ellipsize="end" />
+
+                <TextView
+                    android:id="@+id/tvNewTag"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="8dp"
+                    android:background="@drawable/bg_new_tag"
+                    android:paddingHorizontal="6dp"
+                    android:paddingVertical="2dp"
+                    android:text="NEW"
+                    android:textColor="@color/white"
+                    android:textSize="10sp"
+                    android:textStyle="bold"
+                    android:visibility="gone" />
+            </LinearLayout>
 
             <TextView
                 android:id="@+id/tvMessage"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="6dp"
+                android:layout_marginTop="4dp"
                 android:text="You've completed your first lesson!"
                 android:textSize="14sp"
                 android:textColor="@color/textColorSecondary"
-                android:lineSpacingExtra="2dp"
-                android:maxLines="3"
-                android:ellipsize="end" />
+                android:maxLines="2"
+                android:ellipsize="end"
+                android:lineSpacingExtra="2dp" />
 
-            <LinearLayout
+            <TextView
+                android:id="@+id/tvTime"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
-                android:orientation="horizontal"
-                android:gravity="center_vertical">
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="🕐"
-                    android:textSize="11sp"
-                    android:layout_marginEnd="4dp" />
-
-                <TextView
-                    android:id="@+id/tvTime"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="2 hours ago"
-                    android:textSize="12sp"
-                    android:textColor="@color/textColorSecondary"
-                    android:alpha="0.8" />
-
-            </LinearLayout>
+                android:layout_marginTop="6dp"
+                android:text="2 hours ago"
+                android:textSize="11sp"
+                android:textColor="@color/textColorSecondary"
+                android:alpha="0.7"
+                android:textStyle="italic" />
 
         </LinearLayout>
 
-        <!-- Delete Button with better styling -->
+        <!-- Delete Button -->
         <com.google.android.material.card.MaterialCardView
             android:id="@+id/btnDelete"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
-            android:layout_marginStart="12dp"
-            app:cardCornerRadius="20dp"
+            android:layout_width="36dp"
+            android:layout_height="36dp"
+            app:cardCornerRadius="18dp"
             app:cardElevation="0dp"
-            app:cardBackgroundColor="#10000000"
-            android:clickable="true"
-            android:focusable="true"
-            android:foreground="?attr/selectableItemBackgroundBorderless">
+            app:cardBackgroundColor="#0D000000"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent">
 
             <ImageView
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:src="@android:drawable/ic_menu_close_clear_cancel"
                 android:padding="10dp"
-                android:contentDescription="Delete notification"
                 app:tint="@color/textColorSecondary" />
 
         </com.google.android.material.card.MaterialCardView>
 
-    </LinearLayout>
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
 </com.google.android.material.card.MaterialCardView>
-

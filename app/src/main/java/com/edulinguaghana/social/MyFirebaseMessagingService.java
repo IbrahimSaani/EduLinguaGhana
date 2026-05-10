@@ -21,21 +21,36 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
         Log.d(TAG, "From: " + remoteMessage.getFrom());
         Log.d(TAG, "Message ID: " + remoteMessage.getMessageId());
 
-        // Check if message contains data payload
-        if (!remoteMessage.getData().isEmpty()) {
-            Log.d(TAG, "Message data payload: " + remoteMessage.getData());
-            handleDataMessage(remoteMessage);
-        } else {
-            Log.d(TAG, "No data payload in message");
-        }
-
         // Check if message contains notification payload
+        // If it does, we save it to our local NotificationManager so it appears in the UI
         if (remoteMessage.getNotification() != null) {
-            Log.d(TAG, "Message Notification Title: " + remoteMessage.getNotification().getTitle());
-            Log.d(TAG, "Message Notification Body: " + remoteMessage.getNotification().getBody());
+            String title = remoteMessage.getNotification().getTitle();
+            String body = remoteMessage.getNotification().getBody();
+            Log.d(TAG, "Message Notification Title: " + title);
+            Log.d(TAG, "Message Notification Body: " + body);
+
+            // Save to in-app notification screen
+            com.edulinguaghana.NotificationManager inAppManager = new com.edulinguaghana.NotificationManager(this);
+            inAppManager.addNotification(
+                title != null ? title : "New Message",
+                body != null ? body : "",
+                "📢", // Default emoji for broadcast messages
+                com.edulinguaghana.Notification.NotificationType.SYSTEM
+            );
+            
             handleNotification(remoteMessage);
         } else {
             Log.d(TAG, "No notification payload in message");
+        }
+
+        // Check if message contains data payload
+        if (!remoteMessage.getData().isEmpty()) {
+            Log.d(TAG, "Message data payload: " + remoteMessage.getData());
+            
+            // Handle as data message. We've updated the logic to be smarter about duplicates
+            handleDataMessage(remoteMessage);
+        } else {
+            Log.d(TAG, "No data payload in message");
         }
     }
 
@@ -43,6 +58,12 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
         String type = remoteMessage.getData().get("type");
         String fromUserId = remoteMessage.getData().get("fromUserId");
         String displayName = remoteMessage.getData().get("displayName");
+
+        // If this is a developer broadcast and we already handled the notification payload, skip
+        if (remoteMessage.getNotification() != null && "broadcast".equals(type)) {
+            Log.d(TAG, "Skipping duplicate broadcast data handling");
+            return;
+        }
 
         Log.d(TAG, "Handling data message of type: " + type);
 
