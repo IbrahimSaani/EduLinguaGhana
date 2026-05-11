@@ -59,6 +59,8 @@ public final class TimeBasedBackgroundManager {
     private static boolean shouldApply(Activity activity) {
         if (activity == null) return false;
         if (activity instanceof SplashActivity) return false;
+        if (activity instanceof LoginActivity) return false;
+        if (activity instanceof SignUpActivity) return false;
         // Keep this scoped to the app's own activities; skip third-party screens.
         String packageName = activity.getPackageName();
         String activityPackage = activity.getClass().getPackage() != null
