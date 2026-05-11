@@ -19,6 +19,7 @@
             android:background="?attr/colorPrimary"
             android:elevation="0dp"
             app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
+            app:titleTextAppearance="@style/ToolbarTitleStyle"
             app:titleTextColor="@color/white" />
 
     </com.google.android.material.appbar.AppBarLayout>

@@ -25,6 +25,7 @@
             android:background="@android:color/transparent"
             android:elevation="0dp"
             app:title="@string/quiz_title"
+            app:titleTextAppearance="@style/ToolbarTitleStyle"
             app:titleTextColor="@color/white"
             app:navigationIconTint="@color/white" />
 

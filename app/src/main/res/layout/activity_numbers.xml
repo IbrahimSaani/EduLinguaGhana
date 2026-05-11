@@ -23,6 +23,7 @@
             android:background="@android:color/transparent"
             android:elevation="0dp"
             app:title="@string/numbers_mode"
+            app:titleTextAppearance="@style/ToolbarTitleStyle"
             app:titleTextColor="@color/white"
             app:navigationIcon="@drawable/ic_back"
             app:navigationIconTint="@color/white" />
@@ -550,6 +551,10 @@
                             android:text="@string/speak_button"
                             android:textSize="18sp"
                             android:textStyle="bold"
+                            android:maxLines="1"
+                            android:singleLine="true"
+                            android:ellipsize="end"
+                            android:hyphenationFrequency="none"
                             app:cornerRadius="34dp"
                             app:elevation="10dp"
                             app:icon="@drawable/ic_speak"

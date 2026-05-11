@@ -39,9 +39,9 @@
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:text="@string/profile_title"
+                    android:textAppearance="@style/ToolbarTitleStyle"
                     android:textSize="20sp"
                     android:textColor="@color/white"
-                    android:fontFamily="@font/agbalumo"
                     android:textStyle="bold" />
 
                 <androidx.appcompat.widget.AppCompatImageButton

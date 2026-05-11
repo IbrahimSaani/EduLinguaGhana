@@ -25,6 +25,7 @@
             android:background="@android:color/transparent"
             android:elevation="0dp"
             app:title="🏆 Challenges"
+            app:titleTextAppearance="@style/ToolbarTitleStyle"
             app:titleTextColor="@color/white"
             app:navigationIcon="@drawable/ic_back"
             app:navigationIconTint="@color/white"

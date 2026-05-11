@@ -371,6 +371,7 @@
             android:elevation="0dp"
             app:logo="@drawable/ic_launcher_foreground"
             app:title="@string/app_name"
+            app:titleTextAppearance="@style/ToolbarTitleStyle"
             app:titleTextColor="@color/white"
             app:titleMarginStart="8dp"
             app:subtitleTextColor="@color/white"
