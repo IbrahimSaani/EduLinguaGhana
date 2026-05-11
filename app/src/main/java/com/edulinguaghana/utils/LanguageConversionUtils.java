@@ -97,7 +97,7 @@ public class LanguageConversionUtils {
             if (unit == 0) {
                 return tens[ten];
             } else {
-                return tens[ten] + "-" + units[unit];
+                return tens[ten] + " " + units[unit];
             }
         }
     }

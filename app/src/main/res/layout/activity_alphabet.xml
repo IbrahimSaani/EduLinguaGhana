@@ -478,10 +478,10 @@
                         android:layout_height="wrap_content"
                         android:gravity="center"
                         android:orientation="vertical"
-                        android:paddingTop="60dp"
-                        android:paddingBottom="60dp"
-                        android:paddingStart="32dp"
-                        android:paddingEnd="32dp">
+                        android:paddingTop="32dp"
+                        android:paddingBottom="32dp"
+                        android:paddingStart="16dp"
+                        android:paddingEnd="16dp">
 
                         <!-- Celebration emoji container with animation support -->
                         <FrameLayout
@@ -517,9 +517,9 @@
                         <LinearLayout
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:layout_marginBottom="36dp"
-                            android:layout_marginStart="24dp"
-                            android:layout_marginEnd="24dp"
+                            android:layout_marginBottom="24dp"
+                            android:layout_marginStart="8dp"
+                            android:layout_marginEnd="8dp"
                             android:orientation="vertical"
                             android:gravity="center_horizontal"
                             android:spacing="12dp">
@@ -552,16 +552,16 @@
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
                                 android:textColor="@color/colorPrimary"
-                                android:textSize="32sp"
+                                android:textSize="28sp"
                                 android:textStyle="bold"
                                 android:fontFamily="@font/agbalumo"
-                                android:letterSpacing="0.02"
+                                android:letterSpacing="0.01"
                                 android:gravity="center"
                                 android:maxLines="3"
                                 android:ellipsize="end"
                                 android:breakStrategy="simple"
                                 android:hyphenationFrequency="none"
-                                tools:text="A-pple" />
+                                tools:text="Apple" />
                         </LinearLayout>
 
                         <!-- Speak button - Enhanced with gradient and icon -->

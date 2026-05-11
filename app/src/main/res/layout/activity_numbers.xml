@@ -447,7 +447,7 @@
                         android:layout_height="wrap_content"
                         android:gravity="center_horizontal"
                         android:orientation="vertical"
-                        android:padding="40dp">
+                        android:padding="24dp">
 
                         <!-- Emoji decoration -->
                         <FrameLayout
@@ -466,14 +466,19 @@
                         <!-- Main number with shadow effect -->
                         <TextView
                             android:id="@+id/tvNumber"
-                            android:layout_width="wrap_content"
+                            android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:layout_marginBottom="36dp"
+                            android:layout_marginBottom="24dp"
                             android:fontFamily="@font/agbalumo"
                             android:text="1"
                             android:textColor="@color/colorAccent"
                             android:textSize="140sp"
                             android:textStyle="bold"
+                            android:gravity="center"
+                            android:maxLines="1"
+                            app:autoSizeTextType="uniform"
+                            app:autoSizeMinTextSize="40sp"
+                            app:autoSizeMaxTextSize="140sp"
                             android:shadowColor="#40000000"
                             android:shadowDx="4"
                             android:shadowDy="4"
@@ -484,8 +489,8 @@
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:layout_marginBottom="36dp"
-                            android:layout_marginStart="24dp"
-                            android:layout_marginEnd="24dp"
+                            android:layout_marginStart="8dp"
+                            android:layout_marginEnd="8dp"
                             android:orientation="vertical"
                             android:gravity="center_horizontal"
                             android:spacing="12dp">
@@ -518,16 +523,19 @@
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
                                 android:textColor="@color/colorPrimary"
-                                android:textSize="24sp"
+                                android:textSize="20sp"
                                 android:textStyle="bold"
                                 android:fontFamily="@font/agbalumo"
-                                android:letterSpacing="0.02"
+                                android:letterSpacing="0.01"
                                 android:gravity="center"
-                                android:maxLines="3"
+                                android:maxLines="2"
+                                app:autoSizeTextType="uniform"
+                                app:autoSizeMinTextSize="12sp"
+                                app:autoSizeMaxTextSize="20sp"
                                 android:ellipsize="end"
-                                android:breakStrategy="simple"
                                 android:hyphenationFrequency="none"
-                                tools:text="One" />
+                                android:breakStrategy="simple"
+                                tools:text="One Hundred" />
                         </LinearLayout>
 
                         <!-- Speak button - Enhanced -->
