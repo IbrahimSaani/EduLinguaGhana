@@ -120,6 +120,10 @@
     <string name="daily_quest_description">Complete short tasks each day to earn rewards.</string>
     <string name="badges_title">Exclusive Badges</string>
     <string name="badges_description">Complete challenges to earn exclusive badges and show off your achievements.</string>
+    <string name="teacher_dashboard_error_loading_students">Error loading students: %1$s</string>
+    <string name="parent_dashboard_error_loading_children">Error loading children: %1$s</string>
+    <string name="student_detail_error_loading_progress">Error loading progress: %1$s</string>
+    <string name="student_detail_permission_denied">Permission denied. Please ensure the teacher-student relationship is accepted.</string>
 
     <!-- Authentication -->
     <string name="default_web_client_id">340016497126-2k1gekp5ntr5vj5bmhe14265bb5h1897.apps.googleusercontent.com</string>

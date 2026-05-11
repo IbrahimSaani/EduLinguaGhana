@@ -10,9 +10,9 @@ import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.cardview.widget.CardView;
+import androidx.annotation.NonNull;
 
 import com.edulinguaghana.R;
-import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -51,6 +51,8 @@ public class StudentDetailActivity extends AppCompatActivity {
 
     private ProgressTracker progressTracker;
     private DatabaseReference progressRef;
+    private boolean initialLoadComplete = false;
+    private long lastObservedActivityTimestamp = -1L;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -103,7 +105,7 @@ public class StudentDetailActivity extends AppCompatActivity {
         DatabaseReference usersRef = FirebaseDatabase.getInstance().getReference("users");
         usersRef.child(studentId).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
-            public void onDataChange(DataSnapshot snapshot) {
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
                 if (snapshot.exists()) {
                     studentName = snapshot.child("displayName").getValue(String.class);
                     if (studentName == null) {
@@ -124,7 +126,7 @@ public class StudentDetailActivity extends AppCompatActivity {
             }
 
             @Override
-            public void onCancelled(DatabaseError error) {
+            public void onCancelled(@NonNull DatabaseError error) {
                 // Use default name
                 tvStudentName.setText("Student");
             }
@@ -132,6 +134,7 @@ public class StudentDetailActivity extends AppCompatActivity {
     }
 
     private void loadProgressData() {
+        initialLoadComplete = false;
         loadingProgress.setVisibility(View.VISIBLE);
         statsCard.setVisibility(View.GONE);
 
@@ -141,6 +144,7 @@ public class StudentDetailActivity extends AppCompatActivity {
             @Override
             public void onAggregateRetrieved(ProgressAggregate aggregate) {
                 loadingProgress.setVisibility(View.GONE);
+                initialLoadComplete = true;
                 statsCard.setVisibility(View.VISIBLE);
                 Log.d(TAG, "Progress loaded successfully");
                 displayProgress(aggregate);
@@ -149,13 +153,14 @@ public class StudentDetailActivity extends AppCompatActivity {
             @Override
             public void onError(String error) {
                 loadingProgress.setVisibility(View.GONE);
+                initialLoadComplete = true;
                 Log.e(TAG, "Failed to load progress: " + error);
 
                 String errorMessage = "Error loading progress";
                 if (error != null && error.contains("Permission denied")) {
-                    errorMessage = "Permission denied. Please ensure the teacher-student relationship is accepted.";
+                    errorMessage = getString(R.string.student_detail_permission_denied);
                 } else if (error != null) {
-                    errorMessage = "Error loading progress: " + error;
+                    errorMessage = getString(R.string.student_detail_error_loading_progress, error);
                 }
 
                 Toast.makeText(StudentDetailActivity.this, errorMessage, Toast.LENGTH_LONG).show();
@@ -169,7 +174,7 @@ public class StudentDetailActivity extends AppCompatActivity {
         tvCurrentStreak.setText(aggregate.getCurrentStreak() + " days");
         tvLongestStreak.setText(aggregate.getLongestStreak() + " days");
         tvTotalQuizzes.setText(String.valueOf(aggregate.getTotalQuizzes()));
-        tvAccuracy.setText(String.format("%.1f%%", aggregate.getAccuracy()));
+        tvAccuracy.setText(String.format(Locale.getDefault(), "%.1f%%", aggregate.getAccuracy()));
         tvHighScore.setText(String.valueOf(aggregate.getHighestScore()));
         tvQuizzesThisWeek.setText(String.valueOf(aggregate.getQuizzesThisWeek()));
         tvXPThisWeek.setText(String.valueOf(aggregate.getXpThisWeek()));
@@ -178,11 +183,23 @@ public class StudentDetailActivity extends AppCompatActivity {
 
         // Format last active time
         if (aggregate.getLastUpdated() > 0) {
-            SimpleDateFormat sdf = new SimpleDateFormat("MMM dd, yyyy 'at' HH:mm", Locale.getDefault());
+            SimpleDateFormat sdf = new SimpleDateFormat("MMM d, yyyy 'at' h:mm a", Locale.getDefault());
             String formattedDate = sdf.format(new Date(aggregate.getLastUpdated()));
             tvLastActive.setText(formattedDate);
         } else {
             tvLastActive.setText("Not active yet");
+        }
+
+        if (statsCard != null) {
+            statsCard.setAlpha(0f);
+            statsCard.setScaleX(0.98f);
+            statsCard.setScaleY(0.98f);
+            statsCard.animate()
+                    .alpha(1f)
+                    .scaleX(1f)
+                    .scaleY(1f)
+                    .setDuration(220)
+                    .start();
         }
     }
 
@@ -194,18 +211,38 @@ public class StudentDetailActivity extends AppCompatActivity {
                 .limitToLast(1)
                 .addValueEventListener(new ValueEventListener() {
                     @Override
-                    public void onDataChange(DataSnapshot snapshot) {
-                        if (snapshot.exists()) {
-                            // Reload progress when new activity is detected
+                    public void onDataChange(@NonNull DataSnapshot snapshot) {
+                        if (!snapshot.exists()) return;
+
+                        long latestTimestamp = extractLatestTimestamp(snapshot);
+                        if (latestTimestamp <= 0 || latestTimestamp == lastObservedActivityTimestamp) {
+                            return;
+                        }
+
+                        lastObservedActivityTimestamp = latestTimestamp;
+
+                        if (initialLoadComplete) {
+                            // Reload progress only when a newer activity appears
                             loadProgressData();
                         }
                     }
 
                     @Override
-                    public void onCancelled(DatabaseError error) {
+                    public void onCancelled(@NonNull DatabaseError error) {
                         // Silently fail - not critical
                     }
                 });
+    }
+
+    private long extractLatestTimestamp(DataSnapshot snapshot) {
+        long latestTimestamp = -1L;
+        for (DataSnapshot child : snapshot.getChildren()) {
+            Object value = child.child("timestamp").getValue();
+            if (value instanceof Number) {
+                latestTimestamp = Math.max(latestTimestamp, ((Number) value).longValue());
+            }
+        }
+        return latestTimestamp;
     }
 
     @Override

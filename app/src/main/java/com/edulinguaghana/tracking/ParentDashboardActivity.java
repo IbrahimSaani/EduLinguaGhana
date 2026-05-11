@@ -25,6 +25,7 @@ import com.google.firebase.auth.FirebaseUser;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.LinkedHashMap;
 import java.util.List;
 
 /**
@@ -53,6 +54,7 @@ public class ParentDashboardActivity extends AppCompatActivity {
     private String currentUserId;
     private List<StudentProgressItem> allChildren = new ArrayList<>();
     private int currentSortOption = 0; // 0=Name, 1=Level, 2=Activity
+    private int activeLoadToken = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -72,6 +74,7 @@ public class ParentDashboardActivity extends AppCompatActivity {
         initViews();
         setupRecyclerView();
         setupSwipeRefresh();
+        loadChildren();
     }
 
     private void initViews() {
@@ -203,13 +206,19 @@ public class ParentDashboardActivity extends AppCompatActivity {
     }
 
     private void loadChildren() {
+        final int loadToken = ++activeLoadToken;
+
         loadingProgress.setVisibility(View.VISIBLE);
         emptyStateLayout.setVisibility(View.GONE);
         childrenRecyclerView.setVisibility(View.GONE);
+        allChildren.clear();
+        adapter.updateStudents(new ArrayList<>());
 
         roleManager.getStudents(currentUserId, new RoleManager.RelationshipCallback() {
             @Override
             public void onRelationshipsRetrieved(List<UserRelationship> relationships) {
+                if (loadToken != activeLoadToken) return;
+
                 loadingProgress.setVisibility(View.GONE);
                 if (swipeRefresh != null) {
                     swipeRefresh.setRefreshing(false);
@@ -222,12 +231,14 @@ public class ParentDashboardActivity extends AppCompatActivity {
                 } else {
                     emptyStateLayout.setVisibility(View.GONE);
                     childrenRecyclerView.setVisibility(View.VISIBLE);
-                    loadChildrenProgress(relationships);
+                    loadChildrenProgress(relationships, loadToken);
                 }
             }
 
             @Override
             public void onError(String error) {
+                if (loadToken != activeLoadToken) return;
+
                 loadingProgress.setVisibility(View.GONE);
                 if (swipeRefresh != null) {
                     swipeRefresh.setRefreshing(false);
@@ -235,7 +246,7 @@ public class ParentDashboardActivity extends AppCompatActivity {
                 emptyStateLayout.setVisibility(View.VISIBLE);
                 childrenRecyclerView.setVisibility(View.GONE);
                 if (emptyTextView != null) {
-                    emptyTextView.setText("Error loading children: " + error);
+                    emptyTextView.setText(getString(R.string.parent_dashboard_error_loading_children, error));
                 }
                 Toast.makeText(ParentDashboardActivity.this,
                              "Failed to load children", Toast.LENGTH_SHORT).show();
@@ -244,10 +255,10 @@ public class ParentDashboardActivity extends AppCompatActivity {
         });
     }
 
-    private void loadChildrenProgress(List<UserRelationship> relationships) {
-        allChildren.clear();
+    private void loadChildrenProgress(List<UserRelationship> relationships, int loadToken) {
         final int totalChildren = relationships.size();
         final int[] loadedCount = {0};
+        final LinkedHashMap<String, StudentProgressItem> loadedChildren = new LinkedHashMap<>();
 
         for (UserRelationship relationship : relationships) {
             String studentId = relationship.getStudentId();
@@ -257,17 +268,20 @@ public class ParentDashboardActivity extends AppCompatActivity {
             progressTracker.getProgressAggregate(studentId, new ProgressTracker.ProgressAggregateCallback() {
                 @Override
                 public void onAggregateRetrieved(ProgressAggregate aggregate) {
+                    if (loadToken != activeLoadToken) return;
+
                     StudentProgressItem item = new StudentProgressItem(
                         studentId,
                         studentName,
                         aggregate
                     );
-                    if (shouldAddChild(studentId)) {
-                        allChildren.add(item);
-                    }
+                    loadedChildren.put(studentId, item);
                     loadedCount[0]++;
 
                     if (loadedCount[0] == totalChildren) {
+                        if (loadToken != activeLoadToken) return;
+                        allChildren.clear();
+                        allChildren.addAll(loadedChildren.values());
                         sortChildren();
                         updateStatistics(allChildren);
                     }
@@ -275,18 +289,21 @@ public class ParentDashboardActivity extends AppCompatActivity {
 
                 @Override
                 public void onError(String error) {
+                    if (loadToken != activeLoadToken) return;
+
                     // Add with empty progress
                     StudentProgressItem item = new StudentProgressItem(
                         studentId,
                         studentName,
                         new ProgressAggregate()
                     );
-                    if (shouldAddChild(studentId)) {
-                        allChildren.add(item);
-                    }
+                    loadedChildren.put(studentId, item);
                     loadedCount[0]++;
 
                     if (loadedCount[0] == totalChildren) {
+                        if (loadToken != activeLoadToken) return;
+                        allChildren.clear();
+                        allChildren.addAll(loadedChildren.values());
                         sortChildren();
                         updateStatistics(allChildren);
                     }
@@ -324,15 +341,6 @@ public class ParentDashboardActivity extends AppCompatActivity {
         }
     }
 
-    private boolean shouldAddChild(String studentId) {
-        if (studentId == null) return false;
-        for (StudentProgressItem child : allChildren) {
-            if (studentId.equals(child.getStudentId())) {
-                return false;
-            }
-        }
-        return true;
-    }
 
     private void showRemoveChildDialog() {
         if (allChildren.isEmpty()) {

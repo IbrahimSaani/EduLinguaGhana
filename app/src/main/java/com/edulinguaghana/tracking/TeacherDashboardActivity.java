@@ -26,6 +26,7 @@ import com.google.firebase.auth.FirebaseUser;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.LinkedHashMap;
 import java.util.List;
 
 /**
@@ -54,6 +55,7 @@ public class TeacherDashboardActivity extends AppCompatActivity {
     private String currentUserId;
     private List<StudentProgressItem> allStudents = new ArrayList<>();
     private int currentSortOption = 0; // 0=Name, 1=Level, 2=Activity
+    private int activeLoadToken = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -73,6 +75,7 @@ public class TeacherDashboardActivity extends AppCompatActivity {
         initViews();
         setupRecyclerView();
         setupSwipeRefresh();
+        loadStudents();
     }
 
     private void initViews() {
@@ -204,13 +207,19 @@ public class TeacherDashboardActivity extends AppCompatActivity {
     }
 
     private void loadStudents() {
+        final int loadToken = ++activeLoadToken;
+
         loadingProgress.setVisibility(View.VISIBLE);
         emptyStateLayout.setVisibility(View.GONE);
         studentsRecyclerView.setVisibility(View.GONE);
+        allStudents.clear();
+        adapter.updateStudents(new ArrayList<>());
 
         roleManager.getStudents(currentUserId, new RoleManager.RelationshipCallback() {
             @Override
             public void onRelationshipsRetrieved(List<UserRelationship> relationships) {
+                if (loadToken != activeLoadToken) return;
+
                 loadingProgress.setVisibility(View.GONE);
                 if (swipeRefresh != null) {
                     swipeRefresh.setRefreshing(false);
@@ -223,12 +232,14 @@ public class TeacherDashboardActivity extends AppCompatActivity {
                 } else {
                     emptyStateLayout.setVisibility(View.GONE);
                     studentsRecyclerView.setVisibility(View.VISIBLE);
-                    loadStudentProgress(relationships);
+                    loadStudentProgress(relationships, loadToken);
                 }
             }
 
             @Override
             public void onError(String error) {
+                if (loadToken != activeLoadToken) return;
+
                 loadingProgress.setVisibility(View.GONE);
                 if (swipeRefresh != null) {
                     swipeRefresh.setRefreshing(false);
@@ -236,7 +247,7 @@ public class TeacherDashboardActivity extends AppCompatActivity {
                 emptyStateLayout.setVisibility(View.VISIBLE);
                 studentsRecyclerView.setVisibility(View.GONE);
                 if (emptyTextView != null) {
-                    emptyTextView.setText("Error loading students: " + error);
+                    emptyTextView.setText(getString(R.string.teacher_dashboard_error_loading_students, error));
                 }
                 Toast.makeText(TeacherDashboardActivity.this,
                              "Failed to load students", Toast.LENGTH_SHORT).show();
@@ -245,10 +256,10 @@ public class TeacherDashboardActivity extends AppCompatActivity {
         });
     }
 
-    private void loadStudentProgress(List<UserRelationship> relationships) {
-        allStudents.clear();
+    private void loadStudentProgress(List<UserRelationship> relationships, int loadToken) {
         final int totalStudents = relationships.size();
         final int[] loadedCount = {0};
+        final LinkedHashMap<String, StudentProgressItem> loadedStudents = new LinkedHashMap<>();
 
         for (UserRelationship relationship : relationships) {
             String studentId = relationship.getStudentId();
@@ -258,17 +269,20 @@ public class TeacherDashboardActivity extends AppCompatActivity {
             progressTracker.getProgressAggregate(studentId, new ProgressTracker.ProgressAggregateCallback() {
                 @Override
                 public void onAggregateRetrieved(ProgressAggregate aggregate) {
+                    if (loadToken != activeLoadToken) return;
+
                     StudentProgressItem item = new StudentProgressItem(
                         studentId,
                         studentName,
                         aggregate
                     );
-                    if (shouldAddStudent(studentId)) {
-                        allStudents.add(item);
-                    }
+                    loadedStudents.put(studentId, item);
                     loadedCount[0]++;
 
                     if (loadedCount[0] == totalStudents) {
+                        if (loadToken != activeLoadToken) return;
+                        allStudents.clear();
+                        allStudents.addAll(loadedStudents.values());
                         sortStudents();
                         updateStatistics(allStudents);
                     }
@@ -276,18 +290,21 @@ public class TeacherDashboardActivity extends AppCompatActivity {
 
                 @Override
                 public void onError(String error) {
+                    if (loadToken != activeLoadToken) return;
+
                     // Add with empty progress
                     StudentProgressItem item = new StudentProgressItem(
                         studentId,
                         studentName,
                         new ProgressAggregate()
                     );
-                    if (shouldAddStudent(studentId)) {
-                        allStudents.add(item);
-                    }
+                    loadedStudents.put(studentId, item);
                     loadedCount[0]++;
 
                     if (loadedCount[0] == totalStudents) {
+                        if (loadToken != activeLoadToken) return;
+                        allStudents.clear();
+                        allStudents.addAll(loadedStudents.values());
                         sortStudents();
                         updateStatistics(allStudents);
                     }
@@ -325,15 +342,6 @@ public class TeacherDashboardActivity extends AppCompatActivity {
         }
     }
 
-    private boolean shouldAddStudent(String studentId) {
-        if (studentId == null) return false;
-        for (StudentProgressItem student : allStudents) {
-            if (studentId.equals(student.getStudentId())) {
-                return false;
-            }
-        }
-        return true;
-    }
 
     private void showRemoveStudentDialog() {
         if (allStudents.isEmpty()) {
