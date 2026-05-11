@@ -2,7 +2,6 @@ package com.edulinguaghana;
 
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.app.AppCompatDelegate;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.content.res.ResourcesCompat;
 
@@ -36,7 +35,6 @@ public class SettingsActivity extends AppCompatActivity {
     private Button btnSyncToCloud;
     private Button btnSyncFromCloud;
     private Button btnChangeRole;
-    private View btnAboutApp;
     private View btnAppTutorial;
     private View btnPrivacyPolicy;
     private View btnContactUs;
@@ -82,7 +80,6 @@ public class SettingsActivity extends AppCompatActivity {
         btnSyncToCloud = findViewById(R.id.btnSyncToCloud);
         btnSyncFromCloud = findViewById(R.id.btnSyncFromCloud);
         btnChangeRole = findViewById(R.id.btnChangeRole);
-        btnAboutApp = findViewById(R.id.btnAboutApp);
         btnAppTutorial = findViewById(R.id.btnAppTutorial);
         btnPrivacyPolicy = findViewById(R.id.btnPrivacyPolicy);
         btnContactUs = findViewById(R.id.btnContactUs);
@@ -199,10 +196,6 @@ public class SettingsActivity extends AppCompatActivity {
         });
 
         // About & Privacy listeners
-        if (btnAboutApp != null) {
-            btnAboutApp.setOnClickListener(v -> showAboutDialog());
-        }
-
         if (btnAppTutorial != null) {
             btnAppTutorial.setOnClickListener(v -> {
                 Intent intent = new Intent(this, TutorialActivity.class);
@@ -267,19 +260,6 @@ public class SettingsActivity extends AppCompatActivity {
         } catch (Exception e) {
             e.printStackTrace();
         }
-    }
-
-    private void showAboutDialog() {
-        StyledMenuHelper.showStyledConfirmationDialog(
-            this,
-            "🇬🇭",
-            "About EduLingua Ghana",
-            "EduLingua Ghana is a language learning platform dedicated to preserving and teaching Ghanaian languages like Twi, Ga, and Ewe.\n\nOur mission is to make language learning fun and accessible for everyone.\n\nDeveloped with ❤️ for Ghana.",
-            "Great!",
-            null,
-            null,
-            null
-        );
     }
 
     private void showPrivacyPolicy() {

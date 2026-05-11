@@ -58,6 +58,7 @@ public class ProfileActivity extends AppCompatActivity {
     private ProgressBar pbXp;
     private ImageView ivBadgesPreview;
     private View achievementsCard;
+    private View lessonsSection;
     private AvatarView profileImage, avatarNotSignedIn;
     private DynamicBackgroundView dynamicBackground;
     private MaterialButton btnAddFriend, btnChallengeFriend;
@@ -162,6 +163,7 @@ public class ProfileActivity extends AppCompatActivity {
         tvXpText = findViewById(R.id.tv_xp_text);
         ivBadgesPreview = findViewById(R.id.iv_badges_preview);
         achievementsCard = findViewById(R.id.achievementsCard);
+        lessonsSection = findViewById(R.id.lessonsSection);
     }
 
     /**
@@ -381,6 +383,13 @@ public class ProfileActivity extends AppCompatActivity {
         // Add listener for achievements card
         if (achievementsCard != null) {
             achievementsCard.setOnClickListener(v -> showAchievementsDialog());
+        }
+
+        if (lessonsSection != null) {
+            lessonsSection.setOnClickListener(v -> {
+                Intent intent = new Intent(this, ProgressActivity.class);
+                startActivity(intent);
+            });
         }
     }
 
