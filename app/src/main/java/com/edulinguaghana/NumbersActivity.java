@@ -725,10 +725,10 @@ public class NumbersActivity extends AppCompatActivity {
         
         // Create a custom grid view for numbers
         GridView gridView = new GridView(this);
-        gridView.setNumColumns(10);
-        gridView.setPadding(16, 16, 16, 16);
-        gridView.setVerticalSpacing(8);
-        gridView.setHorizontalSpacing(8);
+        gridView.setNumColumns(5);
+        gridView.setPadding(24, 24, 24, 24);
+        gridView.setVerticalSpacing(16);
+        gridView.setHorizontalSpacing(16);
         
         // Create adapter for numbers 1-100
         java.util.ArrayList<String> numberList = new java.util.ArrayList<>();

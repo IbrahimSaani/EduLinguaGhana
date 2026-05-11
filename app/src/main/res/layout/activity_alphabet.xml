@@ -387,8 +387,9 @@
                 <!-- Mode Badge - Shows RECITAL or PRACTICE -->
                 <com.google.android.material.card.MaterialCardView
                     android:id="@+id/modeBadgeCard"
-                    android:layout_width="match_parent"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:layout_gravity="center_horizontal"
                     app:cardCornerRadius="16dp"
                     app:cardElevation="6dp">
 
@@ -496,50 +497,21 @@
                                 android:textSize="44sp" />
                         </FrameLayout>
 
-                        <!-- Main letter with enhanced shadow and glow -->
-                        <FrameLayout
+                        <!-- Main letter with shadow effect -->
+                        <TextView
+                            android:id="@+id/tvLetter"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_marginBottom="32dp">
-
-                            <!-- Outer glow effect (shadow) -->
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_marginTop="4dp"
-                                android:layout_marginStart="4dp"
-                                android:fontFamily="@font/agbalumo"
-                                android:text="A"
-                                android:alpha="0.15"
-                                android:textColor="@color/colorAccent"
-                                android:textSize="170sp"
-                                android:textStyle="bold" />
-
-                            <!-- Main letter -->
-                            <TextView
-                                android:id="@+id/tvLetter"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:fontFamily="@font/agbalumo"
-                                android:text="A"
-                                android:textColor="@color/colorAccent"
-                                android:textSize="170sp"
-                                android:textStyle="bold" />
-
-                            <!-- Subtle shadow for depth -->
-                            <TextView
-                                android:id="@+id/tvLetterShadow"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_marginTop="3dp"
-                                android:layout_marginStart="3dp"
-                                android:fontFamily="@font/agbalumo"
-                                android:text="A"
-                                android:alpha="0.1"
-                                android:textColor="@android:color/black"
-                                android:textSize="170sp"
-                                android:textStyle="bold" />
-                        </FrameLayout>
+                            android:layout_marginBottom="32dp"
+                            android:fontFamily="@font/agbalumo"
+                            android:text="A"
+                            android:textColor="@color/colorAccent"
+                            android:textSize="160sp"
+                            android:textStyle="bold"
+                            android:shadowColor="#40000000"
+                            android:shadowDx="4"
+                            android:shadowDy="4"
+                            android:shadowRadius="8" />
 
                         <!-- Word display with enhanced styling -->
                         <LinearLayout
@@ -580,16 +552,15 @@
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
                                 android:textColor="@color/colorPrimary"
-                                android:textSize="34sp"
+                                android:textSize="32sp"
                                 android:textStyle="bold"
                                 android:fontFamily="@font/agbalumo"
-                                android:letterSpacing="0.05"
+                                android:letterSpacing="0.02"
                                 android:gravity="center"
                                 android:maxLines="3"
                                 android:ellipsize="end"
-                                android:breakStrategy="balanced"
+                                android:breakStrategy="simple"
                                 android:hyphenationFrequency="none"
-                                android:justificationMode="inter_word"
                                 tools:text="A-pple" />
                         </LinearLayout>
 
