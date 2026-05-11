@@ -37,7 +37,7 @@ import com.edulinguaghana.tts.OfflineGhanaLPTtsService;
 
 public class AlphabetActivity extends AppCompatActivity {
 
-    private TextView tvLanguageTitle, tvLetter, tvLetterWord, tvLetterShadow;
+    private TextView tvLanguageTitle, tvLetter, tvLetterWord;
     private TextView tvProgressCounter;
     private MaterialButton btnPrev, btnNext, btnSpeak;
     private FloatingActionButton btnBack;
@@ -97,7 +97,6 @@ public class AlphabetActivity extends AppCompatActivity {
         tvLanguageTitle = findViewById(R.id.tvLanguageTitle);
         tvLetter = findViewById(R.id.tvLetter);
         tvLetterWord = findViewById(R.id.tvLetterWord);
-        tvLetterShadow = findViewById(R.id.tvLetterShadow);
         tvProgressCounter = findViewById(R.id.tvProgressCounter);
         celebrationEmoji = findViewById(R.id.celebrationEmoji);
 
@@ -332,12 +331,9 @@ public class AlphabetActivity extends AppCompatActivity {
 
     private void updateLetter() {
         try {
-            // Update text with letter and shadow
+            // Update text with letter
             String letter = letters[currentIndex];
             tvLetter.setText(letter);
-            if (tvLetterShadow != null) {
-                tvLetterShadow.setText(letter);
-            }
             tvLetterWord.setText(words[currentIndex]);
 
             // Update progress bar and counter
@@ -363,12 +359,9 @@ public class AlphabetActivity extends AppCompatActivity {
             e.printStackTrace();
         }
 
-        // Update text with letter and shadow
+        // Update text with letter
         String letter = letters[currentIndex];
         tvLetter.setText(letter);
-        if (tvLetterShadow != null) {
-            tvLetterShadow.setText(letter);
-        }
         tvLetterWord.setText(words[currentIndex]);
 
         // Update progress bar and counter
@@ -407,9 +400,6 @@ public class AlphabetActivity extends AppCompatActivity {
         try {
             Animation letterAnim = AnimationUtils.loadAnimation(this, R.anim.letter_bounce);
             tvLetter.startAnimation(letterAnim);
-            if (tvLetterShadow != null) {
-                tvLetterShadow.startAnimation(letterAnim);
-            }
 
             // Animate word text
             Animation wordAnim = AnimationUtils.loadAnimation(this, R.anim.fade_in);
@@ -497,24 +487,6 @@ public class AlphabetActivity extends AppCompatActivity {
                             .start();
                     })
                     .start();
-
-                // Also animate shadow if available
-                if (tvLetterShadow != null) {
-                    tvLetterShadow.animate()
-                        .scaleX(0.8f)
-                        .scaleY(0.8f)
-                        .alpha(0.1f)
-                        .setDuration(100)
-                        .withEndAction(() -> {
-                            tvLetterShadow.animate()
-                                .scaleX(1.0f)
-                                .scaleY(1.0f)
-                                .alpha(0.15f)
-                                .setDuration(150)
-                                .start();
-                        })
-                        .start();
-                }
             }
         } catch (Exception e) {
             e.printStackTrace();
