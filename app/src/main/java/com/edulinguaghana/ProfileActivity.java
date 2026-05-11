@@ -1182,26 +1182,32 @@ public class ProfileActivity extends AppCompatActivity {
 
     // Helper: show dialog to choose a user to challenge
     private void presentChallengeDialog(String currentUserId) {
-        android.app.AlertDialog.Builder builder = new android.app.AlertDialog.Builder(this);
-        builder.setTitle("⚔️ Challenge a Friend");
         final EditText input = new EditText(this);
         input.setHint("Enter friend's user ID");
         input.setInputType(InputType.TYPE_CLASS_TEXT);
-        builder.setView(input);
-        builder.setPositiveButton("Next", (dialog, which) -> {
-            String target = input.getText() != null ? input.getText().toString().trim() : "";
-            if (target.isEmpty()) {
-                Toast.makeText(this, "Please enter a user ID", Toast.LENGTH_SHORT).show();
-                return;
-            }
-            if (target.equals(currentUserId)) {
-                Toast.makeText(this, "You can't challenge yourself", Toast.LENGTH_SHORT).show();
-                return;
-            }
-            performCreateChallengeWithDialog(currentUserId, target);
-        });
-        builder.setNegativeButton("Cancel", (dialog, which) -> dialog.cancel());
-        builder.show();
+
+        StyledMenuHelper.showStyledCustomDialog(
+            this,
+            "🎯",
+            "Create Challenge",
+            "Enter the user ID of the friend you want to challenge.",
+            input,
+            "Next",
+            "Cancel",
+            () -> {
+                String target = input.getText() != null ? input.getText().toString().trim() : "";
+                if (target.isEmpty()) {
+                    Toast.makeText(this, "Please enter a user ID", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+                if (target.equals(currentUserId)) {
+                    Toast.makeText(this, "You can't challenge yourself", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+                performCreateChallengeWithDialog(currentUserId, target);
+            },
+            null
+        );
     }
 
     private void performCreateChallengeWithDialog(String currentUserId, String targetUserId) {
@@ -1244,14 +1250,16 @@ public class ProfileActivity extends AppCompatActivity {
             new com.edulinguaghana.social.ChallengeManager.ChallengeCreationCallback() {
                 @Override
                 public void onSuccess(com.edulinguaghana.social.Challenge challenge) {
-                    new AlertDialog.Builder(ProfileActivity.this)
-                        .setTitle("⚔️ Challenge Created!")
-                        .setMessage("Challenge sent to " + toUserId + ".\nWould you like to play your part now?")
-                        .setPositiveButton("Play Now", (dialog, which) -> {
-                            acceptChallengeAndStartQuiz(challenge);
-                        })
-                        .setNegativeButton("Later", null)
-                        .show();
+                    StyledMenuHelper.showStyledConfirmationDialog(
+                        ProfileActivity.this,
+                        "⚔️",
+                        "Challenge Created!",
+                        "Challenge sent to " + toUserId + ".\nWould you like to play your part now?",
+                        "Play Now",
+                        "Later",
+                        () -> acceptChallengeAndStartQuiz(challenge),
+                        null
+                    );
                 }
 
                 @Override
@@ -1535,17 +1543,21 @@ public class ProfileActivity extends AppCompatActivity {
                 profileInfo.append("• Total Quizzes: ").append(totalQuizzes).append("\n");
                 profileInfo.append("• High Score: ").append(highScore).append("/10");
 
-                new AlertDialog.Builder(ProfileActivity.this)
-                    .setTitle("👤 " + (displayName != null ? displayName : "User Profile"))
-                    .setMessage(profileInfo.toString())
-                    .setPositiveButton("Close", null)
-                    .setNeutralButton("Challenge", (dialog, which) -> {
+                StyledMenuHelper.showStyledConfirmationDialog(
+                    ProfileActivity.this,
+                    "👤",
+                    displayName != null ? displayName : "User Profile",
+                    profileInfo.toString() + "\n\nWould you like to challenge this user?",
+                    "Challenge",
+                    "Close",
+                    () -> {
                         FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
                         if (currentUser != null) {
                             performCreateChallengeWithDialog(currentUser.getUid(), friendUserId);
                         }
-                    })
-                    .show();
+                    },
+                    null
+                );
             }
 
             @Override
@@ -1826,11 +1838,24 @@ public class ProfileActivity extends AppCompatActivity {
             challengeItems[i] = "⏳ Waiting for: " + otherId;
         }
 
-        new AlertDialog.Builder(this)
-            .setTitle("Waiting for Opponent")
-            .setItems(challengeItems, null)
-            .setNegativeButton("Close", null)
-            .show();
+        java.util.List<StyledMenuHelper.MenuItem> menuItems = new java.util.ArrayList<>();
+        for (String challengeItem : challengeItems) {
+            menuItems.add(new StyledMenuHelper.MenuItem(
+                "⏳",
+                challengeItem,
+                "Tap to keep browsing your challenge list",
+                () -> Toast.makeText(this, challengeItem, Toast.LENGTH_SHORT).show()
+            ));
+        }
+
+        StyledMenuHelper.showStyledMenu(
+            this,
+            "⏳",
+            "Waiting for Opponent",
+            "Challenges you’ve completed while waiting for the other player",
+            menuItems,
+            null
+        );
     }
 
     private void showChallenges(String userId) {
@@ -1943,14 +1968,26 @@ public class ProfileActivity extends AppCompatActivity {
             }
         }
 
-        new AlertDialog.Builder(this)
-            .setTitle("Active Challenges (" + challenges.size() + ")")
-            .setItems(challengeItems, (dialog, which) -> {
-                com.edulinguaghana.social.Challenge selectedChallenge = challenges.get(which);
-                showChallengeDetailsDialog(selectedChallenge, userId);
-            })
-            .setNegativeButton("Close", null)
-            .show();
+        java.util.List<StyledMenuHelper.MenuItem> menuItems = new java.util.ArrayList<>();
+        for (int i = 0; i < challenges.size(); i++) {
+            com.edulinguaghana.social.Challenge selectedChallenge = challenges.get(i);
+            String itemTitle = challengeItems[i];
+            menuItems.add(new StyledMenuHelper.MenuItem(
+                "⚔️",
+                itemTitle,
+                "Open challenge details",
+                () -> showChallengeDetailsDialog(selectedChallenge, userId)
+            ));
+        }
+
+        StyledMenuHelper.showStyledMenu(
+            this,
+            "⚔️",
+            "Active Challenges (" + challenges.size() + ")",
+            "Select a challenge to continue",
+            menuItems,
+            null
+        );
     }
 
     private void showChallengeDetailsDialog(com.edulinguaghana.social.Challenge challenge, String userId) {
@@ -1965,17 +2002,16 @@ public class ProfileActivity extends AppCompatActivity {
                         "Time: " + challenge.durationMinutes + " min\n\n" +
                         "Start the quiz now?";
 
-        new AlertDialog.Builder(this)
-            .setTitle("⚔️ Challenge Details")
-            .setMessage(message)
-            .setPositiveButton("Start Quiz", (dialog, which) -> {
-                acceptChallengeAndStartQuiz(challenge);
-            })
-            .setNegativeButton(isChallenged ? "Decline" : "Cancel", (dialog, which) -> {
-                declineChallenge(challenge);
-            })
-            .setNeutralButton("Later", null)
-            .show();
+        StyledMenuHelper.showStyledConfirmationDialog(
+            this,
+            "⚔️",
+            "Challenge Details",
+            message,
+            "Start Quiz",
+            isChallenged ? "Decline" : "Cancel",
+            () -> acceptChallengeAndStartQuiz(challenge),
+            isChallenged ? () -> declineChallenge(challenge) : null
+        );
     }
 
     private void declineChallenge(com.edulinguaghana.social.Challenge challenge) {
@@ -2044,14 +2080,26 @@ public class ProfileActivity extends AppCompatActivity {
             }
         }
 
-        new AlertDialog.Builder(this)
-            .setTitle("Completed Challenges")
-            .setItems(challengeItems, (dialog, which) -> {
-                com.edulinguaghana.social.Challenge selectedChallenge = challenges.get(which);
-                showChallengeResultDetails(selectedChallenge, userId);
-            })
-            .setNegativeButton("Close", null)
-            .show();
+        java.util.List<StyledMenuHelper.MenuItem> menuItems = new java.util.ArrayList<>();
+        for (int i = 0; i < challenges.size(); i++) {
+            com.edulinguaghana.social.Challenge selectedChallenge = challenges.get(i);
+            String itemTitle = challengeItems[i];
+            menuItems.add(new StyledMenuHelper.MenuItem(
+                "🏆",
+                itemTitle,
+                "View the final result",
+                () -> showChallengeResultDetails(selectedChallenge, userId)
+            ));
+        }
+
+        StyledMenuHelper.showStyledMenu(
+            this,
+            "🏆",
+            "Completed Challenges",
+            "Review your finished challenge results",
+            menuItems,
+            null
+        );
     }
 
     private void showChallengeResultDetails(com.edulinguaghana.social.Challenge challenge, String userId) {
@@ -2082,11 +2130,16 @@ public class ProfileActivity extends AppCompatActivity {
                         "Language: " + getLanguageNameFromCode(challenge.language) + "\n" +
                         "Quiz: " + challenge.quizType;
 
-        new AlertDialog.Builder(this)
-            .setTitle("Challenge Result")
-            .setMessage(message)
-            .setPositiveButton("OK", null)
-            .show();
+        StyledMenuHelper.showStyledConfirmationDialog(
+            this,
+            emoji,
+            "Challenge Result",
+            message,
+            "OK",
+            null,
+            null,
+            null
+        );
     }
 
     private void acceptChallengeAndStartQuiz(com.edulinguaghana.social.Challenge challenge) {
