@@ -29,30 +29,48 @@ public class AchievementManager {
     private void initializeAchievements() {
         // Load saved achievements
         String json = prefs.getString(KEY_ACHIEVEMENTS, null);
-        if (json != null) {
-            Type type = new TypeToken<List<Achievement>>() {}.getType();
-            achievements = gson.fromJson(json, type);
+        List<Achievement> defaults = createDefaultAchievements();
 
-            // Update icons for existing achievements to use new professional icons
-            boolean updated = false;
-            List<Achievement> defaults = createDefaultAchievements();
-            for (Achievement a : achievements) {
+        if (json != null) {
+            try {
+                Type type = new TypeToken<List<Achievement>>() {}.getType();
+                achievements = gson.fromJson(json, type);
+
+                // Force update icon names and metadata from defaults, but preserve unlock status
+                boolean changed = false;
                 for (Achievement def : defaults) {
-                    if (def.getId().equals(a.getId())) {
-                        if (a.getIconName() == null || !a.getIconName().equals(def.getIconName())) {
+                    boolean found = false;
+                    for (Achievement a : achievements) {
+                        if (a.getId().equals(def.getId())) {
+                            // Update icon and text from defaults in case they changed
                             a.setIconName(def.getIconName());
-                            updated = true;
+                            a.setTitle(def.getTitle());
+                            a.setDescription(def.getDescription());
+                            a.setEmoji(def.getEmoji());
+                            a.setType(def.getType());
+                            a.setRequiredValue(def.getRequiredValue());
+                            found = true;
+                            changed = true;
+                            break;
                         }
-                        break;
+                    }
+                    // If a new achievement was added to defaults, add it to current list
+                    if (!found) {
+                        achievements.add(def);
+                        changed = true;
                     }
                 }
-            }
-            if (updated) {
+                
+                if (changed) {
+                    saveAchievements();
+                }
+            } catch (Exception e) {
+                achievements = defaults;
                 saveAchievements();
             }
         } else {
             // Create default achievements
-            achievements = createDefaultAchievements();
+            achievements = defaults;
             saveAchievements();
         }
     }
@@ -91,9 +109,14 @@ public class AchievementManager {
         return list;
     }
 
-    private void saveAchievements() {
+    public void saveAchievements() {
         String json = gson.toJson(achievements);
         prefs.edit().putString(KEY_ACHIEVEMENTS, json).apply();
+    }
+
+    public void saveAllAchievements(List<Achievement> achievements) {
+        this.achievements = achievements;
+        saveAchievements();
     }
 
     public List<Achievement> getAllAchievements() {

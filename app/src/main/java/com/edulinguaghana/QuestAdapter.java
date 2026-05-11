@@ -8,6 +8,7 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 import com.edulinguaghana.gamification.Quest;
+import com.google.android.material.card.MaterialCardView;
 import com.google.android.material.progressindicator.LinearProgressIndicator;
 import java.util.List;
 
@@ -59,7 +60,9 @@ public class QuestAdapter extends RecyclerView.Adapter<QuestAdapter.QuestViewHol
         TextView tvQuestPoints;
         LinearProgressIndicator progressQuest;
         View claimIndicator;
-        TextView completionCheckmark;
+        View completionIndicator;
+        MaterialCardView iconBackground;
+        View overlayColor;
 
         public QuestViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -69,7 +72,9 @@ public class QuestAdapter extends RecyclerView.Adapter<QuestAdapter.QuestViewHol
             tvQuestPoints = itemView.findViewById(R.id.tv_quest_points);
             progressQuest = itemView.findViewById(R.id.progress_quest);
             claimIndicator = itemView.findViewById(R.id.claimIndicator);
-            completionCheckmark = itemView.findViewById(R.id.completionCheckmark);
+            completionIndicator = itemView.findViewById(R.id.completionIndicator);
+            iconBackground = itemView.findViewById(R.id.iconBackground);
+            overlayColor = itemView.findViewById(R.id.overlayColor);
         }
 
         public void bind(Quest quest, OnQuestClickListener listener) {
@@ -95,23 +100,32 @@ public class QuestAdapter extends RecyclerView.Adapter<QuestAdapter.QuestViewHol
                 tvQuestProgress.setText("Completed!");
                 tvQuestProgress.setTextColor(itemView.getContext().getColor(R.color.correctAnswer));
                 claimIndicator.setVisibility(View.GONE);
+                completionIndicator.setVisibility(View.VISIBLE);
                 itemView.setAlpha(0.7f);
+                iconBackground.setCardBackgroundColor(itemView.getContext().getColor(R.color.notification_achievement_bg));
+                overlayColor.setAlpha(0.2f);
             } else if (quest.progress >= quest.target) {
                 // Quest is ready to claim
                 tvQuestProgress.setText(quest.progress + "/" + quest.target);
                 tvQuestProgress.setTextColor(itemView.getContext().getColor(R.color.correctAnswer));
                 claimIndicator.setVisibility(View.VISIBLE);
+                completionIndicator.setVisibility(View.GONE);
                 itemView.setAlpha(1.0f);
+                iconBackground.setCardBackgroundColor(itemView.getContext().getColor(R.color.white));
+                overlayColor.setAlpha(0.15f);
             } else {
                 // Quest in progress
                 tvQuestProgress.setText(quest.progress + "/" + quest.target);
                 tvQuestProgress.setTextColor(itemView.getContext().getColor(R.color.colorPrimary));
                 claimIndicator.setVisibility(View.GONE);
+                completionIndicator.setVisibility(View.GONE);
                 itemView.setAlpha(1.0f);
+                iconBackground.setCardBackgroundColor(itemView.getContext().getColor(R.color.dividerColor));
+                overlayColor.setAlpha(0.1f);
             }
 
             // Set points
-            tvQuestPoints.setText("+" + quest.xpReward);
+            tvQuestPoints.setText("+" + quest.xpReward + " XP");
 
             // Set click listener with enhanced feedback
             itemView.setOnClickListener(v -> {

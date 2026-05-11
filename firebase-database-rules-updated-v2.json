@@ -25,6 +25,15 @@
         },
         "displayName": {
           ".write": "$userId === auth.uid"
+        },
+        "badges": {
+          ".write": "$userId === auth.uid"
+        },
+        "quests": {
+          ".write": "$userId === auth.uid"
+        },
+        "achievements": {
+          ".write": "$userId === auth.uid"
         }
       }
     },
@@ -54,7 +63,6 @@
     },
     "challengeStats": {
       ".read": "auth != null",
-      ".write": "auth != null",
       ".indexOn": ["userId", "winRate", "totalChallenges"],
       "$userId": {
         ".read": "auth != null",

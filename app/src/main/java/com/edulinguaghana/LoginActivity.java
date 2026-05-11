@@ -27,6 +27,9 @@ import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.GoogleAuthProvider;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.ValueEventListener;
 
 import com.facebook.AccessToken;
 import com.facebook.CallbackManager;
@@ -142,6 +145,8 @@ public class LoginActivity extends AppCompatActivity {
                         FirebaseUser user = mAuth.getCurrentUser();
                         // Save user to database for friend lookups
                         saveUserToDatabase(user);
+                        // Restore progress from database
+                        restoreUserProgress(user);
                         Toast.makeText(LoginActivity.this, "Welcome back!", Toast.LENGTH_SHORT).show();
                         navigateToMain();
                     } else {
@@ -198,6 +203,8 @@ public class LoginActivity extends AppCompatActivity {
                         FirebaseUser user = mAuth.getCurrentUser();
                         // Save user to database for friend lookups
                         saveUserToDatabase(user);
+                        // Restore progress from database
+                        restoreUserProgress(user);
                         String name = (user != null && user.getDisplayName() != null) ? user.getDisplayName() : "Learner";
                         Toast.makeText(LoginActivity.this,
                                 "Welcome " + name + "!",
@@ -314,6 +321,8 @@ public class LoginActivity extends AppCompatActivity {
                         FirebaseUser user = mAuth.getCurrentUser();
                         // Save user to database for friend lookups
                         saveUserToDatabase(user);
+                        // Restore progress from database
+                        restoreUserProgress(user);
                         String name = (user != null && user.getDisplayName() != null) ? user.getDisplayName() : "Learner";
                         Toast.makeText(LoginActivity.this, "Welcome " + name + "!",
                                 Toast.LENGTH_SHORT).show();
@@ -340,6 +349,88 @@ public class LoginActivity extends AppCompatActivity {
         userProfile.put("lastLogin", System.currentTimeMillis());
 
         usersRef.child(user.getUid()).updateChildren(userProfile);
+    }
+
+    private void restoreUserProgress(FirebaseUser user) {
+        if (user == null) return;
+        String userId = user.getUid();
+
+        // 1. Restore Aggregate Data (XP, Quizzes, Streaks)
+        DatabaseReference aggregatesRef = FirebaseDatabase.getInstance().getReference("aggregates").child(userId);
+        aggregatesRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot snapshot) {
+                com.edulinguaghana.tracking.ProgressAggregate aggregate = snapshot.getValue(com.edulinguaghana.tracking.ProgressAggregate.class);
+                if (aggregate != null) {
+                    // Restore XP
+                    com.edulinguaghana.gamification.XPState xpState = new com.edulinguaghana.gamification.XPState();
+                    xpState.totalXp = aggregate.getTotalXP();
+                    xpState.level = aggregate.getCurrentLevel();
+                    xpState.lastUpdated = aggregate.getLastUpdated();
+                    com.edulinguaghana.gamification.XPManager.saveState(LoginActivity.this, xpState);
+
+                    // Restore Progress Stats
+                    com.edulinguaghana.ProgressManager.saveAllProgress(LoginActivity.this,
+                            aggregate.getHighestScore(),
+                            aggregate.getTotalQuizzes(),
+                            aggregate.getTotalCorrectAnswers(),
+                            aggregate.getTotalQuestions());
+
+                    // Restore Streak
+                    com.edulinguaghana.StreakManager streakManager = new com.edulinguaghana.StreakManager(LoginActivity.this);
+                    streakManager.saveAllStreakData(aggregate.getCurrentStreak(),
+                            aggregate.getLongestStreak(),
+                            aggregate.getDaysActive());
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError error) {}
+        });
+
+        // 2. Restore Badges and Quests
+        DatabaseReference userRef = FirebaseDatabase.getInstance().getReference("users").child(userId);
+        userRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot snapshot) {
+                // Restore Badges
+                if (snapshot.hasChild("badges")) {
+                    java.util.List<com.edulinguaghana.gamification.Badge> badges = new java.util.ArrayList<>();
+                    for (DataSnapshot badgeSnap : snapshot.child("badges").getChildren()) {
+                        badges.add(badgeSnap.getValue(com.edulinguaghana.gamification.Badge.class));
+                    }
+                    if (!badges.isEmpty()) {
+                        com.edulinguaghana.gamification.BadgeManager.saveBadges(LoginActivity.this, badges);
+                    }
+                }
+
+                // Restore Quests
+                if (snapshot.hasChild("quests")) {
+                    java.util.List<com.edulinguaghana.gamification.Quest> quests = new java.util.ArrayList<>();
+                    for (DataSnapshot questSnap : snapshot.child("quests").getChildren()) {
+                        quests.add(questSnap.getValue(com.edulinguaghana.gamification.Quest.class));
+                    }
+                    if (!quests.isEmpty()) {
+                        com.edulinguaghana.gamification.QuestManager.saveQuests(LoginActivity.this, quests);
+                    }
+                }
+
+                // Restore Achievements
+                if (snapshot.hasChild("achievements")) {
+                    java.util.List<com.edulinguaghana.Achievement> achievements = new java.util.ArrayList<>();
+                    for (DataSnapshot achSnap : snapshot.child("achievements").getChildren()) {
+                        achievements.add(achSnap.getValue(com.edulinguaghana.Achievement.class));
+                    }
+                    if (!achievements.isEmpty()) {
+                        com.edulinguaghana.AchievementManager achievementManager = new com.edulinguaghana.AchievementManager(LoginActivity.this);
+                        achievementManager.saveAllAchievements(achievements);
+                    }
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError error) {}
+        });
     }
 
     private void navigateToMain() {

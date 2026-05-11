@@ -21,21 +21,31 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:padding="16dp"
+        android:padding="12dp"
         android:gravity="center_vertical">
 
         <!-- Quest Icon with Status Indicator -->
         <FrameLayout
-            android:layout_width="56dp"
-            android:layout_height="56dp"
-            android:layout_marginEnd="14dp">
+            android:layout_width="64dp"
+            android:layout_height="64dp"
+            android:layout_marginEnd="16dp">
 
             <!-- Icon Background -->
-            <View
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/iconBackground"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:background="@drawable/circle_background"
-                android:alpha="0.15" />
+                app:cardCornerRadius="32dp"
+                app:cardElevation="0dp"
+                app:cardBackgroundColor="#F5F5F5">
+
+                <View
+                    android:id="@+id/overlayColor"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:background="@color/colorPrimaryLight"
+                    android:alpha="0.15" />
+            </com.google.android.material.card.MaterialCardView>
 
             <!-- Quest Icon / Emoji -->
             <TextView
@@ -45,24 +55,31 @@
                 android:text="⚡"
                 android:textSize="32sp"
                 android:gravity="center"
+                android:elevation="2dp"
                 tools:text="⚡" />
 
             <!-- Completion Checkmark (for completed quests) -->
-            <!-- Completion Checkmark (for completed quests) -->
-            <TextView
-                android:id="@+id/completionCheckmark"
-                android:layout_width="20dp"
-                android:layout_height="20dp"
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/completionIndicator"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
                 android:layout_gravity="bottom|end"
-                android:layout_marginEnd="-4dp"
-                android:layout_marginBottom="-4dp"
-                android:background="@drawable/circle_background"
-                android:text="✓"
-                android:textSize="12sp"
-                android:textColor="@android:color/white"
-                android:gravity="center"
-                android:textStyle="bold"
-                android:visibility="gone" />
+                android:layout_marginEnd="0dp"
+                android:layout_marginBottom="0dp"
+                app:cardCornerRadius="12dp"
+                app:cardElevation="3dp"
+                app:cardBackgroundColor="@color/correctAnswer"
+                android:visibility="gone">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:text="✓"
+                    android:textSize="14sp"
+                    android:textColor="@android:color/white"
+                    android:gravity="center"
+                    android:textStyle="bold" />
+            </com.google.android.material.card.MaterialCardView>
 
         </FrameLayout>
 
@@ -159,38 +176,41 @@
 
             </com.google.android.material.card.MaterialCardView>
 
-        </LinearLayout>
-
-        <!-- Quest Points Badge -->
-        <LinearLayout
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:gravity="center"
-            android:layout_marginStart="12dp"
-            android:background="@drawable/badge_background"
-            android:padding="10dp">
-
-            <TextView
-                android:id="@+id/tv_quest_points"
+            <!-- Quest Points Badge -->
+            <com.google.android.material.card.MaterialCardView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                tools:text="+50"
-                android:textSize="15sp"
-                android:textStyle="bold"
-                android:textColor="@color/colorAccent" />
+                android:layout_gravity="start"
+                android:layout_marginTop="4dp"
+                app:cardCornerRadius="10dp"
+                app:cardElevation="0dp"
+                app:cardBackgroundColor="#FFF8E1">
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="XP"
-                android:textSize="10sp"
-                android:textColor="@color/textSecondary"
-                android:layout_marginTop="2dp" />
+                <TextView
+                    android:id="@+id/tv_quest_points"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:paddingHorizontal="8dp"
+                    android:paddingVertical="4dp"
+                    tools:text="+50 XP"
+                    android:textSize="12sp"
+                    android:textStyle="bold"
+                    android:textColor="#F57C00" />
+
+            </com.google.android.material.card.MaterialCardView>
 
         </LinearLayout>
+
+        <!-- Right Arrow (Indicator for progress) -->
+        <ImageView
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:layout_marginStart="8dp"
+            android:src="@drawable/ic_arrow_forward"
+            android:contentDescription="Quest Progress Indicator"
+            app:tint="@color/dividerColor"
+            android:alpha="0.5" />
 
     </LinearLayout>
 
 </com.google.android.material.card.MaterialCardView>
-

@@ -14,40 +14,45 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:padding="16dp"
+        android:padding="12dp"
         android:gravity="center">
 
         <!-- Badge Container with Background Circle -->
         <FrameLayout
-            android:layout_width="80dp"
-            android:layout_height="80dp"
+            android:id="@+id/iconContainer"
+            android:layout_width="96dp"
+            android:layout_height="96dp"
             android:layout_marginTop="4dp"
             android:layout_marginBottom="8dp">
 
-            <!-- Background Circle -->
+            <!-- Background Circle with Glow/Inner Shadow effect -->
             <com.google.android.material.card.MaterialCardView
+                android:id="@+id/iconBackground"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                app:cardCornerRadius="40dp"
-                app:cardElevation="0dp"
-                app:cardBackgroundColor="@color/cardBackground">
+                app:cardCornerRadius="48dp"
+                app:cardElevation="2dp"
+                app:cardBackgroundColor="#F5F5F5"
+                app:cardPreventCornerOverlap="false">
 
                 <View
+                    android:id="@+id/overlayColor"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:background="@color/colorPrimaryLight"
-                    android:alpha="0.3"/>
+                    android:alpha="0.15"/>
             </com.google.android.material.card.MaterialCardView>
 
             <!-- Badge Icon -->
             <ImageView
                 android:id="@+id/ivBadge"
-                android:layout_width="56dp"
-                android:layout_height="56dp"
+                android:layout_width="60dp"
+                android:layout_height="60dp"
                 android:layout_gravity="center"
                 android:src="@drawable/ic_achievement_star"
                 android:contentDescription="Achievement Badge"
-                android:scaleType="fitCenter" />
+                android:scaleType="fitCenter"
+                android:elevation="3dp" />
 
             <!-- Emoji (Alternative) -->
             <TextView
@@ -56,8 +61,9 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
                 android:text="🏆"
-                android:textSize="48sp"
+                android:textSize="44sp"
                 android:gravity="center"
+                android:elevation="3dp"
                 android:visibility="gone" />
         </FrameLayout>
 
@@ -88,6 +94,35 @@
             android:ellipsize="end"
             android:lineSpacingExtra="2dp" />
 
+        <!-- Progress for Locked Achievements -->
+        <LinearLayout
+            android:id="@+id/progressContainer"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_marginTop="8dp"
+            android:visibility="gone">
+
+            <ProgressBar
+                android:id="@+id/achievementProgress"
+                style="@style/Widget.AppCompat.ProgressBar.Horizontal"
+                android:layout_width="match_parent"
+                android:layout_height="6dp"
+                android:progress="0"
+                android:max="100"
+                android:progressDrawable="@drawable/progress_bar_custom" />
+
+            <TextView
+                android:id="@+id/tvProgressText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_marginTop="2dp"
+                android:text="0/10"
+                android:textSize="10sp"
+                android:textColor="@color/textColorSecondary" />
+        </LinearLayout>
+
         <!-- Unlock Date Badge -->
         <com.google.android.material.card.MaterialCardView
             android:id="@+id/unlockDateCard"
@@ -117,4 +152,3 @@
     </LinearLayout>
 
 </com.google.android.material.card.MaterialCardView>
-

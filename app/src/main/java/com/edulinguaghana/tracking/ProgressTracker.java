@@ -13,6 +13,7 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import android.content.SharedPreferences;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -226,25 +227,51 @@ public class ProgressTracker {
                     StreakManager streakManager = new StreakManager(context);
                     int currentStreak = streakManager.getCurrentStreak();
                     int longestStreak = streakManager.getLongestStreak();
+                    int totalPracticeDays = streakManager.getTotalPracticeDays();
                     aggregate.setCurrentStreak(currentStreak);
                     aggregate.setLongestStreak(longestStreak);
+                    aggregate.setDaysActive(totalPracticeDays);
 
                     // From ProgressManager (local)
                     int totalQuizzes = com.edulinguaghana.ProgressManager.getTotalQuizzes(context);
                     int totalCorrect = com.edulinguaghana.ProgressManager.getTotalCorrect(context);
                     int highScore = com.edulinguaghana.ProgressManager.getHighScore(context);
                     int accuracy = com.edulinguaghana.ProgressManager.getAccuracy(context);
+                    
+                    // We need a way to get total questions from ProgressManager
+                    SharedPreferences p = context.getSharedPreferences("EduLinguaPrefs", Context.MODE_PRIVATE);
+                    int totalQuestions = p.getInt("TOTAL_QUESTIONS", totalQuizzes * 10);
 
                     aggregate.setTotalQuizzes(totalQuizzes);
                     aggregate.setTotalCorrectAnswers(totalCorrect);
-                    aggregate.setTotalQuestions(totalQuizzes * 10); // Assuming 10 questions per quiz
+                    aggregate.setTotalQuestions(totalQuestions);
                     aggregate.setHighestScore(highScore);
                     aggregate.setAccuracy(accuracy);
+
+                    // Quests and Badges
+                    java.util.List<com.edulinguaghana.gamification.Badge> badges = com.edulinguaghana.gamification.BadgeManager.getAllBadges(context);
+                    int unlockedBadges = 0;
+                    for (com.edulinguaghana.gamification.Badge b : badges) if (b.unlocked) unlockedBadges++;
+                    aggregate.setTotalBadges(unlockedBadges);
+                    
+                    java.util.List<com.edulinguaghana.gamification.Quest> quests = com.edulinguaghana.gamification.QuestManager.getDailyQuests(context);
+                    int completedQuests = 0;
+                    for (com.edulinguaghana.gamification.Quest q : quests) if (q.completed) completedQuests++;
+                    
+                    com.edulinguaghana.AchievementManager achievementManager = new com.edulinguaghana.AchievementManager(context);
+                    java.util.List<com.edulinguaghana.Achievement> achievements = achievementManager.getAllAchievements();
+                    aggregate.setTotalAchievements(achievementManager.getUnlockedCount());
 
                     aggregate.setLastUpdated(System.currentTimeMillis());
 
                     // Save back to Firebase
                     aggregatesRef.child(userId).setValue(aggregate);
+
+                    // Also save quests and badges separately for better syncing
+                    DatabaseReference userRef = FirebaseDatabase.getInstance().getReference("users").child(userId);
+                    userRef.child("badges").setValue(badges);
+                    userRef.child("quests").setValue(quests);
+                    userRef.child("achievements").setValue(achievements);
 
                 } catch (Exception e) {
                     Log.e(TAG, "Error updating aggregates", e);

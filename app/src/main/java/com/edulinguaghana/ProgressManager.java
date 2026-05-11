@@ -18,6 +18,9 @@ public class ProgressManager {
     private static final String KEY_TOTAL_CORRECT = "TOTAL_CORRECT";
     private static final String KEY_LANGUAGES_USED = "LANGUAGES_USED"; // Track distinct languages for language_explorer quest
 
+    // Accuracy mapping
+    private static final String KEY_TOTAL_QUESTIONS = "TOTAL_QUESTIONS";
+
     // Update global progress stats
     public static void updateProgress(Context context, String mode, int score, int correctCount) {
         updateProgress(context, mode, score, correctCount, 10); // Default 10 questions
@@ -31,6 +34,7 @@ public class ProgressManager {
         int prevHighScore = prefs.getInt(KEY_HIGH_SCORE, 0);
         int totalQuizzes = prefs.getInt(KEY_TOTAL_QUIZZES, 0);
         int totalCorrect = prefs.getInt(KEY_TOTAL_CORRECT, 0);
+        int totalQuestionsAcc = prefs.getInt(KEY_TOTAL_QUESTIONS, 0);
 
         // Update stats
         if (score > prevHighScore) {
@@ -40,6 +44,7 @@ public class ProgressManager {
 
         editor.putInt(KEY_TOTAL_QUIZZES, totalQuizzes + 1);
         editor.putInt(KEY_TOTAL_CORRECT, totalCorrect + correctCount);
+        editor.putInt(KEY_TOTAL_QUESTIONS, totalQuestionsAcc + totalQuestions);
         editor.apply();
 
         // --- Gamification: award XP and progress quests ---
@@ -162,11 +167,20 @@ public class ProgressManager {
     public static int getAccuracy(Context context) {
         SharedPreferences prefs = context.getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE);
         int correct = prefs.getInt(KEY_TOTAL_CORRECT, 0);
-        int quizzes = prefs.getInt(KEY_TOTAL_QUIZZES, 0);
-        int totalQuestions = quizzes * 10; // assuming 10 per quiz
+        int totalQuestions = prefs.getInt(KEY_TOTAL_QUESTIONS, 0);
 
         if (totalQuestions == 0) return 0;
         return (int) Math.round((correct * 100.0) / totalQuestions);
+    }
+
+    public static void saveAllProgress(Context context, int highScore, int totalQuizzes, int totalCorrect, int totalQuestions) {
+        SharedPreferences prefs = context.getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE);
+        prefs.edit()
+                .putInt(KEY_HIGH_SCORE, highScore)
+                .putInt(KEY_TOTAL_QUIZZES, totalQuizzes)
+                .putInt(KEY_TOTAL_CORRECT, totalCorrect)
+                .putInt(KEY_TOTAL_QUESTIONS, totalQuestions)
+                .apply();
     }
 
     // Clear progress (optional)
