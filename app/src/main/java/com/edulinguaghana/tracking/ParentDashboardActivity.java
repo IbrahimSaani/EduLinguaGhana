@@ -72,7 +72,6 @@ public class ParentDashboardActivity extends AppCompatActivity {
         initViews();
         setupRecyclerView();
         setupSwipeRefresh();
-        loadChildren();
     }
 
     private void initViews() {
@@ -263,7 +262,9 @@ public class ParentDashboardActivity extends AppCompatActivity {
                         studentName,
                         aggregate
                     );
-                    allChildren.add(item);
+                    if (shouldAddChild(studentId)) {
+                        allChildren.add(item);
+                    }
                     loadedCount[0]++;
 
                     if (loadedCount[0] == totalChildren) {
@@ -280,7 +281,9 @@ public class ParentDashboardActivity extends AppCompatActivity {
                         studentName,
                         new ProgressAggregate()
                     );
-                    allChildren.add(item);
+                    if (shouldAddChild(studentId)) {
+                        allChildren.add(item);
+                    }
                     loadedCount[0]++;
 
                     if (loadedCount[0] == totalChildren) {
@@ -319,6 +322,16 @@ public class ParentDashboardActivity extends AppCompatActivity {
         if (tvActiveToday != null) {
             tvActiveToday.setText(String.valueOf(activeToday));
         }
+    }
+
+    private boolean shouldAddChild(String studentId) {
+        if (studentId == null) return false;
+        for (StudentProgressItem child : allChildren) {
+            if (studentId.equals(child.getStudentId())) {
+                return false;
+            }
+        }
+        return true;
     }
 
     private void showRemoveChildDialog() {

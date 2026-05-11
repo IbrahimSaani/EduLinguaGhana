@@ -73,7 +73,6 @@ public class TeacherDashboardActivity extends AppCompatActivity {
         initViews();
         setupRecyclerView();
         setupSwipeRefresh();
-        loadStudents();
     }
 
     private void initViews() {
@@ -264,7 +263,9 @@ public class TeacherDashboardActivity extends AppCompatActivity {
                         studentName,
                         aggregate
                     );
-                    allStudents.add(item);
+                    if (shouldAddStudent(studentId)) {
+                        allStudents.add(item);
+                    }
                     loadedCount[0]++;
 
                     if (loadedCount[0] == totalStudents) {
@@ -281,7 +282,9 @@ public class TeacherDashboardActivity extends AppCompatActivity {
                         studentName,
                         new ProgressAggregate()
                     );
-                    allStudents.add(item);
+                    if (shouldAddStudent(studentId)) {
+                        allStudents.add(item);
+                    }
                     loadedCount[0]++;
 
                     if (loadedCount[0] == totalStudents) {
@@ -320,6 +323,16 @@ public class TeacherDashboardActivity extends AppCompatActivity {
         if (tvActiveToday != null) {
             tvActiveToday.setText(String.valueOf(activeToday));
         }
+    }
+
+    private boolean shouldAddStudent(String studentId) {
+        if (studentId == null) return false;
+        for (StudentProgressItem student : allStudents) {
+            if (studentId.equals(student.getStudentId())) {
+                return false;
+            }
+        }
+        return true;
     }
 
     private void showRemoveStudentDialog() {
