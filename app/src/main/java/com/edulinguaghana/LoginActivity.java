@@ -30,6 +30,9 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.ValueEventListener;
 
 import com.facebook.AccessToken;
 import com.facebook.CallbackManager;
@@ -201,15 +204,7 @@ public class LoginActivity extends AppCompatActivity {
                 .addOnCompleteListener(this, task -> {
                     if (task.isSuccessful()) {
                         FirebaseUser user = mAuth.getCurrentUser();
-                        // Save user to database for friend lookups
-                        saveUserToDatabase(user);
-                        // Restore progress from database
-                        restoreUserProgress(user);
-                        String name = (user != null && user.getDisplayName() != null) ? user.getDisplayName() : "Learner";
-                        Toast.makeText(LoginActivity.this,
-                                "Welcome " + name + "!",
-                                Toast.LENGTH_SHORT).show();
-                        navigateToMain();
+                        handleSocialLogin(user);
                     } else {
                         String message = (task.getException() != null) ? task.getException().getMessage() : "Unknown error";
                         Toast.makeText(LoginActivity.this,
@@ -319,20 +314,58 @@ public class LoginActivity extends AppCompatActivity {
                 .addOnCompleteListener(this, task -> {
                     if (task.isSuccessful()) {
                         FirebaseUser user = mAuth.getCurrentUser();
-                        // Save user to database for friend lookups
-                        saveUserToDatabase(user);
-                        // Restore progress from database
-                        restoreUserProgress(user);
-                        String name = (user != null && user.getDisplayName() != null) ? user.getDisplayName() : "Learner";
-                        Toast.makeText(LoginActivity.this, "Welcome " + name + "!",
-                                Toast.LENGTH_SHORT).show();
-                        navigateToMain();
+                        handleSocialLogin(user);
                     } else {
                         String message = (task.getException() != null) ? task.getException().getMessage() : "Unknown error";
                         Toast.makeText(LoginActivity.this, "Authentication failed: " + message,
                                 Toast.LENGTH_LONG).show();
                     }
                 });
+    }
+
+    private void handleSocialLogin(FirebaseUser user) {
+        if (user == null) {
+            Toast.makeText(this, "Could not load your account", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        DatabaseReference userRef = FirebaseDatabase.getInstance().getReference("users").child(user.getUid());
+        userRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot snapshot) {
+                if (hasCompleteLearnerProfile(snapshot)) {
+                    saveUserToDatabase(user);
+                    restoreUserProgress(user);
+                    String name = (user.getDisplayName() != null) ? user.getDisplayName() : "Learner";
+                    Toast.makeText(LoginActivity.this,
+                            "Welcome " + name + "!",
+                            Toast.LENGTH_SHORT).show();
+                    navigateToMain();
+                } else {
+                    launchProfileCompletion();
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError error) {
+                launchProfileCompletion();
+            }
+        });
+    }
+
+    private boolean hasCompleteLearnerProfile(DataSnapshot snapshot) {
+        return snapshot != null
+                && !TextUtils.isEmpty(snapshot.child("age").getValue(String.class))
+                && !TextUtils.isEmpty(snapshot.child("school").getValue(String.class))
+                && !TextUtils.isEmpty(snapshot.child("studentClass").getValue(String.class));
+    }
+
+    private void launchProfileCompletion() {
+        Intent intent = new Intent(this, CompleteProfileActivity.class);
+        intent.putExtra(CompleteProfileActivity.EXTRA_NEXT_STEP, CompleteProfileActivity.NEXT_STEP_MAIN);
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        startActivity(intent);
+        finish();
     }
 
     /**

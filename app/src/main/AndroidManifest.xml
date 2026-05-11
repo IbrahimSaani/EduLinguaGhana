@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<manifest xmlns:android="http://schemas.android.com/apk/res/android" xmlns:tools="http://schemas.android.com/tools">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
     <!--  Mic permission for pronunciation practice mode  -->
     <uses-permission android:name="android.permission.RECORD_AUDIO"/>
     <!--  Haptic feedback permission -->
@@ -32,8 +32,7 @@
 
         <activity
             android:name="com.facebook.FacebookActivity"
-            android:configChanges="keyboard|keyboardHidden|screenLayout|screenSize|orientation"
-            android:label="@string/app_name" />
+            android:configChanges="keyboard|keyboardHidden|screenLayout|screenSize|orientation" />
 
         <activity
             android:name="com.facebook.CustomTabActivity"
@@ -74,6 +73,8 @@
         <activity android:name=".LoginActivity" android:exported="false"/>
         <!--  SignUpActivity  -->
         <activity android:name=".SignUpActivity" android:exported="false"/>
+        <!--  CompleteProfileActivity  -->
+        <activity android:name=".CompleteProfileActivity" android:exported="false"/>
         <!--  RoleSelectionActivity  -->
         <activity android:name=".RoleSelectionActivity" android:exported="false"/>
         <!--  AccountManagementActivity  -->
@@ -84,8 +85,6 @@
         <activity android:name=".AnimatedAvatarDemoActivity" android:exported="false"/>
         <!--  ChallengesActivity  -->
         <activity android:name=".ChallengesActivity" android:exported="false"/>
-        <!--  LanguageLeaderboardActivity  -->
-        <activity android:name=".LanguageLeaderboardActivity" android:exported="false"/>
         <!--  TutorialActivity  -->
         <activity android:name=".TutorialActivity" android:exported="false"/>
 
@@ -114,9 +113,7 @@
         <!--  QR Code Scanner Activity  -->
         <activity
             android:name="com.journeyapps.barcodescanner.CaptureActivity"
-            android:screenOrientation="fullSensor"
-            android:exported="false"
-            tools:replace="screenOrientation" />
+            android:exported="false" />
 
         <!--  Firebase Cloud Messaging Service  -->
         <service

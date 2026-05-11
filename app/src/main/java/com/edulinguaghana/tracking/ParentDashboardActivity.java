@@ -3,6 +3,7 @@ package com.edulinguaghana.tracking;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.ArrayAdapter;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -20,6 +21,7 @@ import com.edulinguaghana.StyledMenuHelper;
 import com.edulinguaghana.roles.RoleManager;
 import com.edulinguaghana.roles.UserRelationship;
 import com.google.android.material.button.MaterialButton;
+import com.google.android.material.textfield.MaterialAutoCompleteTextView;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
@@ -40,6 +42,7 @@ public class ParentDashboardActivity extends AppCompatActivity {
     private SwipeRefreshLayout swipeRefresh;
     private LinearLayout emptyStateLayout;
     private MaterialButton btnSort;
+    private MaterialAutoCompleteTextView classFilterDropdown;
     private MaterialButton btnAddFirstChild;
     private MaterialButton btnAddChildBottom;
     private MaterialButton btnRemoveChild;
@@ -55,6 +58,20 @@ public class ParentDashboardActivity extends AppCompatActivity {
     private List<StudentProgressItem> allChildren = new ArrayList<>();
     private int currentSortOption = 0; // 0=Name, 1=Level, 2=Activity
     private int activeLoadToken = 0;
+
+    private static final String ALL_CLASSES_FILTER = "All Classes";
+    private static final String UNASSIGNED_CLASSES_FILTER = "Unassigned";
+    private final String[] classFilterOptions = {
+            ALL_CLASSES_FILTER,
+            "Class 1",
+            "Class 2",
+            "Class 3",
+            "Class 4",
+            "Class 5",
+            "Class 6",
+            UNASSIGNED_CLASSES_FILTER
+    };
+    private String selectedClassFilter = ALL_CLASSES_FILTER;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -91,6 +108,7 @@ public class ParentDashboardActivity extends AppCompatActivity {
         emptyStateLayout = findViewById(R.id.emptyStateLayout);
         swipeRefresh = findViewById(R.id.swipeRefresh);
         btnSort = findViewById(R.id.btnSort);
+        classFilterDropdown = findViewById(R.id.classFilterDropdown);
         btnAddFirstChild = findViewById(R.id.btnAddFirstChild);
         btnAddChildBottom = findViewById(R.id.btnAddChildBottom);
         btnRemoveChild = findViewById(R.id.btnRemoveChild);
@@ -116,6 +134,25 @@ public class ParentDashboardActivity extends AppCompatActivity {
         if (btnSort != null) {
             btnSort.setOnClickListener(v -> showSortDialog());
         }
+
+        setupClassFilter();
+    }
+
+    private void setupClassFilter() {
+        if (classFilterDropdown == null) return;
+
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(
+                this,
+                android.R.layout.simple_dropdown_item_1line,
+                classFilterOptions
+        );
+        classFilterDropdown.setAdapter(adapter);
+        classFilterDropdown.setText(selectedClassFilter, false);
+        classFilterDropdown.setOnClickListener(v -> classFilterDropdown.showDropDown());
+        classFilterDropdown.setOnItemClickListener((parent, view, position, id) -> {
+            selectedClassFilter = classFilterOptions[position];
+            renderChildren();
+        });
     }
 
     private void openRelationshipManagement() {
@@ -163,26 +200,7 @@ public class ParentDashboardActivity extends AppCompatActivity {
     }
 
     private void sortChildren() {
-        if (allChildren.isEmpty()) return;
-
-        switch (currentSortOption) {
-            case 0: // By Name
-                Collections.sort(allChildren, (a, b) ->
-                    a.getStudentName().compareToIgnoreCase(b.getStudentName()));
-                break;
-            case 1: // By Level
-                Collections.sort(allChildren, (a, b) ->
-                    Integer.compare(b.getProgress().getCurrentLevel(),
-                                  a.getProgress().getCurrentLevel()));
-                break;
-            case 2: // By Recent Activity
-                Collections.sort(allChildren, (a, b) ->
-                    Long.compare(b.getProgress().getLastUpdated(),
-                               a.getProgress().getLastUpdated()));
-                break;
-        }
-
-        adapter.updateStudents(allChildren);
+        renderChildren();
     }
 
     private void setupRecyclerView() {
@@ -225,9 +243,8 @@ public class ParentDashboardActivity extends AppCompatActivity {
                 }
 
                 if (relationships.isEmpty()) {
-                    emptyStateLayout.setVisibility(View.VISIBLE);
-                    childrenRecyclerView.setVisibility(View.GONE);
-                    updateStatistics(new ArrayList<>());
+                    allChildren.clear();
+                    renderChildren();
                 } else {
                     emptyStateLayout.setVisibility(View.GONE);
                     childrenRecyclerView.setVisibility(View.VISIBLE);
@@ -264,52 +281,167 @@ public class ParentDashboardActivity extends AppCompatActivity {
             String studentId = relationship.getStudentId();
             String studentName = relationship.getStudentName();
 
-            // Load progress for each child
-            progressTracker.getProgressAggregate(studentId, new ProgressTracker.ProgressAggregateCallback() {
+            roleManager.getUserStudentClass(studentId, new RoleManager.StringValueCallback() {
                 @Override
-                public void onAggregateRetrieved(ProgressAggregate aggregate) {
-                    if (loadToken != activeLoadToken) return;
-
-                    StudentProgressItem item = new StudentProgressItem(
-                        studentId,
-                        studentName,
-                        aggregate
-                    );
-                    loadedChildren.put(studentId, item);
-                    loadedCount[0]++;
-
-                    if (loadedCount[0] == totalChildren) {
-                        if (loadToken != activeLoadToken) return;
-                        allChildren.clear();
-                        allChildren.addAll(loadedChildren.values());
-                        sortChildren();
-                        updateStatistics(allChildren);
-                    }
+                public void onValueRetrieved(String studentClass) {
+                    loadChildProgressAggregate(studentId, studentName, studentClass, loadedChildren, loadedCount, totalChildren, loadToken);
                 }
 
                 @Override
                 public void onError(String error) {
-                    if (loadToken != activeLoadToken) return;
-
-                    // Add with empty progress
-                    StudentProgressItem item = new StudentProgressItem(
-                        studentId,
-                        studentName,
-                        new ProgressAggregate()
-                    );
-                    loadedChildren.put(studentId, item);
-                    loadedCount[0]++;
-
-                    if (loadedCount[0] == totalChildren) {
-                        if (loadToken != activeLoadToken) return;
-                        allChildren.clear();
-                        allChildren.addAll(loadedChildren.values());
-                        sortChildren();
-                        updateStatistics(allChildren);
-                    }
+                    loadChildProgressAggregate(studentId, studentName, "", loadedChildren, loadedCount, totalChildren, loadToken);
                 }
             });
         }
+    }
+
+    private void loadChildProgressAggregate(String studentId, String studentName, String studentClass,
+                                            LinkedHashMap<String, StudentProgressItem> loadedChildren,
+                                            int[] loadedCount, int totalChildren, int loadToken) {
+        progressTracker.getProgressAggregate(studentId, new ProgressTracker.ProgressAggregateCallback() {
+            @Override
+            public void onAggregateRetrieved(ProgressAggregate aggregate) {
+                if (loadToken != activeLoadToken) return;
+
+                StudentProgressItem item = new StudentProgressItem(
+                        studentId,
+                        studentName,
+                        aggregate,
+                        studentClass
+                );
+                loadedChildren.put(studentId, item);
+                loadedCount[0]++;
+
+                if (loadedCount[0] == totalChildren) {
+                    if (loadToken != activeLoadToken) return;
+                    allChildren.clear();
+                    allChildren.addAll(loadedChildren.values());
+                    renderChildren();
+                }
+            }
+
+            @Override
+            public void onError(String error) {
+                if (loadToken != activeLoadToken) return;
+
+                StudentProgressItem item = new StudentProgressItem(
+                        studentId,
+                        studentName,
+                        new ProgressAggregate(),
+                        studentClass
+                );
+                loadedChildren.put(studentId, item);
+                loadedCount[0]++;
+
+                if (loadedCount[0] == totalChildren) {
+                    if (loadToken != activeLoadToken) return;
+                    allChildren.clear();
+                    allChildren.addAll(loadedChildren.values());
+                    renderChildren();
+                }
+            }
+        });
+    }
+
+    private void renderChildren() {
+        List<StudentProgressItem> visibleChildren = new ArrayList<>();
+        for (StudentProgressItem child : allChildren) {
+            if (matchesSelectedClass(child.getStudentClass())) {
+                visibleChildren.add(child);
+            }
+        }
+
+        sortVisibleChildren(visibleChildren);
+        adapter.updateStudents(visibleChildren);
+        updateStatistics(visibleChildren);
+
+        if (visibleChildren.isEmpty()) {
+            emptyStateLayout.setVisibility(View.VISIBLE);
+            childrenRecyclerView.setVisibility(View.GONE);
+            if (emptyTextView != null) {
+                emptyTextView.setText(getEmptyStateMessage());
+            }
+        } else {
+            emptyStateLayout.setVisibility(View.GONE);
+            childrenRecyclerView.setVisibility(View.VISIBLE);
+        }
+    }
+
+    private boolean matchesSelectedClass(String studentClass) {
+        String normalizedClass = normalizeClassLabel(studentClass);
+
+        if (ALL_CLASSES_FILTER.equals(selectedClassFilter)) {
+            return true;
+        }
+
+        if (UNASSIGNED_CLASSES_FILTER.equals(selectedClassFilter)) {
+            return normalizedClass.isEmpty();
+        }
+
+        return selectedClassFilter.equalsIgnoreCase(normalizedClass);
+    }
+
+    private void sortVisibleChildren(List<StudentProgressItem> children) {
+        if (children.isEmpty()) return;
+
+        Collections.sort(children, (a, b) -> {
+            if (ALL_CLASSES_FILTER.equals(selectedClassFilter)) {
+                int classCompare = Integer.compare(
+                        getClassSortOrder(a.getStudentClass()),
+                        getClassSortOrder(b.getStudentClass())
+                );
+                if (classCompare != 0) {
+                    return classCompare;
+                }
+            }
+
+            switch (currentSortOption) {
+                case 0:
+                    String aName = a.getStudentName() != null ? a.getStudentName() : "";
+                    String bName = b.getStudentName() != null ? b.getStudentName() : "";
+                    return aName.compareToIgnoreCase(bName);
+                case 1:
+                    return Integer.compare(
+                            b.getProgress().getCurrentLevel(),
+                            a.getProgress().getCurrentLevel());
+                case 2:
+                    return Long.compare(
+                            b.getProgress().getLastUpdated(),
+                            a.getProgress().getLastUpdated());
+                default:
+                    return 0;
+            }
+        });
+    }
+
+    private int getClassSortOrder(String studentClass) {
+        String normalizedClass = normalizeClassLabel(studentClass);
+        switch (normalizedClass) {
+            case "Class 1": return 1;
+            case "Class 2": return 2;
+            case "Class 3": return 3;
+            case "Class 4": return 4;
+            case "Class 5": return 5;
+            case "Class 6": return 6;
+            case "": return 999;
+            default: return 998;
+        }
+    }
+
+    private String normalizeClassLabel(String studentClass) {
+        return studentClass == null ? "" : studentClass.trim();
+    }
+
+    private String getEmptyStateMessage() {
+        if (ALL_CLASSES_FILTER.equals(selectedClassFilter)) {
+            return "Connect with your children to track their learning progress.\n\nTap the + button below to get started.";
+        }
+
+        if (UNASSIGNED_CLASSES_FILTER.equals(selectedClassFilter)) {
+            return "No children without a class assignment were found.";
+        }
+
+        return "No children found in " + selectedClassFilter + ".";
     }
 
     private void updateStatistics(List<StudentProgressItem> children) {

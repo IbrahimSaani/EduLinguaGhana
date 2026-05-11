@@ -40,6 +40,11 @@ public class RoleManager {
         void onError(String error);
     }
 
+    public interface StringValueCallback {
+        void onValueRetrieved(String value);
+        void onError(String error);
+    }
+
     public RoleManager() {
         FirebaseDatabase database = FirebaseDatabase.getInstance();
         this.usersRef = database.getReference("users");
@@ -242,6 +247,29 @@ public class RoleManager {
                     callback.onError(error.getMessage());
                 }
             });
+    }
+
+    /**
+     * Fetch the class assigned to a user profile.
+     */
+    public void getUserStudentClass(String userId, StringValueCallback callback) {
+        if (userId == null) {
+            callback.onError("User ID is null");
+            return;
+        }
+
+        usersRef.child(userId).child("studentClass").addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot snapshot) {
+                String studentClass = snapshot.getValue(String.class);
+                callback.onValueRetrieved(studentClass != null ? studentClass.trim() : "");
+            }
+
+            @Override
+            public void onCancelled(DatabaseError error) {
+                callback.onError(error.getMessage());
+            }
+        });
     }
 
     /**

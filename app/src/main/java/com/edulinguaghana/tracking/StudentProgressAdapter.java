@@ -64,6 +64,7 @@ public class StudentProgressAdapter extends RecyclerView.Adapter<StudentProgress
         private TextView tvAccuracy;
         private TextView tvStreak;
         private TextView tvLastActive;
+        private TextView tvStudentClass;
         private View streakLayout;
         private View btnViewDetails;
         private View btnRemove;
@@ -78,6 +79,7 @@ public class StudentProgressAdapter extends RecyclerView.Adapter<StudentProgress
             tvAccuracy = itemView.findViewById(R.id.tvAccuracy);
             tvStreak = itemView.findViewById(R.id.tvStreak);
             tvLastActive = itemView.findViewById(R.id.tvLastActive);
+            tvStudentClass = itemView.findViewById(R.id.tvStudentClass);
             streakLayout = itemView.findViewById(R.id.streakLayout);
             btnViewDetails = itemView.findViewById(R.id.btnViewDetails);
             btnRemove = itemView.findViewById(R.id.btnRemove);
@@ -116,6 +118,13 @@ public class StudentProgressAdapter extends RecyclerView.Adapter<StudentProgress
                 }
             } else {
                 tvLastActive.setText("Not active yet");
+            }
+
+            if (tvStudentClass != null) {
+                String studentClass = item.getStudentClass();
+                tvStudentClass.setText("Class: " + (studentClass != null && !studentClass.trim().isEmpty()
+                        ? studentClass.trim()
+                        : "Not set"));
             }
 
             // Click listeners

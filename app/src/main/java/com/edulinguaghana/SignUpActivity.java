@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Patterns;
+import android.widget.ArrayAdapter;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -18,6 +19,7 @@ import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.common.api.ApiException;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.button.MaterialButton;
+import com.google.android.material.textfield.MaterialAutoCompleteTextView;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.firebase.auth.AuthCredential;
 import com.google.firebase.auth.FacebookAuthProvider;
@@ -25,8 +27,11 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.GoogleAuthProvider;
 import com.google.firebase.auth.UserProfileChangeRequest;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 import com.facebook.AccessToken;
 import com.facebook.CallbackManager;
@@ -43,9 +48,14 @@ public class SignUpActivity extends AppCompatActivity {
 
     private static final int RC_GOOGLE_SIGN_IN = 9002;
 
-    private TextInputEditText etName, etEmail, etPassword, etConfirmPassword;
+    private TextInputEditText etName, etAge, etSchool, etEmail, etPassword, etConfirmPassword;
+    private MaterialAutoCompleteTextView etStudentClass;
     private MaterialButton btnSignUp, btnGoogleSignUp, btnFacebookSignUp;
     private TextView tvLogin, tvSkip;
+
+    private final String[] basicClassOptions = {
+            "Class 1", "Class 2", "Class 3", "Class 4", "Class 5", "Class 6"
+    };
 
     private FirebaseAuth mAuth;
     private GoogleSignInClient mGoogleSignInClient;
@@ -70,6 +80,7 @@ public class SignUpActivity extends AppCompatActivity {
         mGoogleSignInClient = GoogleSignIn.getClient(this, gso);
 
         initViews();
+        setupStudentClassDropdown();
         setupListeners();
         animateViews();
     }
@@ -93,6 +104,9 @@ public class SignUpActivity extends AppCompatActivity {
 
     private void initViews() {
         etName = findViewById(R.id.etName);
+        etAge = findViewById(getResourceId("etAge"));
+        etSchool = findViewById(getResourceId("etSchool"));
+        etStudentClass = findViewById(getResourceId("etStudentClass"));
         etEmail = findViewById(R.id.etEmail);
         etPassword = findViewById(R.id.etPassword);
         etConfirmPassword = findViewById(R.id.etConfirmPassword);
@@ -101,6 +115,22 @@ public class SignUpActivity extends AppCompatActivity {
         btnFacebookSignUp = findViewById(R.id.btnFacebookSignUp);
         tvLogin = findViewById(R.id.tvLogin);
         tvSkip = findViewById(R.id.tvSkip);
+    }
+
+    private void setupStudentClassDropdown() {
+        if (etStudentClass == null) return;
+
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(
+                this,
+                android.R.layout.simple_dropdown_item_1line,
+                basicClassOptions
+        );
+        etStudentClass.setAdapter(adapter);
+        etStudentClass.setOnClickListener(v -> etStudentClass.showDropDown());
+    }
+
+    private int getResourceId(String name) {
+        return getResources().getIdentifier(name, "id", getPackageName());
     }
 
     private void setupListeners() {
@@ -120,11 +150,14 @@ public class SignUpActivity extends AppCompatActivity {
 
     private void signUpWithEmail() {
          String name = etName.getText().toString().trim();
+         String age = etAge.getText() != null ? etAge.getText().toString().trim() : "";
+         String school = etSchool.getText() != null ? etSchool.getText().toString().trim() : "";
+         String studentClass = etStudentClass.getText() != null ? etStudentClass.getText().toString().trim() : "";
          String email = etEmail.getText().toString().trim();
          String password = etPassword.getText().toString().trim();
          String confirmPassword = etConfirmPassword.getText().toString().trim();
 
-         if (!validateInput(name, email, password, confirmPassword)) {
+         if (!validateInput(name, age, school, studentClass, email, password, confirmPassword)) {
              return;
          }
 
@@ -158,7 +191,7 @@ public class SignUpActivity extends AppCompatActivity {
                                      .addOnCompleteListener(updateTask -> {
                                          if (updateTask.isSuccessful()) {
                                              // Save user to database for friend lookups
-                                             saveUserToDatabase(user);
+                                              saveUserToDatabase(user, age, school, studentClass);
                                              Toast.makeText(SignUpActivity.this,
                                                      "Account created successfully!",
                                                      Toast.LENGTH_SHORT).show();
@@ -244,12 +277,7 @@ public class SignUpActivity extends AppCompatActivity {
                 .addOnCompleteListener(this, task -> {
                     if (task.isSuccessful()) {
                         FirebaseUser user = mAuth.getCurrentUser();
-                        // Save user to database for friend lookups
-                        saveUserToDatabase(user);
-                        Toast.makeText(SignUpActivity.this,
-                                "Welcome " + user.getDisplayName() + "!",
-                                Toast.LENGTH_SHORT).show();
-                        navigateToMain();
+                        handleSocialSignUp(user);
                     } else {
                         Toast.makeText(SignUpActivity.this,
                                 "Facebook authentication failed: " + task.getException().getMessage(),
@@ -258,10 +286,38 @@ public class SignUpActivity extends AppCompatActivity {
                 });
     }
 
-    private boolean validateInput(String name, String email, String password, String confirmPassword) {
+    private boolean validateInput(String name, String age, String school, String studentClass,
+                                  String email, String password, String confirmPassword) {
         if (TextUtils.isEmpty(name)) {
             etName.setError("Name is required");
             etName.requestFocus();
+            return false;
+        }
+
+        if (!TextUtils.isEmpty(age)) {
+            try {
+                int parsedAge = Integer.parseInt(age);
+                if (parsedAge <= 0 || parsedAge > 25) {
+                    etAge.setError("Enter a valid age");
+                    etAge.requestFocus();
+                    return false;
+                }
+            } catch (NumberFormatException e) {
+                etAge.setError("Age must be a number");
+                etAge.requestFocus();
+                return false;
+            }
+        }
+
+        if (!TextUtils.isEmpty(school) && school.length() < 2) {
+            etSchool.setError("Enter a valid school name");
+            etSchool.requestFocus();
+            return false;
+        }
+
+        if (!TextUtils.isEmpty(studentClass) && studentClass.length() < 3) {
+            etStudentClass.setError("Select a class");
+            etStudentClass.requestFocus();
             return false;
         }
 
@@ -329,18 +385,56 @@ public class SignUpActivity extends AppCompatActivity {
                 .addOnCompleteListener(this, task -> {
                     if (task.isSuccessful()) {
                         FirebaseUser user = mAuth.getCurrentUser();
-                        // Save user to database for friend lookups
-                        saveUserToDatabase(user);
-                        Toast.makeText(SignUpActivity.this,
-                                "Welcome " + user.getDisplayName() + "!",
-                                Toast.LENGTH_SHORT).show();
-                        navigateToMain();
+                        handleSocialSignUp(user);
                     } else {
                         Toast.makeText(SignUpActivity.this,
                                 "Authentication failed: " + task.getException().getMessage(),
                                 Toast.LENGTH_LONG).show();
                     }
                 });
+    }
+
+    private void handleSocialSignUp(FirebaseUser user) {
+        if (user == null) {
+            Toast.makeText(this, "Could not load your account", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        DatabaseReference userRef = FirebaseDatabase.getInstance().getReference("users").child(user.getUid());
+        userRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot snapshot) {
+                if (hasCompleteLearnerProfile(snapshot)) {
+                    saveUserToDatabase(user);
+                    Toast.makeText(SignUpActivity.this,
+                            "Welcome " + user.getDisplayName() + "!",
+                            Toast.LENGTH_SHORT).show();
+                    navigateToMain();
+                } else {
+                    launchProfileCompletion();
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError error) {
+                launchProfileCompletion();
+            }
+        });
+    }
+
+    private boolean hasCompleteLearnerProfile(DataSnapshot snapshot) {
+        return snapshot != null
+                && !TextUtils.isEmpty(snapshot.child("age").getValue(String.class))
+                && !TextUtils.isEmpty(snapshot.child("school").getValue(String.class))
+                && !TextUtils.isEmpty(snapshot.child("studentClass").getValue(String.class));
+    }
+
+    private void launchProfileCompletion() {
+        Intent intent = new Intent(this, CompleteProfileActivity.class);
+        intent.putExtra(CompleteProfileActivity.EXTRA_NEXT_STEP, CompleteProfileActivity.NEXT_STEP_ROLE_SELECTION);
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        startActivity(intent);
+        finish();
     }
 
     /**
@@ -355,6 +449,23 @@ public class SignUpActivity extends AppCompatActivity {
         userProfile.put("email", user.getEmail());
         userProfile.put("displayName", user.getDisplayName());
         userProfile.put("username", user.getDisplayName() != null ? user.getDisplayName() : user.getEmail());
+        userProfile.put("lastLogin", System.currentTimeMillis());
+
+        usersRef.child(user.getUid()).updateChildren(userProfile);
+    }
+
+    private void saveUserToDatabase(FirebaseUser user, String age, String school, String studentClass) {
+        if (user == null) return;
+
+        DatabaseReference usersRef = FirebaseDatabase.getInstance().getReference("users");
+        Map<String, Object> userProfile = new HashMap<>();
+        userProfile.put("uid", user.getUid());
+        userProfile.put("email", user.getEmail());
+        userProfile.put("displayName", user.getDisplayName());
+        userProfile.put("username", user.getDisplayName() != null ? user.getDisplayName() : user.getEmail());
+        userProfile.put("age", age);
+        userProfile.put("school", school);
+        userProfile.put("studentClass", studentClass);
         userProfile.put("createdAt", System.currentTimeMillis());
         // Don't set role yet - let user choose in RoleSelectionActivity
 
@@ -373,6 +484,9 @@ public class SignUpActivity extends AppCompatActivity {
         userProfile.put("email", user.getEmail());
         userProfile.put("displayName", user.getDisplayName());
         userProfile.put("username", user.getDisplayName() != null ? user.getDisplayName() : user.getEmail());
+        userProfile.put("age", "");
+        userProfile.put("school", "");
+        userProfile.put("studentClass", "");
         userProfile.put("role", role.name());
         userProfile.put("createdAt", System.currentTimeMillis());
 

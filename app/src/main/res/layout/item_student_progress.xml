@@ -59,6 +59,16 @@
                     android:textSize="12sp"
                     android:textColor="@color/textColorSecondary"
                     android:layout_marginTop="2dp"/>
+
+                <TextView
+                    android:id="@+id/tvStudentClass"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Class: Not set"
+                    android:textSize="12sp"
+                    android:textStyle="bold"
+                    android:textColor="@color/colorPrimary"
+                    android:layout_marginTop="2dp"/>
             </LinearLayout>
 
             <!-- Level Badge -->

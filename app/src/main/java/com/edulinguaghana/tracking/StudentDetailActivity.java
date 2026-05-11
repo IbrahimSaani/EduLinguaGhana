@@ -36,6 +36,9 @@ public class StudentDetailActivity extends AppCompatActivity {
     private ProgressBar loadingProgress;
     private CardView statsCard;
     private TextView tvStudentName;
+    private TextView tvStudentAge;
+    private TextView tvStudentSchool;
+    private TextView tvStudentClass;
     private TextView tvLevel;
     private TextView tvTotalXP;
     private TextView tvCurrentStreak;
@@ -86,6 +89,9 @@ public class StudentDetailActivity extends AppCompatActivity {
         loadingProgress = findViewById(R.id.loadingProgress);
         statsCard = findViewById(R.id.statsCard);
         tvStudentName = findViewById(R.id.tvStudentName);
+        tvStudentAge = findViewById(R.id.tvStudentAge);
+        tvStudentSchool = findViewById(R.id.tvStudentSchool);
+        tvStudentClass = findViewById(R.id.tvStudentClass);
         tvLevel = findViewById(R.id.tvLevel);
         tvTotalXP = findViewById(R.id.tvTotalXP);
         tvCurrentStreak = findViewById(R.id.tvCurrentStreak);
@@ -115,8 +121,24 @@ public class StudentDetailActivity extends AppCompatActivity {
                         studentName = snapshot.child("email").getValue(String.class);
                     }
 
+                    String age = snapshot.child("age").getValue(String.class);
+                    String school = snapshot.child("school").getValue(String.class);
+                    String studentClass = snapshot.child("studentClass").getValue(String.class);
+
                     if (tvStudentName != null) {
                         tvStudentName.setText(studentName != null ? studentName : "Student");
+                    }
+
+                    if (tvStudentAge != null) {
+                        tvStudentAge.setText(!isEmptyValue(age) ? age : "Not set");
+                    }
+
+                    if (tvStudentSchool != null) {
+                        tvStudentSchool.setText(!isEmptyValue(school) ? school : "Not set");
+                    }
+
+                    if (tvStudentClass != null) {
+                        tvStudentClass.setText(!isEmptyValue(studentClass) ? studentClass : "Not set");
                     }
 
                     if (getSupportActionBar() != null) {
@@ -131,6 +153,10 @@ public class StudentDetailActivity extends AppCompatActivity {
                 tvStudentName.setText("Student");
             }
         });
+    }
+
+    private boolean isEmptyValue(String value) {
+        return value == null || value.trim().isEmpty() || "null".equalsIgnoreCase(value.trim());
     }
 
     private void loadProgressData() {

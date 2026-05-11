@@ -125,6 +125,32 @@
     <string name="student_detail_error_loading_progress">Error loading progress: %1$s</string>
     <string name="student_detail_permission_denied">Permission denied. Please ensure the teacher-student relationship is accepted.</string>
 
+    <!-- Profile Completion -->
+    <string name="complete_profile_title">Complete Your Profile</string>
+    <string name="complete_profile_subtitle">Tell us a little more so we can personalize your learning journey.</string>
+    <string name="complete_profile_section">Learner Profile</string>
+    <string name="complete_profile_name_label">Name</string>
+    <string name="complete_profile_email_label">Email</string>
+    <string name="complete_profile_age_hint">Age</string>
+    <string name="complete_profile_school_hint">School</string>
+    <string name="complete_profile_class_hint">Class</string>
+    <string name="complete_profile_continue">Continue</string>
+    <string name="complete_profile_saved">Profile saved successfully!</string>
+    <string name="complete_profile_missing_user">Unable to load your account. Please sign in again.</string>
+    <string name="complete_profile_required_age">Please enter your age.</string>
+    <string name="complete_profile_required_school">Please enter your school.</string>
+    <string name="complete_profile_required_class">Please select your class.</string>
+    <string name="complete_profile_save_failed">Failed to save profile: %1$s</string>
+
+    <string-array name="basic_class_options">
+        <item>Class 1</item>
+        <item>Class 2</item>
+        <item>Class 3</item>
+        <item>Class 4</item>
+        <item>Class 5</item>
+        <item>Class 6</item>
+    </string-array>
+
     <!-- Authentication -->
     <string name="default_web_client_id">340016497126-2k1gekp5ntr5vj5bmhe14265bb5h1897.apps.googleusercontent.com</string>
     <string name="facebook_app_id">1391797185678939</string>

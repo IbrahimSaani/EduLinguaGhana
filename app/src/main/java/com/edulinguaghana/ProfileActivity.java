@@ -189,6 +189,9 @@ public class ProfileActivity extends AppCompatActivity {
                     userProfile.put("email", user.getEmail());
                     userProfile.put("displayName", user.getDisplayName());
                     userProfile.put("username", user.getDisplayName() != null ? user.getDisplayName() : user.getEmail());
+                    userProfile.put("age", "");
+                    userProfile.put("school", "");
+                    userProfile.put("studentClass", "");
                     userProfile.put("createdAt", System.currentTimeMillis());
 
                     usersRef.child(user.getUid()).setValue(userProfile)
@@ -200,6 +203,23 @@ public class ProfileActivity extends AppCompatActivity {
                         });
                 } else {
                     android.util.Log.d("ProfileActivity", "User already exists in database: " + user.getUid());
+
+                    java.util.Map<String, Object> schemaUpdates = new java.util.HashMap<>();
+                    if (!snapshot.hasChild("age")) {
+                        schemaUpdates.put("age", "");
+                    }
+                    if (!snapshot.hasChild("school")) {
+                        schemaUpdates.put("school", "");
+                    }
+                    if (!snapshot.hasChild("studentClass")) {
+                        schemaUpdates.put("studentClass", "");
+                    }
+
+                    if (!schemaUpdates.isEmpty()) {
+                        usersRef.child(user.getUid()).updateChildren(schemaUpdates)
+                            .addOnSuccessListener(aVoid -> android.util.Log.d("ProfileActivity", "Learner profile fields synced"))
+                            .addOnFailureListener(e -> android.util.Log.e("ProfileActivity", "Failed to sync learner profile fields", e));
+                    }
                 }
             }
 
