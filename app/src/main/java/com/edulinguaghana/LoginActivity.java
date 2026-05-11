@@ -342,13 +342,20 @@ public class LoginActivity extends AppCompatActivity {
                             Toast.LENGTH_SHORT).show();
                     navigateToMain();
                 } else {
-                    launchProfileCompletion();
+                    saveUserToDatabase(user);
+                    restoreUserProgress(user);
+                    Toast.makeText(LoginActivity.this,
+                            "Welcome back! You can update age, school, and class in Manage Account.",
+                            Toast.LENGTH_LONG).show();
+                    navigateToMain();
                 }
             }
 
             @Override
             public void onCancelled(DatabaseError error) {
-                launchProfileCompletion();
+                saveUserToDatabase(user);
+                restoreUserProgress(user);
+                navigateToMain();
             }
         });
     }
@@ -360,13 +367,6 @@ public class LoginActivity extends AppCompatActivity {
                 && !TextUtils.isEmpty(snapshot.child("studentClass").getValue(String.class));
     }
 
-    private void launchProfileCompletion() {
-        Intent intent = new Intent(this, CompleteProfileActivity.class);
-        intent.putExtra(CompleteProfileActivity.EXTRA_NEXT_STEP, CompleteProfileActivity.NEXT_STEP_MAIN);
-        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-        startActivity(intent);
-        finish();
-    }
 
     /**
      * Save user profile to Firebase Realtime Database

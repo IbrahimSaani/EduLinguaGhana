@@ -111,6 +111,7 @@ public class ProfileActivity extends AppCompatActivity {
         setupListeners();
     }
 
+
     private void setupDynamicBackground() {
         if (dynamicBackground == null) return;
 
@@ -156,7 +157,6 @@ public class ProfileActivity extends AppCompatActivity {
         profileImage = findViewById(R.id.profileImage);
         avatarNotSignedIn = findViewById(R.id.avatarNotSignedIn);
         dynamicBackground = findViewById(R.id.dynamicBackground);
-
         // Gamification views
         tvLevel = findViewById(R.id.tv_level);
         pbXp = findViewById(R.id.pb_xp);
@@ -268,7 +268,7 @@ public class ProfileActivity extends AppCompatActivity {
 
             // Load user statistics from ProgressManager
             // Display streak (TODO: implement streak tracking)
-            tvProfileStreak.setText("0 days");
+            tvProfileStreak.setText(R.string.profile_streak_default);
 
             // Display total lessons (using total quizzes as proxy)
             int totalLessons = ProgressManager.getTotalQuizzes(this);
@@ -411,6 +411,7 @@ public class ProfileActivity extends AppCompatActivity {
                 startActivity(intent);
             });
         }
+
     }
 
     private void showLanguageSelectionDialog() {

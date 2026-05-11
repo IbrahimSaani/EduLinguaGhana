@@ -166,6 +166,16 @@
     <!-- Profile Screen -->
     <string name="profile_title">My Profile</string>
     <string name="profile_app_icon_desc">App Icon</string>
+    <string name="profile_learner_details_title">Learner Details</string>
+    <string name="profile_field_age">Age</string>
+    <string name="profile_field_school">School</string>
+    <string name="profile_field_class">Class</string>
+    <string name="profile_not_set">Not set</string>
+    <string name="profile_edit_learner_profile">Edit Learner Profile</string>
+
+    <string name="complete_profile_edit_title">Edit Your Profile</string>
+    <string name="complete_profile_edit_subtitle">Update your age, school, and class whenever they change.</string>
+    <string name="complete_profile_save_changes">Save Changes</string>
     <string name="profile_join_adventure">Join the Adventure!</string>
     <string name="profile_sign_in_message">Sign in to save your progress, earn cool badges, and see your custom avatar everywhere!</string>
     <string name="profile_sign_in_button">Let\'s Sign In! 🚀</string>

@@ -29,15 +29,18 @@ public class CompleteProfileActivity extends AppCompatActivity {
     public static final String EXTRA_NEXT_STEP = "next_step";
     public static final String NEXT_STEP_ROLE_SELECTION = "role_selection";
     public static final String NEXT_STEP_MAIN = "main";
+    public static final String NEXT_STEP_PROFILE = "profile";
 
     private TextInputEditText etAge, etSchool;
     private MaterialAutoCompleteTextView etStudentClass;
     private MaterialButton btnContinue;
     private android.widget.TextView tvDisplayName, tvEmail;
+    private android.widget.TextView tvTitle, tvSubtitle;
 
     private FirebaseUser currentUser;
     private RoleManager roleManager;
     private String[] classOptions;
+    private boolean editMode;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -53,8 +56,10 @@ public class CompleteProfileActivity extends AppCompatActivity {
         }
 
         roleManager = new RoleManager();
+        editMode = NEXT_STEP_PROFILE.equals(getIntent().getStringExtra(EXTRA_NEXT_STEP));
         classOptions = getResources().getStringArray(R.array.basic_class_options);
         initViews();
+        configureModeUi();
         setupClassDropdown();
         bindUserInfo();
         loadExistingProfileValues();
@@ -68,6 +73,20 @@ public class CompleteProfileActivity extends AppCompatActivity {
         btnContinue = findViewById(R.id.btnContinue);
         tvDisplayName = findViewById(R.id.tvDisplayName);
         tvEmail = findViewById(R.id.tvEmail);
+        tvTitle = findViewById(R.id.tvTitle);
+        tvSubtitle = findViewById(R.id.tvSubtitle);
+    }
+
+    private void configureModeUi() {
+        if (tvTitle != null && editMode) {
+            tvTitle.setText(R.string.complete_profile_edit_title);
+        }
+        if (tvSubtitle != null && editMode) {
+            tvSubtitle.setText(R.string.complete_profile_edit_subtitle);
+        }
+        if (btnContinue != null && editMode) {
+            btnContinue.setText(R.string.complete_profile_save_changes);
+        }
     }
 
     private void setupClassDropdown() {
@@ -196,6 +215,12 @@ public class CompleteProfileActivity extends AppCompatActivity {
 
     private void routeAfterCompletion() {
         String nextStep = getIntent().getStringExtra(EXTRA_NEXT_STEP);
+        if (NEXT_STEP_PROFILE.equals(nextStep)) {
+            setResult(RESULT_OK);
+            finish();
+            return;
+        }
+
         if (NEXT_STEP_ROLE_SELECTION.equals(nextStep)) {
             Intent intent = new Intent(this, RoleSelectionActivity.class);
             intent.putExtra("first_time", true);
