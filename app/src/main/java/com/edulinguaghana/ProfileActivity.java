@@ -656,7 +656,6 @@ public class ProfileActivity extends AppCompatActivity {
             input,
             "Search",
             "Cancel",
-            "Show All Users",
             () -> {
                 String target = input.getText() != null ? input.getText().toString().trim() : "";
                 if (target.isEmpty()) {
@@ -671,8 +670,7 @@ public class ProfileActivity extends AppCompatActivity {
                 // Validate user exists before sending request
                 validateAndAddFriendById(currentUserId, target);
             },
-            null,
-            this::showAllUsersInDatabase
+            null
         );
     }
 
@@ -807,14 +805,16 @@ public class ProfileActivity extends AppCompatActivity {
                     String friendEmail = email != null ? email : "Unknown";
 
                     // Show confirmation dialog
-                    new AlertDialog.Builder(ProfileActivity.this)
-                        .setTitle("✅ QR Code Scanned!")
-                        .setMessage("Add " + friendName + " as friend?\n\nEmail: " + friendEmail)
-                        .setPositiveButton("Add Friend", (dialog, which) -> {
-                            sendFriendRequest(currentUserId, scannedUserId, friendName);
-                        })
-                        .setNegativeButton("Cancel", null)
-                        .show();
+                    StyledMenuHelper.showStyledConfirmationDialog(
+                        ProfileActivity.this,
+                        "✅",
+                        "QR Code Scanned!",
+                        "Add " + friendName + " as friend?\n\nEmail: " + friendEmail,
+                        "Add Friend",
+                        "Cancel",
+                        () -> sendFriendRequest(currentUserId, scannedUserId, friendName),
+                        null
+                    );
                 }
 
                 @Override
@@ -860,18 +860,22 @@ public class ProfileActivity extends AppCompatActivity {
         qrImageView.setPadding(40, 40, 40, 40);
 
         // Show in dialog
-        new AlertDialog.Builder(this)
-            .setTitle("📱 My Friend Code")
-            .setMessage("Show this QR code to friends so they can add you!")
-            .setView(qrImageView)
-            .setPositiveButton("Close", null)
-            .setNeutralButton("Share ID", (dialog, which) -> {
+        StyledMenuHelper.showStyledCustomDialog(
+            this,
+            "📱",
+            "My Friend Code",
+            "Show this QR code to friends so they can add you!",
+            qrImageView,
+            "Share ID",
+            "Close",
+            () -> {
                 android.content.ClipboardManager clipboard = (android.content.ClipboardManager) getSystemService(CLIPBOARD_SERVICE);
                 android.content.ClipData clip = android.content.ClipData.newPlainText("User ID", currentUserId);
                 clipboard.setPrimaryClip(clip);
                 Toast.makeText(this, "User ID copied!", Toast.LENGTH_SHORT).show();
-            })
-            .show();
+            },
+            null
+        );
     }
 
     private void showFriendSuggestions(String currentUserId) {
@@ -886,30 +890,39 @@ public class ProfileActivity extends AppCompatActivity {
                 progressDialog.dismiss();
 
                 if (suggestions.isEmpty()) {
-                    new AlertDialog.Builder(ProfileActivity.this)
-                        .setTitle("No Suggestions")
-                        .setMessage("No friend suggestions available right now.\n\nTry again after more users join the app!")
-                        .setPositiveButton("OK", null)
-                        .show();
+                    StyledMenuHelper.showStyledConfirmationDialog(
+                        ProfileActivity.this,
+                        "💡",
+                        "No Suggestions",
+                        "No friend suggestions available right now.\n\nTry again after more users join the app!",
+                        "OK",
+                        null,
+                        null,
+                        null
+                    );
                     return;
                 }
 
-                String[] suggestionItems = new String[suggestions.size()];
-                for (int i = 0; i < suggestions.size(); i++) {
-                    FriendSuggestionEngine.UserSuggestion suggestion = suggestions.get(i);
+                java.util.List<StyledMenuHelper.MenuItem> menuItems = new java.util.ArrayList<>();
+                for (FriendSuggestionEngine.UserSuggestion suggestion : suggestions) {
                     String commonText = suggestion.commonInterests.isEmpty() ? "" :
-                        " • " + String.join(", ", suggestion.commonInterests);
-                    suggestionItems[i] = "💡 " + suggestion.username + " (Match: " + suggestion.matchScore + "%)" + commonText;
+                        "\n" + String.join(", ", suggestion.commonInterests);
+                    menuItems.add(new StyledMenuHelper.MenuItem(
+                        "💡",
+                        suggestion.username,
+                        "Match: " + suggestion.matchScore + "%" + commonText,
+                        () -> showAddFriendConfirmation(currentUserId, suggestion.userId, suggestion.username, suggestion.email)
+                    ));
                 }
 
-                new AlertDialog.Builder(ProfileActivity.this)
-                    .setTitle("Friend Suggestions")
-                    .setItems(suggestionItems, (dialog, which) -> {
-                        FriendSuggestionEngine.UserSuggestion selected = suggestions.get(which);
-                        showAddFriendConfirmation(currentUserId, selected.userId, selected.username, selected.email);
-                    })
-                    .setNegativeButton("Close", null)
-                    .show();
+                StyledMenuHelper.showStyledMenu(
+                    ProfileActivity.this,
+                    "💡",
+                    "Friend Suggestions",
+                    "Select a friend to add",
+                    menuItems,
+                    null
+                );
             }
 
             @Override
@@ -930,55 +943,59 @@ public class ProfileActivity extends AppCompatActivity {
             return;
         }
 
-        // Combine all history into one list with labels
-        java.util.List<String> allHistory = new java.util.ArrayList<>();
-        java.util.List<String> allHistoryValues = new java.util.ArrayList<>();
-        java.util.List<String> allHistoryTypes = new java.util.ArrayList<>();
+        // Combine all history into menu items
+        java.util.List<StyledMenuHelper.MenuItem> menuItems = new java.util.ArrayList<>();
 
         for (String email : emailHistory) {
-            allHistory.add("📧 " + email);
-            allHistoryValues.add(email);
-            allHistoryTypes.add("email");
+            menuItems.add(new StyledMenuHelper.MenuItem(
+                "📧",
+                email,
+                "Search again",
+                () -> searchUserByEmail(email, currentUserId)
+            ));
         }
 
         for (String username : usernameHistory) {
-            allHistory.add("👤 " + username);
-            allHistoryValues.add(username);
-            allHistoryTypes.add("username");
+            menuItems.add(new StyledMenuHelper.MenuItem(
+                "👤",
+                username,
+                "Search again",
+                () -> searchUserByUsername(username, currentUserId)
+            ));
         }
 
         for (String uid : uidHistory) {
-            allHistory.add("🆔 " + uid.substring(0, Math.min(20, uid.length())) + "...");
-            allHistoryValues.add(uid);
-            allHistoryTypes.add("uid");
+            String truncatedUid = uid.substring(0, Math.min(20, uid.length())) + "...";
+            menuItems.add(new StyledMenuHelper.MenuItem(
+                "🆔",
+                truncatedUid,
+                "Search again",
+                () -> validateAndAddFriendById(currentUserId, uid)
+            ));
         }
 
-        String[] historyItems = allHistory.toArray(new String[0]);
-
-        new AlertDialog.Builder(this)
-            .setTitle("Recent Searches")
-            .setItems(historyItems, (dialog, which) -> {
-                String value = allHistoryValues.get(which);
-                String type = allHistoryTypes.get(which);
-
-                switch (type) {
-                    case "email":
-                        searchUserByEmail(value, currentUserId);
-                        break;
-                    case "username":
-                        searchUserByUsername(value, currentUserId);
-                        break;
-                    case "uid":
-                        validateAndAddFriendById(currentUserId, value);
-                        break;
-                }
-            })
-            .setNeutralButton("Clear History", (dialog, which) -> {
-                searchHistory.clearAll();
-                Toast.makeText(this, "Search history cleared", Toast.LENGTH_SHORT).show();
-            })
-            .setNegativeButton("Close", null)
-            .show();
+        StyledMenuHelper.showStyledMenu(
+            this,
+            "📜",
+            "Search History",
+            "Tap to search again or swipe to clear",
+            menuItems,
+            () -> {
+                StyledMenuHelper.showStyledConfirmationDialog(
+                    this,
+                    "🗑️",
+                    "Clear History?",
+                    "Are you sure you want to clear all search history?",
+                    "Clear",
+                    "Cancel",
+                    () -> {
+                        searchHistory.clearAll();
+                        Toast.makeText(this, "Search history cleared", Toast.LENGTH_SHORT).show();
+                    },
+                    null
+                );
+            }
+        );
     }
 
     private void showAllUsersInDatabase() {
@@ -1026,11 +1043,17 @@ public class ProfileActivity extends AppCompatActivity {
                 textView.setTextSize(12);
                 scrollView.addView(textView);
 
-                new android.app.AlertDialog.Builder(ProfileActivity.this)
-                    .setTitle("All Users in Database")
-                    .setView(scrollView)
-                    .setPositiveButton("OK", null)
-                    .show();
+                StyledMenuHelper.showStyledCustomDialog(
+                    ProfileActivity.this,
+                    "👥",
+                    "All Users in Database",
+                    "View all registered users",
+                    scrollView,
+                    "OK",
+                    "Cancel",
+                    null,
+                    null
+                );
             }
 
             @Override
@@ -1058,18 +1081,21 @@ public class ProfileActivity extends AppCompatActivity {
                     android.util.Log.e("ProfileActivity", "User not found in database: " + targetUserId);
 
                     // Show more helpful error message
-                    new AlertDialog.Builder(ProfileActivity.this)
-                        .setTitle("User Not Found")
-                        .setMessage("The user with ID:\n" + targetUserId +
-                                  "\n\ndoes not exist in the database.\n\n" +
-                                  "Possible reasons:\n" +
-                                  "• The user hasn't signed up yet\n" +
-                                  "• The user ID is incorrect\n" +
-                                  "• The user signed up but their data wasn't saved\n\n" +
-                                  "Tip: Use the 'Show All Users' button to see available users.")
-                        .setPositiveButton("OK", null)
-                        .setNeutralButton("Show All Users", (d, w) -> showAllUsersInDatabase())
-                        .show();
+                    StyledMenuHelper.showStyledConfirmationDialog(
+                        ProfileActivity.this,
+                        "🔍",
+                        "User Not Found",
+                        "The user with ID:\n" + targetUserId +
+                              "\n\ndoes not exist in the database.\n\n" +
+                              "Possible reasons:\n" +
+                              "• The user hasn't signed up yet\n" +
+                              "• The user ID is incorrect\n" +
+                              "• The user signed up but their data wasn't saved",
+                        "Show All Users",
+                        "OK",
+                        () -> showAllUsersInDatabase(),
+                        null
+                    );
                     return;
                 }
 
@@ -1116,17 +1142,20 @@ public class ProfileActivity extends AppCompatActivity {
                         android.util.Log.e("ProfileActivity", "No user found with email: " + email);
 
                         // Show more helpful error message
-                        new AlertDialog.Builder(ProfileActivity.this)
-                            .setTitle("User Not Found")
-                            .setMessage("No user found with email:\n" + email +
-                                      "\n\nPossible reasons:\n" +
-                                      "• The user hasn't signed up yet\n" +
-                                      "• The email address is incorrect\n" +
-                                      "• The email is not indexed in database\n\n" +
-                                      "Tip: Use the 'Show All Users' button to see available users.")
-                            .setPositiveButton("OK", null)
-                            .setNeutralButton("Show All Users", (d, w) -> showAllUsersInDatabase())
-                            .show();
+                        StyledMenuHelper.showStyledConfirmationDialog(
+                            ProfileActivity.this,
+                            "🔍",
+                            "User Not Found",
+                            "No user found with email:\n" + email +
+                                  "\n\nPossible reasons:\n" +
+                                  "• The user hasn't signed up yet\n" +
+                                  "• The email address is incorrect\n" +
+                                  "• The email is not indexed in database",
+                            "Show All Users",
+                            "OK",
+                            () -> showAllUsersInDatabase(),
+                            null
+                        );
                         return;
                     }
 
@@ -1170,14 +1199,16 @@ public class ProfileActivity extends AppCompatActivity {
                         "Name: " + (displayName != null ? displayName : "Unknown") + "\n" +
                         "Email: " + email;
 
-        new AlertDialog.Builder(this)
-            .setTitle("Confirm Friend Request")
-            .setMessage(message)
-            .setPositiveButton("Send Request", (dialog, which) -> {
-                performSendFriendRequest(currentUserId, targetUserId);
-            })
-            .setNegativeButton("Cancel", null)
-            .show();
+        StyledMenuHelper.showStyledConfirmationDialog(
+            this,
+            "➕",
+            "Add Friend",
+            message,
+            "Send Request",
+            "Cancel",
+            () -> performSendFriendRequest(currentUserId, targetUserId),
+            null
+        );
     }
 
     // Helper: show dialog to choose a user to challenge
@@ -1568,22 +1599,35 @@ public class ProfileActivity extends AppCompatActivity {
     }
 
     private void showRemoveFriendConfirmation(Friend friend, String currentUserId) {
-        new AlertDialog.Builder(this)
-            .setTitle("Remove Friend?")
-            .setMessage("Are you sure you want to remove " + friend.friendUserId + " from your friends?")
-            .setPositiveButton("Remove", (dialog, which) -> {
+        StyledMenuHelper.showStyledConfirmationDialog(
+            this,
+            "❌",
+            "Remove Friend",
+            "Are you sure you want to remove " + friend.friendUserId + " from your friends?",
+            "Remove",
+            "Cancel",
+            () -> {
                 SocialRepository repo = SocialProvider.get();
                 if (repo != null) {
                     try {
                         repo.removeFriend(currentUserId, friend.friendUserId);
-                        Toast.makeText(this, "Friend removed", Toast.LENGTH_SHORT).show();
+                        StyledMenuHelper.showStyledConfirmationDialog(
+                            this,
+                            "✅",
+                            "Friend Removed",
+                            friend.friendUserId + " has been removed from your friends.",
+                            "OK",
+                            null,
+                            () -> showFriendsList(currentUserId),
+                            null
+                        );
                     } catch (Exception ex) {
                         Toast.makeText(this, "Failed to remove friend", Toast.LENGTH_SHORT).show();
                     }
                 }
-            })
-            .setNegativeButton("Cancel", null)
-            .show();
+            },
+            null
+        );
     }
 
     private void showFriendRequests(String userId) {
@@ -1653,14 +1697,16 @@ public class ProfileActivity extends AppCompatActivity {
     }
 
     private void showAcceptAllConfirmation(java.util.List<Friend> requests) {
-        new AlertDialog.Builder(this)
-            .setTitle("Accept All Friend Requests?")
-            .setMessage("Accept all " + requests.size() + " pending friend requests?")
-            .setPositiveButton("Accept All", (dialog, which) -> {
-                acceptAllFriendRequests(requests);
-            })
-            .setNegativeButton("Cancel", null)
-            .show();
+        StyledMenuHelper.showStyledConfirmationDialog(
+            this,
+            "✅",
+            "Accept All Requests?",
+            "Accept all " + requests.size() + " pending friend requests?",
+            "Accept All",
+            "Cancel",
+            () -> acceptAllFriendRequests(requests),
+            null
+        );
     }
 
     private void acceptAllFriendRequests(java.util.List<Friend> requests) {
@@ -1713,10 +1759,13 @@ public class ProfileActivity extends AppCompatActivity {
 
 
     private void showAcceptRejectDialog(Friend request) {
-        new AlertDialog.Builder(this)
-            .setTitle("Friend Request")
-            .setMessage("Accept friend request from " + request.userId + "?")
-            .setPositiveButton("Accept", (dialog, which) -> {
+        java.util.List<StyledMenuHelper.MenuItem> menuItems = new java.util.ArrayList<>();
+
+        menuItems.add(new StyledMenuHelper.MenuItem(
+            "✅",
+            "Accept",
+            "Add this person as a friend",
+            () -> {
                 SocialRepository repo = SocialProvider.get();
                 if (repo != null) {
                     try {
@@ -1724,14 +1773,29 @@ public class ProfileActivity extends AppCompatActivity {
                         String currentUserId = currentUser != null ? currentUser.getUid() : null;
                         if (currentUserId != null) {
                             repo.acceptFriend(currentUserId, request.userId);
-                            Toast.makeText(this, "Friend request accepted!", Toast.LENGTH_SHORT).show();
+                            StyledMenuHelper.showStyledConfirmationDialog(
+                                this,
+                                "✅",
+                                "Success!",
+                                "Friend request from " + request.userId + " accepted!",
+                                "OK",
+                                null,
+                                () -> showFriendRequests(currentUserId),
+                                null
+                            );
                         }
                     } catch (Exception ex) {
                         Toast.makeText(this, "Failed to accept request", Toast.LENGTH_SHORT).show();
                     }
                 }
-            })
-            .setNegativeButton("Reject", (dialog, which) -> {
+            }
+        ));
+
+        menuItems.add(new StyledMenuHelper.MenuItem(
+            "❌",
+            "Reject",
+            "Decline this friend request",
+            () -> {
                 SocialRepository repo = SocialProvider.get();
                 if (repo != null) {
                     try {
@@ -1739,15 +1803,32 @@ public class ProfileActivity extends AppCompatActivity {
                         String currentUserId = currentUser != null ? currentUser.getUid() : null;
                         if (currentUserId != null) {
                             repo.removeFriend(currentUserId, request.userId);
-                            Toast.makeText(this, "Friend request rejected", Toast.LENGTH_SHORT).show();
+                            StyledMenuHelper.showStyledConfirmationDialog(
+                                this,
+                                "❌",
+                                "Request Rejected",
+                                "Friend request from " + request.userId + " has been rejected.",
+                                "OK",
+                                null,
+                                () -> showFriendRequests(currentUserId),
+                                null
+                            );
                         }
                     } catch (Exception ex) {
                         Toast.makeText(this, "Failed to reject request", Toast.LENGTH_SHORT).show();
                     }
                 }
-            })
-            .setNeutralButton("Cancel", null)
-            .show();
+            }
+        ));
+
+        StyledMenuHelper.showStyledMenu(
+            this,
+            "📬",
+            "Friend Request",
+            "From: " + request.userId,
+            menuItems,
+            null
+        );
     }
 
     private void showChallengesMenu(String userId) {
