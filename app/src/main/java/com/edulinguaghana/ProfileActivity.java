@@ -1223,10 +1223,14 @@ public class ProfileActivity extends AppCompatActivity {
             new com.edulinguaghana.social.ChallengeManager.ChallengeCreationCallback() {
                 @Override
                 public void onSuccess(com.edulinguaghana.social.Challenge challenge) {
-                    Toast.makeText(ProfileActivity.this,
-                        "⚔️ Challenge sent to " + toUserId + "!\n" +
-                        "Language: " + language + " | Quiz: " + quizType + " | Time: " + durationMinutes + " min",
-                        Toast.LENGTH_LONG).show();
+                    new AlertDialog.Builder(ProfileActivity.this)
+                        .setTitle("⚔️ Challenge Created!")
+                        .setMessage("Challenge sent to " + toUserId + ".\nWould you like to play your part now?")
+                        .setPositiveButton("Play Now", (dialog, which) -> {
+                            acceptChallengeAndStartQuiz(challenge);
+                        })
+                        .setNegativeButton("Later", null)
+                        .show();
                 }
 
                 @Override
@@ -1718,22 +1722,29 @@ public class ProfileActivity extends AppCompatActivity {
 
         menuItems.add(new StyledMenuHelper.MenuItem(
             "⚔️",
-            "Pending Challenges",
-            "View and accept challenges",
+            "Active Challenges",
+            "Challenges waiting for you to play",
             () -> showChallenges(userId)
+        ));
+
+        menuItems.add(new StyledMenuHelper.MenuItem(
+            "⏳",
+            "Waiting for Opponent",
+            "Challenges you've finished, waiting for others",
+            () -> showWaitingChallenges(userId)
         ));
 
         menuItems.add(new StyledMenuHelper.MenuItem(
             "🏆",
             "Completed Challenges",
-            "See your challenge history",
+            "Finished challenges with final results",
             () -> showCompletedChallenges(userId)
         ));
 
         menuItems.add(new StyledMenuHelper.MenuItem(
             "🎯",
             "Create Challenge",
-            "Challenge a friend",
+            "Start a new challenge with a friend",
             () -> presentChallengeDialog(userId)
         ));
 
@@ -1747,48 +1758,106 @@ public class ProfileActivity extends AppCompatActivity {
         );
     }
 
-    private void showChallenges(String userId) {
-        SocialRepository repo = SocialProvider.get();
-        if (repo == null) {
-            Toast.makeText(this, "Social features unavailable", Toast.LENGTH_SHORT).show();
-            return;
+    private void showWaitingChallenges(String userId) {
+        com.google.firebase.database.DatabaseReference challengesRef =
+            com.google.firebase.database.FirebaseDatabase.getInstance().getReference("challenges");
+
+        challengesRef.addListenerForSingleValueEvent(new com.google.firebase.database.ValueEventListener() {
+            @Override
+            public void onDataChange(com.google.firebase.database.DataSnapshot snapshot) {
+                java.util.List<com.edulinguaghana.social.Challenge> waitingChallenges = new java.util.ArrayList<>();
+                for (com.google.firebase.database.DataSnapshot child : snapshot.getChildren()) {
+                    com.edulinguaghana.social.Challenge challenge = child.getValue(com.edulinguaghana.social.Challenge.class);
+                    if (challenge != null && (challenge.state == com.edulinguaghana.social.Challenge.State.PENDING || 
+                        challenge.state == com.edulinguaghana.social.Challenge.State.ONGOING)) {
+                        
+                        boolean isChallenger = userId.equals(challenge.challengerId);
+                        boolean isChallenged = userId.equals(challenge.challengedId);
+                        
+                        // User has played, but state is not COMPLETED yet
+                        if ((isChallenger && challenge.challengerScore != null) || 
+                            (isChallenged && challenge.challengedScore != null)) {
+                            waitingChallenges.add(challenge);
+                        }
+                    }
+                }
+
+                if (waitingChallenges.isEmpty()) {
+                    Toast.makeText(ProfileActivity.this, "No challenges waiting for opponent", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+
+                showWaitingChallengesDialog(waitingChallenges, userId);
+            }
+
+            @Override
+            public void onCancelled(com.google.firebase.database.DatabaseError error) {
+                Toast.makeText(ProfileActivity.this, "Failed to load challenges", Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    private void showWaitingChallengesDialog(java.util.List<com.edulinguaghana.social.Challenge> challenges, String userId) {
+        String[] challengeItems = new String[challenges.size()];
+        for (int i = 0; i < challenges.size(); i++) {
+            com.edulinguaghana.social.Challenge challenge = challenges.get(i);
+            String otherId = userId.equals(challenge.challengerId) ? challenge.challengedId : challenge.challengerId;
+            challengeItems[i] = "⏳ Waiting for: " + otherId;
         }
 
+        new AlertDialog.Builder(this)
+            .setTitle("Waiting for Opponent")
+            .setItems(challengeItems, null)
+            .setNegativeButton("Close", null)
+            .show();
+    }
+
+    private void showChallenges(String userId) {
         // Use Firebase listener to get challenges
         com.google.firebase.database.DatabaseReference challengesRef =
             com.google.firebase.database.FirebaseDatabase.getInstance().getReference("challenges");
 
-        challengesRef.orderByChild("challengedId").equalTo(userId)
-            .addListenerForSingleValueEvent(new com.google.firebase.database.ValueEventListener() {
-                @Override
-                public void onDataChange(com.google.firebase.database.DataSnapshot snapshot) {
-                    java.util.List<com.edulinguaghana.social.Challenge> pendingChallenges = new java.util.ArrayList<>();
-                    for (com.google.firebase.database.DataSnapshot child : snapshot.getChildren()) {
-                        com.edulinguaghana.social.Challenge challenge = child.getValue(com.edulinguaghana.social.Challenge.class);
-                        if (challenge != null && challenge.state == com.edulinguaghana.social.Challenge.State.PENDING) {
-                            pendingChallenges.add(challenge);
+        // Fetch all challenges where user is a participant
+        challengesRef.addListenerForSingleValueEvent(new com.google.firebase.database.ValueEventListener() {
+            @Override
+            public void onDataChange(com.google.firebase.database.DataSnapshot snapshot) {
+                java.util.List<com.edulinguaghana.social.Challenge> activeChallenges = new java.util.ArrayList<>();
+                for (com.google.firebase.database.DataSnapshot child : snapshot.getChildren()) {
+                    com.edulinguaghana.social.Challenge challenge = child.getValue(com.edulinguaghana.social.Challenge.class);
+                    if (challenge != null && (challenge.state == com.edulinguaghana.social.Challenge.State.PENDING || 
+                        challenge.state == com.edulinguaghana.social.Challenge.State.ONGOING)) {
+                        
+                        // Check if user is participant AND hasn't finished their part
+                        boolean isChallenger = userId.equals(challenge.challengerId);
+                        boolean isChallenged = userId.equals(challenge.challengedId);
+                        
+                        if (isChallenger && challenge.challengerScore == null) {
+                            activeChallenges.add(challenge);
+                        } else if (isChallenged && challenge.challengedScore == null) {
+                            activeChallenges.add(challenge);
                         }
                     }
-
-                    if (pendingChallenges.isEmpty()) {
-                        Toast.makeText(ProfileActivity.this, "No pending challenges", Toast.LENGTH_SHORT).show();
-                        return;
-                    }
-
-                    // Fetch usernames for challenges
-                    fetchUsernamesForChallenges(pendingChallenges);
                 }
 
-                @Override
-                public void onCancelled(com.google.firebase.database.DatabaseError error) {
-                    Toast.makeText(ProfileActivity.this, "Failed to load challenges", Toast.LENGTH_SHORT).show();
+                if (activeChallenges.isEmpty()) {
+                    Toast.makeText(ProfileActivity.this, "No pending challenges", Toast.LENGTH_SHORT).show();
+                    return;
                 }
-            });
+
+                // Fetch names for challenges
+                fetchUsernamesForChallenges(activeChallenges, userId);
+            }
+
+            @Override
+            public void onCancelled(com.google.firebase.database.DatabaseError error) {
+                Toast.makeText(ProfileActivity.this, "Failed to load challenges", Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 
-    private void fetchUsernamesForChallenges(java.util.List<com.edulinguaghana.social.Challenge> challenges) {
+    private void fetchUsernamesForChallenges(java.util.List<com.edulinguaghana.social.Challenge> challenges, String userId) {
         if (challenges.isEmpty()) {
-            showChallengesDialog(challenges);
+            showChallengesDialog(challenges, userId);
             return;
         }
 
@@ -1799,34 +1868,42 @@ public class ProfileActivity extends AppCompatActivity {
         final int totalCount = challenges.size();
 
         for (com.edulinguaghana.social.Challenge challenge : challenges) {
-            usersRef.child(challenge.challengerId).addListenerForSingleValueEvent(
+            String otherUserId = userId.equals(challenge.challengerId) ? challenge.challengedId : challenge.challengerId;
+            
+            usersRef.child(otherUserId).addListenerForSingleValueEvent(
                 new com.google.firebase.database.ValueEventListener() {
                     @Override
                     public void onDataChange(com.google.firebase.database.DataSnapshot snapshot) {
+                        String name;
                         if (snapshot.exists()) {
                             String displayName = snapshot.child("displayName").getValue(String.class);
                             if (displayName != null && !displayName.isEmpty()) {
-                                challenge.challengerName = displayName;
+                                name = displayName;
                             } else {
                                 String email = snapshot.child("email").getValue(String.class);
-                                challenge.challengerName = email != null ? email : challenge.challengerId;
+                                name = email != null ? email : otherUserId;
                             }
                         } else {
-                            challenge.challengerName = challenge.challengerId;
+                            name = otherUserId;
+                        }
+                        
+                        if (userId.equals(challenge.challengerId)) {
+                            challenge.challengedName = name;
+                        } else {
+                            challenge.challengerName = name;
                         }
 
                         fetchedCount[0]++;
                         if (fetchedCount[0] == totalCount) {
-                            showChallengesDialog(challenges);
+                            showChallengesDialog(challenges, userId);
                         }
                     }
 
                     @Override
                     public void onCancelled(com.google.firebase.database.DatabaseError error) {
-                        challenge.challengerName = challenge.challengerId;
                         fetchedCount[0]++;
                         if (fetchedCount[0] == totalCount) {
-                            showChallengesDialog(challenges);
+                            showChallengesDialog(challenges, userId);
                         }
                     }
                 }
@@ -1834,33 +1911,60 @@ public class ProfileActivity extends AppCompatActivity {
         }
     }
 
-    private void showChallengesDialog(java.util.List<com.edulinguaghana.social.Challenge> challenges) {
+    private void showChallengesDialog(java.util.List<com.edulinguaghana.social.Challenge> challenges, String userId) {
         String[] challengeItems = new String[challenges.size()];
         for (int i = 0; i < challenges.size(); i++) {
             com.edulinguaghana.social.Challenge challenge = challenges.get(i);
-            String displayName = challenge.challengerName != null && !challenge.challengerName.isEmpty()
-                ? challenge.challengerName
-                : challenge.challengerId;
-            challengeItems[i] = "⚔️ Challenge from: " + displayName;
+            if (userId.equals(challenge.challengerId)) {
+                challengeItems[i] = "⚔️ Against: " + (challenge.challengedName != null ? challenge.challengedName : challenge.challengedId);
+            } else {
+                challengeItems[i] = "⚔️ From: " + (challenge.challengerName != null ? challenge.challengerName : challenge.challengerId);
+            }
         }
 
         new AlertDialog.Builder(this)
-            .setTitle("Challenges (" + challenges.size() + ")")
+            .setTitle("Active Challenges (" + challenges.size() + ")")
             .setItems(challengeItems, (dialog, which) -> {
                 com.edulinguaghana.social.Challenge selectedChallenge = challenges.get(which);
-                showChallengeDetailsDialog(selectedChallenge);
+                showChallengeDetailsDialog(selectedChallenge, userId);
             })
             .setNegativeButton("Close", null)
             .show();
     }
 
-    private void showCompletedChallenges(String userId) {
-        SocialRepository repo = SocialProvider.get();
-        if (repo == null) {
-            Toast.makeText(this, "Social features unavailable", Toast.LENGTH_SHORT).show();
-            return;
-        }
+    private void showChallengeDetailsDialog(com.edulinguaghana.social.Challenge challenge, String userId) {
+        boolean isChallenged = userId.equals(challenge.challengedId);
+        String otherPerson = isChallenged ? 
+            (challenge.challengerName != null ? challenge.challengerName : "Opponent") : 
+            (challenge.challengedName != null ? challenge.challengedName : "Opponent");
+            
+        String message = (isChallenged ? "From: " : "To: ") + otherPerson + "\n" +
+                        "Language: " + getLanguageNameFromCode(challenge.language) + "\n" +
+                        "Quiz: " + challenge.quizType + "\n" +
+                        "Time: " + challenge.durationMinutes + " min\n\n" +
+                        "Start the quiz now?";
 
+        new AlertDialog.Builder(this)
+            .setTitle("⚔️ Challenge Details")
+            .setMessage(message)
+            .setPositiveButton("Start Quiz", (dialog, which) -> {
+                acceptChallengeAndStartQuiz(challenge);
+            })
+            .setNegativeButton(isChallenged ? "Decline" : "Cancel", (dialog, which) -> {
+                declineChallenge(challenge);
+            })
+            .setNeutralButton("Later", null)
+            .show();
+    }
+
+    private void declineChallenge(com.edulinguaghana.social.Challenge challenge) {
+        com.edulinguaghana.social.ChallengeManager manager = new com.edulinguaghana.social.ChallengeManager();
+        manager.declineChallenge(challenge.id, () -> {
+            runOnUiThread(() -> Toast.makeText(ProfileActivity.this, "Challenge cancelled", Toast.LENGTH_SHORT).show());
+        });
+    }
+
+    private void showCompletedChallenges(String userId) {
         // Use Firebase listener to get completed challenges
         com.google.firebase.database.DatabaseReference challengesRef =
             com.google.firebase.database.FirebaseDatabase.getInstance().getReference("challenges");
@@ -1901,9 +2005,8 @@ public class ProfileActivity extends AppCompatActivity {
             com.edulinguaghana.social.Challenge challenge = challenges.get(i);
 
             // Get scores
-            Integer myScore = challenge.results.get(userId);
-            String opponentId = userId.equals(challenge.challengerId) ? challenge.challengedId : challenge.challengerId;
-            Integer opponentScore = challenge.results.get(opponentId);
+            Integer myScore = userId.equals(challenge.challengerId) ? challenge.challengerScore : challenge.challengedScore;
+            Integer opponentScore = userId.equals(challenge.challengerId) ? challenge.challengedScore : challenge.challengerScore;
 
             String result;
             if (myScore != null && opponentScore != null) {
@@ -1916,7 +2019,7 @@ public class ProfileActivity extends AppCompatActivity {
                 }
                 challengeItems[i] = result + " - You: " + myScore + " vs " + opponentScore;
             } else {
-                challengeItems[i] = "Waiting for results...";
+                challengeItems[i] = "Result processing...";
             }
         }
 
@@ -1931,9 +2034,8 @@ public class ProfileActivity extends AppCompatActivity {
     }
 
     private void showChallengeResultDetails(com.edulinguaghana.social.Challenge challenge, String userId) {
-        Integer myScore = challenge.results.get(userId);
-        String opponentId = userId.equals(challenge.challengerId) ? challenge.challengedId : challenge.challengerId;
-        Integer opponentScore = challenge.results.get(opponentId);
+        Integer myScore = userId.equals(challenge.challengerId) ? challenge.challengerScore : challenge.challengedScore;
+        Integer opponentScore = userId.equals(challenge.challengerId) ? challenge.challengedScore : challenge.challengerScore;
 
         String result;
         String emoji;
@@ -1955,32 +2057,14 @@ public class ProfileActivity extends AppCompatActivity {
 
         String message = emoji + " " + result + "\n\n" +
                         "Your Score: " + (myScore != null ? myScore : "N/A") + "\n" +
-                        "Opponent: " + opponentId + "\n" +
-                        "Their Score: " + (opponentScore != null ? opponentScore : "N/A") + "\n" +
-                        "Quiz: " + challenge.quizId;
+                        "Opponent Score: " + (opponentScore != null ? opponentScore : "N/A") + "\n" +
+                        "Language: " + getLanguageNameFromCode(challenge.language) + "\n" +
+                        "Quiz: " + challenge.quizType;
 
         new AlertDialog.Builder(this)
             .setTitle("Challenge Result")
             .setMessage(message)
             .setPositiveButton("OK", null)
-            .show();
-    }
-
-    private void showChallengeDetailsDialog(com.edulinguaghana.social.Challenge challenge) {
-        String message = "Challenger: " + challenge.challengerId + "\n" +
-                        "Quiz: " + challenge.quizId + "\n\n" +
-                        "Accept this challenge and start the quiz?";
-
-        new AlertDialog.Builder(this)
-            .setTitle("⚔️ Challenge Details")
-            .setMessage(message)
-            .setPositiveButton("Accept & Start", (dialog, which) -> {
-                acceptChallengeAndStartQuiz(challenge);
-            })
-            .setNegativeButton("Decline", (dialog, which) -> {
-                declineChallenge(challenge);
-            })
-            .setNeutralButton("Later", null)
             .show();
     }
 
@@ -1994,10 +2078,11 @@ public class ProfileActivity extends AppCompatActivity {
 
                 // Launch quiz with challenge info
                 Intent intent = new Intent(ProfileActivity.this, QuizActivity.class);
-                intent.putExtra("LANG_CODE", "tw"); // Default to Twi for now
-                intent.putExtra("LANG_NAME", "Twi");
-                intent.putExtra("QUIZ_TYPE", challenge.quizId);
+                intent.putExtra("LANG_CODE", challenge.language);
+                intent.putExtra("LANG_NAME", getLanguageNameFromCode(challenge.language));
+                intent.putExtra("QUIZ_TYPE", challenge.quizType);
                 intent.putExtra("CHALLENGE_ID", challenge.id);
+                intent.putExtra("CHALLENGE_DURATION", challenge.durationMinutes);
                 intent.putExtra("CHALLENGE_MODE", true);
                 startActivity(intent);
 
@@ -2008,16 +2093,15 @@ public class ProfileActivity extends AppCompatActivity {
         }
     }
 
-    private void declineChallenge(com.edulinguaghana.social.Challenge challenge) {
-        SocialRepository repo = SocialProvider.get();
-        if (repo != null) {
-            try {
-                challenge.state = com.edulinguaghana.social.Challenge.State.CANCELLED;
-                repo.updateChallenge(challenge);
-                Toast.makeText(this, "Challenge declined", Toast.LENGTH_SHORT).show();
-            } catch (Exception ex) {
-                Toast.makeText(this, "Failed to decline challenge", Toast.LENGTH_SHORT).show();
-            }
+    private String getLanguageNameFromCode(String code) {
+        if (code == null) return "Unknown";
+        switch (code) {
+            case "en": return "English";
+            case "fr": return "French";
+            case "ak": return "Twi";
+            case "ee": return "Ewe";
+            case "gaa": return "Ga";
+            default: return "Unknown";
         }
     }
 

@@ -486,7 +486,15 @@ public class QuizActivity extends AppCompatActivity {
 
     private void startGame() {
         score = 0;
-        remainingTime = 30000L;
+        
+        // Use challenge duration if available, else default to 30 seconds
+        if (isChallengeMode) {
+            long durationSeconds = getIntent().getLongExtra("CHALLENGE_DURATION", 60);
+            remainingTime = durationSeconds * 1000;
+        } else {
+            remainingTime = 30000L;
+        }
+
         if (tvGameScore != null) {
             tvGameScore.setText(String.format(Locale.getDefault(), getString(R.string.quiz_score), score));
         }
@@ -1015,62 +1023,28 @@ public class QuizActivity extends AppCompatActivity {
     }
 
     private void saveChallengeResult() {
-        com.edulinguaghana.social.SocialRepository repo = com.edulinguaghana.social.SocialProvider.get();
-        if (repo == null) return;
-
-        try {
-            // Get current user ID
-            com.google.firebase.auth.FirebaseUser currentUser = com.google.firebase.auth.FirebaseAuth.getInstance().getCurrentUser();
-            if (currentUser == null) return;
-
-            String userId = currentUser.getUid();
-
-            // Get the challenge from Firebase
-            com.google.firebase.database.DatabaseReference challengeRef =
-                com.google.firebase.database.FirebaseDatabase.getInstance()
-                    .getReference("challenges").child(challengeId);
-
-            challengeRef.addListenerForSingleValueEvent(new com.google.firebase.database.ValueEventListener() {
-                @Override
-                public void onDataChange(com.google.firebase.database.DataSnapshot snapshot) {
-                    com.edulinguaghana.social.Challenge challenge = snapshot.getValue(com.edulinguaghana.social.Challenge.class);
-                    if (challenge != null) {
-                        // Save the score
-                        if (challenge.results == null) {
-                            challenge.results = new java.util.HashMap<>();
-                        }
-                        challenge.results.put(userId, score);
-
-                        // Check if both players have completed
-                        if (challenge.results.size() >= 2) {
-                            challenge.state = com.edulinguaghana.social.Challenge.State.COMPLETED;
-                        }
-
-                        // Update challenge
-                        challengeRef.setValue(challenge);
-
-                        // Show result
-                        runOnUiThread(() -> {
-                            Toast.makeText(QuizActivity.this,
-                                "Challenge score saved: " + score + " points! ⚔️",
-                                Toast.LENGTH_LONG).show();
-                        });
+        com.edulinguaghana.social.ChallengeManager challengeManager = new com.edulinguaghana.social.ChallengeManager();
+        com.google.firebase.auth.FirebaseUser user = com.google.firebase.auth.FirebaseAuth.getInstance().getCurrentUser();
+        
+        if (user == null) return;
+        
+        challengeManager.recordScore(challengeId, user.getUid(), score, new com.edulinguaghana.social.ChallengeManager.ScoreRecordingCallback() {
+            @Override
+            public void onSuccess(com.edulinguaghana.social.Challenge challenge) {
+                runOnUiThread(() -> {
+                    String msg = "Challenge score saved: " + score + " points! ⚔️";
+                    if (challenge.state == com.edulinguaghana.social.Challenge.State.COMPLETED) {
+                        msg = "Challenge COMPLETED! Final score: " + score;
                     }
-                }
+                    Toast.makeText(QuizActivity.this, msg, Toast.LENGTH_LONG).show();
+                });
+            }
 
-                @Override
-                public void onCancelled(com.google.firebase.database.DatabaseError error) {
-                    runOnUiThread(() -> {
-                        Toast.makeText(QuizActivity.this,
-                            "Failed to save challenge result",
-                            Toast.LENGTH_SHORT).show();
-                    });
-                }
-            });
-
-        } catch (Exception ex) {
-            Toast.makeText(this, "Error saving challenge result", Toast.LENGTH_SHORT).show();
-        }
+            @Override
+            public void onFailure(String error) {
+                runOnUiThread(() -> Toast.makeText(QuizActivity.this, "Failed to save challenge score: " + error, Toast.LENGTH_SHORT).show());
+            }
+        });
     }
 
     /**

@@ -41,26 +41,26 @@ public class ChallengeCreationDialog {
         Spinner durationSpinner = dialogView.findViewById(R.id.spinnerDuration);
 
         // Setup language spinner
-        String[] languages = {"Twi", "Ewe", "Ga"};
+        String[] languages = {"English", "French", "Twi", "Ewe", "Ga"};
         ArrayAdapter<String> languageAdapter = new ArrayAdapter<>(context,
             android.R.layout.simple_spinner_item, languages);
         languageAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         languageSpinner.setAdapter(languageAdapter);
 
         // Setup quiz type spinner
-        String[] quizTypes = {"Vocabulary", "Grammar", "Phrases", "Numbers"};
+        String[] quizTypes = {"Letter Quiz", "Number Sequencing", "Matching", "Mixed Mode"};
         ArrayAdapter<String> quizAdapter = new ArrayAdapter<>(context,
             android.R.layout.simple_spinner_item, quizTypes);
         quizAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         quizTypeSpinner.setAdapter(quizAdapter);
 
         // Setup duration spinner
-        String[] durations = {"5 minutes", "10 minutes", "15 minutes", "20 minutes", "30 minutes"};
+        String[] durations = {"30 seconds", "1 minute", "2 minutes", "3 minutes", "5 minutes"};
         ArrayAdapter<String> durationAdapter = new ArrayAdapter<>(context,
             android.R.layout.simple_spinner_item, durations);
         durationAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         durationSpinner.setAdapter(durationAdapter);
-        durationSpinner.setSelection(1);  // Default to 10 minutes
+        durationSpinner.setSelection(1);  // Default to 1 minute
 
         StyledMenuHelper.showStyledCustomDialog(
             context,
@@ -85,31 +85,35 @@ public class ChallengeCreationDialog {
 
     private String getLanguageCode(String languageName) {
         switch (languageName) {
+            case "English":
+                return "en";
+            case "French":
+                return "fr";
             case "Twi":
-                return "tw";
+                return "ak";
             case "Ewe":
                 return "ee";
             case "Ga":
-                return "ga";
+                return "gaa";
             default:
-                return "tw";
+                return "ak";
         }
     }
 
     private Long parseDuration(String durationText) {
         switch (durationText) {
+            case "30 seconds":
+                return 30L; // Interpreted as seconds
+            case "1 minute":
+                return 60L;
+            case "2 minutes":
+                return 120L;
+            case "3 minutes":
+                return 180L;
             case "5 minutes":
-                return 5L;
-            case "10 minutes":
-                return 10L;
-            case "15 minutes":
-                return 15L;
-            case "20 minutes":
-                return 20L;
-            case "30 minutes":
-                return 30L;
+                return 300L;
             default:
-                return 10L;
+                return 60L;
         }
     }
 }

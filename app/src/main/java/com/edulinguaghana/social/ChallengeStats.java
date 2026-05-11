@@ -8,6 +8,7 @@ public class ChallengeStats {
     public int challengesWon;
     public int challengesLost;
     public int challengesTied;
+    public int challengesDeclined;
     public int totalChallenges;
     public double winRate;
     public long lastChallengeTime;
@@ -16,6 +17,7 @@ public class ChallengeStats {
         this.challengesWon = 0;
         this.challengesLost = 0;
         this.challengesTied = 0;
+        this.challengesDeclined = 0;
         this.totalChallenges = 0;
         this.winRate = 0.0;
         this.lastChallengeTime = 0;
@@ -46,8 +48,12 @@ public class ChallengeStats {
 
         // Calculate win rate
         if (totalChallenges > 0) {
-            winRate = (double) challengesWon / totalChallenges;
+            winRate = (double) challengesWon / (totalChallenges);
         }
+    }
+
+    public void recordDecline() {
+        challengesDeclined++;
     }
 
     public String getFormattedWinRate() {

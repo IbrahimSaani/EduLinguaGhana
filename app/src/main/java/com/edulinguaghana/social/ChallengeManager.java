@@ -38,10 +38,10 @@ public class ChallengeManager {
             challenge.challengedId = challengedId;
             challenge.language = language;
             challenge.quizType = quizType;
-            challenge.durationMinutes = durationMinutes != null ? durationMinutes : 10L;
+            challenge.durationMinutes = durationMinutes != null ? durationMinutes : 60L; // Use as seconds internally now
             challenge.state = Challenge.State.PENDING;
             challenge.createdAt = System.currentTimeMillis();
-            challenge.expiresAt = challenge.createdAt + (challenge.durationMinutes * 60 * 1000);
+            challenge.expiresAt = challenge.createdAt + (challenge.durationMinutes * 1000);
             challenge.quizId = generateQuizId(quizType);
 
             // Save to Firebase
@@ -267,8 +267,51 @@ public class ChallengeManager {
     }
 
     /**
-     * Fetches completed challenges for a user
+     * Declines a challenge
      */
+    public void declineChallenge(String challengeId, Runnable onComplete) {
+        dbRef.child(CHALLENGES_PATH).child(challengeId)
+            .addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(DataSnapshot snapshot) {
+                    Challenge challenge = snapshot.getValue(Challenge.class);
+                    if (challenge != null) {
+                        challenge.state = Challenge.State.CANCELLED;
+                        dbRef.child(CHALLENGES_PATH).child(challengeId).setValue(challenge);
+                        
+                        // Increment decline count for the challenged player
+                        incrementDeclineCount(challenge.challengedId, onComplete);
+                    } else if (onComplete != null) {
+                        onComplete.run();
+                    }
+                }
+
+                @Override
+                public void onCancelled(DatabaseError error) {
+                    if (onComplete != null) onComplete.run();
+                }
+            });
+    }
+
+    private void incrementDeclineCount(String userId, Runnable onComplete) {
+        dbRef.child(CHALLENGE_STATS_PATH).child(userId)
+            .addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(DataSnapshot snapshot) {
+                    ChallengeStats stats = snapshot.exists() ? snapshot.getValue(ChallengeStats.class) : new ChallengeStats(userId);
+                    if (stats != null) {
+                        stats.recordDecline();
+                        dbRef.child(CHALLENGE_STATS_PATH).child(userId).setValue(stats);
+                    }
+                    if (onComplete != null) onComplete.run();
+                }
+
+                @Override
+                public void onCancelled(DatabaseError error) {
+                    if (onComplete != null) onComplete.run();
+                }
+            });
+    }
     public void getCompletedChallenges(String userId, ChallengesCallback callback) {
         dbRef.child(CHALLENGES_PATH)
             .orderByChild("state")
