@@ -128,8 +128,6 @@ public class RelationshipManagementActivity extends AppCompatActivity {
 
             String label = role == UserRole.TEACHER ? "Add Student" : "Add Child";
             btnAddStudent.setText(label);
-            etStudentEmail.setHint(role == UserRole.TEACHER ?
-                "Enter student's email or code" : "Enter child's email or code");
         } else {
             // Students show their code for teachers/parents to use
             addStudentSection.setVisibility(View.GONE);
