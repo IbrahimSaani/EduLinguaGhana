@@ -86,7 +86,7 @@
         android:id="@+id/challenges_view_pager"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="@color/appBackground"
+        android:background="@android:color/transparent"
         app:layout_behavior="@string/appbar_scrolling_view_behavior" />
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

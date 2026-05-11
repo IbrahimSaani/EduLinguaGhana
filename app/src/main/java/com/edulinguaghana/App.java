@@ -1,6 +1,7 @@
 package com.edulinguaghana;
 
 import android.app.Application;
+import android.util.Log;
 
 import com.facebook.FacebookSdk;
 import com.facebook.appevents.AppEventsLogger;
@@ -12,9 +13,13 @@ import com.edulinguaghana.social.SocialProvider;
 import com.edulinguaghana.social.FCMTokenManager;
 
 public class App extends Application {
+    private static final String TAG = "App";
+
     @Override
     public void onCreate() {
         super.onCreate();
+        TimeBasedBackgroundManager.register(this);
+
         // Initialize Firebase (no-op if already initialized by google-services)
         try {
             FirebaseApp.initializeApp(this);
@@ -35,7 +40,7 @@ public class App extends Application {
             SocialProvider.init(repo);
         } catch (Exception e) {
             // Fall back to null provider; existing code should handle null
-            e.printStackTrace();
+            Log.e(TAG, "Failed to initialize SocialProvider", e);
         }
 
         // Initialize FCM token
@@ -43,7 +48,7 @@ public class App extends Application {
             FCMTokenManager fcmTokenManager = new FCMTokenManager(this);
             fcmTokenManager.initializeFCMToken();
         } catch (Exception e) {
-            e.printStackTrace();
+            Log.e(TAG, "Failed to initialize FCM token", e);
         }
     }
 }
