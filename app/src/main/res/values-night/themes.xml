@@ -15,6 +15,7 @@
         <item name="colorOnSurface">@color/textColorPrimary</item>
         <!-- Status bar color. -->
         <item name="android:statusBarColor">@color/colorPrimaryDark</item>
+        <item name="android:windowLightStatusBar">false</item>
         <item name="android:navigationBarColor">@color/appBackground</item>
         <!-- Disable fullscreen mode - ensure status bar is always visible -->
         <item name="android:windowFullscreen">false</item>

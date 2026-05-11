@@ -539,34 +539,35 @@
                                 tools:text="One Hundred" />
                         </LinearLayout>
 
-                        <!-- Speak button - Enhanced -->
-                        <com.google.android.material.button.MaterialButton
-                            android:id="@+id/btnSpeakNumber"
-                            style="@style/Widget.Material3.Button"
-                            android:layout_width="wrap_content"
-                            android:layout_height="68dp"
-                            android:minWidth="240dp"
-                            android:paddingStart="36dp"
-                            android:paddingEnd="36dp"
-                            android:text="@string/speak_button"
-                            android:textSize="18sp"
-                            android:textStyle="bold"
-                            android:maxLines="1"
-                            android:singleLine="true"
-                            android:ellipsize="end"
-                            android:hyphenationFrequency="none"
-                            app:cornerRadius="34dp"
-                            app:elevation="10dp"
-                            app:icon="@drawable/ic_speak"
-                            app:iconSize="28dp"
-                            app:iconGravity="start"
-                            app:iconPadding="16dp" />
+                          <!-- Speak button - Enhanced -->
+                           <com.google.android.material.button.MaterialButton
+                               android:id="@+id/btnSpeakNumber"
+                               style="@style/Widget.Material3.Button"
+                               android:layout_width="match_parent"
+                               android:layout_height="68dp"
+                               android:minWidth="0dp"
+                               android:paddingStart="16dp"
+                               android:paddingEnd="16dp"
+                               android:text="@string/speak_button"
+                               android:textSize="18sp"
+                               android:textStyle="bold"
+                               android:maxLines="1"
+                               android:singleLine="true"
+                               android:ellipsize="end"
+                               android:hyphenationFrequency="none"
+                               app:cornerRadius="34dp"
+                               app:elevation="10dp"
+                               app:icon="@drawable/ic_speak"
+                               app:iconSize="20dp"
+                               app:iconGravity="start"
+                               app:iconPadding="8dp" />
 
                         <!-- Hint text -->
                         <TextView
-                            android:layout_width="wrap_content"
+                            android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="18dp"
+                            android:gravity="center"
                             android:text="✨ Tap to hear pronunciation!"
                             android:textColor="@color/colorAccent"
                             android:textSize="11sp"

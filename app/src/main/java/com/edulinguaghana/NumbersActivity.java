@@ -77,6 +77,13 @@ public class NumbersActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_numbers);
 
+        // Set up toolbar back button
+        com.google.android.material.appbar.MaterialToolbar toolbar = findViewById(R.id.toolbar);
+        if (toolbar != null) {
+            setSupportActionBar(toolbar);
+            toolbar.setNavigationOnClickListener(v -> finish());
+        }
+
         tvLanguageTitleNum = findViewById(R.id.tvLanguageTitleNum);
         tvNumber = findViewById(R.id.tvNumber);
         tvNumberSpelling = findViewById(R.id.tvNumberSpelling);
