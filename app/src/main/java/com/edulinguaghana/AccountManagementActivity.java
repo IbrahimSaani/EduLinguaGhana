@@ -11,6 +11,8 @@ import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
+import com.edulinguaghana.roles.RoleManager;
+import com.edulinguaghana.roles.UserRole;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.card.MaterialCardView;
 import com.google.android.material.textfield.MaterialAutoCompleteTextView;
@@ -34,7 +36,10 @@ public class AccountManagementActivity extends AppCompatActivity {
     private MaterialButton btnUpdateProfile, btnChangePassword, btnSendVerificationEmail, btnDeleteAccount;
     private MaterialCardView changePasswordCard, emailVerificationCard;
     private View progressOverlay;
+    private View learnerDetailsSection;
     private String[] classOptions;
+    private RoleManager roleManager;
+    private UserRole currentUserRole = UserRole.STUDENT;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -43,6 +48,7 @@ public class AccountManagementActivity extends AppCompatActivity {
 
         mAuth = FirebaseAuth.getInstance();
         currentUser = mAuth.getCurrentUser();
+        roleManager = new RoleManager();
 
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -76,6 +82,7 @@ public class AccountManagementActivity extends AppCompatActivity {
         changePasswordCard = findViewById(R.id.changePasswordCard);
         emailVerificationCard = findViewById(R.id.emailVerificationCard);
         progressOverlay = findViewById(R.id.progressOverlay);
+        learnerDetailsSection = findViewById(R.id.learnerDetailsSection);
         classOptions = getResources().getStringArray(R.array.basic_class_options);
     }
 
@@ -121,8 +128,45 @@ public class AccountManagementActivity extends AppCompatActivity {
                 emailVerificationCard.setVisibility(View.VISIBLE);
             }
 
-            loadLearnerProfileValues();
+            loadRoleAndProfileData();
         }
+    }
+
+    private void loadRoleAndProfileData() {
+        if (currentUser == null) return;
+
+        roleManager.getUserRole(this, currentUser.getUid(), new RoleManager.RoleCallback() {
+            @Override
+            public void onRoleRetrieved(UserRole role) {
+                currentUserRole = role;
+                boolean isStudent = role == UserRole.STUDENT;
+
+                if (learnerDetailsSection != null) {
+                    learnerDetailsSection.setVisibility(isStudent ? View.VISIBLE : View.GONE);
+                }
+
+                if (isStudent) {
+                    loadLearnerProfileValues();
+                } else {
+                    clearLearnerFields();
+                }
+            }
+
+            @Override
+            public void onError(String error) {
+                currentUserRole = UserRole.STUDENT;
+                if (learnerDetailsSection != null) {
+                    learnerDetailsSection.setVisibility(View.VISIBLE);
+                }
+                loadLearnerProfileValues();
+            }
+        });
+    }
+
+    private void clearLearnerFields() {
+        if (etLearnerAge != null) etLearnerAge.setText("");
+        if (etLearnerSchool != null) etLearnerSchool.setText("");
+        if (etLearnerClass != null) etLearnerClass.setText("", false);
     }
 
     private void setupListeners() {
@@ -176,36 +220,47 @@ public class AccountManagementActivity extends AppCompatActivity {
             return;
         }
 
-        if (TextUtils.isEmpty(learnerAge)) {
-            etLearnerAge.setError(getString(R.string.complete_profile_required_age));
-            etLearnerAge.requestFocus();
-            return;
-        }
-
-        try {
-            int parsedAge = Integer.parseInt(learnerAge);
-            if (parsedAge <= 0 || parsedAge > 25) {
+        boolean isStudent = currentUserRole == UserRole.STUDENT;
+        if (isStudent) {
+            if (TextUtils.isEmpty(learnerAge)) {
                 etLearnerAge.setError(getString(R.string.complete_profile_required_age));
                 etLearnerAge.requestFocus();
                 return;
             }
-        } catch (NumberFormatException e) {
-            etLearnerAge.setError(getString(R.string.complete_profile_required_age));
-            etLearnerAge.requestFocus();
-            return;
+
+            try {
+                int parsedAge = Integer.parseInt(learnerAge);
+                if (parsedAge <= 0 || parsedAge > 25) {
+                    etLearnerAge.setError(getString(R.string.complete_profile_required_age));
+                    etLearnerAge.requestFocus();
+                    return;
+                }
+            } catch (NumberFormatException e) {
+                etLearnerAge.setError(getString(R.string.complete_profile_required_age));
+                etLearnerAge.requestFocus();
+                return;
+            }
+
+            if (TextUtils.isEmpty(learnerSchool)) {
+                etLearnerSchool.setError(getString(R.string.complete_profile_required_school));
+                etLearnerSchool.requestFocus();
+                return;
+            }
+
+            if (TextUtils.isEmpty(learnerClass)) {
+                etLearnerClass.setError(getString(R.string.complete_profile_required_class));
+                etLearnerClass.requestFocus();
+                return;
+            }
+        } else {
+            learnerAge = "";
+            learnerSchool = "";
+            learnerClass = "";
         }
 
-        if (TextUtils.isEmpty(learnerSchool)) {
-            etLearnerSchool.setError(getString(R.string.complete_profile_required_school));
-            etLearnerSchool.requestFocus();
-            return;
-        }
-
-        if (TextUtils.isEmpty(learnerClass)) {
-            etLearnerClass.setError(getString(R.string.complete_profile_required_class));
-            etLearnerClass.requestFocus();
-            return;
-        }
+        final String learnerAgeToSave = learnerAge;
+        final String learnerSchoolToSave = learnerSchool;
+        final String learnerClassToSave = learnerClass;
 
         showProgress(true);
 
@@ -216,7 +271,7 @@ public class AccountManagementActivity extends AppCompatActivity {
         currentUser.updateProfile(profileUpdates)
                 .addOnCompleteListener(task -> {
                     if (task.isSuccessful()) {
-                        updateProfileInDatabase(newDisplayName, learnerAge, learnerSchool, learnerClass);
+                        updateProfileInDatabase(newDisplayName, learnerAgeToSave, learnerSchoolToSave, learnerClassToSave);
                     } else {
                         showProgress(false);
                         Toast.makeText(AccountManagementActivity.this,
@@ -703,7 +758,7 @@ public class AccountManagementActivity extends AppCompatActivity {
                                     emailVerificationCard.setVisibility(View.GONE);
                                 }
 
-                                loadLearnerProfileValues();
+                                loadRoleAndProfileData();
                             }
                         }
                     });

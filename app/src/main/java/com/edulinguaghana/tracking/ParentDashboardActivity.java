@@ -174,13 +174,13 @@ public class ParentDashboardActivity extends AppCompatActivity {
     }
 
     private void showSortDialog() {
-        String[] options = {"Sort by Name", "Sort by Level", "Sort by Recent Activity"};
+        String[] options = {"Sort by Name", "Most Weekly Quizzes", "Needs Attention"};
 
         // Create menu items for styled dialog
         java.util.List<com.edulinguaghana.StyledMenuHelper.MenuItem> menuItems = new java.util.ArrayList<>();
         for (int i = 0; i < options.length; i++) {
             final int index = i;
-            String icon = index == 0 ? "🔤" : (index == 1 ? "📊" : "🕐");
+            String icon = index == 0 ? "🔤" : (index == 1 ? "📝" : "🚨");
             menuItems.add(new com.edulinguaghana.StyledMenuHelper.MenuItem(
                 icon,
                 options[i],
@@ -194,7 +194,7 @@ public class ParentDashboardActivity extends AppCompatActivity {
         com.edulinguaghana.StyledMenuHelper.showStyledMenu(
             this,
             "🔀",
-            "Sort Children",
+            "Sort Family View",
             menuItems
         );
     }
@@ -402,12 +402,12 @@ public class ParentDashboardActivity extends AppCompatActivity {
                     return aName.compareToIgnoreCase(bName);
                 case 1:
                     return Integer.compare(
-                            b.getProgress().getCurrentLevel(),
-                            a.getProgress().getCurrentLevel());
+                            b.getProgress().getQuizzesThisWeek(),
+                            a.getProgress().getQuizzesThisWeek());
                 case 2:
                     return Long.compare(
-                            b.getProgress().getLastUpdated(),
-                            a.getProgress().getLastUpdated());
+                            a.getProgress().getLastUpdated(),
+                            b.getProgress().getLastUpdated());
                 default:
                     return 0;
             }
@@ -446,13 +446,13 @@ public class ParentDashboardActivity extends AppCompatActivity {
 
     private void updateStatistics(List<StudentProgressItem> children) {
         int totalChildren = children.size();
-        int totalLevels = 0;
+        int totalQuizzesThisWeek = 0;
         int activeToday = 0;
         long oneDayAgo = System.currentTimeMillis() - (24 * 60 * 60 * 1000);
 
         for (StudentProgressItem child : children) {
             ProgressAggregate progress = child.getProgress();
-            totalLevels += progress.getCurrentLevel();
+            totalQuizzesThisWeek += progress.getQuizzesThisWeek();
 
             if (progress.getLastUpdated() > oneDayAgo) {
                 activeToday++;
@@ -464,8 +464,7 @@ public class ParentDashboardActivity extends AppCompatActivity {
         }
 
         if (tvAvgLevel != null) {
-            int avgLevel = totalChildren > 0 ? totalLevels / totalChildren : 0;
-            tvAvgLevel.setText(String.valueOf(avgLevel));
+            tvAvgLevel.setText(String.valueOf(totalQuizzesThisWeek));
         }
 
         if (tvActiveToday != null) {
