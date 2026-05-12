@@ -7,7 +7,6 @@ import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.Toast;
 
-import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -21,7 +20,6 @@ import java.util.List;
 public class NotificationsActivity extends AppCompatActivity implements NotificationsAdapter.OnNotificationClickListener {
 
     private com.edulinguaghana.DynamicBackgroundView dynamicBackground;
-    private com.edulinguaghana.AnimatedAvatarView emptyStateAvatar;
     private RecyclerView notificationsRecyclerView;
     private LinearLayout emptyStateLayout;
     private SwipeRefreshLayout swipeRefresh;
@@ -46,7 +44,6 @@ public class NotificationsActivity extends AppCompatActivity implements Notifica
 
         // Initialize views
         dynamicBackground = findViewById(R.id.dynamicBackground);
-        emptyStateAvatar = findViewById(R.id.emptyStateAvatar);
         notificationsRecyclerView = findViewById(R.id.notificationsRecyclerView);
         emptyStateLayout = findViewById(R.id.emptyStateLayout);
         swipeRefresh = findViewById(R.id.swipeRefresh);
@@ -70,9 +67,6 @@ public class NotificationsActivity extends AppCompatActivity implements Notifica
         btnStartLearning.setOnClickListener(v -> {
             finish(); // Go back to main activity
         });
-
-        // Setup mascot if in empty state
-        setupMascot();
 
         // Check and generate notifications based on user progress
         notificationManager.checkAndGenerateNotifications();
@@ -107,12 +101,6 @@ public class NotificationsActivity extends AppCompatActivity implements Notifica
         dynamicBackground.setColors(colorStart, colorMid, colorEnd);
     }
 
-    private void setupMascot() {
-        if (emptyStateAvatar == null) return;
-        
-        // Setup Kojo as the default empty state mascot
-        emptyStateAvatar.setDefaultAvatar();
-    }
 
     private void setupRecyclerView() {
         notificationsRecyclerView.setLayoutManager(new LinearLayoutManager(this));
