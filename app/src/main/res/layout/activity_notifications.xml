@@ -104,12 +104,16 @@
 
             <!-- Bell Icon for Empty State -->
             <ImageView
+                android:id="@+id/emptyStateBellIcon"
                 android:layout_width="120dp"
                 android:layout_height="120dp"
                 android:src="@drawable/ic_notifications"
                 android:contentDescription="No notifications"
                 android:layout_marginBottom="16dp"
                 android:alpha="0.6"
+                android:clickable="true"
+                android:focusable="true"
+                android:foreground="?attr/selectableItemBackgroundBorderless"
                 app:tint="@color/colorPrimary" />
 
             <TextView
@@ -135,7 +139,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="12dp"
-                android:text="Kojo will let you know when you get\nfriend requests or earn achievements!"
+                android:text="You will get notified when you receive\nfriend requests or earn achievements!"
                 android:textSize="15sp"
                 android:textColor="@color/textColorSecondary"
                 android:lineSpacingExtra="4dp"

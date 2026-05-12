@@ -1,9 +1,13 @@
 package com.edulinguaghana;
 
 import android.os.Bundle;
+import android.os.Build;
+import android.os.VibrationEffect;
+import android.os.Vibrator;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.Toast;
 
@@ -20,6 +24,7 @@ import java.util.List;
 public class NotificationsActivity extends AppCompatActivity implements NotificationsAdapter.OnNotificationClickListener {
 
     private com.edulinguaghana.DynamicBackgroundView dynamicBackground;
+    private ImageView emptyStateBellIcon;
     private RecyclerView notificationsRecyclerView;
     private LinearLayout emptyStateLayout;
     private SwipeRefreshLayout swipeRefresh;
@@ -44,6 +49,7 @@ public class NotificationsActivity extends AppCompatActivity implements Notifica
 
         // Initialize views
         dynamicBackground = findViewById(R.id.dynamicBackground);
+        emptyStateBellIcon = findViewById(R.id.emptyStateBellIcon);
         notificationsRecyclerView = findViewById(R.id.notificationsRecyclerView);
         emptyStateLayout = findViewById(R.id.emptyStateLayout);
         swipeRefresh = findViewById(R.id.swipeRefresh);
@@ -53,6 +59,9 @@ public class NotificationsActivity extends AppCompatActivity implements Notifica
 
         // Setup background
         setupBackground();
+
+        // Setup empty-state interactions
+        setupEmptyStateInteractions();
 
         // Initialize notification manager
         notificationManager = new NotificationManager(this);
@@ -105,6 +114,47 @@ public class NotificationsActivity extends AppCompatActivity implements Notifica
     private void setupRecyclerView() {
         notificationsRecyclerView.setLayoutManager(new LinearLayoutManager(this));
         notificationsRecyclerView.setHasFixedSize(true);
+    }
+
+    private void setupEmptyStateInteractions() {
+        if (emptyStateBellIcon == null) return;
+
+        emptyStateBellIcon.setOnClickListener(v -> {
+            v.animate()
+                .rotationBy(20f)
+                .setDuration(90)
+                .withEndAction(() -> v.animate()
+                    .rotationBy(-40f)
+                    .setDuration(120)
+                    .withEndAction(() -> v.animate()
+                        .rotationBy(20f)
+                        .setDuration(90)
+                        .start())
+                    .start())
+                .start();
+
+            v.animate()
+                .scaleX(1.1f)
+                .scaleY(1.1f)
+                .setDuration(120)
+                .withEndAction(() -> v.animate()
+                    .scaleX(1f)
+                    .scaleY(1f)
+                    .setDuration(120)
+                    .start())
+                .start();
+
+            Vibrator vibrator = (Vibrator) getSystemService(VIBRATOR_SERVICE);
+            if (vibrator != null && vibrator.hasVibrator()) {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                    vibrator.vibrate(VibrationEffect.createOneShot(25, VibrationEffect.DEFAULT_AMPLITUDE));
+                } else {
+                    vibrator.vibrate(25);
+                }
+            }
+
+            Toast.makeText(this, "You're all caught up! We'll ring this bell when something new arrives.", Toast.LENGTH_SHORT).show();
+        });
     }
 
     private void loadNotifications() {
