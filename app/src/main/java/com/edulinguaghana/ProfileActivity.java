@@ -1570,25 +1570,62 @@ public class ProfileActivity extends AppCompatActivity {
                     profileInfo.append("📅 Joined: ").append(sdf.format(new java.util.Date(createdAt))).append("\n\n");
                 }
 
-                profileInfo.append("📊 Stats:\n");
-                profileInfo.append("• Total Quizzes: ").append(totalQuizzes).append("\n");
-                profileInfo.append("• High Score: ").append(highScore).append("/10");
+                // Fetch challenge stats to include in the profile
+                com.edulinguaghana.social.ChallengeManager challengeManager = new com.edulinguaghana.social.ChallengeManager();
+                challengeManager.getChallengeStats(friendUserId, new com.edulinguaghana.social.ChallengeManager.StatsCallback() {
+                    @Override
+                    public void onSuccess(com.edulinguaghana.social.ChallengeStats stats) {
+                        runOnUiThread(() -> {
+                            profileInfo.append("📊 Stats:\n");
+                            profileInfo.append("• Total Quizzes: ").append(totalQuizzes).append("\n");
+                            profileInfo.append("• High Score: ").append(highScore).append("/10\n");
+                            profileInfo.append("• ⚔️ Challenges Won: ").append(stats.challengesWon).append("\n");
+                            profileInfo.append("• ⚔️ Challenges Lost: ").append(stats.challengesLost).append("\n");
 
-                StyledMenuHelper.showStyledConfirmationDialog(
-                    ProfileActivity.this,
-                    "👤",
-                    displayName != null ? displayName : "User Profile",
-                    profileInfo.toString() + "\n\nWould you like to challenge this user?",
-                    "Challenge",
-                    "Close",
-                    () -> {
-                        FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
-                        if (currentUser != null) {
-                            performCreateChallengeWithDialog(currentUser.getUid(), friendUserId);
-                        }
-                    },
-                    null
-                );
+                            StyledMenuHelper.showStyledConfirmationDialog(
+                                ProfileActivity.this,
+                                "👤",
+                                displayName != null ? displayName : "User Profile",
+                                profileInfo.toString() + "\n\nWould you like to challenge this user?",
+                                "Challenge",
+                                "Close",
+                                () -> {
+                                    FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
+                                    if (currentUser != null) {
+                                        performCreateChallengeWithDialog(currentUser.getUid(), friendUserId);
+                                    }
+                                },
+                                null
+                            );
+                        });
+                    }
+
+                    @Override
+                    public void onFailure(String error) {
+                        runOnUiThread(() -> {
+                            // Fallback if challenge stats fail
+                            profileInfo.append("📊 Stats:\n");
+                            profileInfo.append("• Total Quizzes: ").append(totalQuizzes).append("\n");
+                            profileInfo.append("• High Score: ").append(highScore).append("/10");
+
+                            StyledMenuHelper.showStyledConfirmationDialog(
+                                ProfileActivity.this,
+                                "👤",
+                                displayName != null ? displayName : "User Profile",
+                                profileInfo.toString() + "\n\nWould you like to challenge this user?",
+                                "Challenge",
+                                "Close",
+                                () -> {
+                                    FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
+                                    if (currentUser != null) {
+                                        performCreateChallengeWithDialog(currentUser.getUid(), friendUserId);
+                                    }
+                                },
+                                null
+                            );
+                        });
+                    }
+                });
             }
 
             @Override
@@ -1834,42 +1871,104 @@ public class ProfileActivity extends AppCompatActivity {
     private void showChallengesMenu(String userId) {
         java.util.List<StyledMenuHelper.MenuItem> menuItems = new java.util.ArrayList<>();
 
+        // Add stats at the top of the menu
+        com.edulinguaghana.social.ChallengeManager challengeManager = new com.edulinguaghana.social.ChallengeManager();
+        challengeManager.getChallengeStats(userId, new com.edulinguaghana.social.ChallengeManager.StatsCallback() {
+            @Override
+            public void onSuccess(com.edulinguaghana.social.ChallengeStats stats) {
+                runOnUiThread(() -> {
+                    String statsSummary = "Won: " + stats.challengesWon + " | Lost: " + stats.challengesLost;
+                    
+                    menuItems.add(new StyledMenuHelper.MenuItem(
+                        "📊",
+                        "Your Challenge Stats",
+                        statsSummary,
+                        null // Just informative
+                    ));
+
+                    menuItems.add(new StyledMenuHelper.MenuItem(
+                        "⚔️",
+                        "Active Challenges",
+                        "Challenges waiting for you to play",
+                        () -> showChallenges(userId)
+                    ));
+
+                    menuItems.add(new StyledMenuHelper.MenuItem(
+                        "⏳",
+                        "Waiting for Opponent",
+                        "Challenges you've finished, waiting for others",
+                        () -> showWaitingChallenges(userId)
+                    ));
+
+                    menuItems.add(new StyledMenuHelper.MenuItem(
+                        "🏆",
+                        "Completed Challenges",
+                        "Finished challenges with final results",
+                        () -> showCompletedChallenges(userId)
+                    ));
+
+                    menuItems.add(new StyledMenuHelper.MenuItem(
+                        "🎯",
+                        "Create Challenge",
+                        "Start a new challenge with a friend",
+                        () -> presentChallengeDialog(userId)
+                    ));
+
+                    StyledMenuHelper.showStyledMenu(
+                        ProfileActivity.this,
+                        "⚔️",
+                        "Challenges",
+                        "Compete with friends\n" + statsSummary,
+                        menuItems,
+                        null
+                    );
+                });
+            }
+
+            @Override
+            public void onFailure(String error) {
+                // Fallback to original menu if stats fail
+                runOnUiThread(() -> {
+                    menuItems.add(new StyledMenuHelper.MenuItem(
+                        "⚔️",
+                        "Active Challenges",
+                        "Challenges waiting for you to play",
+                        () -> showChallenges(userId)
+                    ));
+                    // ... other items omitted for brevity in this block but I'll add them properly below
+                    showOriginalChallengesMenu(userId);
+                });
+            }
+        });
+    }
+
+    private void showOriginalChallengesMenu(String userId) {
+        java.util.List<StyledMenuHelper.MenuItem> menuItems = new java.util.ArrayList<>();
         menuItems.add(new StyledMenuHelper.MenuItem(
             "⚔️",
             "Active Challenges",
             "Challenges waiting for you to play",
             () -> showChallenges(userId)
         ));
-
         menuItems.add(new StyledMenuHelper.MenuItem(
             "⏳",
             "Waiting for Opponent",
             "Challenges you've finished, waiting for others",
             () -> showWaitingChallenges(userId)
         ));
-
         menuItems.add(new StyledMenuHelper.MenuItem(
             "🏆",
             "Completed Challenges",
             "Finished challenges with final results",
             () -> showCompletedChallenges(userId)
         ));
-
         menuItems.add(new StyledMenuHelper.MenuItem(
             "🎯",
             "Create Challenge",
             "Start a new challenge with a friend",
             () -> presentChallengeDialog(userId)
         ));
-
-        StyledMenuHelper.showStyledMenu(
-            this,
-            "⚔️",
-            "Challenges",
-            "Compete with friends",
-            menuItems,
-            null
-        );
+        StyledMenuHelper.showStyledMenu(this, "⚔️", "Challenges", "Compete with friends", menuItems, null);
     }
 
     private void showWaitingChallenges(String userId) {

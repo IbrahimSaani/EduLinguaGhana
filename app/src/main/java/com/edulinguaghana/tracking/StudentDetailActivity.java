@@ -15,6 +15,8 @@ import androidx.annotation.NonNull;
 import com.edulinguaghana.R;
 import com.edulinguaghana.roles.RoleManager;
 import com.edulinguaghana.roles.UserRole;
+import com.edulinguaghana.social.ChallengeManager;
+import com.edulinguaghana.social.ChallengeStats;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -58,6 +60,8 @@ public class StudentDetailActivity extends AppCompatActivity {
     private TextView tvTotalBadges;
     private TextView tvDaysActive;
     private TextView tvTimeSpent;
+    private TextView tvChallengesWon;
+    private TextView tvChallengesLost;
 
     // Section views for role-based customization
     private View dividerStreaks;
@@ -72,10 +76,14 @@ public class StudentDetailActivity extends AppCompatActivity {
     private View dividerEngagement;
     private View tvLabelEngagement;
     private View layoutEngagement;
+    private View dividerChallenges;
+    private View tvLabelChallenges;
+    private View layoutChallenges;
 
     private ProgressTracker progressTracker;
     private DatabaseReference progressRef;
     private RoleManager roleManager;
+    private ChallengeManager challengeManager;
     private boolean initialLoadComplete = false;
     private long lastObservedActivityTimestamp = -1L;
 
@@ -93,13 +101,34 @@ public class StudentDetailActivity extends AppCompatActivity {
 
         progressTracker = new ProgressTracker();
         roleManager = new RoleManager();
+        challengeManager = new ChallengeManager();
         progressRef = FirebaseDatabase.getInstance().getReference("progress").child(studentId);
 
         initViews();
         loadCurrentUserRole();
         loadStudentInfo();
         loadProgressData();
+        loadChallengeStats();
         setupRealtimeListener();
+    }
+
+    private void loadChallengeStats() {
+        challengeManager.getChallengeStats(studentId, new ChallengeManager.StatsCallback() {
+            @Override
+            public void onSuccess(ChallengeStats stats) {
+                if (tvChallengesWon != null) {
+                    tvChallengesWon.setText(String.valueOf(stats.challengesWon));
+                }
+                if (tvChallengesLost != null) {
+                    tvChallengesLost.setText(String.valueOf(stats.challengesLost));
+                }
+            }
+
+            @Override
+            public void onFailure(String error) {
+                Log.e(TAG, "Failed to load challenge stats: " + error);
+            }
+        });
     }
 
     private void loadCurrentUserRole() {
@@ -140,6 +169,11 @@ public class StudentDetailActivity extends AppCompatActivity {
             if (tvLabelAchievements != null) tvLabelAchievements.setVisibility(View.VISIBLE);
             if (layoutAchievements != null) layoutAchievements.setVisibility(View.VISIBLE);
             if (dividerAchievements != null) dividerAchievements.setVisibility(View.VISIBLE);
+
+            // Challenges visible to both
+            if (tvLabelChallenges != null) tvLabelChallenges.setVisibility(View.VISIBLE);
+            if (layoutChallenges != null) layoutChallenges.setVisibility(View.VISIBLE);
+            if (dividerChallenges != null) dividerChallenges.setVisibility(View.VISIBLE);
         } else if (currentUserRole == UserRole.TEACHER) {
             // Teachers focus on academic performance
             if (tvLabelStreaks != null) tvLabelStreaks.setVisibility(View.GONE);
@@ -157,6 +191,11 @@ public class StudentDetailActivity extends AppCompatActivity {
             if (tvLabelEngagement != null) tvLabelEngagement.setVisibility(View.VISIBLE);
             if (layoutEngagement != null) layoutEngagement.setVisibility(View.VISIBLE);
             if (dividerEngagement != null) dividerEngagement.setVisibility(View.VISIBLE);
+
+            // Challenges visible to both, but we explicitly set it here for clarity
+            if (tvLabelChallenges != null) tvLabelChallenges.setVisibility(View.VISIBLE);
+            if (layoutChallenges != null) layoutChallenges.setVisibility(View.VISIBLE);
+            if (dividerChallenges != null) dividerChallenges.setVisibility(View.VISIBLE);
         }
     }
 
@@ -197,6 +236,8 @@ public class StudentDetailActivity extends AppCompatActivity {
         tvTotalBadges = findViewById(R.id.tvTotalBadges);
         tvDaysActive = findViewById(R.id.tvDaysActive);
         tvTimeSpent = findViewById(R.id.tvTimeSpent);
+        tvChallengesWon = findViewById(R.id.tvChallengesWon);
+        tvChallengesLost = findViewById(R.id.tvChallengesLost);
 
         dividerStreaks = findViewById(R.id.dividerStreaks);
         tvLabelStreaks = findViewById(R.id.tvLabelStreaks);
@@ -210,6 +251,9 @@ public class StudentDetailActivity extends AppCompatActivity {
         dividerEngagement = findViewById(R.id.dividerEngagement);
         tvLabelEngagement = findViewById(R.id.tvLabelEngagement);
         layoutEngagement = findViewById(R.id.layoutEngagement);
+        dividerChallenges = findViewById(R.id.dividerChallenges);
+        tvLabelChallenges = findViewById(R.id.tvLabelChallenges);
+        layoutChallenges = findViewById(R.id.layoutChallenges);
     }
 
     private void loadStudentInfo() {

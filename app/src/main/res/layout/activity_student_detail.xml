@@ -691,6 +691,90 @@
 
                     <!-- Divider -->
                     <View
+                        android:id="@+id/dividerChallenges"
+                        android:layout_width="match_parent"
+                        android:layout_height="1dp"
+                        android:background="@color/dividerColor"
+                        android:layout_marginBottom="16dp"/>
+
+                    <!-- Challenges -->
+                    <TextView
+                        android:id="@+id/tvLabelChallenges"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="⚔️ Challenges"
+                        android:textSize="18sp"
+                        android:textStyle="bold"
+                        android:textColor="@color/colorPrimary"
+                        android:layout_marginBottom="12dp"/>
+
+                    <LinearLayout
+                        android:id="@+id/layoutChallenges"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:layout_marginBottom="16dp">
+
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:orientation="vertical"
+                            android:gravity="center"
+                            android:padding="12dp">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Won"
+                                android:textSize="12sp"
+                                android:textColor="@color/textColorSecondary"
+                                android:layout_marginBottom="4dp"/>
+
+                            <TextView
+                                android:id="@+id/tvChallengesWon"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="0"
+                                android:textSize="20sp"
+                                android:textStyle="bold"
+                                android:textColor="@color/correctAnswer"/>
+                        </LinearLayout>
+
+                        <View
+                            android:layout_width="1dp"
+                            android:layout_height="match_parent"
+                            android:background="@color/dividerColor"/>
+
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:orientation="vertical"
+                            android:gravity="center"
+                            android:padding="12dp">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Lost"
+                                android:textSize="12sp"
+                                android:textColor="@color/textColorSecondary"
+                                android:layout_marginBottom="4dp"/>
+
+                            <TextView
+                                android:id="@+id/tvChallengesLost"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="0"
+                                android:textSize="20sp"
+                                android:textStyle="bold"
+                                android:textColor="@color/wrongAnswer"/>
+                        </LinearLayout>
+                    </LinearLayout>
+
+                    <!-- Divider -->
+                    <View
                         android:id="@+id/dividerAchievements"
                         android:layout_width="match_parent"
                         android:layout_height="1dp"

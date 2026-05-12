@@ -39,16 +39,15 @@
     },
     "friends": {
       ".read": "auth != null",
-      ".write": "auth != null",
+      ".write": "auth != null && (newData.child('userId').val() === auth.uid || newData.child('friendUserId').val() === auth.uid || data.child('userId').val() === auth.uid || data.child('friendUserId').val() === auth.uid)",
       ".indexOn": ["userId", "friendUserId", "status"]
     },
     "challenges": {
       ".read": "auth != null",
-      ".write": "auth != null",
       ".indexOn": ["state", "challengedId", "challengerId", "completedAt", "createdAt"],
       "$challengeId": {
         ".read": "auth != null",
-        ".write": "auth != null",
+        ".write": "auth != null && (!data.exists() || data.child('challengerId').val() === auth.uid || data.child('challengedId').val() === auth.uid)",
         ".validate": "newData.hasChildren(['challengerId', 'challengedId', 'state']) && newData.child('state').isString() && (newData.child('state').val() === 'pending' || newData.child('state').val() === 'in_progress' || newData.child('state').val() === 'completed' || newData.child('state').val() === 'PENDING' || newData.child('state').val() === 'ONGOING' || newData.child('state').val() === 'COMPLETED' || newData.child('state').val() === 'EXPIRED' || newData.child('state').val() === 'CANCELLED') && newData.child('challengerId').isString() && newData.child('challengedId').isString() && newData.child('createdAt').isNumber() && newData.child('language').isString() && newData.child('quizType').isString() && newData.child('durationMinutes').isNumber()",
         "challengerScore": {
           ".validate": "newData.isNumber() || !newData.exists()"
@@ -63,11 +62,10 @@
     },
     "challengeStats": {
       ".read": "auth != null",
-      ".write": "auth != null",
       ".indexOn": ["userId", "winRate", "totalChallenges"],
       "$userId": {
         ".read": "auth != null",
-        ".write": "$userId === auth.uid || auth != null",
+        ".write": "$userId === auth.uid",
         ".validate": "newData.hasChildren(['userId', 'challengesWon', 'challengesLost', 'challengesTied', 'challengesDeclined', 'totalChallenges', 'winRate']) && newData.child('userId').val() === $userId && newData.child('challengesWon').isNumber() && newData.child('challengesLost').isNumber() && newData.child('challengesTied').isNumber() && newData.child('challengesDeclined').isNumber() && newData.child('totalChallenges').isNumber() && newData.child('winRate').isNumber()",
         "challengesWon": {
           ".validate": "newData.isNumber()"
