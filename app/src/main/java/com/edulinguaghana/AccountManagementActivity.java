@@ -30,7 +30,7 @@ public class AccountManagementActivity extends AppCompatActivity {
 
     private AvatarView avatarView;
     private MaterialButton btnEditAvatar;
-    private TextInputEditText etDisplayName, etLearnerAge, etLearnerSchool, etCurrentPassword, etNewPassword, etConfirmPassword;
+    private TextInputEditText etDisplayName, etLearnerAge, etCurrentPassword, etNewPassword, etConfirmPassword;
     private MaterialAutoCompleteTextView etLearnerClass;
     private TextView tvEmail;
     private MaterialButton btnUpdateProfile, btnChangePassword, btnSendVerificationEmail, btnDeleteAccount;
@@ -69,7 +69,6 @@ public class AccountManagementActivity extends AppCompatActivity {
         btnEditAvatar = findViewById(R.id.btnEditAvatar);
         etDisplayName = findViewById(R.id.etDisplayName);
         etLearnerAge = findViewById(R.id.etLearnerAge);
-        etLearnerSchool = findViewById(R.id.etLearnerSchool);
         etLearnerClass = findViewById(R.id.etLearnerClass);
         etCurrentPassword = findViewById(R.id.etCurrentPassword);
         etNewPassword = findViewById(R.id.etNewPassword);
@@ -165,7 +164,6 @@ public class AccountManagementActivity extends AppCompatActivity {
 
     private void clearLearnerFields() {
         if (etLearnerAge != null) etLearnerAge.setText("");
-        if (etLearnerSchool != null) etLearnerSchool.setText("");
         if (etLearnerClass != null) etLearnerClass.setText("", false);
     }
 
@@ -182,7 +180,7 @@ public class AccountManagementActivity extends AppCompatActivity {
     }
 
     private void loadLearnerProfileValues() {
-        if (currentUser == null || etLearnerAge == null || etLearnerSchool == null || etLearnerClass == null) {
+        if (currentUser == null || etLearnerAge == null || etLearnerClass == null) {
             return;
         }
 
@@ -193,11 +191,9 @@ public class AccountManagementActivity extends AppCompatActivity {
                     @Override
                     public void onDataChange(com.google.firebase.database.DataSnapshot snapshot) {
                         String age = snapshot.child("age").getValue(String.class);
-                        String school = snapshot.child("school").getValue(String.class);
                         String studentClass = snapshot.child("studentClass").getValue(String.class);
 
                         etLearnerAge.setText(TextUtils.isEmpty(age) ? "" : age);
-                        etLearnerSchool.setText(TextUtils.isEmpty(school) ? "" : school);
                         etLearnerClass.setText(TextUtils.isEmpty(studentClass) ? "" : studentClass, false);
                     }
 
@@ -211,7 +207,6 @@ public class AccountManagementActivity extends AppCompatActivity {
     private void updateProfile() {
         String newDisplayName = etDisplayName.getText().toString().trim();
         String learnerAge = etLearnerAge != null ? etLearnerAge.getText().toString().trim() : "";
-        String learnerSchool = etLearnerSchool != null ? etLearnerSchool.getText().toString().trim() : "";
         String learnerClass = etLearnerClass != null ? etLearnerClass.getText().toString().trim() : "";
 
         if (TextUtils.isEmpty(newDisplayName)) {
@@ -222,44 +217,40 @@ public class AccountManagementActivity extends AppCompatActivity {
 
         boolean isStudent = currentUserRole == UserRole.STUDENT;
         if (isStudent) {
-            if (TextUtils.isEmpty(learnerAge)) {
+            // For students, both age and class must be present
+            if (TextUtils.isEmpty(learnerAge) && !TextUtils.isEmpty(learnerClass)) {
                 etLearnerAge.setError(getString(R.string.complete_profile_required_age));
                 etLearnerAge.requestFocus();
                 return;
             }
 
-            try {
-                int parsedAge = Integer.parseInt(learnerAge);
-                if (parsedAge <= 0 || parsedAge > 25) {
-                    etLearnerAge.setError(getString(R.string.complete_profile_required_age));
-                    etLearnerAge.requestFocus();
-                    return;
-                }
-            } catch (NumberFormatException e) {
-                etLearnerAge.setError(getString(R.string.complete_profile_required_age));
-                etLearnerAge.requestFocus();
-                return;
-            }
-
-            if (TextUtils.isEmpty(learnerSchool)) {
-                etLearnerSchool.setError(getString(R.string.complete_profile_required_school));
-                etLearnerSchool.requestFocus();
-                return;
-            }
-
-            if (TextUtils.isEmpty(learnerClass)) {
+            if (!TextUtils.isEmpty(learnerAge) && TextUtils.isEmpty(learnerClass)) {
                 etLearnerClass.setError(getString(R.string.complete_profile_required_class));
                 etLearnerClass.requestFocus();
                 return;
             }
+
+            // Validate age if provided
+            if (!TextUtils.isEmpty(learnerAge)) {
+                try {
+                    int parsedAge = Integer.parseInt(learnerAge);
+                    if (parsedAge <= 0 || parsedAge > 25) {
+                        etLearnerAge.setError(getString(R.string.complete_profile_required_age));
+                        etLearnerAge.requestFocus();
+                        return;
+                    }
+                } catch (NumberFormatException e) {
+                    etLearnerAge.setError(getString(R.string.complete_profile_required_age));
+                    etLearnerAge.requestFocus();
+                    return;
+                }
+            }
         } else {
             learnerAge = "";
-            learnerSchool = "";
             learnerClass = "";
         }
 
         final String learnerAgeToSave = learnerAge;
-        final String learnerSchoolToSave = learnerSchool;
         final String learnerClassToSave = learnerClass;
 
         showProgress(true);
@@ -271,7 +262,7 @@ public class AccountManagementActivity extends AppCompatActivity {
         currentUser.updateProfile(profileUpdates)
                 .addOnCompleteListener(task -> {
                     if (task.isSuccessful()) {
-                        updateProfileInDatabase(newDisplayName, learnerAgeToSave, learnerSchoolToSave, learnerClassToSave);
+                        updateProfileInDatabase(newDisplayName, learnerAgeToSave, learnerClassToSave);
                     } else {
                         showProgress(false);
                         Toast.makeText(AccountManagementActivity.this,
@@ -281,7 +272,7 @@ public class AccountManagementActivity extends AppCompatActivity {
                 });
     }
 
-    private void updateProfileInDatabase(String displayName, String age, String school, String studentClass) {
+    private void updateProfileInDatabase(String displayName, String age, String studentClass) {
         com.google.firebase.database.DatabaseReference usersRef =
                 com.google.firebase.database.FirebaseDatabase.getInstance()
                         .getReference("users")
@@ -291,7 +282,6 @@ public class AccountManagementActivity extends AppCompatActivity {
         updates.put("displayName", displayName);
         updates.put("username", displayName);
         updates.put("age", age);
-        updates.put("school", school);
         updates.put("studentClass", studentClass);
         updates.put("updatedAt", System.currentTimeMillis());
 

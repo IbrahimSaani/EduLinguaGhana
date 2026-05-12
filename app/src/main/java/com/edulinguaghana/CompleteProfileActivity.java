@@ -31,7 +31,7 @@ public class CompleteProfileActivity extends AppCompatActivity {
     public static final String NEXT_STEP_MAIN = "main";
     public static final String NEXT_STEP_PROFILE = "profile";
 
-    private TextInputEditText etAge, etSchool;
+    private TextInputEditText etAge;
     private MaterialAutoCompleteTextView etStudentClass;
     private MaterialButton btnContinue;
     private android.widget.TextView tvDisplayName, tvEmail;
@@ -41,6 +41,7 @@ public class CompleteProfileActivity extends AppCompatActivity {
     private RoleManager roleManager;
     private String[] classOptions;
     private boolean editMode;
+    private UserRole currentUserRole = UserRole.STUDENT;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -62,19 +63,33 @@ public class CompleteProfileActivity extends AppCompatActivity {
         configureModeUi();
         setupClassDropdown();
         bindUserInfo();
+        loadCurrentRole();
         loadExistingProfileValues();
         setupListeners();
     }
 
     private void initViews() {
         etAge = findViewById(R.id.etAge);
-        etSchool = findViewById(R.id.etSchool);
         etStudentClass = findViewById(R.id.etStudentClass);
         btnContinue = findViewById(R.id.btnContinue);
         tvDisplayName = findViewById(R.id.tvDisplayName);
         tvEmail = findViewById(R.id.tvEmail);
         tvTitle = findViewById(R.id.tvTitle);
         tvSubtitle = findViewById(R.id.tvSubtitle);
+    }
+
+    private void loadCurrentRole() {
+        roleManager.getUserRole(this, currentUser.getUid(), new RoleManager.RoleCallback() {
+            @Override
+            public void onRoleRetrieved(UserRole role) {
+                currentUserRole = role;
+            }
+
+            @Override
+            public void onError(String error) {
+                currentUserRole = UserRole.STUDENT;
+            }
+        });
     }
 
     private void configureModeUi() {
@@ -119,14 +134,10 @@ public class CompleteProfileActivity extends AppCompatActivity {
                     public void onDataChange(com.google.firebase.database.DataSnapshot snapshot) {
                         if (snapshot.exists()) {
                             String age = snapshot.child("age").getValue(String.class);
-                            String school = snapshot.child("school").getValue(String.class);
                             String studentClass = snapshot.child("studentClass").getValue(String.class);
 
                             if (etAge != null && !TextUtils.isEmpty(age)) {
                                 etAge.setText(age);
-                            }
-                            if (etSchool != null && !TextUtils.isEmpty(school)) {
-                                etSchool.setText(school);
                             }
                             if (etStudentClass != null && !TextUtils.isEmpty(studentClass)) {
                                 etStudentClass.setText(studentClass, false);
@@ -149,8 +160,12 @@ public class CompleteProfileActivity extends AppCompatActivity {
     }
 
     private void saveProfileAndContinue() {
+        if (currentUserRole != UserRole.STUDENT) {
+            routeAfterCompletion();
+            return;
+        }
+
         String age = safeText(etAge);
-        String school = safeText(etSchool);
         String studentClass = safeText(etStudentClass);
 
         if (TextUtils.isEmpty(age)) {
@@ -173,12 +188,6 @@ public class CompleteProfileActivity extends AppCompatActivity {
             return;
         }
 
-        if (TextUtils.isEmpty(school)) {
-            if (etSchool != null) etSchool.setError(getString(R.string.complete_profile_required_school));
-            if (etSchool != null) etSchool.requestFocus();
-            return;
-        }
-
         if (TextUtils.isEmpty(studentClass)) {
             if (etStudentClass != null) etStudentClass.setError(getString(R.string.complete_profile_required_class));
             if (etStudentClass != null) etStudentClass.requestFocus();
@@ -194,7 +203,7 @@ public class CompleteProfileActivity extends AppCompatActivity {
         updates.put("displayName", currentUser.getDisplayName());
         updates.put("username", currentUser.getDisplayName() != null ? currentUser.getDisplayName() : currentUser.getEmail());
         updates.put("age", age);
-        updates.put("school", school);
+        updates.put("school", "");
         updates.put("studentClass", studentClass);
         updates.put("lastLogin", System.currentTimeMillis());
 

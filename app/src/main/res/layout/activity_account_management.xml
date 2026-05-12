@@ -138,7 +138,6 @@
 
                     <!-- Card Content -->
                     <LinearLayout
-                        android:id="@+id/learnerDetailsSection"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:orientation="vertical"
@@ -339,6 +338,7 @@
 
                     <!-- Learner Details Section -->
                     <LinearLayout
+                        android:id="@+id/learnerDetailsSection"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:orientation="vertical"
@@ -386,30 +386,6 @@
 
                         </com.google.android.material.textfield.TextInputLayout>
 
-                        <com.google.android.material.textfield.TextInputLayout
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:layout_marginTop="12dp"
-                            app:boxStrokeColor="@color/colorPrimary"
-                            app:hintEnabled="false"
-                            app:boxCornerRadiusTopStart="12dp"
-                            app:boxCornerRadiusTopEnd="12dp"
-                            app:boxCornerRadiusBottomStart="12dp"
-                            app:boxCornerRadiusBottomEnd="12dp"
-                            app:startIconDrawable="@android:drawable/ic_menu_edit"
-                            app:startIconTint="@color/colorPrimary"
-                            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox">
-
-                            <com.google.android.material.textfield.TextInputEditText
-                                android:id="@+id/etLearnerSchool"
-                                android:layout_width="match_parent"
-                                android:layout_height="wrap_content"
-                                android:hint="@string/complete_profile_school_hint"
-                                android:inputType="textCapWords"
-                                android:textSize="16sp"
-                                android:padding="16dp" />
-
-                        </com.google.android.material.textfield.TextInputLayout>
 
                         <com.google.android.material.textfield.TextInputLayout
                             android:layout_width="match_parent"

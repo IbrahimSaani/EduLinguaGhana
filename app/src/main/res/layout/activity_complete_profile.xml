@@ -135,29 +135,6 @@
                         android:textSize="16sp" />
                 </com.google.android.material.textfield.TextInputLayout>
 
-                <com.google.android.material.textfield.TextInputLayout
-                    android:id="@+id/tilSchool"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="16dp"
-                    android:hint="@string/complete_profile_school_hint"
-                    app:boxCornerRadiusBottomEnd="14dp"
-                    app:boxCornerRadiusBottomStart="14dp"
-                    app:boxCornerRadiusTopEnd="14dp"
-                    app:boxCornerRadiusTopStart="14dp"
-                    app:boxStrokeColor="@color/colorPrimary"
-                    app:hintTextColor="@color/colorPrimary"
-                    app:startIconDrawable="@android:drawable/ic_menu_myplaces"
-                    app:startIconTint="@color/colorPrimary"
-                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox">
-
-                    <com.google.android.material.textfield.TextInputEditText
-                        android:id="@+id/etSchool"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:inputType="textCapWords"
-                        android:textSize="16sp" />
-                </com.google.android.material.textfield.TextInputLayout>
 
                 <com.google.android.material.textfield.TextInputLayout
                     android:id="@+id/tilStudentClass"

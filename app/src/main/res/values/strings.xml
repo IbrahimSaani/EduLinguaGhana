@@ -132,7 +132,6 @@
     <string name="complete_profile_name_label">Name</string>
     <string name="complete_profile_email_label">Email</string>
     <string name="complete_profile_age_hint">Age</string>
-    <string name="complete_profile_school_hint">School</string>
     <string name="complete_profile_class_hint">Class</string>
     <string name="complete_profile_continue">Continue</string>
     <string name="complete_profile_saved">Profile saved successfully!</string>
