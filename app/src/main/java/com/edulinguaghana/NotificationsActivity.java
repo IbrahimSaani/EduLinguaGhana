@@ -41,6 +41,7 @@ public class NotificationsActivity extends AppCompatActivity implements Notifica
     private List<Notification> notifications;
     private SoundPool soundPool;
     private int bellSoundId;
+    private Toast bellToast;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -174,7 +175,7 @@ public class NotificationsActivity extends AppCompatActivity implements Notifica
                 }
             }
 
-            Toast.makeText(this, "You're all caught up! We'll ring this bell when something new arrives.", Toast.LENGTH_SHORT).show();
+            showBellToast("You're all caught up! We'll ring this bell when something new arrives.");
         });
     }
 
@@ -233,6 +234,17 @@ public class NotificationsActivity extends AppCompatActivity implements Notifica
         if (soundPool != null && bellSoundId > 0) {
             soundPool.play(bellSoundId, 1f, 1f, 0, 0, 1f);
         }
+    }
+
+    private void showBellToast(String message) {
+        if (isFinishing() || isDestroyed()) return;
+
+        if (bellToast != null) {
+            bellToast.cancel();
+        }
+
+        bellToast = Toast.makeText(this, message, Toast.LENGTH_SHORT);
+        bellToast.show();
     }
 
     private void loadNotifications() {
@@ -387,10 +399,22 @@ public class NotificationsActivity extends AppCompatActivity implements Notifica
 
     @Override
     protected void onDestroy() {
+        if (bellToast != null) {
+            bellToast.cancel();
+            bellToast = null;
+        }
         super.onDestroy();
         if (soundPool != null) {
             soundPool.release();
             soundPool = null;
+        }
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        if (bellToast != null) {
+            bellToast.cancel();
         }
     }
 }
