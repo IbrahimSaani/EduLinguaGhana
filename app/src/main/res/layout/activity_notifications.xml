@@ -102,19 +102,71 @@
             android:gravity="center"
             android:padding="40dp">
 
-            <!-- Bell Icon for Empty State -->
-            <ImageView
-                android:id="@+id/emptyStateBellIcon"
-                android:layout_width="120dp"
-                android:layout_height="120dp"
-                android:src="@drawable/ic_notifications"
-                android:contentDescription="No notifications"
-                android:layout_marginBottom="16dp"
-                android:alpha="0.6"
-                android:clickable="true"
-                android:focusable="true"
-                android:foreground="?attr/selectableItemBackgroundBorderless"
-                app:tint="@color/colorPrimary" />
+            <!-- Bell icon with tiny sparkle overlays (animated on tap) -->
+            <FrameLayout
+                android:id="@+id/emptyStateBellContainer"
+                android:layout_width="140dp"
+                android:layout_height="140dp"
+                android:layout_marginBottom="16dp">
+
+                <ImageView
+                    android:id="@+id/emptyStateBellIcon"
+                    android:layout_width="120dp"
+                    android:layout_height="120dp"
+                    android:layout_gravity="center"
+                    android:src="@drawable/ic_notifications"
+                    android:contentDescription="No notifications"
+                    android:alpha="0.6"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:foreground="?attr/selectableItemBackgroundBorderless"
+                    app:tint="@color/colorPrimary" />
+
+                <ImageView
+                    android:id="@+id/sparkleTopLeft"
+                    android:layout_width="14dp"
+                    android:layout_height="14dp"
+                    android:layout_gravity="top|start"
+                    android:layout_marginTop="22dp"
+                    android:layout_marginStart="26dp"
+                    android:src="@android:drawable/btn_star_big_on"
+                    android:visibility="invisible"
+                    app:tint="@color/colorAccent" />
+
+                <ImageView
+                    android:id="@+id/sparkleTopRight"
+                    android:layout_width="12dp"
+                    android:layout_height="12dp"
+                    android:layout_gravity="top|end"
+                    android:layout_marginTop="20dp"
+                    android:layout_marginEnd="24dp"
+                    android:src="@android:drawable/btn_star_big_on"
+                    android:visibility="invisible"
+                    app:tint="@color/colorAccent" />
+
+                <ImageView
+                    android:id="@+id/sparkleBottomLeft"
+                    android:layout_width="12dp"
+                    android:layout_height="12dp"
+                    android:layout_gravity="bottom|start"
+                    android:layout_marginBottom="24dp"
+                    android:layout_marginStart="22dp"
+                    android:src="@android:drawable/btn_star_big_on"
+                    android:visibility="invisible"
+                    app:tint="@color/colorAccent" />
+
+                <ImageView
+                    android:id="@+id/sparkleBottomRight"
+                    android:layout_width="14dp"
+                    android:layout_height="14dp"
+                    android:layout_gravity="bottom|end"
+                    android:layout_marginBottom="22dp"
+                    android:layout_marginEnd="26dp"
+                    android:src="@android:drawable/btn_star_big_on"
+                    android:visibility="invisible"
+                    app:tint="@color/colorAccent" />
+
+            </FrameLayout>
 
             <TextView
                 android:layout_width="wrap_content"

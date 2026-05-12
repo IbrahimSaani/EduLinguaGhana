@@ -25,6 +25,10 @@ public class NotificationsActivity extends AppCompatActivity implements Notifica
 
     private com.edulinguaghana.DynamicBackgroundView dynamicBackground;
     private ImageView emptyStateBellIcon;
+    private View sparkleTopLeft;
+    private View sparkleTopRight;
+    private View sparkleBottomLeft;
+    private View sparkleBottomRight;
     private RecyclerView notificationsRecyclerView;
     private LinearLayout emptyStateLayout;
     private SwipeRefreshLayout swipeRefresh;
@@ -50,6 +54,10 @@ public class NotificationsActivity extends AppCompatActivity implements Notifica
         // Initialize views
         dynamicBackground = findViewById(R.id.dynamicBackground);
         emptyStateBellIcon = findViewById(R.id.emptyStateBellIcon);
+        sparkleTopLeft = findViewById(R.id.sparkleTopLeft);
+        sparkleTopRight = findViewById(R.id.sparkleTopRight);
+        sparkleBottomLeft = findViewById(R.id.sparkleBottomLeft);
+        sparkleBottomRight = findViewById(R.id.sparkleBottomRight);
         notificationsRecyclerView = findViewById(R.id.notificationsRecyclerView);
         emptyStateLayout = findViewById(R.id.emptyStateLayout);
         swipeRefresh = findViewById(R.id.swipeRefresh);
@@ -120,6 +128,8 @@ public class NotificationsActivity extends AppCompatActivity implements Notifica
         if (emptyStateBellIcon == null) return;
 
         emptyStateBellIcon.setOnClickListener(v -> {
+            playBellSparkle();
+
             v.animate()
                 .rotationBy(20f)
                 .setDuration(90)
@@ -155,6 +165,57 @@ public class NotificationsActivity extends AppCompatActivity implements Notifica
 
             Toast.makeText(this, "You're all caught up! We'll ring this bell when something new arrives.", Toast.LENGTH_SHORT).show();
         });
+    }
+
+    private void playBellSparkle() {
+        View[] sparkles = {sparkleTopLeft, sparkleTopRight, sparkleBottomLeft, sparkleBottomRight};
+        float[][] offsetsDp = {
+            {-10f, -14f},
+            {10f, -12f},
+            {-10f, 12f},
+            {10f, 14f}
+        };
+
+        for (int i = 0; i < sparkles.length; i++) {
+            View sparkle = sparkles[i];
+            if (sparkle == null) continue;
+
+            sparkle.animate().cancel();
+            sparkle.setVisibility(View.VISIBLE);
+            sparkle.setAlpha(0f);
+            sparkle.setScaleX(0.5f);
+            sparkle.setScaleY(0.5f);
+            sparkle.setTranslationX(0f);
+            sparkle.setTranslationY(0f);
+
+            final float tx = dpToPx(offsetsDp[i][0]);
+            final float ty = dpToPx(offsetsDp[i][1]);
+
+            sparkle.animate()
+                .alpha(1f)
+                .scaleX(1f)
+                .scaleY(1f)
+                .setStartDelay(i * 30L)
+                .setDuration(90)
+                .withEndAction(() -> sparkle.animate()
+                    .alpha(0f)
+                    .translationX(tx)
+                    .translationY(ty)
+                    .scaleX(1.2f)
+                    .scaleY(1.2f)
+                    .setDuration(200)
+                    .withEndAction(() -> {
+                        sparkle.setVisibility(View.INVISIBLE);
+                        sparkle.setTranslationX(0f);
+                        sparkle.setTranslationY(0f);
+                    })
+                    .start())
+                .start();
+        }
+    }
+
+    private float dpToPx(float dp) {
+        return dp * getResources().getDisplayMetrics().density;
     }
 
     private void loadNotifications() {
