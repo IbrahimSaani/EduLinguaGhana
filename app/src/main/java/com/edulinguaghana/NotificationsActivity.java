@@ -2,6 +2,7 @@ package com.edulinguaghana;
 
 import android.os.Bundle;
 import android.os.Build;
+import android.media.SoundPool;
 import android.os.VibrationEffect;
 import android.os.Vibrator;
 import android.view.Menu;
@@ -38,6 +39,8 @@ public class NotificationsActivity extends AppCompatActivity implements Notifica
     private NotificationsAdapter adapter;
     private NotificationManager notificationManager;
     private List<Notification> notifications;
+    private SoundPool soundPool;
+    private int bellSoundId;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -70,6 +73,12 @@ public class NotificationsActivity extends AppCompatActivity implements Notifica
 
         // Setup empty-state interactions
         setupEmptyStateInteractions();
+
+        // Initialize SoundPool for bell sound
+        soundPool = new SoundPool.Builder()
+                .setMaxStreams(1)
+                .build();
+        bellSoundId = soundPool.load(this, R.raw.bell, 1);
 
         // Initialize notification manager
         notificationManager = new NotificationManager(this);
@@ -129,6 +138,7 @@ public class NotificationsActivity extends AppCompatActivity implements Notifica
 
         emptyStateBellIcon.setOnClickListener(v -> {
             playBellSparkle();
+            playBellSound();
 
             v.animate()
                 .rotationBy(20f)
@@ -157,9 +167,10 @@ public class NotificationsActivity extends AppCompatActivity implements Notifica
             Vibrator vibrator = (Vibrator) getSystemService(VIBRATOR_SERVICE);
             if (vibrator != null && vibrator.hasVibrator()) {
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                    vibrator.vibrate(VibrationEffect.createOneShot(25, VibrationEffect.DEFAULT_AMPLITUDE));
+                    long[] pattern = {0, 60, 40, 80};
+                    vibrator.vibrate(VibrationEffect.createWaveform(pattern, -1));
                 } else {
-                    vibrator.vibrate(25);
+                    vibrator.vibrate(new long[]{0, 60, 40, 80}, -1);
                 }
             }
 
@@ -216,6 +227,12 @@ public class NotificationsActivity extends AppCompatActivity implements Notifica
 
     private float dpToPx(float dp) {
         return dp * getResources().getDisplayMetrics().density;
+    }
+
+    private void playBellSound() {
+        if (soundPool != null && bellSoundId > 0) {
+            soundPool.play(bellSoundId, 1f, 1f, 0, 0, 1f);
+        }
     }
 
     private void loadNotifications() {
@@ -366,6 +383,15 @@ public class NotificationsActivity extends AppCompatActivity implements Notifica
             return true;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if (soundPool != null) {
+            soundPool.release();
+            soundPool = null;
+        }
     }
 }
 
