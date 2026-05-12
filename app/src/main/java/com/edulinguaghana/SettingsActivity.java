@@ -35,9 +35,9 @@ public class SettingsActivity extends AppCompatActivity {
     private Button btnSyncToCloud;
     private Button btnSyncFromCloud;
     private Button btnChangeRole;
-    private View btnAppTutorial;
-    private View btnPrivacyPolicy;
-    private View btnContactUs;
+     private View btnAppTutorial;
+     private View btnPrivacyPolicy;
+     private View btnContactUs;
     private TextView tvLastSync;
     private TextView tvCurrentRole;
 
@@ -80,9 +80,9 @@ public class SettingsActivity extends AppCompatActivity {
         btnSyncToCloud = findViewById(R.id.btnSyncToCloud);
         btnSyncFromCloud = findViewById(R.id.btnSyncFromCloud);
         btnChangeRole = findViewById(R.id.btnChangeRole);
-        btnAppTutorial = findViewById(R.id.btnAppTutorial);
-        btnPrivacyPolicy = findViewById(R.id.btnPrivacyPolicy);
-        btnContactUs = findViewById(R.id.btnContactUs);
+         btnAppTutorial = findViewById(R.id.btnAppTutorial);
+         btnPrivacyPolicy = findViewById(R.id.btnPrivacyPolicy);
+         btnContactUs = findViewById(R.id.btnContactUs);
         tvLastSync = findViewById(R.id.tvLastSync);
         tvCurrentRole = findViewById(R.id.tvCurrentRole);
 
@@ -196,16 +196,16 @@ public class SettingsActivity extends AppCompatActivity {
         });
 
         // About & Privacy listeners
-        if (btnAppTutorial != null) {
-            btnAppTutorial.setOnClickListener(v -> {
-                Intent intent = new Intent(this, TutorialActivity.class);
-                startActivity(intent);
-            });
-        }
+         if (btnAppTutorial != null) {
+             btnAppTutorial.setOnClickListener(v -> {
+                 Intent intent = new Intent(this, TutorialActivity.class);
+                 startActivity(intent);
+             });
+         }
 
-        if (btnPrivacyPolicy != null) {
-            btnPrivacyPolicy.setOnClickListener(v -> showPrivacyPolicy());
-        }
+         if (btnPrivacyPolicy != null) {
+             btnPrivacyPolicy.setOnClickListener(v -> showPrivacyPolicy());
+         }
 
         if (btnContactUs != null) {
             btnContactUs.setOnClickListener(v -> contactDevelopers());
