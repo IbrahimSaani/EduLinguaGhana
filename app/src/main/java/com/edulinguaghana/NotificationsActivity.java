@@ -42,6 +42,7 @@ public class NotificationsActivity extends AppCompatActivity implements Notifica
     private SoundPool soundPool;
     private int bellSoundId;
     private Toast bellToast;
+    private boolean bellRotationInProgress;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -141,18 +142,22 @@ public class NotificationsActivity extends AppCompatActivity implements Notifica
             playBellSparkle();
             playBellSound();
 
-            v.animate()
-                .rotationBy(20f)
-                .setDuration(90)
-                .withEndAction(() -> v.animate()
-                    .rotationBy(-40f)
-                    .setDuration(120)
+            if (!bellRotationInProgress) {
+                bellRotationInProgress = true;
+                v.animate()
+                    .rotationBy(20f)
+                    .setDuration(90)
                     .withEndAction(() -> v.animate()
-                        .rotationBy(20f)
-                        .setDuration(90)
+                        .rotationBy(-40f)
+                        .setDuration(120)
+                        .withEndAction(() -> v.animate()
+                            .rotationBy(20f)
+                            .setDuration(90)
+                            .withEndAction(() -> bellRotationInProgress = false)
+                            .start())
                         .start())
-                    .start())
-                .start();
+                    .start();
+            }
 
             v.animate()
                 .scaleX(1.1f)
@@ -403,6 +408,10 @@ public class NotificationsActivity extends AppCompatActivity implements Notifica
             bellToast.cancel();
             bellToast = null;
         }
+        if (emptyStateBellIcon != null) {
+            emptyStateBellIcon.animate().cancel();
+        }
+        bellRotationInProgress = false;
         super.onDestroy();
         if (soundPool != null) {
             soundPool.release();
@@ -416,6 +425,10 @@ public class NotificationsActivity extends AppCompatActivity implements Notifica
         if (bellToast != null) {
             bellToast.cancel();
         }
+        if (emptyStateBellIcon != null) {
+            emptyStateBellIcon.animate().cancel();
+        }
+        bellRotationInProgress = false;
     }
 }
 
