@@ -11,6 +11,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.edulinguaghana.R;
 
+import com.edulinguaghana.roles.UserRole;
 import java.util.List;
 
 /**
@@ -20,6 +21,7 @@ public class StudentProgressAdapter extends RecyclerView.Adapter<StudentProgress
 
     private List<StudentProgressItem> students;
     private OnStudentClickListener listener;
+    private UserRole viewRole = UserRole.STUDENT;
 
     public interface OnStudentClickListener {
         void onStudentClick(String studentId);
@@ -28,6 +30,12 @@ public class StudentProgressAdapter extends RecyclerView.Adapter<StudentProgress
 
     public StudentProgressAdapter(List<StudentProgressItem> students, OnStudentClickListener listener) {
         this.students = students;
+        this.listener = listener;
+    }
+
+    public StudentProgressAdapter(List<StudentProgressItem> students, UserRole role, OnStudentClickListener listener) {
+        this.students = students;
+        this.viewRole = role;
         this.listener = listener;
     }
 
@@ -42,7 +50,7 @@ public class StudentProgressAdapter extends RecyclerView.Adapter<StudentProgress
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         StudentProgressItem item = students.get(position);
-        holder.bind(item, listener);
+        holder.bind(item, viewRole, listener);
     }
 
     @Override
@@ -85,7 +93,7 @@ public class StudentProgressAdapter extends RecyclerView.Adapter<StudentProgress
             btnRemove = itemView.findViewById(R.id.btnRemove);
         }
 
-        public void bind(StudentProgressItem item, OnStudentClickListener listener) {
+        public void bind(StudentProgressItem item, UserRole role, OnStudentClickListener listener) {
             ProgressAggregate progress = item.getProgress();
 
             tvStudentName.setText(item.getStudentName() != null ? item.getStudentName() : "Unknown Student");
@@ -94,12 +102,29 @@ public class StudentProgressAdapter extends RecyclerView.Adapter<StudentProgress
             tvQuizzes.setText(String.valueOf(progress.getTotalQuizzes()));
             tvAccuracy.setText(String.format("%.0f%%", progress.getAccuracy()));
 
-            if (progress.getCurrentStreak() > 0) {
+            // Role-based customization
+            if (role == UserRole.PARENT) {
+                // Parents might care less about accuracy percentage on the summary card
+                // Maybe we can show something else, but for now we'll just keep it consistent 
+                // with what we decided for the detail screen if needed.
+                // However, the detail screen hide Accuracy for parents.
+                // Let's hide the accuracy column for parents to make it feel different.
+                if (tvAccuracy != null && tvAccuracy.getParent() instanceof View) {
+                    ((View) tvAccuracy.getParent()).setVisibility(View.GONE);
+                }
+            } else if (role == UserRole.TEACHER) {
+                // Teachers focus on accuracy, maybe hide streak to keep it academic
+                if (streakLayout != null) {
+                    streakLayout.setVisibility(View.GONE);
+                }
+            }
+
+            if (role != UserRole.TEACHER && progress.getCurrentStreak() > 0) {
                 tvStreak.setText("🔥 " + progress.getCurrentStreak() + " day streak");
                 if (streakLayout != null) {
                     streakLayout.setVisibility(View.VISIBLE);
                 }
-            } else {
+            } else if (role != UserRole.TEACHER) {
                 if (streakLayout != null) {
                     streakLayout.setVisibility(View.GONE);
                 }

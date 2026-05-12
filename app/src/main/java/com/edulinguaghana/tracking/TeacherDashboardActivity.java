@@ -20,6 +20,7 @@ import com.edulinguaghana.R;
 import com.edulinguaghana.StyledMenuHelper;
 import com.edulinguaghana.roles.RoleManager;
 import com.edulinguaghana.roles.UserRelationship;
+import com.edulinguaghana.roles.UserRole;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.textfield.MaterialAutoCompleteTextView;
 import com.google.firebase.auth.FirebaseAuth;
@@ -52,6 +53,8 @@ public class TeacherDashboardActivity extends AppCompatActivity {
     private TextView tvTotalStudents;
     private TextView tvAvgLevel;
     private TextView tvActiveToday;
+    private TextView tvClassAccuracy;
+    private TextView tvTotalWeeklyQuizzes;
 
     private RoleManager roleManager;
     private ProgressTracker progressTracker;
@@ -118,6 +121,8 @@ public class TeacherDashboardActivity extends AppCompatActivity {
         tvTotalStudents = findViewById(R.id.tvTotalStudents);
         tvAvgLevel = findViewById(R.id.tvAvgLevel);
         tvActiveToday = findViewById(R.id.tvActiveToday);
+        tvClassAccuracy = findViewById(R.id.tvClassAccuracy);
+        tvTotalWeeklyQuizzes = findViewById(R.id.tvTotalWeeklyQuizzes);
 
 
         if (btnAddFirstStudent != null) {
@@ -205,7 +210,7 @@ public class TeacherDashboardActivity extends AppCompatActivity {
     }
 
     private void setupRecyclerView() {
-        adapter = new StudentProgressAdapter(new ArrayList<>(), new StudentProgressAdapter.OnStudentClickListener() {
+        adapter = new StudentProgressAdapter(new ArrayList<>(), UserRole.TEACHER, new StudentProgressAdapter.OnStudentClickListener() {
             @Override
             public void onStudentClick(String studentId) {
                 // Open detailed view for this student
@@ -450,11 +455,15 @@ public class TeacherDashboardActivity extends AppCompatActivity {
         int totalStudents = students.size();
         int totalLevels = 0;
         int activeToday = 0;
+        int totalWeeklyQuizzes = 0;
+        double totalAccuracy = 0;
         long oneDayAgo = System.currentTimeMillis() - (24 * 60 * 60 * 1000);
 
         for (StudentProgressItem student : students) {
             ProgressAggregate progress = student.getProgress();
             totalLevels += progress.getCurrentLevel();
+            totalWeeklyQuizzes += progress.getQuizzesThisWeek();
+            totalAccuracy += progress.getAccuracy();
 
             if (progress.getLastUpdated() > oneDayAgo) {
                 activeToday++;
@@ -472,6 +481,15 @@ public class TeacherDashboardActivity extends AppCompatActivity {
 
         if (tvActiveToday != null) {
             tvActiveToday.setText(String.valueOf(activeToday));
+        }
+
+        if (tvClassAccuracy != null) {
+            double avgAccuracy = totalStudents > 0 ? totalAccuracy / totalStudents : 0;
+            tvClassAccuracy.setText(String.format("%.1f%%", avgAccuracy));
+        }
+
+        if (tvTotalWeeklyQuizzes != null) {
+            tvTotalWeeklyQuizzes.setText(String.valueOf(totalWeeklyQuizzes));
         }
     }
 

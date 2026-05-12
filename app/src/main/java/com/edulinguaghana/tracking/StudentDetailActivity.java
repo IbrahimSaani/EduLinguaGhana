@@ -13,6 +13,9 @@ import androidx.cardview.widget.CardView;
 import androidx.annotation.NonNull;
 
 import com.edulinguaghana.R;
+import com.edulinguaghana.roles.RoleManager;
+import com.edulinguaghana.roles.UserRole;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -32,12 +35,12 @@ public class StudentDetailActivity extends AppCompatActivity {
 
     private String studentId;
     private String studentName;
+    private UserRole currentUserRole = UserRole.STUDENT;
 
     private ProgressBar loadingProgress;
     private CardView statsCard;
     private TextView tvStudentName;
     private TextView tvStudentAge;
-    private TextView tvStudentSchool;
     private TextView tvStudentClass;
     private TextView tvLevel;
     private TextView tvTotalXP;
@@ -46,14 +49,33 @@ public class StudentDetailActivity extends AppCompatActivity {
     private TextView tvTotalQuizzes;
     private TextView tvAccuracy;
     private TextView tvHighScore;
+    private TextView tvAverageScore;
+    private TextView tvTotalQuestions;
     private TextView tvQuizzesThisWeek;
     private TextView tvXPThisWeek;
     private TextView tvLastActive;
     private TextView tvTotalAchievements;
     private TextView tvTotalBadges;
+    private TextView tvDaysActive;
+    private TextView tvTimeSpent;
+
+    // Section views for role-based customization
+    private View dividerStreaks;
+    private View tvLabelStreaks;
+    private View layoutStreaks;
+    private View dividerQuizStats;
+    private View tvLabelQuizPerformance;
+    private View layoutQuizStats;
+    private View dividerAchievements;
+    private View tvLabelAchievements;
+    private View layoutAchievements;
+    private View dividerEngagement;
+    private View tvLabelEngagement;
+    private View layoutEngagement;
 
     private ProgressTracker progressTracker;
     private DatabaseReference progressRef;
+    private RoleManager roleManager;
     private boolean initialLoadComplete = false;
     private long lastObservedActivityTimestamp = -1L;
 
@@ -70,12 +92,80 @@ public class StudentDetailActivity extends AppCompatActivity {
         }
 
         progressTracker = new ProgressTracker();
+        roleManager = new RoleManager();
         progressRef = FirebaseDatabase.getInstance().getReference("progress").child(studentId);
 
         initViews();
+        loadCurrentUserRole();
         loadStudentInfo();
         loadProgressData();
         setupRealtimeListener();
+    }
+
+    private void loadCurrentUserRole() {
+        String uid = FirebaseAuth.getInstance().getUid();
+        if (uid != null) {
+            roleManager.getUserRole(this, uid, new RoleManager.RoleCallback() {
+                @Override
+                public void onRoleRetrieved(UserRole role) {
+                    currentUserRole = role;
+                    applyRoleBasedUI();
+                    updateTitle();
+                }
+
+                @Override
+                public void onError(String error) {
+                    Log.e(TAG, "Error loading current user role: " + error);
+                }
+            });
+        }
+    }
+
+    private void applyRoleBasedUI() {
+        // Differentiate view based on role
+        if (currentUserRole == UserRole.PARENT) {
+            // Parents focus on engagement and rewards
+            if (tvLabelQuizPerformance != null) tvLabelQuizPerformance.setVisibility(View.GONE);
+            if (layoutQuizStats != null) layoutQuizStats.setVisibility(View.GONE);
+            if (dividerQuizStats != null) dividerQuizStats.setVisibility(View.GONE);
+
+            if (tvLabelEngagement != null) tvLabelEngagement.setVisibility(View.GONE);
+            if (layoutEngagement != null) layoutEngagement.setVisibility(View.GONE);
+            if (dividerEngagement != null) dividerEngagement.setVisibility(View.GONE);
+
+            if (tvLabelStreaks != null) tvLabelStreaks.setVisibility(View.VISIBLE);
+            if (layoutStreaks != null) layoutStreaks.setVisibility(View.VISIBLE);
+            if (dividerStreaks != null) dividerStreaks.setVisibility(View.VISIBLE);
+            
+            if (tvLabelAchievements != null) tvLabelAchievements.setVisibility(View.VISIBLE);
+            if (layoutAchievements != null) layoutAchievements.setVisibility(View.VISIBLE);
+            if (dividerAchievements != null) dividerAchievements.setVisibility(View.VISIBLE);
+        } else if (currentUserRole == UserRole.TEACHER) {
+            // Teachers focus on academic performance
+            if (tvLabelStreaks != null) tvLabelStreaks.setVisibility(View.GONE);
+            if (layoutStreaks != null) layoutStreaks.setVisibility(View.GONE);
+            if (dividerStreaks != null) dividerStreaks.setVisibility(View.GONE);
+
+            if (tvLabelAchievements != null) tvLabelAchievements.setVisibility(View.GONE);
+            if (layoutAchievements != null) layoutAchievements.setVisibility(View.GONE);
+            if (dividerAchievements != null) dividerAchievements.setVisibility(View.GONE);
+
+            if (tvLabelQuizPerformance != null) tvLabelQuizPerformance.setVisibility(View.VISIBLE);
+            if (layoutQuizStats != null) layoutQuizStats.setVisibility(View.VISIBLE);
+            if (dividerQuizStats != null) dividerQuizStats.setVisibility(View.VISIBLE);
+
+            if (tvLabelEngagement != null) tvLabelEngagement.setVisibility(View.VISIBLE);
+            if (layoutEngagement != null) layoutEngagement.setVisibility(View.VISIBLE);
+            if (dividerEngagement != null) dividerEngagement.setVisibility(View.VISIBLE);
+        }
+    }
+
+    private void updateTitle() {
+        if (getSupportActionBar() != null) {
+            String prefix = (currentUserRole == UserRole.PARENT) ? "Child: " : "Student: ";
+            getSupportActionBar().setTitle(studentName != null ? prefix + studentName : 
+                    (currentUserRole == UserRole.PARENT ? "Child Progress" : "Student Progress"));
+        }
     }
 
     private void initViews() {
@@ -90,7 +180,6 @@ public class StudentDetailActivity extends AppCompatActivity {
         statsCard = findViewById(R.id.statsCard);
         tvStudentName = findViewById(R.id.tvStudentName);
         tvStudentAge = findViewById(R.id.tvStudentAge);
-        tvStudentSchool = findViewById(R.id.tvStudentSchool);
         tvStudentClass = findViewById(R.id.tvStudentClass);
         tvLevel = findViewById(R.id.tvLevel);
         tvTotalXP = findViewById(R.id.tvTotalXP);
@@ -99,11 +188,28 @@ public class StudentDetailActivity extends AppCompatActivity {
         tvTotalQuizzes = findViewById(R.id.tvTotalQuizzes);
         tvAccuracy = findViewById(R.id.tvAccuracy);
         tvHighScore = findViewById(R.id.tvHighScore);
+        tvAverageScore = findViewById(R.id.tvAverageScore);
+        tvTotalQuestions = findViewById(R.id.tvTotalQuestions);
         tvQuizzesThisWeek = findViewById(R.id.tvQuizzesThisWeek);
         tvXPThisWeek = findViewById(R.id.tvXPThisWeek);
         tvLastActive = findViewById(R.id.tvLastActive);
         tvTotalAchievements = findViewById(R.id.tvTotalAchievements);
         tvTotalBadges = findViewById(R.id.tvTotalBadges);
+        tvDaysActive = findViewById(R.id.tvDaysActive);
+        tvTimeSpent = findViewById(R.id.tvTimeSpent);
+
+        dividerStreaks = findViewById(R.id.dividerStreaks);
+        tvLabelStreaks = findViewById(R.id.tvLabelStreaks);
+        layoutStreaks = findViewById(R.id.layoutStreaks);
+        dividerQuizStats = findViewById(R.id.dividerQuizStats);
+        tvLabelQuizPerformance = findViewById(R.id.tvLabelQuizPerformance);
+        layoutQuizStats = findViewById(R.id.layoutQuizStats);
+        dividerAchievements = findViewById(R.id.dividerAchievements);
+        tvLabelAchievements = findViewById(R.id.tvLabelAchievements);
+        layoutAchievements = findViewById(R.id.layoutAchievements);
+        dividerEngagement = findViewById(R.id.dividerEngagement);
+        tvLabelEngagement = findViewById(R.id.tvLabelEngagement);
+        layoutEngagement = findViewById(R.id.layoutEngagement);
     }
 
     private void loadStudentInfo() {
@@ -122,7 +228,6 @@ public class StudentDetailActivity extends AppCompatActivity {
                     }
 
                     String age = snapshot.child("age").getValue(String.class);
-                    String school = snapshot.child("school").getValue(String.class);
                     String studentClass = snapshot.child("studentClass").getValue(String.class);
 
                     if (tvStudentName != null) {
@@ -133,17 +238,11 @@ public class StudentDetailActivity extends AppCompatActivity {
                         tvStudentAge.setText(!isEmptyValue(age) ? age : "Not set");
                     }
 
-                    if (tvStudentSchool != null) {
-                        tvStudentSchool.setText(!isEmptyValue(school) ? school : "Not set");
-                    }
-
                     if (tvStudentClass != null) {
                         tvStudentClass.setText(!isEmptyValue(studentClass) ? studentClass : "Not set");
                     }
 
-                    if (getSupportActionBar() != null) {
-                        getSupportActionBar().setTitle(studentName != null ? studentName : "Student Progress");
-                    }
+                    updateTitle();
                 }
             }
 
@@ -202,10 +301,23 @@ public class StudentDetailActivity extends AppCompatActivity {
         tvTotalQuizzes.setText(String.valueOf(aggregate.getTotalQuizzes()));
         tvAccuracy.setText(String.format(Locale.getDefault(), "%.1f%%", aggregate.getAccuracy()));
         tvHighScore.setText(String.valueOf(aggregate.getHighestScore()));
+        tvAverageScore.setText(String.format(Locale.getDefault(), "%.1f", aggregate.getAverageScore()));
+        tvTotalQuestions.setText(String.valueOf(aggregate.getTotalQuestions()));
         tvQuizzesThisWeek.setText(String.valueOf(aggregate.getQuizzesThisWeek()));
         tvXPThisWeek.setText(String.valueOf(aggregate.getXpThisWeek()));
         tvTotalAchievements.setText(String.valueOf(aggregate.getTotalAchievements()));
         tvTotalBadges.setText(String.valueOf(aggregate.getTotalBadges()));
+        tvDaysActive.setText(String.valueOf(aggregate.getDaysActive()));
+
+        // Format time spent (convert seconds to minutes)
+        long minutes = aggregate.getTotalTimeSpentSeconds() / 60;
+        if (minutes < 60) {
+            tvTimeSpent.setText(minutes + "m");
+        } else {
+            long hours = minutes / 60;
+            long remainingMinutes = minutes % 60;
+            tvTimeSpent.setText(hours + "h " + remainingMinutes + "m");
+        }
 
         // Format last active time
         if (aggregate.getLastUpdated() > 0) {

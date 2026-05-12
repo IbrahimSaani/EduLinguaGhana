@@ -20,6 +20,7 @@ import com.edulinguaghana.R;
 import com.edulinguaghana.StyledMenuHelper;
 import com.edulinguaghana.roles.RoleManager;
 import com.edulinguaghana.roles.UserRelationship;
+import com.edulinguaghana.roles.UserRole;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.textfield.MaterialAutoCompleteTextView;
 import com.google.firebase.auth.FirebaseAuth;
@@ -204,7 +205,7 @@ public class ParentDashboardActivity extends AppCompatActivity {
     }
 
     private void setupRecyclerView() {
-        adapter = new StudentProgressAdapter(new ArrayList<>(), new StudentProgressAdapter.OnStudentClickListener() {
+        adapter = new StudentProgressAdapter(new ArrayList<>(), UserRole.PARENT, new StudentProgressAdapter.OnStudentClickListener() {
             @Override
             public void onStudentClick(String studentId) {
                 // Open detailed view for this child

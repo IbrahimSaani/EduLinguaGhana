@@ -149,32 +149,6 @@
                             <LinearLayout
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
-                                android:orientation="horizontal"
-                                android:layout_marginBottom="10dp">
-
-                                <TextView
-                                    android:layout_width="0dp"
-                                    android:layout_height="wrap_content"
-                                    android:layout_weight="1"
-                                    android:text="School"
-                                    android:textColor="@color/textColorSecondary"
-                                    android:textSize="13sp" />
-
-                                <TextView
-                                    android:id="@+id/tvStudentSchool"
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:text="Not set"
-                                    android:textColor="@color/textColorPrimary"
-                                    android:textStyle="bold"
-                                    android:textSize="13sp"
-                                    android:maxLines="1"
-                                    android:ellipsize="end" />
-                            </LinearLayout>
-
-                            <LinearLayout
-                                android:layout_width="match_parent"
-                                android:layout_height="wrap_content"
                                 android:orientation="horizontal">
 
                                 <TextView
@@ -277,6 +251,7 @@
 
                     <!-- Divider -->
                     <View
+                        android:id="@+id/dividerStreaks"
                         android:layout_width="match_parent"
                         android:layout_height="1dp"
                         android:background="@color/dividerColor"
@@ -284,6 +259,7 @@
 
                     <!-- Streaks -->
                     <TextView
+                        android:id="@+id/tvLabelStreaks"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="🔥 Streaks"
@@ -293,6 +269,7 @@
                         android:layout_marginBottom="12dp"/>
 
                     <LinearLayout
+                        android:id="@+id/layoutStreaks"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:orientation="horizontal"
@@ -358,6 +335,7 @@
 
                     <!-- Divider -->
                     <View
+                        android:id="@+id/dividerQuizStats"
                         android:layout_width="match_parent"
                         android:layout_height="1dp"
                         android:background="@color/dividerColor"
@@ -365,6 +343,7 @@
 
                     <!-- Quiz Stats -->
                     <TextView
+                        android:id="@+id/tvLabelQuizPerformance"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="📝 Quiz Performance"
@@ -374,6 +353,198 @@
                         android:layout_marginBottom="12dp"/>
 
                     <LinearLayout
+                        android:id="@+id/layoutQuizStats"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:layout_marginBottom="16dp">
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal">
+
+                            <LinearLayout
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:orientation="vertical"
+                                android:gravity="center"
+                                android:padding="8dp">
+
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="Total Quizzes"
+                                    android:textSize="12sp"
+                                    android:textColor="@color/textColorSecondary"
+                                    android:layout_marginBottom="4dp"/>
+
+                                <TextView
+                                    android:id="@+id/tvTotalQuizzes"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="0"
+                                    android:textSize="20sp"
+                                    android:textStyle="bold"
+                                    android:textColor="@color/textColorPrimary"/>
+                            </LinearLayout>
+
+                            <View
+                                android:layout_width="1dp"
+                                android:layout_height="match_parent"
+                                android:background="@color/dividerColor"/>
+
+                            <LinearLayout
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:orientation="vertical"
+                                android:gravity="center"
+                                android:padding="8dp">
+
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="Accuracy"
+                                    android:textSize="12sp"
+                                    android:textColor="@color/textColorSecondary"
+                                    android:layout_marginBottom="4dp"/>
+
+                                <TextView
+                                    android:id="@+id/tvAccuracy"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="0%"
+                                    android:textSize="20sp"
+                                    android:textStyle="bold"
+                                    android:textColor="@color/correctAnswer"/>
+                            </LinearLayout>
+
+                            <View
+                                android:layout_width="1dp"
+                                android:layout_height="match_parent"
+                                android:background="@color/dividerColor"/>
+
+                            <LinearLayout
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:orientation="vertical"
+                                android:gravity="center"
+                                android:padding="8dp">
+
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="High Score"
+                                    android:textSize="12sp"
+                                    android:textColor="@color/textColorSecondary"
+                                    android:layout_marginBottom="4dp"/>
+
+                                <TextView
+                                    android:id="@+id/tvHighScore"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="0"
+                                    android:textSize="20sp"
+                                    android:textStyle="bold"
+                                    android:textColor="@color/colorAccent"/>
+                            </LinearLayout>
+                        </LinearLayout>
+
+                        <View
+                            android:layout_width="match_parent"
+                            android:layout_height="1dp"
+                            android:background="@color/dividerColor"
+                            android:layout_marginTop="8dp"
+                            android:layout_marginBottom="8dp"/>
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal">
+
+                            <LinearLayout
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:orientation="vertical"
+                                android:gravity="center"
+                                android:padding="8dp">
+
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="Avg Score"
+                                    android:textSize="12sp"
+                                    android:textColor="@color/textColorSecondary"
+                                    android:layout_marginBottom="4dp"/>
+
+                                <TextView
+                                    android:id="@+id/tvAverageScore"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="0.0"
+                                    android:textSize="20sp"
+                                    android:textStyle="bold"
+                                    android:textColor="@color/colorPrimary"/>
+                            </LinearLayout>
+
+                            <View
+                                android:layout_width="1dp"
+                                android:layout_height="match_parent"
+                                android:background="@color/dividerColor"/>
+
+                            <LinearLayout
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:orientation="vertical"
+                                android:gravity="center"
+                                android:padding="8dp">
+
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="Questions"
+                                    android:textSize="12sp"
+                                    android:textColor="@color/textColorSecondary"
+                                    android:layout_marginBottom="4dp"/>
+
+                                <TextView
+                                    android:id="@+id/tvTotalQuestions"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="0"
+                                    android:textSize="20sp"
+                                    android:textStyle="bold"
+                                    android:textColor="@color/textColorPrimary"/>
+                            </LinearLayout>
+                        </LinearLayout>
+                    </LinearLayout>
+
+                    <!-- Engagement Divider (Teacher only) -->
+                    <View
+                        android:id="@+id/dividerEngagement"
+                        android:layout_width="match_parent"
+                        android:layout_height="1dp"
+                        android:background="@color/dividerColor"
+                        android:layout_marginBottom="16dp"/>
+
+                    <!-- Learning Activity (Teacher only) -->
+                    <TextView
+                        android:id="@+id/tvLabelEngagement"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="📈 Learning Activity"
+                        android:textSize="18sp"
+                        android:textStyle="bold"
+                        android:textColor="@color/colorPrimary"
+                        android:layout_marginBottom="12dp"/>
+
+                    <LinearLayout
+                        android:id="@+id/layoutEngagement"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:orientation="horizontal"
@@ -385,18 +556,18 @@
                             android:layout_weight="1"
                             android:orientation="vertical"
                             android:gravity="center"
-                            android:padding="8dp">
+                            android:padding="12dp">
 
                             <TextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="Total Quizzes"
+                                android:text="Days Active"
                                 android:textSize="12sp"
                                 android:textColor="@color/textColorSecondary"
                                 android:layout_marginBottom="4dp"/>
 
                             <TextView
-                                android:id="@+id/tvTotalQuizzes"
+                                android:id="@+id/tvDaysActive"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:text="0"
@@ -416,52 +587,21 @@
                             android:layout_weight="1"
                             android:orientation="vertical"
                             android:gravity="center"
-                            android:padding="8dp">
+                            android:padding="12dp">
 
                             <TextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="Accuracy"
+                                android:text="Time Spent"
                                 android:textSize="12sp"
                                 android:textColor="@color/textColorSecondary"
                                 android:layout_marginBottom="4dp"/>
 
                             <TextView
-                                android:id="@+id/tvAccuracy"
+                                android:id="@+id/tvTimeSpent"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="0%"
-                                android:textSize="20sp"
-                                android:textStyle="bold"
-                                android:textColor="@color/correctAnswer"/>
-                        </LinearLayout>
-
-                        <View
-                            android:layout_width="1dp"
-                            android:layout_height="match_parent"
-                            android:background="@color/dividerColor"/>
-
-                        <LinearLayout
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:orientation="vertical"
-                            android:gravity="center"
-                            android:padding="8dp">
-
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="High Score"
-                                android:textSize="12sp"
-                                android:textColor="@color/textColorSecondary"
-                                android:layout_marginBottom="4dp"/>
-
-                            <TextView
-                                android:id="@+id/tvHighScore"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="0"
+                                android:text="0m"
                                 android:textSize="20sp"
                                 android:textStyle="bold"
                                 android:textColor="@color/colorAccent"/>
@@ -551,6 +691,7 @@
 
                     <!-- Divider -->
                     <View
+                        android:id="@+id/dividerAchievements"
                         android:layout_width="match_parent"
                         android:layout_height="1dp"
                         android:background="@color/dividerColor"
@@ -558,6 +699,7 @@
 
                     <!-- Achievements -->
                     <TextView
+                        android:id="@+id/tvLabelAchievements"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="🏆 Achievements"
@@ -567,6 +709,7 @@
                         android:layout_marginBottom="12dp"/>
 
                     <LinearLayout
+                        android:id="@+id/layoutAchievements"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:orientation="horizontal">
