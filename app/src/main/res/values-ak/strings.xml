@@ -5,6 +5,7 @@
     <!-- Quiz Prompts - Twi -->
     <string name="quiz_prompt_letter">Wɔ ka abidifo ɛsɛm?</string>
     <string name="quiz_prompt_number">Wɔ ka nɔmba ɛsɛm?</string>
+    <string name="quiz_prompt_sequence_find">Hwehwɛ nɔma a ɛyerae no:</string>
     <string name="quiz_prompt_matching">Hwan no din a ɛfiri abidifo %s?</string>
 
     <!-- Quiz Feedback -->

@@ -191,6 +191,15 @@ public class QuizActivity extends AppCompatActivity {
         btnEndQuit.setOnClickListener(v -> finish());
     }
 
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if (item.getItemId() == android.R.id.home) {
+            finish();
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
     private void bindViews() {
         toolbar = findViewById(R.id.toolbar);
         appBarLayout = findViewById(R.id.appBarLayout);
@@ -623,7 +632,7 @@ public class QuizActivity extends AppCompatActivity {
     }
 
     private void generateSequenceQuestion() {
-        int start = random.nextInt(20) + 1;
+        int start = random.nextInt(Math.max(1, MAX_NUMBER - 5)) + 1;
         int step = 1;
         int[] seq = new int[4];
         for (int i = 0; i < 4; i++) {
@@ -634,9 +643,19 @@ public class QuizActivity extends AppCompatActivity {
         int missingValue = seq[missingIndex];
         currentCorrectAnswer = String.valueOf(missingValue);
 
-        // Display sequence prompt without localization
+        // Display sequence prompt with words for non-English languages
         if (tvGamePrompt != null) {
-            tvGamePrompt.setText("Find the missing number: " + seq[0] + ", " + seq[1] + ", ?, " + seq[3]);
+            String s0 = String.valueOf(seq[0]);
+            String s1 = String.valueOf(seq[1]);
+            String s3 = String.valueOf(seq[3]);
+
+            if (!languageCode.equals("en")) {
+                s0 = LanguageConversionUtils.convertNumberToWord(seq[0], languageCode);
+                s1 = LanguageConversionUtils.convertNumberToWord(seq[1], languageCode);
+                s3 = LanguageConversionUtils.convertNumberToWord(seq[3], languageCode);
+            }
+
+            tvGamePrompt.setText(getString(R.string.quiz_prompt_sequence_find) + "\n" + s0 + ", " + s1 + ", ?, " + s3);
         }
 
         List<String> options = new ArrayList<>();

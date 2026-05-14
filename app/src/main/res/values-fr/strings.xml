@@ -5,6 +5,7 @@
     <!-- Quiz Prompts - French -->
     <string name="quiz_prompt_letter">Quelle lettre avez-vous entendue?</string>
     <string name="quiz_prompt_number">Quel numéro avez-vous entendu?</string>
+    <string name="quiz_prompt_sequence_find">Trouvez le nombre manquant:</string>
     <string name="quiz_prompt_matching">Quel mot commence par la lettre %s?</string>
 
     <!-- Quiz Feedback -->

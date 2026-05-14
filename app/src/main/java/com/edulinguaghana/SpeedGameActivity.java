@@ -329,17 +329,27 @@ public class SpeedGameActivity extends AppCompatActivity {
     // NEW: Generate sequence question
     private void generateSequenceQuestion() {
         Random rnd = new Random();
-        int start = rnd.nextInt(20) + 1;
+        int start = rnd.nextInt(Math.max(1, MAX_NUMBER - 5)) + 1;
         int[] seq = new int[4];
         for (int i = 0; i < 4; i++) {
             seq[i] = start + i;
         }
-        int missingIndex = rnd.nextInt(2) + 1;
+        int missingIndex = 2; // Fixed missing index for simplicity
         int missingValue = seq[missingIndex];
         currentCorrectAnswer = String.valueOf(missingValue);
 
-        // Build a short sequence prompt. Use localized base question and add numbers.
-        tvGamePrompt.setText(getString(R.string.quiz_prompt_number) + " " + seq[0] + ", " + seq[1] + ", ?, " + seq[3]);
+        // Build sequence prompt with words for non-English languages
+        String s0 = String.valueOf(seq[0]);
+        String s1 = String.valueOf(seq[1]);
+        String s3 = String.valueOf(seq[3]);
+
+        if (!languageCode.equals("en")) {
+            s0 = LanguageConversionUtils.convertNumberToWord(seq[0], languageCode);
+            s1 = LanguageConversionUtils.convertNumberToWord(seq[1], languageCode);
+            s3 = LanguageConversionUtils.convertNumberToWord(seq[3], languageCode);
+        }
+
+        tvGamePrompt.setText(getString(R.string.quiz_prompt_sequence_find) + "\n" + s0 + ", " + s1 + ", ?, " + s3);
         tvGameFeedback.setText("");
 
         List<String> options = new ArrayList<>();

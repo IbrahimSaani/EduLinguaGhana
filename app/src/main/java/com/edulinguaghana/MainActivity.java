@@ -1049,6 +1049,12 @@ public class MainActivity extends AppCompatActivity {
                 () -> openQuizScreen(langCode, langName, "basic", "beginner", "all")
         ));
         menuItems.add(new StyledMenuHelper.MenuItem(
+                "🔢",
+                "Numbers Quiz",
+                "Listen and identify numbers",
+                () -> openQuizScreen(langCode, langName, "numbers", "beginner", "all")
+        ));
+        menuItems.add(new StyledMenuHelper.MenuItem(
                 "📊",
                 "Number Sequencing",
                 "Find the missing number",

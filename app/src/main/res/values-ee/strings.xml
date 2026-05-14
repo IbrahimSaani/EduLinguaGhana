@@ -5,6 +5,7 @@
     <!-- Quiz Prompts - Ewe -->
     <string name="quiz_prompt_letter">Kede ka ŋutsoƒe lɔme?</string>
     <string name="quiz_prompt_number">Kede ka nɔmba lɔme?</string>
+    <string name="quiz_prompt_sequence_find">Di nɔmba si bu:</string>
     <string name="quiz_prompt_matching">Kaɖe ŋuta si ŋu ta kple kede %s?</string>
 
     <!-- Quiz Feedback -->
