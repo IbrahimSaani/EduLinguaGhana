@@ -33,6 +33,7 @@ import com.edulinguaghana.utils.LanguageConversionUtils;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
@@ -87,6 +88,10 @@ public class QuizActivity extends AppCompatActivity {
     private String currentCorrectAnswer;
     private String currentPromptTtsText;
     private boolean isSfxOn = true;
+
+    // Matching mode state
+    private MaterialButton firstSelectedButton = null;
+    private int matchingPairsRemaining = 0;
 
     // Offline TTS for native Ghanaian languages (loads pre-recorded audio from res/raw)
     private OfflineGhanaLPTtsService offlineTts;
@@ -685,40 +690,134 @@ public class QuizActivity extends AppCompatActivity {
     }
 
     private void generateMatchingQuestion() {
-        // Use fallback matching with hardcoded words
-        int idx = random.nextInt(matchLetters.length);
-        String letter = matchLetters[idx];
-        String correctWord = matchWords[idx];
-        currentCorrectAnswer = correctWord;
         if (tvGamePrompt != null) {
-            tvGamePrompt.setText(getString(R.string.quiz_prompt_matching, letter));
+            tvGamePrompt.setText(R.string.quiz_prompt_matching_pairs);
         }
 
-        List<String> options = new ArrayList<>();
-        Set<Integer> used = new HashSet<>();
-        options.add(correctWord);
-        used.add(idx);
+        // Get 3 random pairs from the matching pool
+        List<Integer> indices = new ArrayList<>();
+        for (int i = 0; i < matchLetters.length; i++) indices.add(i);
+        Collections.shuffle(indices);
 
-        while (options.size() < 6 && used.size() < matchWords.length) {
-            int pick = random.nextInt(matchWords.length);
-            if (!used.contains(pick)) {
-                options.add(matchWords[pick]);
-                used.add(pick);
+        List<String> displayItems = new ArrayList<>();
+        Map<String, String> pairs = new HashMap<>();
+
+        for (int i = 0; i < 3; i++) {
+            int idx = indices.get(i);
+            String letter = matchLetters[idx];
+            String word = matchWords[idx];
+            displayItems.add(letter);
+            displayItems.add(word);
+            pairs.put(letter, word);
+            pairs.put(word, letter); // Bidirectional for easy checking
+        }
+
+        Collections.shuffle(displayItems);
+
+        MaterialButton[] buttons = {btnOption1, btnOption2, btnOption3, btnOption4, btnOption5, btnOption6};
+        for (int i = 0; i < 6; i++) {
+            if (buttons[i] != null) {
+                buttons[i].setText(displayItems.get(i));
+                buttons[i].setTag(pairs.get(displayItems.get(i)));
+                buttons[i].setVisibility(View.VISIBLE);
+                buttons[i].setAlpha(1.0f);
+                buttons[i].setEnabled(true);
+                buttons[i].setStrokeWidth(2); // Reset stroke width
             }
         }
 
-        while (options.size() < 6) {
-            options.add(matchWords[random.nextInt(matchWords.length)]);
+        matchingPairsRemaining = 3;
+        firstSelectedButton = null;
+        currentCorrectAnswer = "MATCHING_MODE"; // Marker for generic check
+        currentPromptTtsText = "Match the letters to the words";
+    }
+
+    private void handleMatchingClick(MaterialButton clickedButton) {
+        if (firstSelectedButton == null) {
+            // First selection
+            firstSelectedButton = clickedButton;
+            clickedButton.setStrokeColor(ColorStateList.valueOf(ContextCompat.getColor(this, R.color.colorAccent)));
+            clickedButton.setStrokeWidth(6);
+            return;
         }
 
-        Collections.shuffle(options);
-        if (btnOption1 != null) btnOption1.setText(options.get(0));
-        if (btnOption2 != null) btnOption2.setText(options.get(1));
-        if (btnOption3 != null) btnOption3.setText(options.get(2));
-        if (btnOption4 != null) btnOption4.setText(options.get(3));
-        if (btnOption5 != null) btnOption5.setText(options.get(4));
-        if (btnOption6 != null) btnOption6.setText(options.get(5));
-        currentPromptTtsText = letter;
+        if (firstSelectedButton == clickedButton) {
+            // Deselect
+            firstSelectedButton.setStrokeColor(ColorStateList.valueOf(ContextCompat.getColor(this, R.color.buttonSecondary)));
+            firstSelectedButton.setStrokeWidth(2);
+            firstSelectedButton = null;
+            return;
+        }
+
+        // Second selection - Check match
+        String secondVal = clickedButton.getText().toString();
+        String targetForFirst = (String) firstSelectedButton.getTag();
+
+        if (secondVal.equals(targetForFirst)) {
+            // Correct Match!
+            playSfx(true);
+            score++;
+            tvGameScore.setText(String.format(Locale.getDefault(), getString(R.string.quiz_score), score));
+            tvGameFeedback.setText("Match found! ✨");
+            tvGameFeedback.setTextColor(ContextCompat.getColor(this, R.color.correctAnswer));
+            
+            if (score > bestScore) {
+                bestScore = score;
+                saveHighScore();
+            }
+
+            // Animate and hide matched buttons
+            final MaterialButton first = firstSelectedButton;
+            final MaterialButton second = clickedButton;
+            first.animate().alpha(0).scaleX(0.5f).scaleY(0.5f).setDuration(300).withEndAction(() -> first.setVisibility(View.INVISIBLE));
+            second.animate().alpha(0).scaleX(0.5f).scaleY(0.5f).setDuration(300).withEndAction(() -> second.setVisibility(View.INVISIBLE));
+
+            matchingPairsRemaining--;
+            firstSelectedButton = null;
+
+            if (matchingPairsRemaining == 0) {
+                cancelTimer();
+                tvGameFeedback.setText(R.string.quiz_feedback_correct);
+                tvGameFeedback.setTextColor(ContextCompat.getColor(this, R.color.correctAnswer));
+
+                new Handler().postDelayed(() -> {
+                    if (remainingTime <= 0) {
+                        endQuiz();
+                    } else {
+                        generateNewQuestion();
+                        startTimer();
+                    }
+                }, 1000);
+            }
+        } else {
+            // Wrong Match
+            playSfx(false);
+            tvGameFeedback.setText("Not a match! ❌");
+            tvGameFeedback.setTextColor(ContextCompat.getColor(this, R.color.wrongAnswer));
+
+            firstSelectedButton.setStrokeColor(ColorStateList.valueOf(ContextCompat.getColor(this, R.color.wrongAnswer)));
+            clickedButton.setStrokeColor(ColorStateList.valueOf(ContextCompat.getColor(this, R.color.wrongAnswer)));
+
+            remainingTime -= PENALTY_TIME;
+            if (remainingTime < 0) remainingTime = 0;
+            if (tvGameTimer != null) {
+                tvGameTimer.setText(String.format(Locale.getDefault(), getString(R.string.quiz_timer), remainingTime / 1000));
+            }
+
+            Animation shake = AnimationUtils.loadAnimation(this, R.anim.wrong_answer);
+            clickedButton.startAnimation(shake);
+
+            final MaterialButton first = firstSelectedButton;
+            final MaterialButton second = clickedButton;
+            firstSelectedButton = null;
+
+            new Handler().postDelayed(() -> {
+                first.setStrokeColor(ColorStateList.valueOf(ContextCompat.getColor(this, R.color.buttonSecondary)));
+                first.setStrokeWidth(2);
+                second.setStrokeColor(ColorStateList.valueOf(ContextCompat.getColor(this, R.color.buttonSecondary)));
+                second.setStrokeWidth(2);
+            }, 500);
+        }
     }
 
     private void generateMixedQuestion() {
@@ -730,6 +829,10 @@ public class QuizActivity extends AppCompatActivity {
     }
 
     private void checkAnswer(MaterialButton clickedButton) {
+        if ("matching".equals(quizType)) {
+            handleMatchingClick(clickedButton);
+            return;
+        }
         cancelTimer();
         String answer = clickedButton.getText().toString();
         boolean isCorrect = answer.equals(currentCorrectAnswer);
@@ -974,7 +1077,12 @@ public class QuizActivity extends AppCompatActivity {
         for (MaterialButton button : buttons) {
             if (button != null) {
                 button.setStrokeColor(ColorStateList.valueOf(ContextCompat.getColor(this, R.color.buttonSecondary)));
+                button.setStrokeWidth(2);
                 button.clearAnimation();
+                button.setVisibility(View.VISIBLE);
+                button.setAlpha(1.0f);
+                button.setScaleX(1.0f);
+                button.setScaleY(1.0f);
             }
         }
     }
