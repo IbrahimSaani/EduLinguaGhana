@@ -198,38 +198,58 @@ public class CloudSyncManager {
             return;
         }
 
-        // Get username - prioritize parameter, then Firebase display name, then email, then Anonymous
-        String finalUserName = userName;
-        if (finalUserName == null || finalUserName.isEmpty() || finalUserName.equals("Anonymous")) {
-            if (user.getDisplayName() != null && !user.getDisplayName().isEmpty()) {
-                finalUserName = user.getDisplayName();
-            } else if (user.getEmail() != null) {
-                // Use email prefix (before @)
-                finalUserName = user.getEmail().split("@")[0];
-            } else {
-                finalUserName = "User" + userId.substring(0, Math.min(6, userId.length()));
+        // Check user role - only students should be on the leaderboard
+        com.edulinguaghana.roles.RoleManager roleManager = new com.edulinguaghana.roles.RoleManager();
+        roleManager.getUserRole(context, userId, new com.edulinguaghana.roles.RoleManager.RoleCallback() {
+            @Override
+            public void onRoleRetrieved(com.edulinguaghana.roles.UserRole role) {
+                if (role != com.edulinguaghana.roles.UserRole.STUDENT) {
+                    Log.d(TAG, "Non-student user (" + role + ") tried to upload to leaderboard. Skipping.");
+                    // Return success but with a message indicating it's for students
+                    callback.onSyncComplete(true, "Great job! (Leaderboard is for students)");
+                    return;
+                }
+
+                // Get username - prioritize parameter, then Firebase display name, then email, then Anonymous
+                String finalUserName = userName;
+                if (finalUserName == null || finalUserName.isEmpty() || finalUserName.equals("Anonymous")) {
+                    if (user.getDisplayName() != null && !user.getDisplayName().isEmpty()) {
+                        finalUserName = user.getDisplayName();
+                    } else if (user.getEmail() != null) {
+                        // Use email prefix (before @)
+                        finalUserName = user.getEmail().split("@")[0];
+                    } else {
+                        finalUserName = "User" + userId.substring(0, Math.min(6, userId.length()));
+                    }
+                }
+
+                Map<String, Object> leaderboardEntry = new HashMap<>();
+                leaderboardEntry.put("userId", userId);
+                leaderboardEntry.put("userName", finalUserName);
+                leaderboardEntry.put("score", score);
+                leaderboardEntry.put("timestamp", System.currentTimeMillis());
+
+                Log.d(TAG, "Uploading score to leaderboard - User: " + finalUserName + ", Score: " + score);
+
+                // Upload to leaderboard
+                databaseRef.child("leaderboard").child(userId)
+                    .setValue(leaderboardEntry)
+                    .addOnSuccessListener(aVoid -> {
+                        Log.d(TAG, "Score uploaded to leaderboard successfully");
+                        callback.onSyncComplete(true, "Score submitted!");
+                    })
+                    .addOnFailureListener(e -> {
+                        Log.e(TAG, "Failed to upload score: " + e.getMessage(), e);
+                        callback.onSyncComplete(false, "Upload failed: " + e.getMessage());
+                    });
             }
-        }
 
-        Map<String, Object> leaderboardEntry = new HashMap<>();
-        leaderboardEntry.put("userId", userId);
-        leaderboardEntry.put("userName", finalUserName);
-        leaderboardEntry.put("score", score);
-        leaderboardEntry.put("timestamp", System.currentTimeMillis());
-
-        Log.d(TAG, "Uploading score to leaderboard - User: " + finalUserName + ", Score: " + score);
-
-        // Upload to leaderboard
-        databaseRef.child("leaderboard").child(userId)
-            .setValue(leaderboardEntry)
-            .addOnSuccessListener(aVoid -> {
-                Log.d(TAG, "Score uploaded to leaderboard successfully");
-                callback.onSyncComplete(true, "Score submitted!");
-            })
-            .addOnFailureListener(e -> {
-                Log.e(TAG, "Failed to upload score: " + e.getMessage(), e);
-                callback.onSyncComplete(false, "Upload failed: " + e.getMessage());
-            });
+            @Override
+            public void onError(String error) {
+                Log.e(TAG, "Failed to verify user role for leaderboard: " + error);
+                callback.onSyncComplete(false, "Verification failed: " + error);
+            }
+        });
     }
 
     /**

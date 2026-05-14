@@ -203,23 +203,35 @@ public class LeaderboardActivity extends AppCompatActivity {
                 }
 
                 for (LeaderboardEntry entry : tempList) {
-                    // Check if userName is missing or looks like a UID
-                    String userName = entry.getUserName();
-                    boolean isLikelyUID = userName == null || userName.isEmpty() ||
-                                          userName.length() > 20 ||
-                                          userName.equals(entry.getUserId()) ||
-                                          (userName.length() >= 20 && !userName.contains(" "));
+                    // Fetch whole user snapshot to check role, username, and avatar
+                    usersRef.child(entry.getUserId()).addListenerForSingleValueEvent(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(@NonNull DataSnapshot userSnapshot) {
+                            if (userSnapshot.exists()) {
+                                // 1. Check user role - ONLY STUDENTS should be on the leaderboard
+                                String roleStr = userSnapshot.child("role").getValue(String.class);
+                                com.edulinguaghana.roles.UserRole role = com.edulinguaghana.roles.UserRole.fromString(roleStr);
 
-                    if (isLikelyUID) {
-                        // Fetch username and avatar from users node
-                        usersRef.child(entry.getUserId()).addListenerForSingleValueEvent(new ValueEventListener() {
-                            @Override
-                            public void onDataChange(@NonNull DataSnapshot userSnapshot) {
-                                if (userSnapshot.exists()) {
+                                if (role != com.edulinguaghana.roles.UserRole.STUDENT) {
+                                    // Skip non-students
+                                    processedCount[0]++;
+                                    if (processedCount[0] == totalEntries) {
+                                        finishLoadingLeaderboard(swipeTriggered);
+                                    }
+                                    return;
+                                }
+
+                                // 2. Handle username (Check if missing or looks like a UID)
+                                String userName = entry.getUserName();
+                                boolean isLikelyUID = userName == null || userName.isEmpty() ||
+                                                      userName.length() > 20 ||
+                                                      userName.equals(entry.getUserId()) ||
+                                                      (userName.length() >= 20 && !userName.contains(" "));
+
+                                if (isLikelyUID) {
                                     String displayName = userSnapshot.child("displayName").getValue(String.class);
                                     String email = userSnapshot.child("email").getValue(String.class);
 
-                                    // Check if displayName is valid (not null, not empty, not a UID)
                                     if (displayName != null && !displayName.isEmpty() &&
                                         displayName.length() <= 30 &&
                                         !displayName.equals(entry.getUserId())) {
@@ -231,64 +243,34 @@ public class LeaderboardActivity extends AppCompatActivity {
                                         // Last resort: generate a username from UID
                                         entry.setUserName("User" + entry.getUserId().substring(0, Math.min(6, entry.getUserId().length())));
                                     }
-
-                                    // Fetch avatar data
-                                    if (userSnapshot.child("avatarData").exists()) {
-                                        entry.setAvatarData((java.util.Map<String, Object>) userSnapshot.child("avatarData").getValue());
-                                    }
-                                } else {
-                                    // User not found in database, use fallback
-                                    entry.setUserName("User" + entry.getUserId().substring(0, Math.min(6, entry.getUserId().length())));
                                 }
+
+                                // 3. Fetch avatar data
+                                if (userSnapshot.child("avatarData").exists()) {
+                                    entry.setAvatarData((java.util.Map<String, Object>) userSnapshot.child("avatarData").getValue());
+                                }
+
                                 leaderboardList.add(entry);
-                                processedCount[0]++;
-
-                                if (processedCount[0] == totalEntries) {
-                                    finishLoadingLeaderboard(swipeTriggered);
-                                }
+                            } else {
+                                // User not found in database, we can't verify role so skip to be safe
+                                android.util.Log.d("Leaderboard", "User " + entry.getUserId() + " not found, skipping.");
                             }
 
-                            @Override
-                            public void onCancelled(@NonNull DatabaseError error) {
-                                // Use fallback name
-                                if (entry.getUserName() == null || entry.getUserName().isEmpty()) {
-                                    entry.setUserName("User" + entry.getUserId().substring(0, Math.min(6, entry.getUserId().length())));
-                                }
-                                leaderboardList.add(entry);
-                                processedCount[0]++;
-
-                                if (processedCount[0] == totalEntries) {
-                                    finishLoadingLeaderboard(swipeTriggered);
-                                }
+                            processedCount[0]++;
+                            if (processedCount[0] == totalEntries) {
+                                finishLoadingLeaderboard(swipeTriggered);
                             }
-                        });
-                    } else {
-                        // Username is fine, but still fetch avatar data
-                        usersRef.child(entry.getUserId()).child("avatarData").addListenerForSingleValueEvent(new ValueEventListener() {
-                            @Override
-                            public void onDataChange(@NonNull DataSnapshot avatarSnapshot) {
-                                if (avatarSnapshot.exists()) {
-                                    entry.setAvatarData((java.util.Map<String, Object>) avatarSnapshot.getValue());
-                                }
-                                leaderboardList.add(entry);
-                                processedCount[0]++;
+                        }
 
-                                if (processedCount[0] == totalEntries) {
-                                    finishLoadingLeaderboard(swipeTriggered);
-                                }
+                        @Override
+                        public void onCancelled(@NonNull DatabaseError error) {
+                            // Skip entry on error
+                            processedCount[0]++;
+                            if (processedCount[0] == totalEntries) {
+                                finishLoadingLeaderboard(swipeTriggered);
                             }
-
-                            @Override
-                            public void onCancelled(@NonNull DatabaseError error) {
-                                leaderboardList.add(entry);
-                                processedCount[0]++;
-
-                                if (processedCount[0] == totalEntries) {
-                                    finishLoadingLeaderboard(swipeTriggered);
-                                }
-                            }
-                        });
-                    }
+                        }
+                    });
                 }
             }
 
