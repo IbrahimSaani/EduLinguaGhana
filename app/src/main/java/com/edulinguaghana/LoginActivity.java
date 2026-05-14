@@ -42,8 +42,11 @@ import com.facebook.login.LoginManager;
 import com.facebook.login.LoginResult;
 
 import java.util.Arrays;
+import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Map;
+
+import androidx.core.content.ContextCompat;
 
 public class LoginActivity extends AppCompatActivity {
 
@@ -107,6 +110,7 @@ public class LoginActivity extends AppCompatActivity {
         tvSignUp = findViewById(R.id.tvSignUp);
         tvForgotPassword = findViewById(R.id.tvForgotPassword);
         tvSkip = findViewById(R.id.tvSkip);
+        progressBar = findViewById(R.id.progressBar);
     }
 
     private void setupListeners() {
@@ -140,10 +144,12 @@ public class LoginActivity extends AppCompatActivity {
         }
 
         btnLogin.setEnabled(false);
+        if (progressBar != null) progressBar.setVisibility(android.view.View.VISIBLE);
 
         mAuth.signInWithEmailAndPassword(email, password)
                 .addOnCompleteListener(this, task -> {
                     btnLogin.setEnabled(true);
+                    if (progressBar != null) progressBar.setVisibility(android.view.View.GONE);
                     if (task.isSuccessful()) {
                         FirebaseUser user = mAuth.getCurrentUser();
                         // Save user to database for friend lookups

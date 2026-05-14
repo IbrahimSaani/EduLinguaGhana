@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Patterns;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -25,7 +26,6 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.GoogleAuthProvider;
 import com.google.firebase.auth.UserProfileChangeRequest;
-import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
@@ -39,8 +39,11 @@ import com.facebook.login.LoginManager;
 import com.facebook.login.LoginResult;
 
 import java.util.Arrays;
+import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Map;
+
+import androidx.core.content.ContextCompat;
 
 public class SignUpActivity extends AppCompatActivity {
 
@@ -49,6 +52,7 @@ public class SignUpActivity extends AppCompatActivity {
     private TextInputEditText etName, etEmail, etPassword, etConfirmPassword;
     private MaterialButton btnSignUp, btnGoogleSignUp, btnFacebookSignUp;
     private TextView tvLogin, tvSkip;
+    private ProgressBar progressBar;
 
     private FirebaseAuth mAuth;
     private GoogleSignInClient mGoogleSignInClient;
@@ -104,6 +108,7 @@ public class SignUpActivity extends AppCompatActivity {
         btnFacebookSignUp = findViewById(R.id.btnFacebookSignUp);
         tvLogin = findViewById(R.id.tvLogin);
         tvSkip = findViewById(R.id.tvSkip);
+        progressBar = findViewById(R.id.progressBar);
     }
 
     private void setupListeners() {
@@ -132,11 +137,13 @@ public class SignUpActivity extends AppCompatActivity {
          }
 
          btnSignUp.setEnabled(false);
+         if (progressBar != null) progressBar.setVisibility(android.view.View.VISIBLE);
 
          // Check if email already exists before attempting to create account
          checkEmailExists(email, exists -> {
              if (exists) {
                  btnSignUp.setEnabled(true);
+                 if (progressBar != null) progressBar.setVisibility(android.view.View.GONE);
                  etEmail.setError("This email is already registered");
                  etEmail.requestFocus();
                  Toast.makeText(SignUpActivity.this,
@@ -149,6 +156,7 @@ public class SignUpActivity extends AppCompatActivity {
              mAuth.createUserWithEmailAndPassword(email, password)
                      .addOnCompleteListener(this, task -> {
                          btnSignUp.setEnabled(true);
+                         if (progressBar != null) progressBar.setVisibility(android.view.View.GONE);
                          if (task.isSuccessful()) {
                              FirebaseUser user = mAuth.getCurrentUser();
 

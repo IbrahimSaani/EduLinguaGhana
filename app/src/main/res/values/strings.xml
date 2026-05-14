@@ -257,4 +257,10 @@
     <string name="quiz_welcome">Welcome to Quiz</string>
     <string name="quiz_time_limit">Time Limit</string>
     <string name="quiz_mode">Quiz Mode</string>
+
+    <!-- Authentication Screen Enhancements -->
+    <string name="login_welcome_back">👋 Welcome Back!</string>
+    <string name="login_subtitle_engaging">Sign in to continue your journey</string>
+    <string name="signup_create_account">✨ Create Account</string>
+    <string name="signup_subtitle_adventure">Start your learning adventure today!</string>
 </resources>
