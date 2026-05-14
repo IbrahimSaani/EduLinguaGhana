@@ -156,7 +156,7 @@ public class LanguageConversionUtils {
 
         String[] standaloneUnits = {"", "Baako", "Mmienu", "Mmiɛnsa", "Ɛnan", "Enum", "Nsia", "Nson", "Nwɔtwe", "Nkron"};
         String[] combinedUnits = {"", "baako", "mmienu", "mmiɛnsa", "nan", "num", "nsia", "nson", "nwɔtwe", "nkron"};
-        String[] tens = {"", "Edu", "Aduonu", "Aduasa", "Aduanan", "Aduonum", "Aduosia", "Aduoson", "Aduɔwɔtwe", "Aduɔkron"};
+        String[] tens = {"", "Edu", "Aduonu", "Aduasa", "Aduanan", "Aduonum", "Aduosia", "Aduɔson", "Aduɔwɔtwe", "Aduɔkron"};
 
         if (num < 10) return standaloneUnits[num];
         if (num == 10) return "Edu";

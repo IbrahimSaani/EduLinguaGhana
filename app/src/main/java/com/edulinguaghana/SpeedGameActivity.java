@@ -1,6 +1,7 @@
 package com.edulinguaghana;
 
 import android.content.SharedPreferences;
+import android.graphics.Color;
 import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.os.CountDownTimer;
@@ -13,6 +14,7 @@ import android.widget.Button;
 import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.ContextCompat;
 
 import com.edulinguaghana.tts.OfflineGhanaLPTtsService;
 import com.edulinguaghana.utils.LanguageConversionUtils;
@@ -46,6 +48,7 @@ public class SpeedGameActivity extends AppCompatActivity {
 
     // Timer settings (total round time)
     private static final long TOTAL_TIME_MS = 30000;  // 30s round
+    private static final long PENALTY_TIME_MS = 1000;  // 1s penalty
     private static final int MAX_NUMBER = 50;  // NEW: For number questions
 
     // Letters to use in the game - KEEP for compatibility
@@ -228,6 +231,7 @@ public class SpeedGameActivity extends AppCompatActivity {
         tvGameFeedback.setText("");
         timeLeftMs = TOTAL_TIME_MS;
         tvGameTimer.setText(getString(R.string.quiz_timer, (timeLeftMs / 1000)));
+        tvGameTimer.setTextColor(Color.parseColor("#0D47A1")); // Dark blue for visibility
 
         generateNewQuestion();
         startTimer();
@@ -463,6 +467,11 @@ public class SpeedGameActivity extends AppCompatActivity {
             tvGameFeedback.setText(getString(R.string.quiz_feedback_wrong, currentCorrectAnswer));
             playSfx(false);
             playWrongAnimation(clickedButton);
+            
+            // Decrease time by 1 second on wrong answer
+            timeLeftMs -= PENALTY_TIME_MS;
+            if (timeLeftMs < 0) timeLeftMs = 0;
+            tvGameTimer.setText(getString(R.string.quiz_timer, (timeLeftMs / 1000)));
         }
 
         // Next question immediately
@@ -474,11 +483,20 @@ public class SpeedGameActivity extends AppCompatActivity {
     // -------------------------
     private void startTimer() {
         cancelTimer();
-        countDownTimer = new CountDownTimer(timeLeftMs, 1000) {
+        countDownTimer = new CountDownTimer(timeLeftMs, 500) {
             @Override
             public void onTick(long millisUntilFinished) {
                 timeLeftMs = millisUntilFinished;
-                tvGameTimer.setText(getString(R.string.quiz_timer, (millisUntilFinished / 1000)));
+                long s = millisUntilFinished / 1000;
+                tvGameTimer.setText(getString(R.string.quiz_timer, s));
+                
+                // Change to red if 10 seconds or below
+                if (s <= 10) {
+                    tvGameTimer.setTextColor(ContextCompat.getColor(SpeedGameActivity.this, R.color.wrongAnswer));
+                } else {
+                    // Dark blue for better visibility on light background
+                    tvGameTimer.setTextColor(Color.parseColor("#0D47A1"));
+                }
             }
 
             @Override

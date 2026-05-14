@@ -277,6 +277,10 @@
                                     android:textAppearance="?attr/textAppearanceBody2"
                                     android:textColor="@color/colorPrimary"
                                     android:textStyle="bold"
+                                    android:shadowColor="#80000000"
+                                    android:shadowDx="1"
+                                    android:shadowDy="1"
+                                    android:shadowRadius="2"
                                     tools:text="30s" />
                             </LinearLayout>
 

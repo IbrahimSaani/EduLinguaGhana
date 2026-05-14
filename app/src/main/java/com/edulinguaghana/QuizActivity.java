@@ -46,7 +46,7 @@ public class QuizActivity extends AppCompatActivity {
     public static final String KEY_SFX_ENABLED = "sfx_enabled";
     public static final String KEY_QUIZ_MUSIC_VOLUME = "QUIZ_MUSIC_VOLUME";
 
-    private static final long PENALTY_TIME = 5000L;
+    private static final long PENALTY_TIME = 1000L;
     private static final int MAX_NUMBER = 50;
 
     private final Random random = new Random();
@@ -507,6 +507,9 @@ public class QuizActivity extends AppCompatActivity {
         if (tvGameScore != null) {
             tvGameScore.setText(String.format(Locale.getDefault(), getString(R.string.quiz_score), score));
         }
+        if (tvGameTimer != null) {
+            tvGameTimer.setTextColor(ContextCompat.getColor(this, R.color.colorPrimary));
+        }
         if (tvGameFeedback != null) {
             tvGameFeedback.setText("");
         }
@@ -755,6 +758,9 @@ public class QuizActivity extends AppCompatActivity {
             playSfx(false);
             remainingTime -= PENALTY_TIME;
             if (remainingTime < 0) remainingTime = 0;
+            if (tvGameTimer != null) {
+                tvGameTimer.setText(String.format(Locale.getDefault(), getString(R.string.quiz_timer), remainingTime / 1000));
+            }
         }
 
 
@@ -773,13 +779,21 @@ public class QuizActivity extends AppCompatActivity {
 
     private void startTimer() {
         cancelTimer();
-        countDownTimer = new CountDownTimer(remainingTime, 1000) {
+        countDownTimer = new CountDownTimer(remainingTime, 500) {
             @Override
             public void onTick(long millisUntilFinished) {
                 remainingTime = millisUntilFinished;
                 long s = millisUntilFinished / 1000;
                 if (tvGameTimer != null) {
                     tvGameTimer.setText(String.format(Locale.getDefault(), getString(R.string.quiz_timer), s));
+                    
+                    // Change to red if 10 seconds or below
+                    if (s <= 10) {
+                        tvGameTimer.setTextColor(ContextCompat.getColor(QuizActivity.this, R.color.wrongAnswer));
+                    } else {
+                        // Use a dark color for better visibility on white background
+                        tvGameTimer.setTextColor(ContextCompat.getColor(QuizActivity.this, R.color.colorPrimary));
+                    }
                 }
             }
 
