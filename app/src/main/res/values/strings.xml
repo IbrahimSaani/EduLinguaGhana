@@ -46,6 +46,8 @@
     <string name="quiz_prompt_sequence_find">Find the missing number:</string>
     <string name="quiz_prompt_matching">Which word starts with letter %s?</string>
     <string name="quiz_prompt_matching_pairs">Match the letters to their words! 🔗</string>
+    <string name="quiz_prompt_missing_letter">Which letter is missing? %s</string>
+    <string name="quiz_prompt_odd_one_out">Which word does NOT start with %s?</string>
     <string name="quiz_feedback_correct">✅ Correct!</string>
     <string name="quiz_feedback_wrong">❌ Wrong! Correct: %s</string>
     <string name="quiz_timer">Time: %ds</string>

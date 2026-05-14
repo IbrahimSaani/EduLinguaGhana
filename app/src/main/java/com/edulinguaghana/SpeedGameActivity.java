@@ -64,10 +64,6 @@ public class SpeedGameActivity extends AppCompatActivity {
             "N","O","P","Q","R","S","T","U","V","W","X","Y","Z"
     };
 
-    // Hardcoded matching pairs for matching quiz mode
-    private final String[] matchLetters = {"A", "B", "C"};
-    private final String[] matchWords = {"Apple", "Ball", "Cat"};
-
     // TTS
     private TextToSpeech tts;
     private boolean isTtsReady = false;
@@ -228,6 +224,7 @@ public class SpeedGameActivity extends AppCompatActivity {
         if (t.contains("letter")) return "letters";
         if (t.contains("sequ")) return "sequence";
         if (t.contains("match")) return "matching";
+        if (t.contains("miss")) return "missing_letter";
         if (t.contains("mix")) return "mixed";
         if (t.contains("num")) return "numbers";
         return t;
@@ -256,6 +253,9 @@ public class SpeedGameActivity extends AppCompatActivity {
                 break;
             case "matching":
                 generateMatchingQuestion();
+                break;
+            case "missing_letter":
+                generateMissingLetterQuestion();
                 break;
             case "mixed":
                 generateMixedQuestion();
@@ -390,35 +390,24 @@ public class SpeedGameActivity extends AppCompatActivity {
         speakWithTts("Find the missing number");
     }
 
-    // NEW: Generate matching question
     private void generateMatchingQuestion() {
-        Random rnd = new Random();
-
-        // Use fallback matching with hardcoded words
-        int idx = rnd.nextInt(matchLetters.length);
-        String letter = matchLetters[idx];
-        String correctWord = matchWords[idx];
+        String[] currentAlphabet = LanguageConversionUtils.getAlphabetForLanguage(languageCode);
+        String letter = currentAlphabet[new Random().nextInt(currentAlphabet.length)];
+        String correctWord = LanguageConversionUtils.getMatchingWordForLetter(letter, languageCode);
         currentCorrectAnswer = correctWord;
 
-        // Use localized string resource for matching prompt
         tvGamePrompt.setText(getString(R.string.quiz_prompt_matching, letter));
         tvGameFeedback.setText("");
 
         List<String> options = new ArrayList<>();
-        Set<Integer> used = new HashSet<>();
         options.add(correctWord);
-        used.add(idx);
-
-        while (options.size() < 6 && used.size() < matchWords.length) {
-            int pick = rnd.nextInt(matchWords.length);
-            if (!used.contains(pick)) {
-                options.add(matchWords[pick]);
-                used.add(pick);
-            }
-        }
 
         while (options.size() < 6) {
-            options.add(matchWords[rnd.nextInt(matchWords.length)]);
+            String randomLetter = currentAlphabet[new Random().nextInt(currentAlphabet.length)];
+            String randomWord = LanguageConversionUtils.getMatchingWordForLetter(randomLetter, languageCode);
+            if (!options.contains(randomWord)) {
+                options.add(randomWord);
+            }
         }
 
         Collections.shuffle(options);
@@ -432,14 +421,44 @@ public class SpeedGameActivity extends AppCompatActivity {
         speakWithTts(letter);
     }
 
+    private void generateMissingLetterQuestion() {
+        String[] currentAlphabet = LanguageConversionUtils.getAlphabetForLanguage(languageCode);
+        String letter = currentAlphabet[new Random().nextInt(currentAlphabet.length)];
+        String word = LanguageConversionUtils.getMatchingWordForLetter(letter, languageCode);
+        
+        String displayWord = word.replaceFirst("(?i)" + letter, "___");
+        tvGamePrompt.setText(getString(R.string.quiz_prompt_missing_letter, displayWord));
+        tvGameFeedback.setText("");
+        
+        currentCorrectAnswer = letter;
+        
+        List<String> options = new ArrayList<>();
+        options.add(letter);
+        while (options.size() < 6) {
+            String rl = currentAlphabet[new Random().nextInt(currentAlphabet.length)];
+            if (!options.contains(rl)) options.add(rl);
+        }
+        
+        Collections.shuffle(options);
+        btnOption1.setText(options.get(0));
+        btnOption2.setText(options.get(1));
+        btnOption3.setText(options.get(2));
+        btnOption4.setText(options.get(3));
+        btnOption5.setText(options.get(4));
+        btnOption6.setText(options.get(5));
+        
+        speakWithTts(word);
+    }
+
     // NEW: Generate mixed question
     private void generateMixedQuestion() {
         Random rnd = new Random();
-        if (rnd.nextBoolean()) {
-            generateLetterQuestion();
-        } else {
-            generateNumberQuestion();
-        }
+        int r = rnd.nextInt(5);
+        if (r == 0) generateLetterQuestion();
+        else if (r == 1) generateNumberQuestion();
+        else if (r == 2) generateSequenceQuestion();
+        else if (r == 3) generateMatchingQuestion();
+        else generateMissingLetterQuestion();
     }
 
     // Helper method to speak with appropriate TTS

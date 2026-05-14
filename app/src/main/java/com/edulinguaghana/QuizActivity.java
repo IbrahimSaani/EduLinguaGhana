@@ -375,6 +375,8 @@ public class QuizActivity extends AppCompatActivity {
         if (t.contains("letter")) return "letters";
         if (t.contains("sequ")) return "sequence";
         if (t.contains("match")) return "matching";
+        if (t.contains("miss")) return "missing_letter";
+        if (t.contains("odd") || t.contains("word")) return "odd_one_out";
         if (t.contains("mix")) return "mixed";
         if (t.contains("num")) return "numbers";
         return t;
@@ -531,6 +533,12 @@ public class QuizActivity extends AppCompatActivity {
                 break;
             case "matching":
                 generateMatchingQuestion();
+                break;
+            case "missing_letter":
+                generateMissingLetterQuestion();
+                break;
+            case "odd_one_out":
+                generateOddOneOutQuestion();
                 break;
             case "mixed":
                 generateMixedQuestion();
@@ -696,7 +704,7 @@ public class QuizActivity extends AppCompatActivity {
         String[] currentAlphabet = LanguageConversionUtils.getAlphabetForLanguage(languageCode);
         
         List<String> indices = new ArrayList<>();
-        for (String s : currentAlphabet) indices.add(s);
+        Collections.addAll(indices, currentAlphabet);
         Collections.shuffle(indices);
 
         List<String> displayItems = new ArrayList<>();
@@ -735,6 +743,76 @@ public class QuizActivity extends AppCompatActivity {
         firstSelectedButton = null;
         currentCorrectAnswer = "MATCHING_MODE";
         currentPromptTtsText = "Match the letters to the words";
+    }
+
+    private void generateMissingLetterQuestion() {
+        String[] currentAlphabet = LanguageConversionUtils.getAlphabetForLanguage(languageCode);
+        String letter = currentAlphabet[random.nextInt(currentAlphabet.length)];
+        String word = LanguageConversionUtils.getMatchingWordForLetter(letter, languageCode);
+        
+        // Hide the first occurrence of the letter (usually the start)
+        String displayWord = word.replaceFirst("(?i)" + letter, "___");
+        
+        if (tvGamePrompt != null) {
+            tvGamePrompt.setText(getString(R.string.quiz_prompt_missing_letter, displayWord));
+        }
+        
+        currentCorrectAnswer = letter;
+        currentPromptTtsText = word;
+        
+        List<String> options = new ArrayList<>();
+        options.add(letter);
+        
+        while (options.size() < 6) {
+            String randomLetter = currentAlphabet[random.nextInt(currentAlphabet.length)];
+            if (!options.contains(randomLetter)) {
+                options.add(randomLetter);
+            }
+        }
+        
+        Collections.shuffle(options);
+        MaterialButton[] buttons = {btnOption1, btnOption2, btnOption3, btnOption4, btnOption5, btnOption6};
+        for (int i = 0; i < 6; i++) {
+            if (buttons[i] != null) {
+                buttons[i].setText(options.get(i));
+                buttons[i].setVisibility(View.VISIBLE);
+            }
+        }
+    }
+
+    private void generateOddOneOutQuestion() {
+        String[] currentAlphabet = LanguageConversionUtils.getAlphabetForLanguage(languageCode);
+        
+        List<String> letters = new ArrayList<>();
+        Collections.addAll(letters, currentAlphabet);
+        Collections.shuffle(letters);
+        
+        String commonLetter = letters.get(0);
+        
+        if (tvGamePrompt != null) {
+            tvGamePrompt.setText(getString(R.string.quiz_prompt_matching, commonLetter));
+        }
+        
+        String correctWord = LanguageConversionUtils.getMatchingWordForLetter(commonLetter, languageCode);
+        currentCorrectAnswer = correctWord;
+        currentPromptTtsText = commonLetter;
+        
+        List<String> options = new ArrayList<>();
+        options.add(correctWord);
+        
+        for (int i = 1; i < 6 && i < letters.size(); i++) {
+            options.add(LanguageConversionUtils.getMatchingWordForLetter(letters.get(i), languageCode));
+        }
+        
+        Collections.shuffle(options);
+        MaterialButton[] buttons = {btnOption1, btnOption2, btnOption3, btnOption4, btnOption5, btnOption6};
+        for (int i = 0; i < 6; i++) {
+            if (buttons[i] != null) {
+                buttons[i].setText(options.get(i));
+                buttons[i].setVisibility(View.VISIBLE);
+                buttons[i].setTextSize(18); // Smaller text for words
+            }
+        }
     }
 
     private void handleMatchingClick(MaterialButton clickedButton) {
@@ -779,6 +857,10 @@ public class QuizActivity extends AppCompatActivity {
 
             matchingPairsRemaining--;
             firstSelectedButton = null;
+            
+            if (tvGamePrompt != null) {
+                tvGamePrompt.setText("Match found! (" + matchingPairsRemaining + " pairs left)");
+            }
 
             if (matchingPairsRemaining == 0) {
                 cancelTimer();
@@ -826,11 +908,13 @@ public class QuizActivity extends AppCompatActivity {
     }
 
     private void generateMixedQuestion() {
-        if (random.nextBoolean()) {
-            generateLetterQuestion();
-        } else {
-            generateNumberQuestion();
-        }
+        int r = random.nextInt(6);
+        if (r == 0) generateLetterQuestion();
+        else if (r == 1) generateNumberQuestion();
+        else if (r == 2) generateSequenceQuestion();
+        else if (r == 3) generateMatchingQuestion();
+        else if (r == 4) generateMissingLetterQuestion();
+        else generateOddOneOutQuestion();
     }
 
     private void checkAnswer(MaterialButton clickedButton) {

@@ -1067,6 +1067,18 @@ public class MainActivity extends AppCompatActivity {
                 () -> openQuizScreen(langCode, langName, "matching", "beginner", "all")
         ));
         menuItems.add(new StyledMenuHelper.MenuItem(
+                "🔍",
+                "Missing Letter",
+                "Find the hidden letter",
+                () -> openQuizScreen(langCode, langName, "missing_letter", "beginner", "all")
+        ));
+        menuItems.add(new StyledMenuHelper.MenuItem(
+                "🔡",
+                "Word Recognition",
+                "Identify the correct word",
+                () -> openQuizScreen(langCode, langName, "odd_one_out", "beginner", "all")
+        ));
+        menuItems.add(new StyledMenuHelper.MenuItem(
                 "🎲",
                 "Mixed Mode",
                 "All question types mixed",
