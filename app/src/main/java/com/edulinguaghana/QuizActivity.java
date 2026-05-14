@@ -108,8 +108,6 @@ public class QuizActivity extends AppCompatActivity {
     private AudioManager.OnAudioFocusChangeListener afChangeListener;
 
     private String[] alphabet; // Will be set based on language
-    private final String[] matchLetters = {"A", "B", "C"};
-    private final String[] matchWords = {"Apple", "Ball", "Cat"};
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -694,22 +692,25 @@ public class QuizActivity extends AppCompatActivity {
             tvGamePrompt.setText(R.string.quiz_prompt_matching_pairs);
         }
 
-        // Get 3 random pairs from the matching pool
-        List<Integer> indices = new ArrayList<>();
-        for (int i = 0; i < matchLetters.length; i++) indices.add(i);
+        // Get the alphabet for the current language to ensure language-specific letters are used
+        String[] currentAlphabet = LanguageConversionUtils.getAlphabetForLanguage(languageCode);
+        
+        List<String> indices = new ArrayList<>();
+        for (String s : currentAlphabet) indices.add(s);
         Collections.shuffle(indices);
 
         List<String> displayItems = new ArrayList<>();
         Map<String, String> pairs = new HashMap<>();
 
-        for (int i = 0; i < 3; i++) {
-            int idx = indices.get(i);
-            String letter = matchLetters[idx];
-            String word = matchWords[idx];
+        // Pick 3 random letters from the current language's alphabet
+        int pairsToCreate = Math.min(3, indices.size());
+        for (int i = 0; i < pairsToCreate; i++) {
+            String letter = indices.get(i);
+            String word = LanguageConversionUtils.getMatchingWordForLetter(letter, languageCode);
             displayItems.add(letter);
             displayItems.add(word);
             pairs.put(letter, word);
-            pairs.put(word, letter); // Bidirectional for easy checking
+            pairs.put(word, letter);
         }
 
         Collections.shuffle(displayItems);
@@ -717,18 +718,22 @@ public class QuizActivity extends AppCompatActivity {
         MaterialButton[] buttons = {btnOption1, btnOption2, btnOption3, btnOption4, btnOption5, btnOption6};
         for (int i = 0; i < 6; i++) {
             if (buttons[i] != null) {
-                buttons[i].setText(displayItems.get(i));
-                buttons[i].setTag(pairs.get(displayItems.get(i)));
-                buttons[i].setVisibility(View.VISIBLE);
-                buttons[i].setAlpha(1.0f);
-                buttons[i].setEnabled(true);
-                buttons[i].setStrokeWidth(2); // Reset stroke width
+                if (i < displayItems.size()) {
+                    buttons[i].setText(displayItems.get(i));
+                    buttons[i].setTag(pairs.get(displayItems.get(i)));
+                    buttons[i].setVisibility(View.VISIBLE);
+                    buttons[i].setAlpha(1.0f);
+                    buttons[i].setEnabled(true);
+                    buttons[i].setStrokeWidth(2);
+                } else {
+                    buttons[i].setVisibility(View.INVISIBLE);
+                }
             }
         }
 
-        matchingPairsRemaining = 3;
+        matchingPairsRemaining = pairsToCreate;
         firstSelectedButton = null;
-        currentCorrectAnswer = "MATCHING_MODE"; // Marker for generic check
+        currentCorrectAnswer = "MATCHING_MODE";
         currentPromptTtsText = "Match the letters to the words";
     }
 
