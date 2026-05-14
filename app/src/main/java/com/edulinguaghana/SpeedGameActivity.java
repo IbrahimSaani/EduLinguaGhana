@@ -1,5 +1,6 @@
 package com.edulinguaghana;
 
+import android.content.res.ColorStateList;
 import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.media.MediaPlayer;
@@ -10,11 +11,14 @@ import android.util.Log;
 import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
-import android.widget.Button;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
+
+import com.google.android.material.button.MaterialButton;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import com.edulinguaghana.tts.OfflineGhanaLPTtsService;
 import com.edulinguaghana.utils.LanguageConversionUtils;
@@ -31,7 +35,10 @@ public class SpeedGameActivity extends AppCompatActivity {
 
     // Views
     private TextView tvGameTitle, tvGameTimer, tvGameScore, tvGameBest, tvGameFeedback, tvGamePrompt;
-    private Button btnPlayAudio, btnOption1, btnOption2, btnOption3, btnOption4, btnOption5, btnOption6, btnBack;
+    private FloatingActionButton btnPlayAudio;
+    private MaterialButton btnOption1, btnOption2, btnOption3, btnOption4, btnOption5, btnOption6;
+    private MaterialButton btnBack;
+    private ProgressBar speedProgressBar;
 
     // Game variables
     private int score = 0;
@@ -94,12 +101,12 @@ public class SpeedGameActivity extends AppCompatActivity {
         alphabet = LanguageConversionUtils.getAlphabetForLanguage(languageCode);
 
         // ...existing code...
-        tvGameTitle    = findViewById(R.id.tvGameTitle);
         tvGameTimer    = findViewById(R.id.tvGameTimer);
         tvGameScore    = findViewById(R.id.tvGameScore);
         tvGameBest     = findViewById(R.id.tvGameBest);
         tvGameFeedback = findViewById(R.id.tvGameFeedback);
         tvGamePrompt   = findViewById(R.id.tvGamePrompt);
+        speedProgressBar = findViewById(R.id.speedProgressBar);
 
         btnOption1 = findViewById(R.id.btnGameOpt1);
         btnOption2 = findViewById(R.id.btnGameOpt2);
@@ -108,6 +115,7 @@ public class SpeedGameActivity extends AppCompatActivity {
         btnOption5 = findViewById(R.id.btnGameOpt5);
         btnOption6 = findViewById(R.id.btnGameOpt6);
         btnBack    = findViewById(R.id.btnGameBack);
+        btnPlayAudio = findViewById(R.id.btnPlayAudio);
 
         // OPTIONAL: if you added a Play Audio button in XML, otherwise comment out
         btnPlayAudio = findViewById(R.id.btnPlayAudio);
@@ -125,12 +133,12 @@ public class SpeedGameActivity extends AppCompatActivity {
         initTts();
 
         // --- Button listeners ---
-        btnOption1.setOnClickListener(v -> handleAnswerClick((Button) v));
-        btnOption2.setOnClickListener(v -> handleAnswerClick((Button) v));
-        btnOption3.setOnClickListener(v -> handleAnswerClick((Button) v));
-        btnOption4.setOnClickListener(v -> handleAnswerClick((Button) v));
-        btnOption5.setOnClickListener(v -> handleAnswerClick((Button) v));
-        btnOption6.setOnClickListener(v -> handleAnswerClick((Button) v));
+        btnOption1.setOnClickListener(v -> handleAnswerClick((MaterialButton) v));
+        btnOption2.setOnClickListener(v -> handleAnswerClick((MaterialButton) v));
+        btnOption3.setOnClickListener(v -> handleAnswerClick((MaterialButton) v));
+        btnOption4.setOnClickListener(v -> handleAnswerClick((MaterialButton) v));
+        btnOption5.setOnClickListener(v -> handleAnswerClick((MaterialButton) v));
+        btnOption6.setOnClickListener(v -> handleAnswerClick((MaterialButton) v));
 
         btnBack.setOnClickListener(v -> {
             cancelTimer();
@@ -445,14 +453,15 @@ public class SpeedGameActivity extends AppCompatActivity {
         }
     }
 
-    private void handleAnswerClick(Button clickedButton) {
+    private void handleAnswerClick(MaterialButton clickedButton) {
         String chosen = clickedButton.getText().toString();
         boolean correct = chosen.equals(currentCorrectAnswer);
 
         if (correct) {
             score++;
-                    tvGameFeedback.setText(getString(R.string.quiz_feedback_correct));
-                    tvGameScore.setText(getString(R.string.quiz_score, score));
+            tvGameFeedback.setText(getString(R.string.quiz_feedback_correct));
+            tvGameFeedback.setTextColor(ContextCompat.getColor(this, R.color.correctAnswer));
+            tvGameScore.setText(getString(R.string.quiz_score, score));
 
             playSfx(true);
             playCorrectAnimation(clickedButton);
@@ -465,13 +474,14 @@ public class SpeedGameActivity extends AppCompatActivity {
             }
         } else {
             tvGameFeedback.setText(getString(R.string.quiz_feedback_wrong, currentCorrectAnswer));
+            tvGameFeedback.setTextColor(ContextCompat.getColor(this, R.color.wrongAnswer));
             playSfx(false);
             playWrongAnimation(clickedButton);
             
             // Decrease time by 1 second on wrong answer
             timeLeftMs -= PENALTY_TIME_MS;
             if (timeLeftMs < 0) timeLeftMs = 0;
-            tvGameTimer.setText(getString(R.string.quiz_timer, (timeLeftMs / 1000)));
+            tvGameTimer.setText(getString(R.string.quiz_timer, (int)(timeLeftMs / 1000)));
         }
 
         // Next question immediately
@@ -488,14 +498,24 @@ public class SpeedGameActivity extends AppCompatActivity {
             public void onTick(long millisUntilFinished) {
                 timeLeftMs = millisUntilFinished;
                 long s = millisUntilFinished / 1000;
-                tvGameTimer.setText(getString(R.string.quiz_timer, s));
+                tvGameTimer.setText(getString(R.string.quiz_timer, (int)s));
+
+                if (speedProgressBar != null) {
+                    int progress = (int) ((millisUntilFinished * 100) / TOTAL_TIME_MS);
+                    speedProgressBar.setProgress(progress);
+                }
                 
                 // Change to red if 10 seconds or below
                 if (s <= 10) {
                     tvGameTimer.setTextColor(ContextCompat.getColor(SpeedGameActivity.this, R.color.wrongAnswer));
+                    if (speedProgressBar != null) {
+                        speedProgressBar.setProgressTintList(ColorStateList.valueOf(ContextCompat.getColor(SpeedGameActivity.this, R.color.wrongAnswer)));
+                    }
                 } else {
-                    // Dark blue for better visibility on light background
-                    tvGameTimer.setTextColor(Color.parseColor("#0D47A1"));
+                    tvGameTimer.setTextColor(ContextCompat.getColor(SpeedGameActivity.this, R.color.colorPrimary));
+                    if (speedProgressBar != null) {
+                        speedProgressBar.setProgressTintList(ColorStateList.valueOf(ContextCompat.getColor(SpeedGameActivity.this, R.color.colorAccent)));
+                    }
                 }
             }
 
@@ -539,12 +559,10 @@ public class SpeedGameActivity extends AppCompatActivity {
     }
 
     private void setOptionsEnabled(boolean enabled) {
-        btnOption1.setEnabled(enabled);
-        btnOption2.setEnabled(enabled);
-        btnOption3.setEnabled(enabled);
-        btnOption4.setEnabled(enabled);
-        btnOption5.setEnabled(enabled);
-        btnOption6.setEnabled(enabled);
+        MaterialButton[] options = {btnOption1, btnOption2, btnOption3, btnOption4, btnOption5, btnOption6};
+        for (MaterialButton btn : options) {
+            if (btn != null) btn.setEnabled(enabled);
+        }
     }
 
     // -------------------------

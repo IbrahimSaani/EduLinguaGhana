@@ -1,217 +1,296 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:fitsSystemWindows="true"
-    android:background="#F3F5FF">
+    android:background="@drawable/gradient_background"
+    tools:context=".SpeedGameActivity">
 
-    <LinearLayout
+    <com.google.android.material.appbar.AppBarLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:padding="16dp">
+        android:background="@android:color/transparent"
+        android:elevation="0dp">
 
-        <!-- Top stats card -->
+        <com.google.android.material.appbar.MaterialToolbar
+            android:id="@+id/toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            app:navigationIcon="@drawable/ic_back"
+            app:navigationIconTint="@color/white"
+            app:title="Speed Challenge"
+            app:titleTextAppearance="@style/ToolbarTitleStyle"
+            app:titleTextColor="@color/white" />
+
+    </com.google.android.material.appbar.AppBarLayout>
+
+    <androidx.core.widget.NestedScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior">
+
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="@drawable/bg_quiz_stats"
             android:orientation="vertical"
             android:padding="16dp"
-            android:layout_marginBottom="16dp">
+            android:paddingTop="8dp">
 
-            <TextView
-                android:id="@+id/tvGameTitle"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Speed Challenge"
-                android:textSize="18sp"
-                android:textStyle="bold"
-                android:textColor="#0D47A1" />
-
-            <TextView
-                android:id="@+id/tvGameTimer"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Time: 30s"
-                android:textSize="14sp"
-                android:textStyle="bold"
-                android:textColor="#0D47A1"
-                android:shadowColor="#40000000"
-                android:shadowDx="1"
-                android:shadowDy="1"
-                android:shadowRadius="1"
-                android:layout_marginTop="4dp" />
-
-            <TextView
-                android:id="@+id/tvGameScore"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Score: 0"
-                android:textSize="14sp"
-                android:textColor="#1B5E20"
-                android:layout_marginTop="4dp" />
-
-            <TextView
-                android:id="@+id/tvGameBest"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Best: 0"
-                android:textSize="14sp"
-                android:textColor="#4E342E"
-                android:layout_marginTop="4dp" />
-        </LinearLayout>
-
-        <!-- Prompt card -->
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:background="@drawable/bg_quiz_card"
-            android:orientation="vertical"
-            android:gravity="center_horizontal"
-            android:padding="16dp"
-            android:layout_marginBottom="16dp">
-
-            <TextView
-                android:id="@+id/tvGamePrompt"
+            <!-- Stats Card -->
+            <com.google.android.material.card.MaterialCardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Tap the correct letter or number"
-                android:textSize="16sp"
-                android:textStyle="bold"
-                android:textColor="#263238" />
+                android:layout_marginBottom="16dp"
+                app:cardCornerRadius="16dp"
+                app:cardElevation="6dp">
 
-            <!-- ### START: Added Button ### -->
-            <Button
-                android:id="@+id/btnPlayAudio"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
-                android:background="@drawable/bg_quiz_secondary_button"
-                android:text="Play Audio"
-                android:textColor="#37474F"
-                android:paddingLeft="24dp"
-                android:paddingRight="24dp"
-                android:textAllCaps="false"/>
-            <!-- ### END: Added Button ### -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="16dp"
+                    android:background="@color/cardBackground">
 
-            <TextView
-                android:id="@+id/tvGameFeedback"
+                    <ProgressBar
+                        android:id="@+id/speedProgressBar"
+                        style="?android:attr/progressBarStyleHorizontal"
+                        android:layout_width="match_parent"
+                        android:layout_height="8dp"
+                        android:layout_marginBottom="16dp"
+                        android:progress="100"
+                        android:progressTint="@color/colorAccent" />
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:gravity="center">
+
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:orientation="vertical"
+                            android:gravity="center">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="⏰"
+                                android:textSize="24sp" />
+
+                            <TextView
+                                android:id="@+id/tvGameTimer"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="4dp"
+                                android:textAppearance="?attr/textAppearanceBody2"
+                                android:textColor="@color/colorPrimary"
+                                android:textStyle="bold"
+                                tools:text="30s" />
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:orientation="vertical"
+                            android:gravity="center">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="⭐"
+                                android:textSize="24sp" />
+
+                            <TextView
+                                android:id="@+id/tvGameScore"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="4dp"
+                                android:textAppearance="?attr/textAppearanceBody2"
+                                android:textColor="@color/colorAccent"
+                                android:textStyle="bold"
+                                tools:text="0" />
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:orientation="vertical"
+                            android:gravity="center">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="🏆"
+                                android:textSize="24sp" />
+
+                            <TextView
+                                android:id="@+id/tvGameBest"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="4dp"
+                                android:textAppearance="?attr/textAppearanceBody2"
+                                android:textColor="@color/correctAnswer"
+                                android:textStyle="bold"
+                                tools:text="0" />
+                        </LinearLayout>
+                    </LinearLayout>
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- Prompt Card -->
+            <com.google.android.material.card.MaterialCardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text=""
-                android:textSize="16sp"
-                android:textStyle="bold"
-                android:textColor="#37474F"
-                android:layout_marginTop="8dp" />
-        </LinearLayout>
+                android:layout_marginBottom="16dp"
+                app:cardCornerRadius="20dp"
+                app:cardElevation="8dp"
+                app:strokeWidth="3dp"
+                app:strokeColor="@color/colorAccent">
 
-        <!-- Options grid -->
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:background="@drawable/bg_quiz_card"
-            android:orientation="vertical"
-            android:padding="16dp"
-            android:layout_marginBottom="16dp">
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="24dp"
+                    android:gravity="center"
+                    android:background="@color/cardBackground">
 
-            <LinearLayout
+                    <TextView
+                        android:id="@+id/tvGamePrompt"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:gravity="center"
+                        android:textAppearance="?attr/textAppearanceHeadline5"
+                        android:textColor="@color/colorPrimary"
+                        android:textStyle="bold"
+                        android:lineSpacingMultiplier="1.2"
+                        tools:text="Listen carefully!\nTap the correct letter" />
+
+                    <com.google.android.material.floatingactionbutton.FloatingActionButton
+                        android:id="@+id/btnPlayAudio"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="20dp"
+                        android:contentDescription="Play Audio"
+                        app:srcCompat="@drawable/ic_play_audio"
+                        app:backgroundTint="@color/colorAccent"
+                        app:tint="@color/white"
+                        app:elevation="4dp" />
+
+                    <TextView
+                        android:id="@+id/tvGameFeedback"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="16dp"
+                        android:textAppearance="?attr/textAppearanceHeadline6"
+                        android:textStyle="bold"
+                        android:minHeight="32dp"
+                        tools:text="✅ Great job!" />
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- Interactive Options Grid -->
+            <GridLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:gravity="center_horizontal"
-                android:layout_marginBottom="8dp">
+                android:columnCount="2"
+                android:alignmentMode="alignMargins"
+                android:columnOrderPreserved="false"
+                android:padding="4dp">
 
-                <Button
+                <com.google.android.material.button.MaterialButton
                     android:id="@+id/btnGameOpt1"
+                    style="@style/Widget.Material3.Button.TonalButton"
                     android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="A"
-                    android:textAllCaps="false"
-                    android:background="@drawable/bg_quiz_option"
-                    android:textColor="#212121"
-                    android:padding="12dp"
-                    android:layout_marginEnd="8dp" />
+                    android:layout_height="80dp"
+                    android:layout_columnWeight="1"
+                    android:layout_margin="8dp"
+                    android:textSize="28sp"
+                    android:textStyle="bold"
+                    app:cornerRadius="16dp"
+                    tools:text="A" />
 
-                <Button
+                <com.google.android.material.button.MaterialButton
                     android:id="@+id/btnGameOpt2"
+                    style="@style/Widget.Material3.Button.TonalButton"
                     android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="B"
-                    android:textAllCaps="false"
-                    android:background="@drawable/bg_quiz_option"
-                    android:textColor="#212121"
-                    android:padding="12dp"
-                    android:layout_marginEnd="8dp" />
+                    android:layout_height="80dp"
+                    android:layout_columnWeight="1"
+                    android:layout_margin="8dp"
+                    android:textSize="28sp"
+                    android:textStyle="bold"
+                    app:cornerRadius="16dp"
+                    tools:text="B" />
 
-                <Button
+                <com.google.android.material.button.MaterialButton
                     android:id="@+id/btnGameOpt3"
+                    style="@style/Widget.Material3.Button.TonalButton"
                     android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="C"
-                    android:textAllCaps="false"
-                    android:background="@drawable/bg_quiz_option"
-                    android:textColor="#212121"
-                    android:padding="12dp" />
-            </LinearLayout>
+                    android:layout_height="80dp"
+                    android:layout_columnWeight="1"
+                    android:layout_margin="8dp"
+                    android:textSize="28sp"
+                    android:textStyle="bold"
+                    app:cornerRadius="16dp"
+                    tools:text="C" />
 
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:gravity="center_horizontal">
-
-                <Button
+                <com.google.android.material.button.MaterialButton
                     android:id="@+id/btnGameOpt4"
+                    style="@style/Widget.Material3.Button.TonalButton"
                     android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="D"
-                    android:textAllCaps="false"
-                    android:background="@drawable/bg_quiz_option"
-                    android:textColor="#212121"
-                    android:padding="12dp"
-                    android:layout_marginEnd="8dp" />
+                    android:layout_height="80dp"
+                    android:layout_columnWeight="1"
+                    android:layout_margin="8dp"
+                    android:textSize="28sp"
+                    android:textStyle="bold"
+                    app:cornerRadius="16dp"
+                    tools:text="D" />
 
-                <Button
+                <com.google.android.material.button.MaterialButton
                     android:id="@+id/btnGameOpt5"
+                    style="@style/Widget.Material3.Button.TonalButton"
                     android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="E"
-                    android:textAllCaps="false"
-                    android:background="@drawable/bg_quiz_option"
-                    android:textColor="#212121"
-                    android:padding="12dp"
-                    android:layout_marginEnd="8dp" />
+                    android:layout_height="80dp"
+                    android:layout_columnWeight="1"
+                    android:layout_margin="8dp"
+                    android:textSize="28sp"
+                    android:textStyle="bold"
+                    app:cornerRadius="16dp"
+                    tools:text="E" />
 
-                <Button
+                <com.google.android.material.button.MaterialButton
                     android:id="@+id/btnGameOpt6"
+                    style="@style/Widget.Material3.Button.TonalButton"
                     android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="F"
-                    android:textAllCaps="false"
-                    android:background="@drawable/bg_quiz_option"
-                    android:textColor="#212121"
-                    android:padding="12dp" />
-            </LinearLayout>
-        </LinearLayout>
+                    android:layout_height="80dp"
+                    android:layout_columnWeight="1"
+                    android:layout_margin="8dp"
+                    android:textSize="28sp"
+                    android:textStyle="bold"
+                    app:cornerRadius="16dp"
+                    tools:text="F" />
 
-        <!-- Back button -->
-        <Button
-            android:id="@+id/btnGameBack"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Back"
-            android:textAllCaps="false"
-            android:background="@drawable/bg_quiz_secondary_button"
-            android:textColor="#37474F"
-            android:paddingLeft="24dp"
-            android:paddingRight="24dp"
-            android:layout_gravity="center_horizontal" />
-    </LinearLayout>
-</ScrollView>
+            </GridLayout>
+
+            <!-- Back Button -->
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnGameBack"
+                style="@style/Widget.Material3.Button.OutlinedButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginTop="24dp"
+                android:text="Quit Game"
+                app:cornerRadius="12dp"
+                app:strokeColor="@color/colorPrimary" />
+
+        </LinearLayout>
+    </androidx.core.widget.NestedScrollView>
+
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

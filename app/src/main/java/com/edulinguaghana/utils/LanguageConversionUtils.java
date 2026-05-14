@@ -338,4 +338,95 @@ public class LanguageConversionUtils {
             "O", "Ɔ", "P", "R", "S", "T", "U", "V", "W", "Y", "Z"
         };
     }
+
+    /**
+     * Gets matching word for a given letter and language
+     */
+    public static String getMatchingWordForLetter(String letter, String languageCode) {
+        String code = normalizeLanguageCode(languageCode);
+        letter = letter.toUpperCase(Locale.ROOT);
+        
+        switch (code) {
+            case LANG_TWI: return getTwiWord(letter);
+            case LANG_EWE: return getEweWord(letter);
+            case LANG_GA: return getGaWord(letter);
+            case LANG_FRENCH: return getFrenchWord(letter);
+            default: return getEnglishWord(letter);
+        }
+    }
+
+    private static String getEnglishWord(String letter) {
+        switch (letter) {
+            case "A": return "Apple"; case "B": return "Ball"; case "C": return "Cat";
+            case "D": return "Dog"; case "E": return "Egg"; case "F": return "Fish";
+            case "G": return "Goat"; case "H": return "Hat"; case "I": return "Igloo";
+            case "J": return "Jam"; case "K": return "Kite"; case "L": return "Lion";
+            case "M": return "Moon"; case "N": return "Net"; case "O": return "Orange";
+            case "P": return "Pen"; case "Q": return "Queen"; case "R": return "Rain";
+            case "S": return "Sun"; case "T": return "Tree"; case "U": return "Umbrella";
+            case "V": return "Van"; case "W": return "Watch"; case "X": return "Xylophone";
+            case "Y": return "Yo-yo"; case "Z": return "Zebra";
+            default: return "Ant";
+        }
+    }
+
+    private static String getTwiWord(String letter) {
+        switch (letter) {
+            case "A": return "Akye"; case "B": return "Bayere"; case "D": return "Dade";
+            case "E": return "Ekuo"; case "Ɛ": return "Ɛna"; case "F": return "Foforo";
+            case "G": return "Gyene"; case "H": return "Hene"; case "I": return "Isuo";
+            case "K": return "Kroma"; case "L": return "Lorry"; case "M": return "Maame";
+            case "N": return "Nan"; case "O": return "Onipa"; case "Ɔ": return "Ɔpanin";
+            case "P": return "Papa"; case "R": return "Rice"; case "S": return "Sika";
+            case "T": return "Tuo"; case "U": return "Unit"; case "W": return "Wura";
+            case "Y": return "Yare";
+            default: return "Abankuo";
+        }
+    }
+
+    private static String getEweWord(String letter) {
+        switch (letter) {
+            case "A": return "Agba"; case "B": return "Baba"; case "D": return "Dadi";
+            case "Ɖ": return "Ɖayi"; case "E": return "Enyi"; case "Ɛ": return "Ɛva";
+            case "F": return "Fifi"; case "Ƒ": return "Ƒu"; case "G": return "Ga";
+            case "Ɣ": return "Ɣletivi"; case "H": return "Hehe"; case "I": return "Ido";
+            case "K": return "Kpo"; case "L": return "Lã"; case "M": return "Mimi";
+            case "N": return "Nye"; case "Ŋ": return "Ŋu"; case "O": return "Owu";
+            case "Ɔ": return "Ɔnyigba"; case "P": return "Papi"; case "R": return "Radio";
+            case "S": return "Susu"; case "T": return "Tsi"; case "U": return "Usi";
+            case "V": return "Vo"; case "Ʋ": return "Ʋu"; case "W": return "Wo";
+            case "X": return "Xexe"; case "Y": return "Yeyi"; case "Z": return "Zi";
+            default: return "Ati";
+        }
+    }
+
+    private static String getGaWord(String letter) {
+        switch (letter) {
+            case "A": return "Amlua"; case "B": return "Baatsona"; case "D": return "Dade";
+            case "E": return "Eko"; case "Ɛ": return "Ɛkyɛ"; case "F": return "Flitloo";
+            case "G": return "Gbe"; case "H": return "Heh"; case "I": return "Isuo";
+            case "J": return "Ja"; case "K": return "Kooni"; case "L": return "Loi";
+            case "M": return "Ma"; case "N": return "Nane"; case "Ŋ": return "Ŋaa";
+            case "O": return "Okpale"; case "Ɔ": return "Ɔtsama"; case "P": return "Paa";
+            case "R": return "Rice"; case "S": return "Sane"; case "T": return "Tsu";
+            case "U": return "Unit"; case "V": return "Vane"; case "W": return "Wuo";
+            case "Y": return "Yaa"; case "Z": return "Zole";
+            default: return "Ati";
+        }
+    }
+
+    private static String getFrenchWord(String letter) {
+        switch (letter) {
+            case "A": return "Avion"; case "B": return "Bateau"; case "C": return "Chat";
+            case "D": return "Dauphin"; case "E": return "Elephant"; case "F": return "Fleur";
+            case "G": return "Gateau"; case "H": return "Hibou"; case "I": return "Ile";
+            case "J": return "Jardin"; case "K": return "Kangourou"; case "L": return "Lion";
+            case "M": return "Maison"; case "N": return "Nid"; case "O": return "Oiseau";
+            case "P": return "Pomme"; case "Q": return "Quatre"; case "R": return "Rouge";
+            case "S": return "Soleil"; case "T": return "Tortue"; case "U": return "Un";
+            case "V": return "Velo"; case "W": return "Wagon"; case "X": return "Xylophone";
+            case "Y": return "Yaourt"; case "Z": return "Zebre";
+            default: return "Ami";
+        }
+    }
 }
