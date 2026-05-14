@@ -152,17 +152,27 @@ public class LanguageConversionUtils {
      */
     public static String convertNumberToWordTwi(int num) {
         if (num < 1 || num > 100) return "";
-        String[] units = {"", "baako", "mienu", "miɛnsa", "nan", "num", "nsia", "nson", "nwɔtwe", "nkron"};
-        String[] tens = {"", "du", "aduonu", "aduasa", "aduanan", "aduonum", "aduosia", "aduɔson", "aduɔwɔtwe", "aduɔkron"};
+        if (num == 100) return "Ɔha";
 
-        if (num < 10) return units[num];
-        if (num == 10) return "du";
-        if (num < 20) return "du" + units[num-10];
-        if (num % 10 == 0) {
-            if(num == 100) return "ɔha";
-            return tens[num/10];
+        String[] standaloneUnits = {"", "Baako", "Mmienu", "Mmiɛnsa", "Ɛnan", "Enum", "Nsia", "Nson", "Nwɔtwe", "Nkron"};
+        String[] combinedUnits = {"", "baako", "mmienu", "mmiɛnsa", "nan", "num", "nsia", "nson", "nwɔtwe", "nkron"};
+        String[] tens = {"", "Edu", "Aduonu", "Aduasa", "Aduanan", "Aduonum", "Aduosia", "Aduoson", "Aduɔwɔtwe", "Aduɔkron"};
+
+        if (num < 10) return standaloneUnits[num];
+        if (num == 10) return "Edu";
+
+        if (num < 20) {
+            int unit = num - 10;
+            if (unit == 9) return "Du nkron";
+            return "Du" + combinedUnits[unit];
         }
-        return tens[num/10] + " " + units[num%10];
+
+        int ten = num / 10;
+        int unit = num % 10;
+
+        if (unit == 0) return tens[ten];
+
+        return tens[ten] + " " + combinedUnits[unit];
     }
 
     /**
@@ -203,22 +213,29 @@ public class LanguageConversionUtils {
      */
     public static String convertNumberToWordGa(int num) {
         if (num < 1 || num > 100) return "";
+        if (num == 100) return "oha";
+
         String[] units = {"", "ekome", "enyɔ", "etɛ", "ejwɛ", "enumɔ", "ekpaa", "kpawo", "kpaanyɔ", "nɛɛhu"};
+
         if (num < 10) return units[num];
         if (num == 10) return "nyɔŋma";
-        if (num < 20) return "nyɔŋma kɛ " + units[num-10];
-        if (num % 10 == 0) {
-            if (num == 20) return "iwuo";
-            if (num == 30) return "iwuo kɛ nyɔŋma";
-            if (num == 40) return "iwuo enyɔ";
-            if (num == 50) return "iwuo enyɔ kɛ nyɔŋma";
-            if (num == 60) return "iwuo etɛ";
-            if (num == 70) return "iwuo etɛ kɛ nyɔŋma";
-            if (num == 80) return "iwuo ejwɛ";
-            if (num == 90) return "iwuo ejwɛ kɛ nyɔŋma";
-            if (num == 100) return "ohaa";
-        }
-        return convertNumberToWordGa(num - (num % 10)) + " kɛ " + units[num % 10];
+        if (num < 20) return "nyɔŋma kɛ " + units[num - 10];
+
+        int ten = num / 10;
+        int unit = num % 10;
+
+        String tenWord;
+        if (ten == 2) tenWord = "nyɔŋmai enyɔ";
+        else if (ten == 3) tenWord = "nyɔŋmai etɛ";
+        else if (ten == 4) tenWord = "nyɔŋmai ejwɛ";
+        else if (ten == 5) tenWord = "nyɔŋmai enumɔ";
+        else if (ten == 6) tenWord = "nyɔŋmai ekpaa";
+        else if (ten == 7) tenWord = "nyɔŋmai kpawo";
+        else if (ten == 8) tenWord = "nyɔŋmai kpaanyɔ";
+        else tenWord = "nyɔŋmai nɛɛhu";
+
+        if (unit == 0) return tenWord;
+        return tenWord + " kɛ " + units[unit];
     }
 
     /**
