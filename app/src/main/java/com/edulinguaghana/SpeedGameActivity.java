@@ -221,10 +221,11 @@ public class SpeedGameActivity extends AppCompatActivity {
     // NEW: Normalize quiz type
     private String normalizeQuizType(String raw) {
         String t = raw.toLowerCase(Locale.ROOT);
+        if (t.contains("shadow")) return "shadow_match";
         if (t.contains("letter")) return "letters";
         if (t.contains("sequ")) return "sequence";
         if (t.contains("match")) return "matching";
-        if (t.contains("miss")) return "missing_letter";
+        if (t.contains("miss")) return "shadow_match";
         if (t.contains("mix")) return "mixed";
         if (t.contains("num")) return "numbers";
         return t;
@@ -243,6 +244,14 @@ public class SpeedGameActivity extends AppCompatActivity {
     }
 
     private void generateNewQuestion() {
+        // Reset shadow match feedback styling
+        if (tvGameFeedback != null) {
+            tvGameFeedback.setText("");
+            tvGameFeedback.setAlpha(1.0f);
+            tvGameFeedback.setTextSize(16);
+            tvGameFeedback.setTextColor(ContextCompat.getColor(this, R.color.textColorPrimary));
+        }
+
         // NEW: Support different quiz modes
         switch (quizType) {
             case "numbers":
@@ -254,8 +263,8 @@ public class SpeedGameActivity extends AppCompatActivity {
             case "matching":
                 generateMatchingQuestion();
                 break;
-            case "missing_letter":
-                generateMissingLetterQuestion();
+            case "shadow_match":
+                generateShadowMatchQuestion();
                 break;
             case "mixed":
                 generateMixedQuestion();
@@ -421,24 +430,37 @@ public class SpeedGameActivity extends AppCompatActivity {
         speakWithTts(letter);
     }
 
-    private void generateMissingLetterQuestion() {
+    private void generateShadowMatchQuestion() {
         String[] currentAlphabet = LanguageConversionUtils.getAlphabetForLanguage(languageCode);
-        String letter = currentAlphabet[new Random().nextInt(currentAlphabet.length)];
-        String word = LanguageConversionUtils.getMatchingWordForLetter(letter, languageCode);
-        
-        String displayWord = word.replaceFirst("(?i)" + letter, "___");
-        tvGamePrompt.setText(getString(R.string.quiz_prompt_missing_letter, displayWord));
-        tvGameFeedback.setText("");
-        
-        currentCorrectAnswer = letter;
-        
-        List<String> options = new ArrayList<>();
-        options.add(letter);
-        while (options.size() < 6) {
-            String rl = currentAlphabet[new Random().nextInt(currentAlphabet.length)];
-            if (!options.contains(rl)) options.add(rl);
+        boolean useNumber = new Random().nextBoolean();
+        String target;
+
+        if (useNumber) {
+            target = String.valueOf(new Random().nextInt(MAX_NUMBER) + 1);
+        } else {
+            target = currentAlphabet[new Random().nextInt(currentAlphabet.length)];
         }
+
+        currentCorrectAnswer = target;
+
+        tvGamePrompt.setText(R.string.quiz_prompt_shadow_match);
         
+        // Show shadow in feedback area
+        tvGameFeedback.setText(target);
+        tvGameFeedback.setTextColor(Color.LTGRAY);
+        tvGameFeedback.setAlpha(0.3f);
+        tvGameFeedback.setTextSize(48);
+
+        List<String> options = new ArrayList<>();
+        options.add(target);
+
+        while (options.size() < 6) {
+            String pick = useNumber ? String.valueOf(new Random().nextInt(MAX_NUMBER) + 1) : currentAlphabet[new Random().nextInt(currentAlphabet.length)];
+            if (!options.contains(pick)) {
+                options.add(pick);
+            }
+        }
+
         Collections.shuffle(options);
         btnOption1.setText(options.get(0));
         btnOption2.setText(options.get(1));
@@ -446,8 +468,8 @@ public class SpeedGameActivity extends AppCompatActivity {
         btnOption4.setText(options.get(3));
         btnOption5.setText(options.get(4));
         btnOption6.setText(options.get(5));
-        
-        speakWithTts(word);
+
+        speakWithTts(target);
     }
 
     // NEW: Generate mixed question
@@ -458,7 +480,7 @@ public class SpeedGameActivity extends AppCompatActivity {
         else if (r == 1) generateNumberQuestion();
         else if (r == 2) generateSequenceQuestion();
         else if (r == 3) generateMatchingQuestion();
-        else generateMissingLetterQuestion();
+        else generateShadowMatchQuestion();
     }
 
     // Helper method to speak with appropriate TTS

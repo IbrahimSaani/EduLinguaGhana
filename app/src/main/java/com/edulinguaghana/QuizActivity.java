@@ -3,6 +3,9 @@ package com.edulinguaghana;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.ColorStateList;
+import android.graphics.Color;
+import android.animation.ObjectAnimator;
+import android.animation.ValueAnimator;
 import android.media.MediaPlayer;
 import android.media.AudioManager;
 import android.net.Uri;
@@ -286,6 +289,16 @@ public class QuizActivity extends AppCompatActivity {
                 description = "Match the letter to the word that starts with it.";
                 iconRes = R.drawable.ic_quiz_matching;
                 break;
+            case "shadow_match":
+                modeLabel = "Shadow Match";
+                description = "Identify the character that fits the shadow outline.";
+                iconRes = R.drawable.ic_quiz_matching; // Reusing matching icon or similar
+                break;
+            case "odd_one_out":
+                modeLabel = "Word Recognition";
+                description = "Identify the correct word starting with the letter.";
+                iconRes = R.drawable.ic_quiz_letters;
+                break;
             case "mixed":
                 modeLabel = "Mixed Quiz";
                 description = "A mix of letter and number questions.";
@@ -372,13 +385,14 @@ public class QuizActivity extends AppCompatActivity {
 
     private String normalizeQuizType(String raw) {
         String t = raw.toLowerCase(Locale.ROOT);
-        if (t.contains("letter")) return "letters";
+        if (t.contains("shadow")) return "shadow_match";
         if (t.contains("sequ")) return "sequence";
         if (t.contains("match")) return "matching";
-        if (t.contains("miss")) return "missing_letter";
+        if (t.contains("miss")) return "shadow_match"; // Map old to new
         if (t.contains("odd") || t.contains("word")) return "odd_one_out";
         if (t.contains("mix")) return "mixed";
         if (t.contains("num")) return "numbers";
+        if (t.contains("letter")) return "letters";
         return t;
     }
 
@@ -534,8 +548,8 @@ public class QuizActivity extends AppCompatActivity {
             case "matching":
                 generateMatchingQuestion();
                 break;
-            case "missing_letter":
-                generateMissingLetterQuestion();
+            case "shadow_match":
+                generateShadowMatchQuestion();
                 break;
             case "odd_one_out":
                 generateOddOneOutQuestion();
@@ -745,37 +759,60 @@ public class QuizActivity extends AppCompatActivity {
         currentPromptTtsText = "Match the letters to the words";
     }
 
-    private void generateMissingLetterQuestion() {
+    private void generateShadowMatchQuestion() {
         String[] currentAlphabet = LanguageConversionUtils.getAlphabetForLanguage(languageCode);
-        String letter = currentAlphabet[random.nextInt(currentAlphabet.length)];
-        String word = LanguageConversionUtils.getMatchingWordForLetter(letter, languageCode);
-        
-        // Hide the first occurrence of the letter (usually the start)
-        String displayWord = word.replaceFirst("(?i)" + letter, "___");
-        
-        if (tvGamePrompt != null) {
-            tvGamePrompt.setText(getString(R.string.quiz_prompt_missing_letter, displayWord));
+        boolean useNumber = random.nextBoolean();
+        String target;
+
+        if (useNumber) {
+            target = String.valueOf(random.nextInt(MAX_NUMBER) + 1);
+        } else {
+            target = currentAlphabet[random.nextInt(currentAlphabet.length)];
         }
-        
-        currentCorrectAnswer = letter;
-        currentPromptTtsText = word;
-        
+
+        currentCorrectAnswer = target;
+        currentPromptTtsText = target;
+
+        if (tvGamePrompt != null) {
+            tvGamePrompt.setText(R.string.quiz_prompt_shadow_match);
+        }
+
+        // Display the "shadow" in the target text area
+        if (tvGamePrompt != null) {
+            // We can reuse the target text view if we add one, or use a specific format in the prompt
+            // For now, let's use a stylized text in the prompt or feedback area to show the shadow
+            tvGameFeedback.setText(target);
+            tvGameFeedback.setTextColor(Color.LTGRAY);
+            tvGameFeedback.setAlpha(0.3f);
+            tvGameFeedback.setTextSize(60);
+        }
+
         List<String> options = new ArrayList<>();
-        options.add(letter);
-        
+        options.add(target);
+
         while (options.size() < 6) {
-            String randomLetter = currentAlphabet[random.nextInt(currentAlphabet.length)];
-            if (!options.contains(randomLetter)) {
-                options.add(randomLetter);
+            String pick = useNumber ? String.valueOf(random.nextInt(MAX_NUMBER) + 1) : currentAlphabet[random.nextInt(currentAlphabet.length)];
+            if (!options.contains(pick)) {
+                options.add(pick);
             }
         }
-        
+
         Collections.shuffle(options);
         MaterialButton[] buttons = {btnOption1, btnOption2, btnOption3, btnOption4, btnOption5, btnOption6};
         for (int i = 0; i < 6; i++) {
             if (buttons[i] != null) {
                 buttons[i].setText(options.get(i));
                 buttons[i].setVisibility(View.VISIBLE);
+                
+                // --- Spinning Wheel Effect ---
+                // Add a continuous rotation to simulate a spinning wheel
+                ObjectAnimator rotate = ObjectAnimator.ofFloat(buttons[i], View.ROTATION, 0f, 360f);
+                rotate.setDuration(3000 + (i * 200)); // Vary speeds slightly
+                rotate.setRepeatCount(ValueAnimator.INFINITE);
+                rotate.setInterpolator(new android.view.animation.LinearInterpolator());
+                rotate.start();
+                // Store animator in tag to cancel it later
+                buttons[i].setTag(R.id.mascotView, rotate); 
             }
         }
     }
@@ -913,7 +950,7 @@ public class QuizActivity extends AppCompatActivity {
         else if (r == 1) generateNumberQuestion();
         else if (r == 2) generateSequenceQuestion();
         else if (r == 3) generateMatchingQuestion();
-        else if (r == 4) generateMissingLetterQuestion();
+        else if (r == 4) generateShadowMatchQuestion();
         else generateOddOneOutQuestion();
     }
 
@@ -1159,12 +1196,23 @@ public class QuizActivity extends AppCompatActivity {
 
     private void resetButtons() {
         if (tvGameFeedback != null) {
+            // Restore default text appearance after shadow match
             tvGameFeedback.setText("");
+            tvGameFeedback.setTextColor(ContextCompat.getColor(this, R.color.textColorPrimary));
+            tvGameFeedback.setAlpha(1.0f);
+            tvGameFeedback.setTextSize(16);
         }
         setButtonsEnabled(true);
         MaterialButton[] buttons = {btnOption1, btnOption2, btnOption3, btnOption4, btnOption5, btnOption6};
         for (MaterialButton button : buttons) {
             if (button != null) {
+                // Cancel ObjectAnimator if exists from Shadow Match
+                Object animator = button.getTag(R.id.mascotView);
+                if (animator instanceof ObjectAnimator) {
+                    ((ObjectAnimator) animator).cancel();
+                }
+                button.setRotation(0f);
+
                 button.setStrokeColor(ColorStateList.valueOf(ContextCompat.getColor(this, R.color.buttonSecondary)));
                 button.setStrokeWidth(2);
                 button.clearAnimation();

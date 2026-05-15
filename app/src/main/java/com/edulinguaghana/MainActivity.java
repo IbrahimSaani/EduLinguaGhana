@@ -1068,10 +1068,10 @@ public class MainActivity extends AppCompatActivity {
                 () -> openQuizScreen(langCode, langName, "matching", "beginner", "all")
         ));
         menuItems.add(new StyledMenuHelper.MenuItem(
-                "🔍",
-                "Missing Letter",
-                "Find the hidden letter",
-                () -> openQuizScreen(langCode, langName, "missing_letter", "beginner", "all")
+                "🎯",
+                "Shadow Match",
+                "Match items to their outlines",
+                () -> openQuizScreen(langCode, langName, "shadow_match", "beginner", "all")
         ));
         menuItems.add(new StyledMenuHelper.MenuItem(
                 "🔡",
