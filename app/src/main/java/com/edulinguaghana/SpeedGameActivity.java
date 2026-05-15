@@ -39,6 +39,7 @@ public class SpeedGameActivity extends AppCompatActivity {
     private MaterialButton btnOption1, btnOption2, btnOption3, btnOption4, btnOption5, btnOption6;
     private MaterialButton btnBack;
     private ProgressBar speedProgressBar;
+    private ShadowView shadowView;
 
     // Game variables
     private int score = 0;
@@ -112,6 +113,7 @@ public class SpeedGameActivity extends AppCompatActivity {
         btnOption6 = findViewById(R.id.btnGameOpt6);
         btnBack    = findViewById(R.id.btnGameBack);
         btnPlayAudio = findViewById(R.id.btnPlayAudio);
+        shadowView = findViewById(R.id.shadowView);
 
         // OPTIONAL: if you added a Play Audio button in XML, otherwise comment out
         btnPlayAudio = findViewById(R.id.btnPlayAudio);
@@ -251,6 +253,7 @@ public class SpeedGameActivity extends AppCompatActivity {
             tvGameFeedback.setTextSize(16);
             tvGameFeedback.setTextColor(ContextCompat.getColor(this, R.color.textColorPrimary));
         }
+        if (shadowView != null) shadowView.setVisibility(View.GONE);
 
         // NEW: Support different quiz modes
         switch (quizType) {
@@ -431,6 +434,10 @@ public class SpeedGameActivity extends AppCompatActivity {
     }
 
     private void generateShadowMatchQuestion() {
+        if (tvGamePrompt != null) {
+            tvGamePrompt.setText(R.string.quiz_prompt_shadow_match);
+        }
+
         String[] currentAlphabet = LanguageConversionUtils.getAlphabetForLanguage(languageCode);
         boolean useNumber = new Random().nextBoolean();
         String target;
@@ -443,13 +450,10 @@ public class SpeedGameActivity extends AppCompatActivity {
 
         currentCorrectAnswer = target;
 
-        tvGamePrompt.setText(R.string.quiz_prompt_shadow_match);
-        
-        // Show shadow in feedback area
-        tvGameFeedback.setText(target);
-        tvGameFeedback.setTextColor(Color.LTGRAY);
-        tvGameFeedback.setAlpha(0.3f);
-        tvGameFeedback.setTextSize(48);
+        if (shadowView != null) {
+            shadowView.setVisibility(View.VISIBLE);
+            shadowView.setCharacter(target);
+        }
 
         List<String> options = new ArrayList<>();
         options.add(target);

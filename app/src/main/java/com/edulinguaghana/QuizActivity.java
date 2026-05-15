@@ -68,6 +68,9 @@ public class QuizActivity extends AppCompatActivity {
     private TextView tvGameTimer, tvGameScore, tvGameBest, tvGameFeedback, tvGamePrompt;
     private FloatingActionButton btnPlayAudio;
     private MaterialButton btnOption1, btnOption2, btnOption3, btnOption4, btnOption5, btnOption6;
+    private ShadowView shadowView;
+    private View scratchCard;
+    private ScratchRevealView scratchRevealView;
 
     // End screen
     private TextView tvFinalScore, tvEndBestScore, tvNewHighScore;
@@ -236,6 +239,9 @@ public class QuizActivity extends AppCompatActivity {
         btnOption4 = findViewById(R.id.btnOption4);
         btnOption5 = findViewById(R.id.btnOption5);
         btnOption6 = findViewById(R.id.btnOption6);
+        shadowView = findViewById(R.id.shadowView);
+        scratchCard = findViewById(R.id.scratchCard);
+        scratchRevealView = findViewById(R.id.scratchRevealView);
 
         tvFinalScore = findViewById(R.id.tvFinalScore);
         tvEndBestScore = findViewById(R.id.tvEndBestScore);
@@ -292,7 +298,12 @@ public class QuizActivity extends AppCompatActivity {
             case "shadow_match":
                 modeLabel = "Shadow Match";
                 description = "Identify the character that fits the shadow outline.";
-                iconRes = R.drawable.ic_quiz_matching; // Reusing matching icon or similar
+                iconRes = R.drawable.ic_quiz_matching; 
+                break;
+            case "hidden_shapes":
+                modeLabel = "Hidden Shapes";
+                description = "Rub the sand to reveal the hidden character.";
+                iconRes = R.drawable.mascot_owl; 
                 break;
             case "odd_one_out":
                 modeLabel = "Word Recognition";
@@ -386,6 +397,7 @@ public class QuizActivity extends AppCompatActivity {
     private String normalizeQuizType(String raw) {
         String t = raw.toLowerCase(Locale.ROOT);
         if (t.contains("shadow")) return "shadow_match";
+        if (t.contains("hidden") || t.contains("shape")) return "hidden_shapes";
         if (t.contains("sequ")) return "sequence";
         if (t.contains("match")) return "matching";
         if (t.contains("miss")) return "shadow_match"; // Map old to new
@@ -550,6 +562,9 @@ public class QuizActivity extends AppCompatActivity {
                 break;
             case "shadow_match":
                 generateShadowMatchQuestion();
+                break;
+            case "hidden_shapes":
+                generateHiddenShapesQuestion();
                 break;
             case "odd_one_out":
                 generateOddOneOutQuestion();
@@ -760,6 +775,10 @@ public class QuizActivity extends AppCompatActivity {
     }
 
     private void generateShadowMatchQuestion() {
+        if (tvGamePrompt != null) {
+            tvGamePrompt.setText(R.string.quiz_prompt_shadow_match);
+        }
+
         String[] currentAlphabet = LanguageConversionUtils.getAlphabetForLanguage(languageCode);
         boolean useNumber = random.nextBoolean();
         String target;
@@ -773,18 +792,12 @@ public class QuizActivity extends AppCompatActivity {
         currentCorrectAnswer = target;
         currentPromptTtsText = target;
 
-        if (tvGamePrompt != null) {
-            tvGamePrompt.setText(R.string.quiz_prompt_shadow_match);
-        }
-
-        // Display the "shadow" in the target text area
-        if (tvGamePrompt != null) {
-            // We can reuse the target text view if we add one, or use a specific format in the prompt
-            // For now, let's use a stylized text in the prompt or feedback area to show the shadow
-            tvGameFeedback.setText(target);
-            tvGameFeedback.setTextColor(Color.LTGRAY);
-            tvGameFeedback.setAlpha(0.3f);
-            tvGameFeedback.setTextSize(60);
+        // --- Use ShadowView with Canvas ---
+        if (shadowView != null) {
+            shadowView.setVisibility(View.VISIBLE);
+            shadowView.setCharacter(target);
+            // Example of using Glide if there were images:
+            // shadowView.setImageUrl("https://example.com/letters/" + target.toLowerCase() + ".png");
         }
 
         List<String> options = new ArrayList<>();
@@ -804,17 +817,73 @@ public class QuizActivity extends AppCompatActivity {
                 buttons[i].setText(options.get(i));
                 buttons[i].setVisibility(View.VISIBLE);
                 
-                // --- Spinning Wheel Effect ---
-                // Add a continuous rotation to simulate a spinning wheel
+                // --- Spinning Wheel Effect (RecyclerView equivalent via Animation) ---
                 ObjectAnimator rotate = ObjectAnimator.ofFloat(buttons[i], View.ROTATION, 0f, 360f);
-                rotate.setDuration(3000 + (i * 200)); // Vary speeds slightly
+                rotate.setDuration(4000 + (i * 300)); 
                 rotate.setRepeatCount(ValueAnimator.INFINITE);
                 rotate.setInterpolator(new android.view.animation.LinearInterpolator());
                 rotate.start();
-                // Store animator in tag to cancel it later
                 buttons[i].setTag(R.id.mascotView, rotate); 
             }
         }
+    }
+
+    private void generateHiddenShapesQuestion() {
+        if (tvGamePrompt != null) {
+            tvGamePrompt.setText(R.string.hidden_shapes_prompt);
+        }
+        
+        // Hide answer buttons during scratch phase
+        setOptionsVisibility(View.INVISIBLE);
+        
+        String[] currentAlphabet = LanguageConversionUtils.getAlphabetForLanguage(languageCode);
+        boolean useNumber = random.nextBoolean();
+        String target;
+
+        if (useNumber) {
+            target = String.valueOf(random.nextInt(20) + 1);
+        } else {
+            target = currentAlphabet[random.nextInt(currentAlphabet.length)];
+        }
+
+        currentCorrectAnswer = target;
+        currentPromptTtsText = target;
+
+        if (scratchCard != null && scratchRevealView != null) {
+            scratchCard.setVisibility(View.VISIBLE);
+            scratchRevealView.setHiddenText(target, text -> {
+                // Character revealed!
+                runOnUiThread(() -> {
+                    speakPrompt();
+                    playSfx(true);
+                    
+                    // Show options to "confirm" selection or just wait and move on
+                    // For Quiz flow, let's show options and wait for user to tap the matching one to get the point
+                    setOptionsVisibility(View.VISIBLE);
+                    
+                    // Highlight the correct one if they scratch it?
+                    // Actually, let's just make it a "scratch to find" and then tap the match.
+                });
+            });
+        }
+        
+        // Prepare options
+        List<String> options = new ArrayList<>();
+        options.add(target);
+        while (options.size() < 6) {
+            String pick = useNumber ? String.valueOf(random.nextInt(20) + 1) : currentAlphabet[random.nextInt(currentAlphabet.length)];
+            if (!options.contains(pick)) options.add(pick);
+        }
+        Collections.shuffle(options);
+        MaterialButton[] buttons = {btnOption1, btnOption2, btnOption3, btnOption4, btnOption5, btnOption6};
+        for (int i = 0; i < 6; i++) {
+            if (buttons[i] != null) buttons[i].setText(options.get(i));
+        }
+    }
+
+    private void setOptionsVisibility(int visibility) {
+        MaterialButton[] buttons = {btnOption1, btnOption2, btnOption3, btnOption4, btnOption5, btnOption6};
+        for (MaterialButton b : buttons) if (b != null) b.setVisibility(visibility);
     }
 
     private void generateOddOneOutQuestion() {
@@ -945,12 +1014,13 @@ public class QuizActivity extends AppCompatActivity {
     }
 
     private void generateMixedQuestion() {
-        int r = random.nextInt(6);
+        int r = random.nextInt(7);
         if (r == 0) generateLetterQuestion();
         else if (r == 1) generateNumberQuestion();
         else if (r == 2) generateSequenceQuestion();
         else if (r == 3) generateMatchingQuestion();
         else if (r == 4) generateShadowMatchQuestion();
+        else if (r == 5) generateHiddenShapesQuestion();
         else generateOddOneOutQuestion();
     }
 
@@ -1202,6 +1272,10 @@ public class QuizActivity extends AppCompatActivity {
             tvGameFeedback.setAlpha(1.0f);
             tvGameFeedback.setTextSize(16);
         }
+        
+        if (shadowView != null) shadowView.setVisibility(View.GONE);
+        if (scratchCard != null) scratchCard.setVisibility(View.GONE);
+
         setButtonsEnabled(true);
         MaterialButton[] buttons = {btnOption1, btnOption2, btnOption3, btnOption4, btnOption5, btnOption6};
         for (MaterialButton button : buttons) {
