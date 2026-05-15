@@ -1,18 +1,26 @@
 package com.edulinguaghana;
 
+import android.animation.ValueAnimator;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.LinearGradient;
 import android.graphics.Paint;
 import android.graphics.Path;
 import android.graphics.PorterDuff;
 import android.graphics.PorterDuffXfermode;
+import android.graphics.Shader;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.animation.AccelerateDecelerateInterpolator;
 
 import androidx.annotation.Nullable;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Random;
 
 public class ScratchRevealView extends View {
 
@@ -22,13 +30,26 @@ public class ScratchRevealView extends View {
     private Path scratchPath;
     private Paint backgroundPaint;
     private Paint textPaint;
+    private Paint particlePaint;
+    private Paint overlayPaint;
+    
     private String hiddenText = "";
     private RevealListener revealListener;
     private boolean isRevealed = false;
     private float pixelsScratched = 0;
+    private final Random random = new Random();
+    private int overlayAlpha = 255;
+    
+    private final List<Particle> particles = new ArrayList<>();
+    private static final int MAX_PARTICLES = 40;
 
     public interface RevealListener {
         void onRevealed(String text);
+    }
+
+    private static class Particle {
+        float x, y, vx, vy, alpha, size;
+        int color;
     }
 
     public ScratchRevealView(Context context) {
@@ -48,17 +69,22 @@ public class ScratchRevealView extends View {
         scratchPaint.setDither(true);
         scratchPaint.setStrokeJoin(Paint.Join.ROUND);
         scratchPaint.setStrokeCap(Paint.Cap.ROUND);
-        scratchPaint.setStrokeWidth(100f); // Width of the rubbing stroke
+        scratchPaint.setStrokeWidth(120f);
         scratchPaint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.CLEAR));
 
-        backgroundPaint = new Paint();
-        backgroundPaint.setColor(Color.parseColor("#C2B280")); // Sand color
-
-        textPaint = new Paint();
-        textPaint.setColor(Color.BLACK);
-        textPaint.setTextSize(300f);
+        backgroundPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+        
+        textPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+        textPaint.setColor(Color.parseColor("#1A237E")); // primary color
+        textPaint.setTextSize(320f);
         textPaint.setTextAlign(Paint.Align.CENTER);
         textPaint.setFakeBoldText(true);
+        textPaint.setShadowLayer(10, 0, 0, Color.LTGRAY);
+
+        particlePaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+        particlePaint.setStyle(Paint.Style.FILL);
+
+        overlayPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
     }
 
     public void setHiddenText(String text, RevealListener listener) {
@@ -66,6 +92,8 @@ public class ScratchRevealView extends View {
         this.revealListener = listener;
         this.isRevealed = false;
         this.pixelsScratched = 0;
+        this.overlayAlpha = 255;
+        this.particles.clear();
         reset();
     }
 
@@ -87,29 +115,71 @@ public class ScratchRevealView extends View {
 
         overlayBitmap = Bitmap.createBitmap(getWidth(), getHeight(), Bitmap.Config.ARGB_8888);
         overlayCanvas = new Canvas(overlayBitmap);
-        overlayCanvas.drawRect(0, 0, getWidth(), getHeight(), backgroundPaint);
         
-        // Add some "texture" to the sand (optional, simple noise)
-        Paint noisePaint = new Paint();
-        noisePaint.setColor(Color.parseColor("#A89968"));
-        for (int i = 0; i < 200; i++) {
-            float x = (float) (Math.random() * getWidth());
-            float y = (float) (Math.random() * getHeight());
-            overlayCanvas.drawCircle(x, y, 2, noisePaint);
+        LinearGradient gradient = new LinearGradient(0, 0, getWidth(), getHeight(),
+                new int[]{Color.parseColor("#D4C491"), Color.parseColor("#C2B280"), Color.parseColor("#B1A170")},
+                null, Shader.TileMode.CLAMP);
+        backgroundPaint.setShader(gradient);
+        overlayCanvas.drawRect(0, 0, getWidth(), getHeight(), backgroundPaint);
+        backgroundPaint.setShader(null);
+        
+        Paint noisePaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+        noisePaint.setColor(Color.parseColor("#33000000"));
+        for (int i = 0; i < 400; i++) {
+            float x = random.nextFloat() * getWidth();
+            float y = random.nextFloat() * getHeight();
+            float size = random.nextFloat() * 3 + 1;
+            overlayCanvas.drawCircle(x, y, size, noisePaint);
         }
     }
 
     @Override
-    protected void onDraw(Canvas canvas) {
-        // Draw the hidden character first
+    protected void onDraw(@androidx.annotation.NonNull Canvas canvas) {
         float x = getWidth() / 2f;
         float y = getHeight() / 2f - ((textPaint.descent() + textPaint.ascent()) / 2f);
         canvas.drawText(hiddenText, x, y, textPaint);
 
-        // Draw the overlay bitmap (the sand/snow)
         if (overlayBitmap != null) {
-            canvas.drawBitmap(overlayBitmap, 0, 0, null);
+            overlayPaint.setAlpha(overlayAlpha);
+            canvas.drawBitmap(overlayBitmap, 0, 0, overlayPaint);
         }
+        
+        drawParticles(canvas);
+    }
+
+    private void drawParticles(Canvas canvas) {
+        for (int i = particles.size() - 1; i >= 0; i--) {
+            Particle p = particles.get(i);
+            particlePaint.setColor(p.color);
+            particlePaint.setAlpha((int) (p.alpha * 255));
+            canvas.drawCircle(p.x, p.y, p.size, particlePaint);
+            
+            p.x += p.vx;
+            p.y += p.vy;
+            p.alpha -= 0.04f;
+            if (p.alpha <= 0) {
+                particles.remove(i);
+            }
+        }
+        if (!particles.isEmpty()) {
+            invalidate();
+        }
+    }
+
+    private void addParticles(float x, float y) {
+        for (int i = 0; i < 4; i++) {
+            if (particles.size() >= MAX_PARTICLES) break;
+            Particle p = new Particle();
+            p.x = x;
+            p.y = y;
+            p.vx = (random.nextFloat() - 0.5f) * 12;
+            p.vy = (random.nextFloat() - 0.5f) * 12;
+            p.alpha = 1.0f;
+            p.size = random.nextFloat() * 12 + 6;
+            p.color = Color.parseColor("#C2B280");
+            particles.add(p);
+        }
+        invalidate();
     }
 
     @Override
@@ -123,12 +193,14 @@ public class ScratchRevealView extends View {
             case MotionEvent.ACTION_DOWN:
                 scratchPath.reset();
                 scratchPath.moveTo(x, y);
+                addParticles(x, y);
                 break;
             case MotionEvent.ACTION_MOVE:
                 scratchPath.lineTo(x, y);
                 if (overlayCanvas != null) {
                     overlayCanvas.drawPath(scratchPath, scratchPaint);
                 }
+                addParticles(x, y);
                 checkRevealProgress();
                 break;
             case MotionEvent.ACTION_UP:
@@ -151,18 +223,29 @@ public class ScratchRevealView extends View {
     private void checkRevealProgress() {
         if (isRevealed) return;
 
-        // Roughly estimate progress based on area rubbed
-        // Real pixel counting is expensive, so we'll use a simplified check or a small-scale bitmap
+        pixelsScratched += 3.0f;
         
-        // For children's game, simple "count moves" or "area covered" is often enough.
-        // Let's do a simple threshold check.
-        pixelsScratched += 1; // Simplified increment per move
-        
-        if (pixelsScratched > 150) { // Threshold for reveal
+        if (pixelsScratched > 180) {
             isRevealed = true;
-            if (revealListener != null) {
-                revealListener.onRevealed(hiddenText);
+            revealFully();
+        }
+    }
+
+    private void revealFully() {
+        ValueAnimator fadeOut = ValueAnimator.ofInt(255, 0);
+        fadeOut.setDuration(600);
+        fadeOut.setInterpolator(new AccelerateDecelerateInterpolator());
+        fadeOut.addUpdateListener(animation -> {
+            overlayAlpha = (int) animation.getAnimatedValue();
+            if (overlayAlpha == 0) {
+                overlayBitmap = null;
             }
+            invalidate();
+        });
+        fadeOut.start();
+
+        if (revealListener != null) {
+            revealListener.onRevealed(hiddenText);
         }
     }
 }

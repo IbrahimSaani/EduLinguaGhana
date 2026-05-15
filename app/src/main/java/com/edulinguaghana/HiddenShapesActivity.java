@@ -21,6 +21,7 @@ public class HiddenShapesActivity extends AppCompatActivity {
     private ScratchRevealView scratchView;
     private TextView tvPrompt;
     private MaterialButton btnNext, btnBack;
+    private nl.dionsegijn.konfetti.xml.KonfettiView konfettiView;
     private String languageCode;
     private String currentCharacter;
     
@@ -40,6 +41,7 @@ public class HiddenShapesActivity extends AppCompatActivity {
         tvPrompt = findViewById(R.id.tvPrompt);
         btnNext = findViewById(R.id.btnNext);
         btnBack = findViewById(R.id.btnBack);
+        konfettiView = findViewById(R.id.konfettiView);
 
         btnBack.setOnClickListener(v -> finish());
         btnNext.setOnClickListener(v -> generateNewCharacter());
@@ -76,12 +78,27 @@ public class HiddenShapesActivity extends AppCompatActivity {
         scratchView.setHiddenText(currentCharacter, text -> {
             // Character revealed!
             runOnUiThread(() -> {
+                celebrate();
                 speakCharacter(text);
                 tvPrompt.setText(getString(R.string.hidden_shapes_found, text));
                 btnNext.setVisibility(View.VISIBLE);
                 btnNext.startAnimation(AnimationUtils.loadAnimation(this, R.anim.bounce_pop));
             });
         });
+    }
+
+    private void celebrate() {
+        if (konfettiView == null) return;
+        konfettiView.start(
+            new nl.dionsegijn.konfetti.core.PartyFactory(
+                new nl.dionsegijn.konfetti.core.emitter.Emitter(1000L, java.util.concurrent.TimeUnit.MILLISECONDS).max(100)
+            )
+            .spread(360)
+            .colors(java.util.Arrays.asList(0xfce18a, 0xff726d, 0xf48fb1, 0xafdfff))
+            .setSpeedBetween(10f, 30f)
+            .position(new nl.dionsegijn.konfetti.core.Position.Relative(0.5, 0.3))
+            .build()
+        );
     }
 
     private void speakCharacter(String text) {

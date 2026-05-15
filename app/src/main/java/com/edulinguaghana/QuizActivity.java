@@ -922,15 +922,11 @@ public class QuizActivity extends AppCompatActivity {
             scratchRevealView.setHiddenText(target, text -> {
                 // Character revealed!
                 runOnUiThread(() -> {
+                    celebrate(); // Add konfetti!
                     speakPrompt();
                     playSfx(true);
                     
-                    // Show options to "confirm" selection or just wait and move on
-                    // For Quiz flow, let's show options and wait for user to tap the matching one to get the point
                     setOptionsVisibility(View.VISIBLE);
-                    
-                    // Highlight the correct one if they scratch it?
-                    // Actually, let's just make it a "scratch to find" and then tap the match.
                 });
             });
         }
