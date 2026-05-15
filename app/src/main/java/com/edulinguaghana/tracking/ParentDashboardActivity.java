@@ -9,7 +9,6 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -30,6 +29,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * Dashboard for parents to view their children's progress
@@ -42,11 +42,7 @@ public class ParentDashboardActivity extends AppCompatActivity {
     private TextView emptyTextView;
     private SwipeRefreshLayout swipeRefresh;
     private LinearLayout emptyStateLayout;
-    private MaterialButton btnSort;
     private MaterialAutoCompleteTextView classFilterDropdown;
-    private MaterialButton btnAddFirstChild;
-    private MaterialButton btnAddChildBottom;
-    private MaterialButton btnRemoveChild;
 
     // Statistics views
     private TextView tvTotalChildren;
@@ -56,23 +52,14 @@ public class ParentDashboardActivity extends AppCompatActivity {
     private RoleManager roleManager;
     private ProgressTracker progressTracker;
     private String currentUserId;
-    private List<StudentProgressItem> allChildren = new ArrayList<>();
+    private final List<StudentProgressItem> allChildren = new ArrayList<>();
     private int currentSortOption = 0; // 0=Name, 1=Level, 2=Activity
     private int activeLoadToken = 0;
 
-    private static final String ALL_CLASSES_FILTER = "All Classes";
-    private static final String UNASSIGNED_CLASSES_FILTER = "Unassigned";
-    private final String[] classFilterOptions = {
-            ALL_CLASSES_FILTER,
-            "Class 1",
-            "Class 2",
-            "Class 3",
-            "Class 4",
-            "Class 5",
-            "Class 6",
-            UNASSIGNED_CLASSES_FILTER
-    };
-    private String selectedClassFilter = ALL_CLASSES_FILTER;
+    private String ALL_CLASSES_FILTER;
+    private String UNASSIGNED_CLASSES_FILTER;
+    private String[] classFilterOptions;
+    private String selectedClassFilter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -85,6 +72,20 @@ public class ParentDashboardActivity extends AppCompatActivity {
             return;
         }
         currentUserId = user.getUid();
+
+        ALL_CLASSES_FILTER = getString(R.string.teacher_dashboard_all_classes);
+        UNASSIGNED_CLASSES_FILTER = getString(R.string.teacher_dashboard_unassigned);
+        classFilterOptions = new String[]{
+                ALL_CLASSES_FILTER,
+                "Class 1",
+                "Class 2",
+                "Class 3",
+                "Class 4",
+                "Class 5",
+                "Class 6",
+                UNASSIGNED_CLASSES_FILTER
+        };
+        selectedClassFilter = ALL_CLASSES_FILTER;
 
         roleManager = new RoleManager();
         progressTracker = new ProgressTracker();
@@ -100,7 +101,7 @@ public class ParentDashboardActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
         if (getSupportActionBar() != null) {
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-            getSupportActionBar().setTitle("My Children");
+            getSupportActionBar().setTitle(R.string.parent_dashboard_title);
         }
 
         childrenRecyclerView = findViewById(R.id.childrenRecyclerView);
@@ -108,11 +109,11 @@ public class ParentDashboardActivity extends AppCompatActivity {
         emptyTextView = findViewById(R.id.emptyTextView);
         emptyStateLayout = findViewById(R.id.emptyStateLayout);
         swipeRefresh = findViewById(R.id.swipeRefresh);
-        btnSort = findViewById(R.id.btnSort);
+        MaterialButton btnSort = findViewById(R.id.btnSort);
         classFilterDropdown = findViewById(R.id.classFilterDropdown);
-        btnAddFirstChild = findViewById(R.id.btnAddFirstChild);
-        btnAddChildBottom = findViewById(R.id.btnAddChildBottom);
-        btnRemoveChild = findViewById(R.id.btnRemoveChild);
+        MaterialButton btnAddFirstChild = findViewById(R.id.btnAddFirstChild);
+        MaterialButton btnAddChildBottom = findViewById(R.id.btnAddChildBottom);
+        MaterialButton btnRemoveChild = findViewById(R.id.btnRemoveChild);
 
         // Statistics views
         tvTotalChildren = findViewById(R.id.tvTotalChildren);
@@ -163,9 +164,7 @@ public class ParentDashboardActivity extends AppCompatActivity {
 
     private void setupSwipeRefresh() {
         if (swipeRefresh != null) {
-            swipeRefresh.setOnRefreshListener(() -> {
-                loadChildren();
-            });
+            swipeRefresh.setOnRefreshListener(this::loadChildren);
             swipeRefresh.setColorSchemeResources(
                 R.color.colorPrimary,
                 R.color.colorAccent,
@@ -175,7 +174,11 @@ public class ParentDashboardActivity extends AppCompatActivity {
     }
 
     private void showSortDialog() {
-        String[] options = {"Sort by Name", "Most Weekly Quizzes", "Needs Attention"};
+        String[] options = {
+                getString(R.string.sort_by_name),
+                getString(R.string.sort_most_weekly_quizzes),
+                getString(R.string.sort_needs_attention)
+        };
 
         // Create menu items for styled dialog
         java.util.List<com.edulinguaghana.StyledMenuHelper.MenuItem> menuItems = new java.util.ArrayList<>();
@@ -195,7 +198,7 @@ public class ParentDashboardActivity extends AppCompatActivity {
         com.edulinguaghana.StyledMenuHelper.showStyledMenu(
             this,
             "🔀",
-            "Sort Family View",
+            getString(R.string.parent_dashboard_sort_title),
             menuItems
         );
     }
@@ -267,7 +270,7 @@ public class ParentDashboardActivity extends AppCompatActivity {
                     emptyTextView.setText(getString(R.string.parent_dashboard_error_loading_children, error));
                 }
                 Toast.makeText(ParentDashboardActivity.this,
-                             "Failed to load children", Toast.LENGTH_SHORT).show();
+                             R.string.parent_dashboard_load_failed, Toast.LENGTH_SHORT).show();
                 updateStatistics(new ArrayList<>());
             }
         });
@@ -371,11 +374,11 @@ public class ParentDashboardActivity extends AppCompatActivity {
     private boolean matchesSelectedClass(String studentClass) {
         String normalizedClass = normalizeClassLabel(studentClass);
 
-        if (ALL_CLASSES_FILTER.equals(selectedClassFilter)) {
+        if (Objects.equals(ALL_CLASSES_FILTER, selectedClassFilter)) {
             return true;
         }
 
-        if (UNASSIGNED_CLASSES_FILTER.equals(selectedClassFilter)) {
+        if (Objects.equals(UNASSIGNED_CLASSES_FILTER, selectedClassFilter)) {
             return normalizedClass.isEmpty();
         }
 
@@ -386,7 +389,7 @@ public class ParentDashboardActivity extends AppCompatActivity {
         if (children.isEmpty()) return;
 
         Collections.sort(children, (a, b) -> {
-            if (ALL_CLASSES_FILTER.equals(selectedClassFilter)) {
+            if (Objects.equals(ALL_CLASSES_FILTER, selectedClassFilter)) {
                 int classCompare = Integer.compare(
                         getClassSortOrder(a.getStudentClass()),
                         getClassSortOrder(b.getStudentClass())
@@ -434,15 +437,15 @@ public class ParentDashboardActivity extends AppCompatActivity {
     }
 
     private String getEmptyStateMessage() {
-        if (ALL_CLASSES_FILTER.equals(selectedClassFilter)) {
-            return "Connect with your children to track their learning progress.\n\nTap the + button below to get started.";
+        if (Objects.equals(ALL_CLASSES_FILTER, selectedClassFilter)) {
+            return getString(R.string.parent_dashboard_empty_message);
         }
 
-        if (UNASSIGNED_CLASSES_FILTER.equals(selectedClassFilter)) {
-            return "No children without a class assignment were found.";
+        if (Objects.equals(UNASSIGNED_CLASSES_FILTER, selectedClassFilter)) {
+            return getString(R.string.teacher_dashboard_empty_unassigned);
         }
 
-        return "No children found in " + selectedClassFilter + ".";
+        return getString(R.string.parent_dashboard_empty_filter, selectedClassFilter);
     }
 
     private void updateStatistics(List<StudentProgressItem> children) {
@@ -476,7 +479,7 @@ public class ParentDashboardActivity extends AppCompatActivity {
 
     private void showRemoveChildDialog() {
         if (allChildren.isEmpty()) {
-            Toast.makeText(this, "No children to remove", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, R.string.parent_dashboard_no_children_to_remove, Toast.LENGTH_SHORT).show();
             return;
         }
 
@@ -492,8 +495,8 @@ public class ParentDashboardActivity extends AppCompatActivity {
         StyledMenuHelper.showStyledMenu(
             this,
             "🗑️",
-            "Remove Child",
-            "Select a child to stop tracking",
+            getString(R.string.parent_dashboard_remove_title),
+            getString(R.string.parent_dashboard_remove_prompt),
             menuItems,
             null
         );
@@ -503,10 +506,10 @@ public class ParentDashboardActivity extends AppCompatActivity {
         StyledMenuHelper.showStyledConfirmationDialog(
             this,
             "❓",
-            "Remove Child?",
-            "Are you sure you want to stop tracking " + child.getStudentName() + "'s progress?",
-            "Remove",
-            "Cancel",
+            getString(R.string.parent_dashboard_remove_dialog_title),
+            getString(R.string.parent_dashboard_remove_dialog_message, child.getStudentName()),
+            getString(R.string.teacher_dashboard_remove_confirm),
+            getString(R.string.teacher_dashboard_remove_cancel),
             () -> removeChildConnection(child.getStudentId(), child.getStudentName()),
             null
         );
@@ -517,20 +520,20 @@ public class ParentDashboardActivity extends AppCompatActivity {
             @Override
             public void onRelationshipsRetrieved(List<UserRelationship> relationships) {
                 for (UserRelationship rel : relationships) {
-                    if (rel.getStudentId().equals(studentId)) {
+                    if (Objects.equals(rel.getStudentId(), studentId)) {
                         roleManager.removeRelationship(rel.getId(),
                             new RoleManager.RelationshipActionCallback() {
                                 @Override
                                 public void onSuccess(UserRelationship relationship) {
                                     Toast.makeText(ParentDashboardActivity.this,
-                                        studentName + " removed from your dashboard", Toast.LENGTH_SHORT).show();
+                                        getString(R.string.parent_dashboard_remove_success, studentName), Toast.LENGTH_SHORT).show();
                                     loadChildren();
                                 }
 
                                 @Override
                                 public void onError(String error) {
                                     Toast.makeText(ParentDashboardActivity.this,
-                                        "Failed to remove: " + error, Toast.LENGTH_SHORT).show();
+                                        getString(R.string.parent_dashboard_remove_failed, error), Toast.LENGTH_SHORT).show();
                                 }
                             });
                         return;
@@ -541,7 +544,7 @@ public class ParentDashboardActivity extends AppCompatActivity {
             @Override
             public void onError(String error) {
                 Toast.makeText(ParentDashboardActivity.this,
-                    "Failed to remove: " + error, Toast.LENGTH_SHORT).show();
+                    getString(R.string.parent_dashboard_remove_failed, error), Toast.LENGTH_SHORT).show();
             }
         });
     }

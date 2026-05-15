@@ -94,7 +94,7 @@ public class StudentDetailActivity extends AppCompatActivity {
 
         studentId = getIntent().getStringExtra("studentId");
         if (studentId == null) {
-            Toast.makeText(this, "Student ID not found", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, R.string.student_detail_id_not_found, Toast.LENGTH_SHORT).show();
             finish();
             return;
         }
@@ -117,10 +117,10 @@ public class StudentDetailActivity extends AppCompatActivity {
             @Override
             public void onSuccess(ChallengeStats stats) {
                 if (tvChallengesWon != null) {
-                    tvChallengesWon.setText(String.valueOf(stats.challengesWon));
+                    tvChallengesWon.setText(String.format(Locale.getDefault(), "%d", stats.challengesWon));
                 }
                 if (tvChallengesLost != null) {
-                    tvChallengesLost.setText(String.valueOf(stats.challengesLost));
+                    tvChallengesLost.setText(String.format(Locale.getDefault(), "%d", stats.challengesLost));
                 }
             }
 
@@ -165,7 +165,7 @@ public class StudentDetailActivity extends AppCompatActivity {
             if (tvLabelStreaks != null) tvLabelStreaks.setVisibility(View.VISIBLE);
             if (layoutStreaks != null) layoutStreaks.setVisibility(View.VISIBLE);
             if (dividerStreaks != null) dividerStreaks.setVisibility(View.VISIBLE);
-            
+
             if (tvLabelAchievements != null) tvLabelAchievements.setVisibility(View.VISIBLE);
             if (layoutAchievements != null) layoutAchievements.setVisibility(View.VISIBLE);
             if (dividerAchievements != null) dividerAchievements.setVisibility(View.VISIBLE);
@@ -201,9 +201,15 @@ public class StudentDetailActivity extends AppCompatActivity {
 
     private void updateTitle() {
         if (getSupportActionBar() != null) {
-            String prefix = (currentUserRole == UserRole.PARENT) ? "Child: " : "Student: ";
-            getSupportActionBar().setTitle(studentName != null ? prefix + studentName : 
-                    (currentUserRole == UserRole.PARENT ? "Child Progress" : "Student Progress"));
+            if (studentName != null) {
+                String title = (currentUserRole == UserRole.PARENT) ?
+                        getString(R.string.student_detail_child_prefix, studentName) :
+                        getString(R.string.student_detail_student_prefix, studentName);
+                getSupportActionBar().setTitle(title);
+            } else {
+                getSupportActionBar().setTitle(currentUserRole == UserRole.PARENT ?
+                        R.string.student_detail_child_progress : R.string.student_detail_student_progress);
+            }
         }
     }
 
@@ -212,7 +218,7 @@ public class StudentDetailActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
         if (getSupportActionBar() != null) {
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-            getSupportActionBar().setTitle("Student Progress");
+            getSupportActionBar().setTitle(R.string.student_detail_student_progress);
         }
 
         loadingProgress = findViewById(R.id.loadingProgress);
@@ -275,15 +281,15 @@ public class StudentDetailActivity extends AppCompatActivity {
                     String studentClass = snapshot.child("studentClass").getValue(String.class);
 
                     if (tvStudentName != null) {
-                        tvStudentName.setText(studentName != null ? studentName : "Student");
+                        tvStudentName.setText(studentName != null ? studentName : getString(R.string.student_detail_default_name));
                     }
 
                     if (tvStudentAge != null) {
-                        tvStudentAge.setText(!isEmptyValue(age) ? age : "Not set");
+                        tvStudentAge.setText(!isEmptyValue(age) ? age : getString(R.string.student_detail_not_set));
                     }
 
                     if (tvStudentClass != null) {
-                        tvStudentClass.setText(!isEmptyValue(studentClass) ? studentClass : "Not set");
+                        tvStudentClass.setText(!isEmptyValue(studentClass) ? studentClass : getString(R.string.student_detail_not_set));
                     }
 
                     updateTitle();
@@ -293,7 +299,7 @@ public class StudentDetailActivity extends AppCompatActivity {
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
                 // Use default name
-                tvStudentName.setText("Student");
+                tvStudentName.setText(R.string.student_detail_default_name);
             }
         });
     }
@@ -325,11 +331,13 @@ public class StudentDetailActivity extends AppCompatActivity {
                 initialLoadComplete = true;
                 Log.e(TAG, "Failed to load progress: " + error);
 
-                String errorMessage = "Error loading progress";
+                final String errorMessage;
                 if (error != null && error.contains("Permission denied")) {
                     errorMessage = getString(R.string.student_detail_permission_denied);
                 } else if (error != null) {
                     errorMessage = getString(R.string.student_detail_error_loading_progress, error);
+                } else {
+                    errorMessage = getString(R.string.student_detail_error_loading);
                 }
 
                 Toast.makeText(StudentDetailActivity.this, errorMessage, Toast.LENGTH_LONG).show();
@@ -338,10 +346,10 @@ public class StudentDetailActivity extends AppCompatActivity {
     }
 
     private void displayProgress(ProgressAggregate aggregate) {
-        tvLevel.setText("Level " + aggregate.getCurrentLevel());
-        tvTotalXP.setText(aggregate.getTotalXP() + " XP");
-        tvCurrentStreak.setText(aggregate.getCurrentStreak() + " days");
-        tvLongestStreak.setText(aggregate.getLongestStreak() + " days");
+        tvLevel.setText(getString(R.string.student_detail_level, aggregate.getCurrentLevel()));
+        tvTotalXP.setText(getString(R.string.student_detail_xp_suffix, aggregate.getTotalXP()));
+        tvCurrentStreak.setText(getString(R.string.student_detail_days_suffix, aggregate.getCurrentStreak()));
+        tvLongestStreak.setText(getString(R.string.student_detail_days_suffix, aggregate.getLongestStreak()));
         tvTotalQuizzes.setText(String.valueOf(aggregate.getTotalQuizzes()));
         tvAccuracy.setText(String.format(Locale.getDefault(), "%.1f%%", aggregate.getAccuracy()));
         tvHighScore.setText(String.valueOf(aggregate.getHighestScore()));
@@ -356,20 +364,20 @@ public class StudentDetailActivity extends AppCompatActivity {
         // Format time spent (convert seconds to minutes)
         long minutes = aggregate.getTotalTimeSpentSeconds() / 60;
         if (minutes < 60) {
-            tvTimeSpent.setText(minutes + "m");
+            tvTimeSpent.setText(getString(R.string.student_detail_minutes_suffix, minutes));
         } else {
             long hours = minutes / 60;
             long remainingMinutes = minutes % 60;
-            tvTimeSpent.setText(hours + "h " + remainingMinutes + "m");
+            tvTimeSpent.setText(getString(R.string.student_detail_hours_minutes_suffix, hours, remainingMinutes));
         }
 
         // Format last active time
         if (aggregate.getLastUpdated() > 0) {
-            SimpleDateFormat sdf = new SimpleDateFormat("MMM d, yyyy 'at' h:mm a", Locale.getDefault());
+            SimpleDateFormat sdf = new SimpleDateFormat(getString(R.string.student_detail_date_format), Locale.getDefault());
             String formattedDate = sdf.format(new Date(aggregate.getLastUpdated()));
             tvLastActive.setText(formattedDate);
         } else {
-            tvLastActive.setText("Not active yet");
+            tvLastActive.setText(R.string.student_detail_not_active);
         }
 
         if (statsCard != null) {

@@ -12,7 +12,7 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import androidx.appcompat.app.AlertDialog;
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -33,6 +33,7 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.List;
+import java.util.Objects;
 
 /**
  * Activity for managing teacher-student and parent-child relationships
@@ -42,7 +43,6 @@ public class RelationshipManagementActivity extends AppCompatActivity {
     private MaterialCardView addStudentSection;
     private MaterialCardView myCodeSection;
     private TextView tvMyCode;
-    private Button btnCopyCode;
     private TextInputEditText etStudentEmail;
     private Button btnAddStudent;
     private RecyclerView pendingRequestsRecyclerView;
@@ -80,13 +80,13 @@ public class RelationshipManagementActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
         if (getSupportActionBar() != null) {
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-            getSupportActionBar().setTitle("Manage Connections");
+            getSupportActionBar().setTitle(R.string.relationship_mgmt_title);
         }
 
         addStudentSection = findViewById(R.id.addStudentSection);
         myCodeSection = findViewById(R.id.myCodeSection);
         tvMyCode = findViewById(R.id.tvMyCode);
-        btnCopyCode = findViewById(R.id.btnCopyCode);
+        Button btnCopyCode = findViewById(R.id.btnCopyCode);
         etStudentEmail = findViewById(R.id.etStudentEmail);
         btnAddStudent = findViewById(R.id.btnAddStudent);
         pendingRequestsRecyclerView = findViewById(R.id.pendingRequestsRecyclerView);
@@ -112,7 +112,7 @@ public class RelationshipManagementActivity extends AppCompatActivity {
             @Override
             public void onError(String error) {
                 Toast.makeText(RelationshipManagementActivity.this,
-                             "Error loading role: " + error, Toast.LENGTH_SHORT).show();
+                             getString(R.string.relationship_mgmt_error_loading_role, error), Toast.LENGTH_SHORT).show();
                 // Default to student
                 currentUserRole = UserRole.STUDENT;
                 setupUIForRole(UserRole.STUDENT);
@@ -121,34 +121,39 @@ public class RelationshipManagementActivity extends AppCompatActivity {
     }
 
     private void setupUIForRole(UserRole role) {
-        if (role == UserRole.TEACHER || role == UserRole.PARENT) {
-            // Teachers and parents can add students/children
-            addStudentSection.setVisibility(View.VISIBLE);
-            myCodeSection.setVisibility(View.GONE);
+        switch (role) {
+            case TEACHER:
+            case PARENT:
+                // Teachers and parents can add students/children
+                addStudentSection.setVisibility(View.VISIBLE);
+                myCodeSection.setVisibility(View.GONE);
 
-            String label = role == UserRole.TEACHER ? "Add Student" : "Add Child";
-            btnAddStudent.setText(label);
-        } else {
-            // Students show their code for teachers/parents to use
-            addStudentSection.setVisibility(View.GONE);
-            myCodeSection.setVisibility(View.VISIBLE);
-            tvMyCode.setText(currentUserId.substring(0, Math.min(8, currentUserId.length())));
+                int labelResId = role == UserRole.TEACHER ? R.string.relationship_mgmt_add_student : R.string.relationship_mgmt_add_child;
+                btnAddStudent.setText(labelResId);
+                break;
+            default:
+                // Students show their code for teachers/parents to use
+                addStudentSection.setVisibility(View.GONE);
+                myCodeSection.setVisibility(View.VISIBLE);
+                tvMyCode.setText(currentUserId.substring(0, Math.min(8, currentUserId.length())));
+                break;
         }
     }
 
     private void copyCodeToClipboard() {
         String code = currentUserId.substring(0, Math.min(8, currentUserId.length()));
         ClipboardManager clipboard = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
-        ClipData clip = ClipData.newPlainText("Student Code", code);
+        ClipData clip = ClipData.newPlainText(getString(R.string.relationship_mgmt_code_clip_label), code);
         clipboard.setPrimaryClip(clip);
-        Toast.makeText(this, "Code copied to clipboard!", Toast.LENGTH_SHORT).show();
+        Toast.makeText(this, R.string.relationship_mgmt_code_copied, Toast.LENGTH_SHORT).show();
     }
 
     private void addStudent() {
-        String emailOrCode = etStudentEmail.getText().toString().trim();
+        android.text.Editable editable = etStudentEmail.getText();
+        String emailOrCode = editable != null ? editable.toString().trim() : "";
 
         if (TextUtils.isEmpty(emailOrCode)) {
-            etStudentEmail.setError("Please enter student's email or code");
+            etStudentEmail.setError(getString(R.string.relationship_mgmt_enter_email_code));
             return;
         }
 
@@ -162,7 +167,7 @@ public class RelationshipManagementActivity extends AppCompatActivity {
         usersRef.orderByChild("email").equalTo(emailOrCode)
                 .addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
-                    public void onDataChange(DataSnapshot snapshot) {
+                    public void onDataChange(@NonNull DataSnapshot snapshot) {
                         if (snapshot.exists()) {
                             // Found by email
                             for (DataSnapshot child : snapshot.getChildren()) {
@@ -178,11 +183,11 @@ public class RelationshipManagementActivity extends AppCompatActivity {
                     }
 
                     @Override
-                    public void onCancelled(DatabaseError error) {
+                    public void onCancelled(@NonNull DatabaseError error) {
                         btnAddStudent.setEnabled(true);
                         loadingProgress.setVisibility(View.GONE);
                         Toast.makeText(RelationshipManagementActivity.this,
-                                     "Search failed: " + error.getMessage(), Toast.LENGTH_SHORT).show();
+                                     getString(R.string.relationship_mgmt_search_failed, error.getMessage()), Toast.LENGTH_SHORT).show();
                     }
                 });
     }
@@ -191,7 +196,7 @@ public class RelationshipManagementActivity extends AppCompatActivity {
         DatabaseReference usersRef = FirebaseDatabase.getInstance().getReference("users");
         usersRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
-            public void onDataChange(DataSnapshot snapshot) {
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
                 boolean found = false;
                 for (DataSnapshot child : snapshot.getChildren()) {
                     String uid = child.getKey();
@@ -207,16 +212,16 @@ public class RelationshipManagementActivity extends AppCompatActivity {
                     btnAddStudent.setEnabled(true);
                     loadingProgress.setVisibility(View.GONE);
                     Toast.makeText(RelationshipManagementActivity.this,
-                                 "Student not found", Toast.LENGTH_SHORT).show();
+                                 R.string.relationship_mgmt_student_not_found, Toast.LENGTH_SHORT).show();
                 }
             }
 
             @Override
-            public void onCancelled(DatabaseError error) {
+            public void onCancelled(@NonNull DatabaseError error) {
                 btnAddStudent.setEnabled(true);
                 loadingProgress.setVisibility(View.GONE);
                 Toast.makeText(RelationshipManagementActivity.this,
-                             "Search failed: " + error.getMessage(), Toast.LENGTH_SHORT).show();
+                                     getString(R.string.relationship_mgmt_search_failed, error.getMessage()), Toast.LENGTH_SHORT).show();
             }
         });
     }
@@ -235,10 +240,10 @@ public class RelationshipManagementActivity extends AppCompatActivity {
                 loadingProgress.setVisibility(View.GONE);
                 etStudentEmail.setText("");
 
-                String message = currentUserRole == UserRole.TEACHER ?
-                        "Student connection request sent!" : "Child connection request sent!";
+                int messageResId = currentUserRole == UserRole.TEACHER ?
+                        R.string.relationship_mgmt_request_sent_student : R.string.relationship_mgmt_request_sent_child;
                 Toast.makeText(RelationshipManagementActivity.this,
-                             message, Toast.LENGTH_SHORT).show();
+                             messageResId, Toast.LENGTH_SHORT).show();
             }
 
             @Override
@@ -246,7 +251,7 @@ public class RelationshipManagementActivity extends AppCompatActivity {
                 btnAddStudent.setEnabled(true);
                 loadingProgress.setVisibility(View.GONE);
                 Toast.makeText(RelationshipManagementActivity.this,
-                             "Failed to create connection: " + error, Toast.LENGTH_LONG).show();
+                             getString(R.string.relationship_mgmt_create_failed, error), Toast.LENGTH_LONG).show();
             }
         });
     }
@@ -274,7 +279,7 @@ public class RelationshipManagementActivity extends AppCompatActivity {
                 public void onError(String error) {
                     loadingProgress.setVisibility(View.GONE);
                     emptyStateLayout.setVisibility(View.VISIBLE);
-                    emptyTextView.setText("Error loading requests");
+                    emptyTextView.setText(R.string.relationship_mgmt_error_loading_requests);
                 }
             });
         }
@@ -283,8 +288,8 @@ public class RelationshipManagementActivity extends AppCompatActivity {
     private void setupPendingRequestsAdapter(List<UserRelationship> relationships) {
         PendingRequestsAdapter adapter = new PendingRequestsAdapter(
             relationships,
-            relationship -> acceptRequest(relationship),
-            relationship -> rejectRequest(relationship)
+            this::acceptRequest,
+            this::rejectRequest
         );
         pendingRequestsRecyclerView.setAdapter(adapter);
     }
@@ -295,14 +300,14 @@ public class RelationshipManagementActivity extends AppCompatActivity {
             @Override
             public void onSuccess(UserRelationship rel) {
                 Toast.makeText(RelationshipManagementActivity.this,
-                             "Connection accepted!", Toast.LENGTH_SHORT).show();
+                             R.string.relationship_mgmt_connection_accepted, Toast.LENGTH_SHORT).show();
                 loadPendingRequests();
             }
 
             @Override
             public void onError(String error) {
                 Toast.makeText(RelationshipManagementActivity.this,
-                             "Failed to accept: " + error, Toast.LENGTH_SHORT).show();
+                             getString(R.string.relationship_mgmt_accept_failed, error), Toast.LENGTH_SHORT).show();
             }
         });
     }
@@ -311,27 +316,25 @@ public class RelationshipManagementActivity extends AppCompatActivity {
         com.edulinguaghana.StyledMenuHelper.showStyledConfirmationDialog(
             this,
             "❌",
-            "Reject Request",
-            "Are you sure you want to reject this connection request?",
-            "Reject",
-            "Cancel",
-            () -> {
-                roleManager.removeRelationship(relationship.getId(),
+            getString(R.string.relationship_mgmt_reject_dialog_title),
+            getString(R.string.relationship_mgmt_reject_dialog_message),
+            getString(R.string.relationship_mgmt_reject_confirm),
+            getString(R.string.relationship_mgmt_reject_cancel),
+            () -> roleManager.removeRelationship(relationship.getId(),
                                              new RoleManager.RelationshipActionCallback() {
                     @Override
                     public void onSuccess(UserRelationship rel) {
                         Toast.makeText(RelationshipManagementActivity.this,
-                                     "Request rejected", Toast.LENGTH_SHORT).show();
+                                     R.string.relationship_mgmt_request_rejected, Toast.LENGTH_SHORT).show();
                         loadPendingRequests();
                     }
 
                     @Override
                     public void onError(String error) {
                         Toast.makeText(RelationshipManagementActivity.this,
-                                     "Failed to reject: " + error, Toast.LENGTH_SHORT).show();
+                                     getString(R.string.relationship_mgmt_reject_failed, error), Toast.LENGTH_SHORT).show();
                     }
-                });
-            },
+                }),
             null
         );
     }

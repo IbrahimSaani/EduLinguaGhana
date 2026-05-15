@@ -1,4 +1,4 @@
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="MissingTranslation">
     <string name="app_name">EduLinguaGhana</string>
     <string name="language_prefix">Language:</string>
     <string name="alphabet_mode">Alphabet - Recital / Practice</string>
@@ -134,6 +134,91 @@
     <string name="parent_dashboard_error_loading_children">Error loading children: %1$s</string>
     <string name="student_detail_error_loading_progress">Error loading progress: %1$s</string>
     <string name="student_detail_permission_denied">Permission denied. Please ensure the teacher-student relationship is accepted.</string>
+
+    <!-- Teacher Dashboard -->
+    <string name="teacher_dashboard_all_classes">All Classes</string>
+    <string name="teacher_dashboard_unassigned">Unassigned</string>
+    <string name="teacher_dashboard_title">My Students</string>
+    <string name="sort_by_name">Sort by Name</string>
+    <string name="sort_by_level">Sort by Level</string>
+    <string name="sort_by_activity">Sort by Recent Activity</string>
+    <string name="teacher_dashboard_sort_title">Sort Students</string>
+    <string name="teacher_dashboard_load_failed">Failed to load students</string>
+    <string name="teacher_dashboard_empty_message">Start building your class by adding students.\n\nTap the + button below to get started.</string>
+    <string name="teacher_dashboard_empty_unassigned">No students without a class assignment were found.</string>
+    <string name="teacher_dashboard_empty_filter">No students found in %1$s.</string>
+    <string name="teacher_dashboard_no_students_to_remove">No students to remove</string>
+    <string name="teacher_dashboard_remove_title">Remove Student</string>
+    <string name="teacher_dashboard_remove_prompt">Select a student to remove</string>
+    <string name="teacher_dashboard_remove_dialog_title">Remove Student?</string>
+    <string name="teacher_dashboard_remove_dialog_message">Are you sure you want to remove %1$s from your class?</string>
+    <string name="teacher_dashboard_remove_confirm">Remove</string>
+    <string name="teacher_dashboard_remove_cancel">Cancel</string>
+    <string name="teacher_dashboard_remove_success">%1$s removed from your class</string>
+    <string name="teacher_dashboard_remove_failed">Failed to remove student: %1$s</string>
+    <string name="teacher_dashboard_remove_not_found">Could not find student relationship</string>
+
+    <!-- Parent Dashboard -->
+    <string name="parent_dashboard_title">My Children</string>
+    <string name="sort_most_weekly_quizzes">Most Weekly Quizzes</string>
+    <string name="sort_needs_attention">Needs Attention</string>
+    <string name="parent_dashboard_sort_title">Sort Family View</string>
+    <string name="parent_dashboard_load_failed">Failed to load children</string>
+    <string name="parent_dashboard_empty_message">Connect with your children to track their learning progress.\n\nTap the + button below to get started.</string>
+    <string name="parent_dashboard_empty_filter">No children found in %1$s.</string>
+    <string name="parent_dashboard_no_children_to_remove">No children to remove</string>
+    <string name="parent_dashboard_remove_title">Remove Child</string>
+    <string name="parent_dashboard_remove_prompt">Select a child to stop tracking</string>
+    <string name="parent_dashboard_remove_dialog_title">Remove Child?</string>
+    <string name="parent_dashboard_remove_dialog_message">Are you sure you want to stop tracking %1$s\'s progress?</string>
+    <string name="parent_dashboard_remove_success">%1$s removed from your dashboard</string>
+    <string name="parent_dashboard_remove_failed">Failed to remove: %1$s</string>
+
+    <!-- Relationship Management -->
+    <string name="relationship_mgmt_title">Manage Connections</string>
+    <string name="relationship_mgmt_error_loading_role">Error loading role: %1$s</string>
+    <string name="relationship_mgmt_add_student">Add Student</string>
+    <string name="relationship_mgmt_add_child">Add Child</string>
+    <string name="relationship_mgmt_code_clip_label">Student Code</string>
+    <string name="relationship_mgmt_code_copied">Code copied to clipboard!</string>
+    <string name="relationship_mgmt_enter_email_code">Please enter student\'s email or code</string>
+    <string name="relationship_mgmt_search_failed">Search failed: %1$s</string>
+    <string name="relationship_mgmt_student_not_found">Student not found</string>
+    <string name="relationship_mgmt_request_sent_student">Student connection request sent!</string>
+    <string name="relationship_mgmt_request_sent_child">Child connection request sent!</string>
+    <string name="relationship_mgmt_create_failed">Failed to create connection: %1$s</string>
+    <string name="relationship_mgmt_error_loading_requests">Error loading requests</string>
+    <string name="relationship_mgmt_connection_accepted">Connection accepted!</string>
+    <string name="relationship_mgmt_accept_failed">Failed to accept: %1$s</string>
+    <string name="relationship_mgmt_reject_dialog_title">Reject Request</string>
+    <string name="relationship_mgmt_reject_dialog_message">Are you sure you want to reject this connection request?</string>
+    <string name="relationship_mgmt_reject_confirm">Reject</string>
+    <string name="relationship_mgmt_reject_cancel">Cancel</string>
+    <string name="relationship_mgmt_request_rejected">Request rejected</string>
+    <string name="relationship_mgmt_reject_failed">Failed to reject: %1$s</string>
+
+    <!-- Student Detail -->
+    <string name="student_detail_id_not_found">Student ID not found</string>
+    <string name="student_detail_child_prefix">Child: %1$s</string>
+    <string name="student_detail_student_prefix">Student: %1$s</string>
+    <string name="student_detail_child_progress">Child Progress</string>
+    <string name="student_detail_student_progress">Student Progress</string>
+    <string name="student_detail_default_name">Student</string>
+    <string name="student_detail_not_set">Not set</string>
+    <string name="student_detail_error_loading">Error loading progress</string>
+    <string name="student_detail_level">Level %1$d</string>
+    <string name="student_detail_xp_suffix">%1$d XP</string>
+    <string name="student_detail_days_suffix">%1$d days</string>
+    <string name="student_detail_minutes_suffix">%1$dm</string>
+    <string name="student_detail_hours_minutes_suffix">%1$dh %2$dm</string>
+    <string name="student_detail_date_format">MMM d, yyyy \'at\' h:mm a</string>
+    <string name="student_detail_not_active">Not active yet</string>
+
+    <!-- Role Manager Errors -->
+    <string name="role_manager_pending_exists">A pending request already exists for this student</string>
+    <string name="role_manager_already_connected">This student is already connected to you</string>
+    <string name="role_manager_relationship_not_found">Relationship not found</string>
+    <string name="role_manager_error_checking">Failed to check existing relationships: %1$s</string>
 
     <!-- Profile Completion -->
     <string name="complete_profile_title">Complete Your Profile</string>
