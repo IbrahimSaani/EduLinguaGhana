@@ -47,6 +47,7 @@
     <string name="quiz_prompt_matching">Which word starts with letter %s?</string>
     <string name="quiz_prompt_matching_pairs">Match the letters to their words! 🔗</string>
     <string name="quiz_prompt_shadow_match">Match the character to its shadow!</string>
+    <string name="quiz_hint_drag_to_match">Drag and drop the answer! 👆</string>
     <string name="quiz_prompt_odd_one_out">Which word does NOT start with %s?</string>
     <string name="quiz_feedback_correct">✅ Correct!</string>
     <string name="quiz_feedback_wrong">❌ Wrong! Correct: %s</string>

@@ -69,6 +69,9 @@ dependencies {
     // Facebook Login
     implementation("com.facebook.android:facebook-login:16.3.0")
 
+    // Celebratory effects
+    implementation("nl.dionsegijn:konfetti-xml:2.0.4")
+
     testImplementation(libs.junit)
 
     androidTestImplementation(libs.ext.junit)

@@ -10,12 +10,16 @@ import android.media.MediaPlayer;
 import android.media.AudioManager;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Build;
 import android.os.CountDownTimer;
 import android.os.Handler;
 import android.speech.tts.TextToSpeech;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.DragEvent;
+import android.content.ClipData;
+import android.content.ClipDescription;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.ImageView;
@@ -71,6 +75,7 @@ public class QuizActivity extends AppCompatActivity {
     private ShadowView shadowView;
     private View scratchCard;
     private ScratchRevealView scratchRevealView;
+    private nl.dionsegijn.konfetti.xml.KonfettiView konfettiView;
 
     // End screen
     private TextView tvFinalScore, tvEndBestScore, tvNewHighScore;
@@ -249,6 +254,7 @@ public class QuizActivity extends AppCompatActivity {
         btnEndQuit = findViewById(R.id.btnEndQuit);
         tvNewHighScore = findViewById(R.id.tvNewHighScore);
         tvEndCelebrationEmoji = findViewById(R.id.tvEndCelebrationEmoji);
+        konfettiView = findViewById(R.id.konfettiView);
     }
 
     private void setupAccessibility() {
@@ -792,12 +798,59 @@ public class QuizActivity extends AppCompatActivity {
         currentCorrectAnswer = target;
         currentPromptTtsText = target;
 
-        // --- Use ShadowView with Canvas ---
         if (shadowView != null) {
             shadowView.setVisibility(View.VISIBLE);
             shadowView.setCharacter(target);
-            // Example of using Glide if there were images:
-            // shadowView.setImageUrl("https://example.com/letters/" + target.toLowerCase() + ".png");
+            
+            // Set up Drag Listener for enhanced interactivity
+            shadowView.setOnDragListener((v, event) -> {
+                switch (event.getAction()) {
+                    case DragEvent.ACTION_DRAG_STARTED:
+                        return true;
+                    case DragEvent.ACTION_DRAG_ENTERED:
+                        v.animate().scaleX(1.2f).scaleY(1.2f).setDuration(200).start();
+                        return true;
+                    case DragEvent.ACTION_DRAG_EXITED:
+                        v.animate().scaleX(1.0f).scaleY(1.0f).setDuration(200).start();
+                        return true;
+                    case DragEvent.ACTION_DROP:
+                        ClipData.Item item = event.getClipData().getItemAt(0);
+                        String dragData = item.getText().toString();
+                        if (dragData.equals(currentCorrectAnswer)) {
+                            MaterialButton[] buttons = {btnOption1, btnOption2, btnOption3, btnOption4, btnOption5, btnOption6};
+                            for (MaterialButton btn : buttons) {
+                                if (btn != null && btn.getText().equals(dragData)) {
+                                    // Set the tag or some flag to allow checkAnswer to proceed
+                                    btn.setTag(R.id.scratchCard, "drag_success");
+                                    shadowView.reveal(ContextCompat.getColor(this, R.color.correctAnswer));
+                                    celebrate();
+                                    checkAnswer(btn);
+                                    btn.setTag(R.id.scratchCard, null);
+                                    break;
+                                }
+                            }
+                        } else {
+                            // Shake effect for wrong drop
+                            ObjectAnimator shake = ObjectAnimator.ofFloat(v, View.TRANSLATION_X, 0, 25);
+                            shake.setDuration(50);
+                            shake.setRepeatCount(5);
+                            shake.setRepeatMode(ValueAnimator.REVERSE);
+                            shake.addListener(new android.animation.AnimatorListenerAdapter() {
+                                @Override
+                                public void onAnimationEnd(android.animation.Animator animation) {
+                                    v.setTranslationX(0);
+                                }
+                            });
+                            shake.start();
+                            playSfx(false);
+                        }
+                        return true;
+                    case DragEvent.ACTION_DRAG_ENDED:
+                        v.animate().scaleX(1.0f).scaleY(1.0f).setDuration(200).start();
+                        return true;
+                }
+                return false;
+            });
         }
 
         List<String> options = new ArrayList<>();
@@ -816,14 +869,29 @@ public class QuizActivity extends AppCompatActivity {
             if (buttons[i] != null) {
                 buttons[i].setText(options.get(i));
                 buttons[i].setVisibility(View.VISIBLE);
+                buttons[i].setStrokeColor(ColorStateList.valueOf(Color.TRANSPARENT)); // Reset stroke
                 
-                // --- Spinning Wheel Effect (RecyclerView equivalent via Animation) ---
-                ObjectAnimator rotate = ObjectAnimator.ofFloat(buttons[i], View.ROTATION, 0f, 360f);
-                rotate.setDuration(4000 + (i * 300)); 
-                rotate.setRepeatCount(ValueAnimator.INFINITE);
-                rotate.setInterpolator(new android.view.animation.LinearInterpolator());
-                rotate.start();
-                buttons[i].setTag(R.id.mascotView, rotate); 
+                // Set up Drag Source
+                final MaterialButton currentBtn = buttons[i];
+                currentBtn.setOnLongClickListener(v -> {
+                    ClipData.Item item = new ClipData.Item(currentBtn.getText());
+                    ClipData dragData = new ClipData(currentBtn.getText(), new String[]{ClipDescription.MIMETYPE_TEXT_PLAIN}, item);
+                    View.DragShadowBuilder myShadow = new View.DragShadowBuilder(currentBtn);
+                    if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
+                        v.startDragAndDrop(dragData, myShadow, null, 0);
+                    } else {
+                        v.startDrag(dragData, myShadow, null, 0);
+                    }
+                    return true;
+                });
+
+                // Subtle floating animation
+                ObjectAnimator floatAnim = ObjectAnimator.ofFloat(buttons[i], View.TRANSLATION_Y, -10f, 10f);
+                floatAnim.setDuration(1500 + (i * 200)); 
+                floatAnim.setRepeatCount(ValueAnimator.INFINITE);
+                floatAnim.setRepeatMode(ValueAnimator.REVERSE);
+                floatAnim.start();
+                buttons[i].setTag(R.id.mascotView, floatAnim);
             }
         }
     }
@@ -1025,6 +1093,11 @@ public class QuizActivity extends AppCompatActivity {
     }
 
     private void checkAnswer(MaterialButton clickedButton) {
+        if ("shadow_match".equals(quizType) && !"drag_success".equals(clickedButton.getTag(R.id.scratchCard))) {
+            // In shadow match, we only want drag and drop to work.
+            tvGameFeedback.setText(R.string.quiz_hint_drag_to_match);
+            return;
+        }
         if ("matching".equals(quizType)) {
             handleMatchingClick(clickedButton);
             return;
@@ -1529,6 +1602,21 @@ public class QuizActivity extends AppCompatActivity {
         }
     }
 
+
+    private void celebrate() {
+        if (konfettiView == null) return;
+
+        konfettiView.start(
+            new nl.dionsegijn.konfetti.core.PartyFactory(
+                new nl.dionsegijn.konfetti.core.emitter.Emitter(1000L, java.util.concurrent.TimeUnit.MILLISECONDS).max(100)
+            )
+            .spread(360)
+            .colors(java.util.Arrays.asList(0xfce18a, 0xff726d, 0xf48fb1, 0xafdfff))
+            .setSpeedBetween(10f, 30f)
+            .position(new nl.dionsegijn.konfetti.core.Position.Relative(0.5, 0.3))
+            .build()
+        );
+    }
 
     @Override
     protected void onDestroy() {

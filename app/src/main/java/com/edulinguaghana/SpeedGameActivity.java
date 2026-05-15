@@ -5,10 +5,16 @@ import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.media.MediaPlayer;
 import android.os.Bundle;
+import android.os.Build;
 import android.os.CountDownTimer;
 import android.speech.tts.TextToSpeech;
 import android.util.Log;
 import android.view.View;
+import android.view.DragEvent;
+import android.content.ClipData;
+import android.content.ClipDescription;
+import android.animation.ObjectAnimator;
+import android.animation.ValueAnimator;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.ProgressBar;
@@ -40,6 +46,7 @@ public class SpeedGameActivity extends AppCompatActivity {
     private MaterialButton btnBack;
     private ProgressBar speedProgressBar;
     private ShadowView shadowView;
+    private nl.dionsegijn.konfetti.xml.KonfettiView konfettiView;
 
     // Game variables
     private int score = 0;
@@ -114,6 +121,7 @@ public class SpeedGameActivity extends AppCompatActivity {
         btnBack    = findViewById(R.id.btnGameBack);
         btnPlayAudio = findViewById(R.id.btnPlayAudio);
         shadowView = findViewById(R.id.shadowView);
+        konfettiView = findViewById(R.id.konfettiView);
 
         // OPTIONAL: if you added a Play Audio button in XML, otherwise comment out
         btnPlayAudio = findViewById(R.id.btnPlayAudio);
@@ -453,6 +461,47 @@ public class SpeedGameActivity extends AppCompatActivity {
         if (shadowView != null) {
             shadowView.setVisibility(View.VISIBLE);
             shadowView.setCharacter(target);
+
+            // Speed game version of drag listener
+            shadowView.setOnDragListener((v, event) -> {
+                switch (event.getAction()) {
+                    case DragEvent.ACTION_DRAG_STARTED: return true;
+                    case DragEvent.ACTION_DRAG_ENTERED:
+                        v.animate().scaleX(1.2f).scaleY(1.2f).setDuration(150).start();
+                        return true;
+                    case DragEvent.ACTION_DRAG_EXITED:
+                        v.animate().scaleX(1.0f).scaleY(1.0f).setDuration(150).start();
+                        return true;
+                    case DragEvent.ACTION_DROP:
+                        ClipData.Item item = event.getClipData().getItemAt(0);
+                        String dragData = item.getText().toString();
+                        if (dragData.equals(currentCorrectAnswer)) {
+                            MaterialButton[] buttons = {btnOption1, btnOption2, btnOption3, btnOption4, btnOption5, btnOption6};
+                            for (MaterialButton btn : buttons) {
+                                if (btn != null && btn.getText().equals(dragData)) {
+                                    btn.setTag(R.id.shadowView, "drag_success");
+                                    shadowView.reveal(ContextCompat.getColor(this, R.color.correctAnswer));
+                                    celebrate();
+                                    handleAnswerClick(btn);
+                                    btn.setTag(R.id.shadowView, null);
+                                    break;
+                                }
+                            }
+                        } else {
+                            ObjectAnimator shake = ObjectAnimator.ofFloat(v, View.TRANSLATION_X, 0, 20);
+                            shake.setDuration(40);
+                            shake.setRepeatCount(3);
+                            shake.setRepeatMode(ValueAnimator.REVERSE);
+                            shake.start();
+                            playSfx(false);
+                        }
+                        return true;
+                    case DragEvent.ACTION_DRAG_ENDED:
+                        v.animate().scaleX(1.0f).scaleY(1.0f).setDuration(150).start();
+                        return true;
+                }
+                return false;
+            });
         }
 
         List<String> options = new ArrayList<>();
@@ -466,12 +515,26 @@ public class SpeedGameActivity extends AppCompatActivity {
         }
 
         Collections.shuffle(options);
-        btnOption1.setText(options.get(0));
-        btnOption2.setText(options.get(1));
-        btnOption3.setText(options.get(2));
-        btnOption4.setText(options.get(3));
-        btnOption5.setText(options.get(4));
-        btnOption6.setText(options.get(5));
+        MaterialButton[] buttons = {btnOption1, btnOption2, btnOption3, btnOption4, btnOption5, btnOption6};
+        for (int i = 0; i < buttons.length; i++) {
+            if (buttons[i] != null) {
+                buttons[i].setText(options.get(i));
+                buttons[i].setStrokeColor(ColorStateList.valueOf(Color.TRANSPARENT));
+
+                final MaterialButton currentBtn = buttons[i];
+                currentBtn.setOnLongClickListener(v -> {
+                    ClipData.Item item = new ClipData.Item(currentBtn.getText());
+                    ClipData dragData = new ClipData(currentBtn.getText(), new String[]{ClipDescription.MIMETYPE_TEXT_PLAIN}, item);
+                    View.DragShadowBuilder myShadow = new View.DragShadowBuilder(currentBtn);
+                    if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
+                        v.startDragAndDrop(dragData, myShadow, null, 0);
+                    } else {
+                        v.startDrag(dragData, myShadow, null, 0);
+                    }
+                    return true;
+                });
+            }
+        }
 
         speakWithTts(target);
     }
@@ -499,6 +562,11 @@ public class SpeedGameActivity extends AppCompatActivity {
     }
 
     private void handleAnswerClick(MaterialButton clickedButton) {
+        if ("shadow_match".equals(quizType) && !"drag_success".equals(clickedButton.getTag(R.id.shadowView))) {
+            // Speed game version: Only drag and drop allowed
+            tvGameFeedback.setText(R.string.quiz_hint_drag_to_match);
+            return;
+        }
         String chosen = clickedButton.getText().toString();
         boolean correct = chosen.equals(currentCorrectAnswer);
 
@@ -699,6 +767,20 @@ public class SpeedGameActivity extends AppCompatActivity {
     // -------------------------
     // LIFECYCLE
     // -------------------------
+    private void celebrate() {
+        if (konfettiView == null) return;
+        konfettiView.start(
+            new nl.dionsegijn.konfetti.core.PartyFactory(
+                new nl.dionsegijn.konfetti.core.emitter.Emitter(1000L, java.util.concurrent.TimeUnit.MILLISECONDS).max(100)
+            )
+            .spread(360)
+            .colors(java.util.Arrays.asList(0xfce18a, 0xff726d, 0xf48fb1, 0xafdfff))
+            .setSpeedBetween(10f, 30f)
+            .position(new nl.dionsegijn.konfetti.core.Position.Relative(0.5, 0.3))
+            .build()
+        );
+    }
+
     @Override
     protected void onDestroy() {
         super.onDestroy();
