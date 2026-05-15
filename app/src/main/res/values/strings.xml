@@ -64,6 +64,12 @@
     <string name="quiz_quit_button">Quit</string>
     <string name="splash_progress_label">Loading fun adventures…</string>
 
+    <!-- Hidden Shapes Game -->
+    <string name="hidden_shapes_title">Hidden Shapes</string>
+    <string name="hidden_shapes_prompt">Rub the sand to reveal the hidden character!</string>
+    <string name="hidden_shapes_found">You found: %s!</string>
+    <string name="hidden_shapes_next">Next One!</string>
+
     <!-- Main screen refresh -->
     <string name="main_tap_hint">Tap the glowing bubble to play or pause.</string>
     <string name="main_subtitle">Learning adventures for curious kids</string>

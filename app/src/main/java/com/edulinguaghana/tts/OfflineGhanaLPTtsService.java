@@ -120,7 +120,9 @@ public class OfflineGhanaLPTtsService {
 
         // No audio file found
         Log.e(TAG, "No audio file found for: " + text + " in language: " + language);
-        callback.onError("No audio file found for: " + text);
+        if (callback != null) {
+            callback.onError("No audio file found for: " + text);
+        }
     }
 
     /**
@@ -132,7 +134,9 @@ public class OfflineGhanaLPTtsService {
 
             if (resId == 0) {
                 Log.w(TAG, "Audio resource not found: " + resourceName);
-                callback.onError("Audio not found: " + resourceName);
+                if (callback != null) {
+                    callback.onError("Audio not found: " + resourceName);
+                }
                 return;
             }
 
@@ -146,12 +150,16 @@ public class OfflineGhanaLPTtsService {
             mediaPlayer = MediaPlayer.create(context, resId);
 
             if (mediaPlayer == null) {
-                callback.onError("Failed to create MediaPlayer for: " + resourceName);
+                if (callback != null) {
+                    callback.onError("Failed to create MediaPlayer for: " + resourceName);
+                }
                 return;
             }
 
             mediaPlayer.setOnCompletionListener(mp -> {
-                callback.onComplete();
+                if (callback != null) {
+                    callback.onComplete();
+                }
                 mp.release();
                 mediaPlayer = null;
             });
@@ -159,19 +167,25 @@ public class OfflineGhanaLPTtsService {
             mediaPlayer.setOnErrorListener((mp, what, extra) -> {
                 String error = "MediaPlayer error: " + what + ", " + extra;
                 Log.e(TAG, error);
-                callback.onError(error);
+                if (callback != null) {
+                    callback.onError(error);
+                }
                 mp.release();
                 mediaPlayer = null;
                 return true;
             });
 
-            callback.onStart();
+            if (callback != null) {
+                callback.onStart();
+            }
             mediaPlayer.start();
             Log.d(TAG, "Playing audio: " + resourceName);
 
         } catch (Exception e) {
             Log.e(TAG, "Error playing audio: " + resourceName, e);
-            callback.onError("Error: " + e.getMessage());
+            if (callback != null) {
+                callback.onError("Error: " + e.getMessage());
+            }
         }
     }
 

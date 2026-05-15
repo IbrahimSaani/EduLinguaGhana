@@ -1091,6 +1091,12 @@ public class MainActivity extends AppCompatActivity {
                 "Fast-paced question game",
                 () -> openSpeedGameScreen(langCode, langName)
         ));
+        menuItems.add(new StyledMenuHelper.MenuItem(
+                "🏜️",
+                "Hidden Shapes",
+                "Rub the sand to reveal items",
+                () -> openHiddenShapesScreen(langCode, langName)
+        ));
 
         StyledMenuHelper.showStyledMenu(
                 this,
@@ -1159,6 +1165,13 @@ public class MainActivity extends AppCompatActivity {
 
     private void openSpeedGameScreen(String langCode, String langName) {
         Intent intent = new Intent(MainActivity.this, SpeedGameActivity.class);
+        intent.putExtra("LANG_CODE", langCode);
+        intent.putExtra("LANG_NAME", langName);
+        startActivity(intent);
+    }
+
+    private void openHiddenShapesScreen(String langCode, String langName) {
+        Intent intent = new Intent(MainActivity.this, HiddenShapesActivity.class);
         intent.putExtra("LANG_CODE", langCode);
         intent.putExtra("LANG_NAME", langName);
         startActivity(intent);
