@@ -35,6 +35,7 @@ import com.google.android.material.card.MaterialCardView;
 import com.google.android.material.chip.Chip;
 import com.google.android.material.chip.ChipGroup;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.airbnb.lottie.LottieAnimationView;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.edulinguaghana.roles.RoleManager;
@@ -55,7 +56,7 @@ public class MainActivity extends AppCompatActivity {
     private ChipGroup languageChipGroup;
     private MaterialCardView btnRecitalMode, btnPracticeMode, btnQuizMode, btnProgressMode;
     private MaterialCardView heroCard;
-    private ImageView mascotView;
+    private LottieAnimationView mascotView;
     private NestedScrollView nestedScrollView;
     private ObjectAnimator overlayPulseAnimator;
     private Animator heroGlowAnimator;

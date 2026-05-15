@@ -514,14 +514,15 @@
                         app:cardElevation="12dp"
                         app:cardUseCompatPadding="false">
 
-                        <!-- Interactive Mascot Owl -->
-                        <ImageView
+                        <!-- Interactive Lottie Mascot Owl -->
+                        <com.airbnb.lottie.LottieAnimationView
                             android:id="@+id/mascotView"
                             android:layout_width="match_parent"
                             android:layout_height="match_parent"
-                            android:padding="30dp"
-                            android:scaleType="fitCenter"
-                            android:src="@drawable/mascot_owl"
+                            android:padding="0dp"
+                            app:lottie_rawRes="@raw/angry_owl"
+                            app:lottie_autoPlay="true"
+                            app:lottie_loop="true"
                             android:contentDescription="@string/main_tap_hint"
                             android:clickable="true"
                             android:focusable="true" />
