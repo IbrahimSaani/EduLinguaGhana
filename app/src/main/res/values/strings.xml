@@ -59,6 +59,10 @@
     <string name="quiz_title">Quiz Mode</string>
     <string name="quiz_start_button">Start Quiz</string>
     <string name="quiz_play_audio_description">Play Audio Prompt</string>
+    <string name="bubble_pop_escaped">Oh no! The letter escaped. Try again! 🎈</string>
+    <string name="bubble_pop_title">Letter Bubble Pop</string>
+    <string name="bubble_pop_score">⭐ Score: %d</string>
+    <string name="bubble_pop_target">Target: %s</string>
     <string name="quiz_end_title">Time Up</string>
     <string name="quiz_end_new_high_score">New High Score! 🎉</string>
     <string name="quiz_play_again_button">Play Again</string>

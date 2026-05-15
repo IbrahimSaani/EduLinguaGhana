@@ -1097,6 +1097,12 @@ public class MainActivity extends AppCompatActivity {
                 "Rub the sand to reveal items",
                 () -> openHiddenShapesScreen(langCode, langName)
         ));
+        menuItems.add(new StyledMenuHelper.MenuItem(
+                "🫧",
+                "Bubble Pop (Mini-game)",
+                "Pop bubbles with correct letters",
+                () -> openBubblePopScreen(langCode, langName)
+        ));
 
         StyledMenuHelper.showStyledMenu(
                 this,
@@ -1172,6 +1178,13 @@ public class MainActivity extends AppCompatActivity {
 
     private void openHiddenShapesScreen(String langCode, String langName) {
         Intent intent = new Intent(MainActivity.this, HiddenShapesActivity.class);
+        intent.putExtra("LANG_CODE", langCode);
+        intent.putExtra("LANG_NAME", langName);
+        startActivity(intent);
+    }
+
+    private void openBubblePopScreen(String langCode, String langName) {
+        Intent intent = new Intent(MainActivity.this, com.edulinguaghana.games.bubblepop.BubblePopActivity.class);
         intent.putExtra("LANG_CODE", langCode);
         intent.putExtra("LANG_NAME", langName);
         startActivity(intent);
