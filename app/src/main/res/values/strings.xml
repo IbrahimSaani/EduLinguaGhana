@@ -372,4 +372,18 @@
     <string name="rocket_sort_numbers">NUMBERS</string>
     <string name="rocket_sort_game_over">Mission Complete!</string>
     <string name="rocket_sort_final_score">Sorted Items: %d</string>
+
+    <!-- Alphabet Bridge -->
+    <string name="alphabet_bridge_title">Alphabet Bridge</string>
+    <string name="alphabet_bridge_prompt">Tap the next letter to help Owlbert cross!</string>
+    <string name="alphabet_bridge_win">Safe across! 🎉</string>
+    <string name="alphabet_bridge_splash">Splash! Try again! 🌊</string>
+
+    <!-- Beat Matcher -->
+    <string name="beat_matcher_title">Beat Matcher</string>
+    <string name="beat_matcher_prompt">Listen to the rhythm and tap the drum!</string>
+    <string name="beat_matcher_listen">Listen…</string>
+    <string name="beat_matcher_tap">Your Turn!</string>
+    <string name="beat_matcher_perfect">Perfect Match! 🥁</string>
+    <string name="beat_matcher_miss">Off beat! Try again.</string>
 </resources>

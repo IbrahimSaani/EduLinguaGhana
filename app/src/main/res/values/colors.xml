@@ -88,4 +88,11 @@
     <color name="nebulaPink">#4D214F</color>
     <color name="nebulaBlue">#1A237E</color>
     <color name="rocketFire">#FF5722</color>
+
+    <!-- Game Specific -->
+    <color name="riverBlue">#039BE5</color>
+    <color name="stoneGray">#9E9E9E</color>
+    <color name="stoneBorder">#757575</color>
+    <color name="drumRed">#C62828</color>
+    <color name="drumGold">#F9A825</color>
 </resources>

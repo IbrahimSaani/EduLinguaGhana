@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Deep Cosmic Purple -->
+    <item>
+        <shape>
+            <gradient
+                android:angle="270"
+                android:startColor="#FF311B92"
+                android:centerColor="#FF1A237E"
+                android:endColor="#FF0D1117" />
+        </shape>
+    </item>
+
+    <!-- Tech/Magic Hex Grid Overlay -->
+    <item>
+        <shape>
+            <stroke
+                android:width="0.5dp"
+                android:color="#1AFFFFFF"
+                android:dashWidth="30dp"
+                android:dashGap="30dp" />
+        </shape>
+    </item>
+
+    <!-- Bottom "Game Slab" -->
+    <item android:top="600dp">
+        <shape>
+            <gradient
+                android:angle="270"
+                android:startColor="#33673AB7"
+                android:endColor="#66000000" />
+            <corners android:topLeftRadius="60dp" android:topRightRadius="60dp" />
+        </shape>
+    </item>
+</layer-list>

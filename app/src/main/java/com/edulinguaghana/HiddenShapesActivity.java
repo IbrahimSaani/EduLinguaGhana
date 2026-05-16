@@ -194,7 +194,7 @@ public class HiddenShapesActivity extends AppCompatActivity {
                 // Pause timer while celebrating/showing revealed item
                 if (gameTimer != null) gameTimer.cancel();
                 
-                score += 10; // 10 points per shape
+                score += 1; // 1 point per shape
                 updateScoreDisplay();
                 celebrate();
                 speakCharacter(text);

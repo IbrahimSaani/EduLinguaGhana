@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Inner Glow Shadow -->
+    <item>
+        <shape>
+            <solid android:color="#22000000" />
+            <corners android:radius="20dp" />
+        </shape>
+    </item>
+    <!-- Border -->
+    <item>
+        <shape>
+            <stroke android:width="2.5dp" android:color="#4FC3F7" android:dashWidth="12dp" android:dashGap="8dp" />
+            <corners android:radius="20dp" />
+        </shape>
+    </item>
+</layer-list>

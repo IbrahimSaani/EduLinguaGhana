@@ -1119,6 +1119,18 @@ public class MainActivity extends AppCompatActivity {
                 "Rub the sand to reveal items",
                 () -> openHiddenShapesScreen(langCode, langName)
         ));
+        menuItems.add(new StyledMenuHelper.MenuItem(
+                "🧩",
+                "Shape Match Puzzle",
+                "Match the letters to the slots",
+                () -> openPuzzleGameScreen(langCode, langName)
+        ));
+        menuItems.add(new StyledMenuHelper.MenuItem(
+                "🥁",
+                "Beat Matcher",
+                "Match the rhythm of numbers",
+                () -> openBeatMatcherScreen(langCode, langName)
+        ));
 
         StyledMenuHelper.showStyledMenu(
                 this,
@@ -1194,6 +1206,20 @@ public class MainActivity extends AppCompatActivity {
 
     private void openHiddenShapesScreen(String langCode, String langName) {
         Intent intent = new Intent(MainActivity.this, HiddenShapesActivity.class);
+        intent.putExtra("LANG_CODE", langCode);
+        intent.putExtra("LANG_NAME", langName);
+        startActivity(intent);
+    }
+
+    private void openPuzzleGameScreen(String langCode, String langName) {
+        Intent intent = new Intent(MainActivity.this, com.edulinguaghana.games.PuzzleGameActivity.class);
+        intent.putExtra("LANG_CODE", langCode);
+        intent.putExtra("LANG_NAME", langName);
+        startActivity(intent);
+    }
+
+    private void openBeatMatcherScreen(String langCode, String langName) {
+        Intent intent = new Intent(MainActivity.this, com.edulinguaghana.games.BeatMatcherActivity.class);
         intent.putExtra("LANG_CODE", langCode);
         intent.putExtra("LANG_NAME", langName);
         startActivity(intent);
