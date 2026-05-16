@@ -7,6 +7,8 @@ import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.os.Build;
 import android.os.CountDownTimer;
+import android.os.Handler;
+import android.os.Looper;
 import android.speech.tts.TextToSpeech;
 import android.util.Log;
 import android.view.View;
@@ -89,6 +91,13 @@ public class SpeedGameActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_speed_game);
+
+        // Pre-warm character arrays
+        new Handler(Looper.getMainLooper()).post(() -> {
+            if (alphabet != null && alphabet.length > 0) {
+                String first = alphabet[0];
+            }
+        });
 
         // --- Get language code and quiz type from intent ---
         languageCode = getIntent().getStringExtra("LANG_CODE");

@@ -3,7 +3,6 @@ package com.edulinguaghana.games.rocketsort;
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.animation.ObjectAnimator;
-import android.animation.ValueAnimator;
 import android.annotation.SuppressLint;
 import android.graphics.Color;
 import android.graphics.drawable.GradientDrawable;
@@ -11,7 +10,6 @@ import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
-import android.view.GestureDetector;
 import android.view.Gravity;
 import android.view.MotionEvent;
 import android.view.View;
@@ -20,7 +18,6 @@ import android.view.animation.LinearInterpolator;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -39,13 +36,14 @@ import nl.dionsegijn.konfetti.xml.KonfettiView;
 public class RocketSortActivity extends AppCompatActivity {
 
     private FrameLayout starFieldContainer, asteroidContainer;
-    private TextView tvScore, tvLives;
+    private TextView tvScore, tvLives, tvCountdown;
     private View overlayLayout;
     private ImageView ivRocketLeft, ivRocketRight;
     private KonfettiView konfettiView;
+    private View rocketDock;
 
     private int score = 0;
-    private int lives = 3;
+    private int lives = 5;
     private boolean isGameOver = false;
     private boolean isPaused = false;
 
@@ -57,13 +55,14 @@ public class RocketSortActivity extends AppCompatActivity {
     private Handler spawnHandler = new Handler(Looper.getMainLooper());
     private Runnable spawnRunnable;
     private List<View> activeAsteroids = new ArrayList<>();
+    private java.util.Map<View, ObjectAnimator> asteroidAnimators = new java.util.HashMap<>();
 
     private MediaPlayer correctPlayer;
     private MediaPlayer wrongPlayer;
 
-    private float currentSpeed = 4000f; 
-    private float spawnInterval = 2500f;
-    private final float MIN_SPEED = 1500f;
+    private float currentSpeed = 3200f; // Faster starting speed
+    private float spawnInterval = 2200f; // More frequent starting spawns
+    private final float MIN_SPEED = 1200f;
     private final float MIN_SPAWN_INTERVAL = 800f;
 
     @Override
@@ -87,13 +86,25 @@ public class RocketSortActivity extends AppCompatActivity {
         asteroidContainer = findViewById(R.id.asteroidContainer);
         tvScore = findViewById(R.id.tvScore);
         tvLives = findViewById(R.id.tvLives);
+        tvCountdown = findViewById(R.id.tvCountdown);
         overlayLayout = findViewById(R.id.overlayLayout);
         ivRocketLeft = findViewById(R.id.ivRocketLeft);
         ivRocketRight = findViewById(R.id.ivRocketRight);
         konfettiView = findViewById(R.id.konfettiView);
+        rocketDock = findViewById(R.id.rocketDock);
+
+        // Pre-warm character arrays for local languages
+        new Handler(Looper.getMainLooper()).post(() -> {
+            if (alphabet != null && alphabet.length > 0) {
+                // Just touching the array to ensure it's fully initialized in memory
+                @SuppressWarnings("unused")
+                String first = alphabet[0];
+            }
+        });
 
         findViewById(R.id.btnPause).setOnClickListener(v -> togglePause());
         findViewById(R.id.btnRestart).setOnClickListener(v -> startNewGame());
+        findViewById(R.id.btnResume).setOnClickListener(v -> togglePause());
         findViewById(R.id.btnQuit).setOnClickListener(v -> finish());
     }
 
@@ -143,8 +154,8 @@ public class RocketSortActivity extends AppCompatActivity {
         isGameOver = false;
         isPaused = false;
         score = 0;
-        lives = 3;
-        currentSpeed = 4000f;
+        lives = 5;
+        currentSpeed = 3200f;
         spawnInterval = 2500f;
         
         updateUI();
@@ -155,17 +166,51 @@ public class RocketSortActivity extends AppCompatActivity {
         }
         activeAsteroids.clear();
 
-        startSpawning();
+        showCountdown();
+    }
+
+    private void showCountdown() {
+        tvCountdown.setVisibility(View.VISIBLE);
+        final int[] count = {3};
+        
+        Runnable countdownRunnable = new Runnable() {
+            @Override
+            public void run() {
+                if (count[0] > 0) {
+                    tvCountdown.setText(String.valueOf(count[0]));
+                    tvCountdown.setScaleX(1.5f);
+                    tvCountdown.setScaleY(1.5f);
+                    tvCountdown.animate().scaleX(1f).scaleY(1f).setDuration(500).start();
+                    count[0]--;
+                    spawnHandler.postDelayed(this, 1000);
+                } else if (count[0] == 0) {
+                    tvCountdown.setText("GO!");
+                    count[0]--;
+                    spawnHandler.postDelayed(this, 800);
+                } else {
+                    tvCountdown.setVisibility(View.GONE);
+                    startSpawning();
+                }
+            }
+        };
+        spawnHandler.post(countdownRunnable);
     }
 
     private void togglePause() {
         isPaused = !isPaused;
         if (isPaused) {
             spawnHandler.removeCallbacks(spawnRunnable);
-            // In a real game, we'd pause all animations too
+            // Properly pause all active ObjectAnimators
+            for (ObjectAnimator animator : asteroidAnimators.values()) {
+                animator.pause();
+            }
             showOverlay("Paused");
         } else {
             overlayLayout.setVisibility(View.GONE);
+            // Properly resume all active ObjectAnimators
+            for (ObjectAnimator animator : asteroidAnimators.values()) {
+                animator.resume();
+            }
             startSpawning();
         }
     }
@@ -187,6 +232,8 @@ public class RocketSortActivity extends AppCompatActivity {
 
     @SuppressLint("ClickableViewAccessibility")
     private void spawnAsteroid() {
+        if (isGameOver || isPaused) return;
+
         boolean isLetter = random.nextBoolean();
         String content = isLetter ? alphabet[random.nextInt(alphabet.length)] : numbers[random.nextInt(numbers.length)];
         
@@ -194,18 +241,16 @@ public class RocketSortActivity extends AppCompatActivity {
         final FrameLayout wrapper = new FrameLayout(this);
         wrapper.setLayoutParams(new FrameLayout.LayoutParams(size, size));
         
-        // Asteroid Shape
-        GradientDrawable shape = new GradientDrawable();
-        shape.setShape(GradientDrawable.OVAL);
-        shape.setColor(Color.parseColor("#8D6E63"));
-        shape.setStroke(4, Color.parseColor("#5D4037"));
-        wrapper.setBackground(shape);
+        // Modern Star Visuals
+        wrapper.setBackgroundResource(R.drawable.star_game_object);
+        wrapper.setElevation(12f);
         
         TextView tv = new TextView(this);
         tv.setText(content);
         tv.setTextColor(Color.WHITE);
-        tv.setTextSize(24);
+        tv.setTextSize(34);
         tv.setGravity(Gravity.CENTER);
+        tv.setShadowLayer(6f, 3f, 3f, Color.BLACK);
         tv.setTypeface(null, android.graphics.Typeface.BOLD);
         wrapper.addView(tv);
         
@@ -222,6 +267,8 @@ public class RocketSortActivity extends AppCompatActivity {
         fallAnimator.setDuration((long) currentSpeed);
         fallAnimator.setInterpolator(new LinearInterpolator());
         
+        asteroidAnimators.put(wrapper, fallAnimator);
+
         final boolean[] isHandled = {false};
 
         fallAnimator.addListener(new AnimatorListenerAdapter() {
@@ -254,13 +301,11 @@ public class RocketSortActivity extends AppCompatActivity {
                         float newX = event.getRawX() + dX;
                         float newY = event.getRawY() + dY;
                         
-                        // Keep within horizontal bounds
                         newX = Math.max(0, Math.min(newX, asteroidContainer.getWidth() - v.getWidth()));
                         
                         v.setX(newX);
                         v.setY(newY);
                         
-                        // Check if dragged into rocket zones (bottom corners)
                         checkRocketCollision(v, isLetter, isHandled, fallAnimator);
                         return true;
 
@@ -282,7 +327,6 @@ public class RocketSortActivity extends AppCompatActivity {
         float containerWidth = asteroidContainer.getWidth();
         float containerHeight = asteroidContainer.getHeight();
         
-        // Rocket trigger zone: Bottom 15% of screen
         if (bottomY > containerHeight * 0.8f) {
             boolean inLeftZone = centerX < containerWidth * 0.4f;
             boolean inRightZone = centerX > containerWidth * 0.6f;
@@ -325,17 +369,20 @@ public class RocketSortActivity extends AppCompatActivity {
     private void handleCorrectSort(boolean leftRocket) {
         if (isGameOver || isFinishing() || isDestroyed()) return;
         score++;
-        correctPlayer.start();
+        if (correctPlayer != null) correctPlayer.start();
         updateUI();
         
         ImageView rocket = leftRocket ? ivRocketLeft : ivRocketRight;
-        rocket.animate().scaleX(1.2f).scaleY(1.2f).setDuration(100).withEndAction(() -> 
-            rocket.animate().scaleX(1.0f).scaleY(1.0f).setDuration(100).start()
-        ).start();
+        if (rocket != null) {
+            rocket.animate().scaleX(1.2f).scaleY(1.2f).setDuration(100).withEndAction(() -> 
+                rocket.animate().scaleX(1.0f).scaleY(1.0f).setDuration(100).start()
+            ).start();
+        }
         
         if (score % 5 == 0) {
-            currentSpeed = Math.max(MIN_SPEED, currentSpeed - 200);
-            spawnInterval = Math.max(MIN_SPAWN_INTERVAL, spawnInterval - 150);
+            currentSpeed = Math.max(MIN_SPEED, currentSpeed - 400); // More aggressive speed up
+            spawnInterval = Math.max(MIN_SPAWN_INTERVAL, spawnInterval - 300); // Faster spawning
+            android.widget.Toast.makeText(this, "Mission Speed Up! 🚀", android.widget.Toast.LENGTH_SHORT).show();
         }
         
         if (score % 10 == 0) celebrate();
@@ -344,10 +391,9 @@ public class RocketSortActivity extends AppCompatActivity {
     private void handleWrongSort(View asteroid) {
         if (isGameOver || isFinishing() || isDestroyed()) return;
         lives--;
-        wrongPlayer.start();
+        if (wrongPlayer != null) wrongPlayer.start();
         updateUI();
         
-        // Shake the whole screen or something
         asteroidContainer.animate().translationX(20).setDuration(50).withEndAction(() ->
             asteroidContainer.animate().translationX(-20).setDuration(50).withEndAction(() ->
                 asteroidContainer.animate().translationX(0).setDuration(50).start()
@@ -360,7 +406,7 @@ public class RocketSortActivity extends AppCompatActivity {
     private void handleMiss() {
         if (isGameOver || isFinishing() || isDestroyed()) return;
         lives--;
-        wrongPlayer.start();
+        if (wrongPlayer != null) wrongPlayer.start();
         updateUI();
         if (lives <= 0) endGame();
     }
@@ -368,6 +414,10 @@ public class RocketSortActivity extends AppCompatActivity {
     private void removeAsteroid(View asteroid) {
         asteroidContainer.removeView(asteroid);
         activeAsteroids.remove(asteroid);
+        ObjectAnimator animator = asteroidAnimators.remove(asteroid);
+        if (animator != null) {
+            animator.cancel();
+        }
     }
 
     private void updateUI() {
@@ -388,15 +438,30 @@ public class RocketSortActivity extends AppCompatActivity {
         if (isFinishing() || isDestroyed()) return;
         overlayLayout.setVisibility(View.VISIBLE);
         ((TextView) findViewById(R.id.tvOverlayTitle)).setText(title);
-        ((TextView) findViewById(R.id.tvOverlayScore)).setText("Final Score: " + score);
+        
+        TextView scoreText = findViewById(R.id.tvOverlayScore);
+        View resumeBtn = findViewById(R.id.btnResume);
+        View restartBtn = findViewById(R.id.btnRestart);
+        
+        if (isPaused && !isGameOver) {
+            scoreText.setText("Mission Status: Paused");
+            resumeBtn.setVisibility(View.VISIBLE);
+            restartBtn.setVisibility(View.GONE);
+        } else {
+            scoreText.setText("Final Score: " + score);
+            resumeBtn.setVisibility(View.GONE);
+            restartBtn.setVisibility(View.VISIBLE);
+        }
     }
 
     private void celebrate() {
-        konfettiView.start(new PartyFactory(new Emitter(100L, java.util.concurrent.TimeUnit.MILLISECONDS).max(30))
-                .position(new Position.Relative(0.5, 0.3))
-                .spread(360)
-                .colors(java.util.Arrays.asList(0xfce18a, 0xff726d, 0xf48fb1, 0xafdfff))
-                .build());
+        if (konfettiView != null) {
+            konfettiView.start(new PartyFactory(new Emitter(100L, java.util.concurrent.TimeUnit.MILLISECONDS).max(30))
+                    .position(new Position.Relative(0.5, 0.3))
+                    .spread(360)
+                    .colors(java.util.Arrays.asList(0xfce18a, 0xff726d, 0xf48fb1, 0xafdfff))
+                    .build());
+        }
     }
 
     @Override

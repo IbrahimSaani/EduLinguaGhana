@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Earthy Explorer Gradient -->
+    <item>
+        <shape>
+            <gradient
+                android:angle="270"
+                android:startColor="#FF2E7D32"
+                android:centerColor="#FF1B5E20"
+                android:endColor="#FF0D2B0F" />
+        </shape>
+    </item>
+
+    <!-- Subtle Texture Overlay -->
+    <item>
+        <shape>
+            <stroke
+                android:width="0.5dp"
+                android:color="#1AFFFFFF"
+                android:dashWidth="20dp"
+                android:dashGap="10dp" />
+        </shape>
+    </item>
+
+    <!-- Bottom "Dig Site" Area -->
+    <item android:top="600dp">
+        <shape>
+            <solid android:color="#33000000" />
+            <corners android:topLeftRadius="60dp" android:topRightRadius="60dp" />
+        </shape>
+    </item>
+</layer-list>

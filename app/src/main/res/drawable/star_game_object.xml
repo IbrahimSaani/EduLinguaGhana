@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Star Shadow -->
+    <item android:top="4dp" android:left="4dp">
+        <vector android:width="80dp" android:height="80dp" android:viewportWidth="24" android:viewportHeight="24">
+            <path android:fillColor="#44000000" android:pathData="M12,17.27L18.18,21L16.54,13.97L22,9.24L14.81,8.63L12,2L9.19,8.63L2,9.24L7.46,13.97L5.82,21L12,17.27Z"/>
+        </vector>
+    </item>
+    <!-- Main Star Body -->
+    <item>
+        <vector android:width="80dp" android:height="80dp" android:viewportWidth="24" android:viewportHeight="24">
+            <path android:fillColor="#FFD54F" android:strokeColor="#FFAB40" android:strokeWidth="1" android:pathData="M12,17.27L18.18,21L16.54,13.97L22,9.24L14.81,8.63L12,2L9.19,8.63L2,9.24L7.46,13.97L5.82,21L12,17.27Z"/>
+        </vector>
+    </item>
+    <!-- Rim Light / Shine -->
+    <item android:bottom="40dp" android:right="40dp" android:top="10dp" android:left="10dp">
+        <vector android:width="80dp" android:height="80dp" android:viewportWidth="24" android:viewportHeight="24">
+            <path android:fillColor="#44FFFFFF" android:pathData="M12,2L9.19,8.63L2,9.24L7.46,13.97L5.82,21L12,17.27L12,2Z"/>
+        </vector>
+    </item>
+</layer-list>

@@ -4,14 +4,22 @@
     android:id="@+id/gameRoot"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/bg_main_day">
+    android:fitsSystemWindows="true">
+
+    <!-- Sky Background Layer -->
+    <ImageView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:scaleType="centerCrop"
+        android:src="@drawable/bg_bubble_game_modern" />
 
     <com.edulinguaghana.DynamicBackgroundView
         android:id="@+id/dynamicBackground"
         android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+        android:layout_height="match_parent"
+        android:visibility="gone" />
 
-    <!-- Ambient Floating Particles Layer -->
+    <!-- Ambient Particles -->
     <FrameLayout
         android:id="@+id/ambientParticles"
         android:layout_width="match_parent"
@@ -23,71 +31,94 @@
         android:layout_height="match_parent"
         android:clipChildren="false">
 
-        <!-- Enhanced Stats Bar -->
-        <com.google.android.material.card.MaterialCardView
+        <!-- Professional Stats Bar -->
+        <LinearLayout
             android:id="@+id/statsCard"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_margin="16dp"
-            app:cardCornerRadius="24dp"
-            app:cardElevation="8dp"
-            app:cardBackgroundColor="#CCFFFFFF">
+            android:background="@drawable/bg_hud_panel"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:padding="16dp">
 
-            <LinearLayout
-                android:layout_width="match_parent"
+            <TextView
+                android:id="@+id/tvScore"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:padding="12dp"
-                android:gravity="center_vertical">
+                android:layout_weight="1"
+                android:fontFamily="@font/agbalumo"
+                android:text="⭐ 0"
+                android:textColor="#4FC3F7"
+                android:textSize="26sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/tvTimer"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="16dp"
+                android:fontFamily="@font/agbalumo"
+                android:text="60s"
+                android:textColor="@color/white"
+                android:textSize="24sp"
+                android:textStyle="bold" />
+
+            <!-- Target Letter Display -->
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:orientation="vertical">
 
                 <TextView
-                    android:id="@+id/tvScore"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="⭐ Score: 0"
-                    android:textColor="@color/colorPrimaryDark"
-                    android:textSize="20sp"
-                    android:fontFamily="@font/agbalumo"
-                    android:textStyle="bold" />
-
-                <LinearLayout
+                    android:id="@+id/tvTargetLabel"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:gravity="center">
+                    android:text="POP THIS!"
+                    android:textColor="@color/white"
+                    android:textSize="12sp"
+                    android:textStyle="bold" />
 
-                    <TextView
-                        android:id="@+id/tvTargetLabel"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="POP THIS!"
-                        android:textColor="@color/colorAccent"
-                        android:textSize="12sp"
-                        android:textStyle="bold" />
-
-                    <TextView
-                        android:id="@+id/tvTarget"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="A"
-                        android:textColor="@color/colorAccent"
-                        android:textSize="28sp"
-                        android:fontFamily="@font/agbalumo"
-                        android:textStyle="bold" />
-                </LinearLayout>
+                <TextView
+                    android:id="@+id/tvTarget"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="@font/agbalumo"
+                    android:text="A"
+                    android:textColor="#FFAB40"
+                    android:textSize="36sp"
+                    android:textStyle="bold"
+                    android:shadowColor="#000000"
+                    android:shadowRadius="5"
+                    android:shadowDx="2"
+                    android:shadowDy="2"/>
             </LinearLayout>
-        </com.google.android.material.card.MaterialCardView>
+        </LinearLayout>
 
         <!-- Game Area -->
         <FrameLayout
             android:id="@+id/bubbleContainer"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_marginTop="100dp"
+            android:layout_marginTop="120dp"
             android:clipChildren="false" />
 
-        <!-- Overlay for Game Over / Pause -->
+        <!-- Countdown Overlay -->
+        <TextView
+            android:id="@+id/tvCountdown"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:fontFamily="@font/agbalumo"
+            android:text="3"
+            android:textColor="#FF4081"
+            android:textSize="120sp"
+            android:visibility="gone"
+            android:shadowColor="#000000"
+            android:shadowRadius="10" />
+
+        <!-- Overlay Menu -->
         <LinearLayout
             android:id="@+id/overlayLayout"
             android:layout_width="match_parent"
@@ -100,17 +131,19 @@
             android:focusable="true">
 
             <com.google.android.material.card.MaterialCardView
-                android:layout_width="wrap_content"
+                android:layout_width="300dp"
                 android:layout_height="wrap_content"
+                app:cardBackgroundColor="#F5F5FA"
                 app:cardCornerRadius="32dp"
-                app:cardElevation="16dp"
-                app:cardBackgroundColor="@android:color/white">
+                app:cardElevation="24dp"
+                app:strokeColor="#FF4081"
+                app:strokeWidth="2dp">
 
                 <LinearLayout
-                    android:layout_width="wrap_content"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="vertical"
-                    android:padding="40dp"
+                    android:padding="32dp"
                     android:gravity="center">
 
                     <TextView
@@ -118,8 +151,8 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="Game Over!"
-                        android:textColor="@color/colorPrimary"
-                        android:textSize="32sp"
+                        android:textColor="#FF4081"
+                        android:textSize="36sp"
                         android:fontFamily="@font/agbalumo"
                         android:textStyle="bold" />
 
@@ -130,13 +163,26 @@
                         android:layout_marginTop="16dp"
                         android:text="Final Score: 0"
                         android:textColor="@color/textColorPrimary"
-                        android:textSize="24sp" />
+                        android:textSize="22sp" />
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btnResume"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="32dp"
+                        android:backgroundTint="#4FC3F7"
+                        android:padding="16dp"
+                        android:text="Resume Game"
+                        android:textColor="#0D1117"
+                        android:visibility="gone"
+                        app:cornerRadius="24dp" />
 
                     <com.google.android.material.button.MaterialButton
                         android:id="@+id/btnRestart"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="32dp"
+                        android:layout_marginTop="16dp"
+                        android:backgroundTint="#FF4081"
                         android:text="Play Again"
                         android:padding="16dp"
                         app:cornerRadius="24dp" />

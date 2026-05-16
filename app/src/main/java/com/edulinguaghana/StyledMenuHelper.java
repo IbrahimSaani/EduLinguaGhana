@@ -54,28 +54,44 @@ public class StyledMenuHelper {
         @NonNull
         @Override
         public View getView(int position, @Nullable View convertView, @NonNull ViewGroup parent) {
-            if (convertView == null) {
-                convertView = LayoutInflater.from(context).inflate(R.layout.item_menu_option, parent, false);
-            }
-
             MenuItem item = items.get(position);
+            boolean isHeader = "SECTION_HEADER".equals(item.subtitle);
 
-            TextView tvIcon = convertView.findViewById(R.id.tvMenuIcon);
-            TextView tvTitle = convertView.findViewById(R.id.tvMenuTitle);
-            TextView tvSubtitle = convertView.findViewById(R.id.tvMenuSubtitle);
-            ImageView ivArrow = convertView.findViewById(R.id.ivMenuArrow);
-
-            tvIcon.setText(item.icon);
-            tvTitle.setText(item.title);
-
-            if (item.subtitle != null && !item.subtitle.isEmpty()) {
-                tvSubtitle.setText(item.subtitle);
-                tvSubtitle.setVisibility(View.VISIBLE);
-            } else {
-                tvSubtitle.setVisibility(View.GONE);
+            if (convertView == null || (isHeader && convertView.findViewById(R.id.tvMenuIcon) != null) || (!isHeader && convertView.findViewById(android.R.id.text1) != null)) {
+                if (isHeader) {
+                    convertView = LayoutInflater.from(context).inflate(android.R.layout.simple_list_item_1, parent, false);
+                } else {
+                    convertView = LayoutInflater.from(context).inflate(R.layout.item_menu_option, parent, false);
+                }
             }
 
-            ivArrow.setVisibility(View.VISIBLE);
+            if (isHeader) {
+                TextView tv = convertView.findViewById(android.R.id.text1);
+                tv.setText(String.format("%s %s", item.icon, item.title));
+                tv.setTextColor(androidx.core.content.ContextCompat.getColor(context, R.color.colorPrimary));
+                tv.setTextSize(18f);
+                tv.setTypeface(null, android.graphics.Typeface.BOLD);
+                tv.setPadding(30, 40, 0, 10);
+                convertView.setClickable(false);
+                convertView.setFocusable(false);
+            } else {
+                TextView tvIcon = convertView.findViewById(R.id.tvMenuIcon);
+                TextView tvTitle = convertView.findViewById(R.id.tvMenuTitle);
+                TextView tvSubtitle = convertView.findViewById(R.id.tvMenuSubtitle);
+                ImageView ivArrow = convertView.findViewById(R.id.ivMenuArrow);
+
+                tvIcon.setText(item.icon);
+                tvTitle.setText(item.title);
+
+                if (item.subtitle != null && !item.subtitle.isEmpty()) {
+                    tvSubtitle.setText(item.subtitle);
+                    tvSubtitle.setVisibility(View.VISIBLE);
+                } else {
+                    tvSubtitle.setVisibility(View.GONE);
+                }
+
+                if (ivArrow != null) ivArrow.setVisibility(View.VISIBLE);
+            }
 
             return convertView;
         }

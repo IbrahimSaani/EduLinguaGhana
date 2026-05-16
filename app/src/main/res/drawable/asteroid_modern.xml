@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Shadow -->
+    <item android:top="4dp" android:left="4dp">
+        <shape android:shape="oval">
+            <solid android:color="#44000000" />
+        </shape>
+    </item>
+    <!-- Main Body -->
+    <item>
+        <shape android:shape="oval">
+            <gradient
+                android:type="radial"
+                android:gradientRadius="40dp"
+                android:startColor="#8D6E63"
+                android:endColor="#4E342E" />
+            <stroke android:width="3dp" android:color="#FFAB40" />
+        </shape>
+    </item>
+    <!-- Rim Light / Shine -->
+    <item android:bottom="40dp" android:right="40dp" android:top="10dp" android:left="10dp">
+        <shape android:shape="oval">
+            <solid android:color="#33FFFFFF" />
+        </shape>
+    </item>
+</layer-list>

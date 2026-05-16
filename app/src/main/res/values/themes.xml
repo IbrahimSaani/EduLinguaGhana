@@ -31,6 +31,16 @@
 
     <style name="Theme.EduLinguaGhana" parent="Base.Theme.EduLinguaGhana" />
 
+    <!-- Game theme that ignores system light/dark mode for background -->
+    <style name="Theme.EduLinguaGhana.Game" parent="Theme.EduLinguaGhana">
+        <item name="android:windowBackground">@android:color/transparent</item>
+        <item name="android:colorBackground">@android:color/transparent</item>
+        <item name="android:windowLightStatusBar">false</item>
+        <item name="android:windowFullscreen">false</item>
+        <item name="android:statusBarColor">#AA000000</item>
+        <item name="android:windowTranslucentStatus">false</item>
+    </style>
+
     <!-- Toolbar Title Style -->
     <style name="ToolbarTitleStyle" parent="TextAppearance.Widget.AppCompat.Toolbar.Title">
         <item name="android:textSize">20sp</item>

@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Vibrant Playful Gradient -->
+    <item>
+        <shape>
+            <gradient
+                android:angle="315"
+                android:startColor="#FF3F51B5"
+                android:centerColor="#FF2196F3"
+                android:endColor="#FF00BCD4" />
+        </shape>
+    </item>
+
+    <!-- Tech Grid Overlay -->
+    <item>
+        <shape>
+            <stroke
+                android:width="0.5dp"
+                android:color="#22FFFFFF"
+                android:dashWidth="40dp"
+                android:dashGap="40dp" />
+        </shape>
+    </item>
+</layer-list>

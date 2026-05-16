@@ -36,9 +36,9 @@ public class ScratchRevealView extends View {
     private String hiddenText = "";
     private RevealListener revealListener;
     private boolean isRevealed = false;
-    private float pixelsScratched = 0;
     private final Random random = new Random();
     private int overlayAlpha = 255;
+    private int moveCount = 0;
     
     private final List<Particle> particles = new ArrayList<>();
     private static final int MAX_PARTICLES = 40;
@@ -91,7 +91,7 @@ public class ScratchRevealView extends View {
         this.hiddenText = text;
         this.revealListener = listener;
         this.isRevealed = false;
-        this.pixelsScratched = 0;
+        this.moveCount = 0;
         this.overlayAlpha = 255;
         this.particles.clear();
         reset();
@@ -221,11 +221,40 @@ public class ScratchRevealView extends View {
     }
 
     private void checkRevealProgress() {
-        if (isRevealed) return;
+        if (isRevealed || overlayBitmap == null) return;
 
-        pixelsScratched += 3.0f;
+        moveCount++;
+        // Only check pixels every 20 moves for performance
+        if (moveCount % 20 != 0) return;
+
+        int width = overlayBitmap.getWidth();
+        int height = overlayBitmap.getHeight();
         
-        if (pixelsScratched > 180) {
+        // Define a central "active" zone where the letter is (center 60%)
+        int startX = (int) (width * 0.2);
+        int endX = (int) (width * 0.8);
+        int startY = (int) (height * 0.2);
+        int endY = (int) (height * 0.8);
+        
+        int totalPixels = 0;
+        int clearedPixels = 0;
+        
+        // Sample pixels with a step to avoid checking millions of pixels
+        int step = 20; 
+        
+        for (int x = startX; x < endX; x += step) {
+            for (int y = startY; y < endY; y += step) {
+                totalPixels++;
+                if (Color.alpha(overlayBitmap.getPixel(x, y)) < 50) {
+                    clearedPixels++;
+                }
+            }
+        }
+
+        float percentCleared = (float) clearedPixels / totalPixels;
+        
+        // Require 45% of the central area to be cleared for a "professional" reveal
+        if (percentCleared > 0.45f) {
             isRevealed = true;
             revealFully();
         }

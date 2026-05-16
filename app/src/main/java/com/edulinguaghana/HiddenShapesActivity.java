@@ -19,15 +19,23 @@ import java.util.Random;
 public class HiddenShapesActivity extends AppCompatActivity {
 
     private ScratchRevealView scratchView;
-    private TextView tvPrompt;
-    private MaterialButton btnNext, btnBack;
+    private TextView tvPrompt, tvCountdown, tvTimer, tvScore;
+    private MaterialButton btnNext, btnRestart, btnResume;
+    private View overlayLayout;
     private nl.dionsegijn.konfetti.xml.KonfettiView konfettiView;
     private String languageCode;
     private String currentCharacter;
+    private String[] alphabet;
+    private int score = 0;
+    private boolean isGameOver = false;
+    private boolean isPaused = false;
+    private long timeLeftMs = 60000;
+    private android.os.CountDownTimer gameTimer;
     
     private TextToSpeech tts;
     private OfflineGhanaLPTtsService offlineTts;
     private boolean isTtsReady = false;
+    private final Handler handler = new Handler(android.os.Looper.getMainLooper());
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -37,17 +45,116 @@ public class HiddenShapesActivity extends AppCompatActivity {
         languageCode = getIntent().getStringExtra("LANG_CODE");
         if (languageCode == null) languageCode = "en";
 
+        // Get language-specific alphabet for pre-warming
+        alphabet = LanguageConversionUtils.getAlphabetForLanguage(languageCode);
+
+        // Pre-warm character arrays
+        handler.post(() -> {
+            if (alphabet != null && alphabet.length > 0) {
+                @SuppressWarnings("unused")
+                String first = alphabet[0];
+            }
+        });
+
         scratchView = findViewById(R.id.scratchView);
         tvPrompt = findViewById(R.id.tvPrompt);
+        tvCountdown = findViewById(R.id.tvCountdown);
+        tvTimer = findViewById(R.id.tvTimer);
+        tvScore = findViewById(R.id.tvScore);
         btnNext = findViewById(R.id.btnNext);
-        btnBack = findViewById(R.id.btnBack);
+        btnRestart = findViewById(R.id.btnRestart);
+        btnResume = findViewById(R.id.btnResume);
+        overlayLayout = findViewById(R.id.overlayLayout);
         konfettiView = findViewById(R.id.konfettiView);
 
-        btnBack.setOnClickListener(v -> finish());
+        // Standard Back Button in Toolbar
+        androidx.appcompat.widget.Toolbar toolbar = findViewById(R.id.toolbar);
+        if (toolbar != null) {
+            toolbar.setNavigationOnClickListener(v -> finish());
+        }
+
         btnNext.setOnClickListener(v -> generateNewCharacter());
+        btnRestart.setOnClickListener(v -> startNewGame());
+        btnResume.setOnClickListener(v -> togglePause());
+        findViewById(R.id.btnQuit).setOnClickListener(v -> finish());
 
         initTts();
-        generateNewCharacter();
+        startNewGame();
+    }
+
+    private void startNewGame() {
+        isGameOver = false;
+        isPaused = false;
+        score = 0;
+        timeLeftMs = 60000;
+        overlayLayout.setVisibility(View.GONE);
+        updateTimerDisplay();
+        updateScoreDisplay();
+        showInitialCountdown();
+    }
+
+    private void togglePause() {
+        if (isGameOver) return;
+        isPaused = !isPaused;
+        if (isPaused) {
+            if (gameTimer != null) gameTimer.cancel();
+            showPauseOverlay("Paused");
+        } else {
+            overlayLayout.setVisibility(View.GONE);
+            startTimer(timeLeftMs);
+        }
+    }
+
+    private void startTimer(long duration) {
+        if (gameTimer != null) gameTimer.cancel();
+        gameTimer = new android.os.CountDownTimer(duration, 1000) {
+            @Override
+            public void onTick(long millisUntilFinished) {
+                timeLeftMs = millisUntilFinished;
+                updateTimerDisplay();
+            }
+
+            @Override
+            public void onFinish() {
+                timeLeftMs = 0;
+                updateTimerDisplay();
+                endGame();
+            }
+        }.start();
+    }
+
+    private void updateTimerDisplay() {
+        if (tvTimer != null) {
+            tvTimer.setText((timeLeftMs / 1000) + "s");
+        }
+    }
+
+    private void updateScoreDisplay() {
+        if (tvScore != null) {
+            tvScore.setText("⭐ " + score);
+        }
+    }
+
+    private void endGame() {
+        isGameOver = true;
+        if (gameTimer != null) gameTimer.cancel();
+        showPauseOverlay("Time Up!");
+    }
+
+    private void showPauseOverlay(String title) {
+        overlayLayout.setVisibility(View.VISIBLE);
+        ((TextView) findViewById(R.id.tvOverlayTitle)).setText(title);
+        TextView scoreText = findViewById(R.id.tvOverlayScore);
+        
+        if (isPaused && !isGameOver) {
+            scoreText.setText("Status: Paused");
+            btnResume.setVisibility(View.VISIBLE);
+            btnRestart.setVisibility(View.GONE);
+        } else {
+            scoreText.setText("Mission Score: " + score);
+            btnResume.setVisibility(View.GONE);
+            btnRestart.setVisibility(View.VISIBLE);
+        }
     }
 
     private void initTts() {
@@ -63,28 +170,74 @@ public class HiddenShapesActivity extends AppCompatActivity {
     }
 
     private void generateNewCharacter() {
-        btnNext.setVisibility(View.INVISIBLE);
+        if (isGameOver || isPaused) return;
+
+        btnNext.setVisibility(View.GONE);
         tvPrompt.setText(R.string.hidden_shapes_prompt);
 
-        String[] alphabet = LanguageConversionUtils.getAlphabetForLanguage(languageCode);
         boolean useNumber = new Random().nextBoolean();
         
         if (useNumber) {
             currentCharacter = String.valueOf(new Random().nextInt(20) + 1);
-        } else {
+        } else if (alphabet != null && alphabet.length > 0) {
             currentCharacter = alphabet[new Random().nextInt(alphabet.length)];
+        } else {
+            currentCharacter = "A"; // Fallback
         }
 
         scratchView.setHiddenText(currentCharacter, text -> {
             // Character revealed!
             runOnUiThread(() -> {
+                if (isGameOver) return;
+                
+                score += 10; // 10 points per shape
+                updateScoreDisplay();
                 celebrate();
                 speakCharacter(text);
                 tvPrompt.setText(getString(R.string.hidden_shapes_found, text));
-                btnNext.setVisibility(View.VISIBLE);
-                btnNext.startAnimation(AnimationUtils.loadAnimation(this, R.anim.bounce_pop));
+                
+                // Auto-advance after 1.5 seconds
+                handler.postDelayed(() -> {
+                    if (!isGameOver && !isPaused) {
+                        generateNewCharacter();
+                    }
+                }, 1500);
             });
         });
+    }
+
+    private void showInitialCountdown() {
+        if (tvCountdown == null) {
+            startTimer(timeLeftMs);
+            generateNewCharacter();
+            return;
+        }
+
+        tvCountdown.setVisibility(View.VISIBLE);
+        final int[] count = {3};
+        
+        Runnable countdownRunnable = new Runnable() {
+            @Override
+            public void run() {
+                if (count[0] > 0) {
+                    tvCountdown.setText(String.valueOf(count[0]));
+                    tvCountdown.setScaleX(1.5f);
+                    tvCountdown.setScaleY(1.5f);
+                    tvCountdown.animate().scaleX(1f).scaleY(1f).setDuration(500).start();
+                    count[0]--;
+                    handler.postDelayed(this, 1000);
+                } else if (count[0] == 0) {
+                    tvCountdown.setText("GO!");
+                    count[0]--;
+                    handler.postDelayed(this, 800);
+                } else {
+                    tvCountdown.setVisibility(View.GONE);
+                    startTimer(timeLeftMs);
+                    generateNewCharacter();
+                }
+            }
+        };
+        handler.post(countdownRunnable);
     }
 
     private void celebrate() {

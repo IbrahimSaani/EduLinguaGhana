@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Vibrant Playful Sky -->
+    <item>
+        <shape>
+            <gradient
+                android:angle="45"
+                android:startColor="#FF4FC3F7"
+                android:endColor="#FFE1F5FE" />
+        </shape>
+    </item>
+
+    <!-- Stylized Low Poly Clouds or Water Reflection effect -->
+    <item>
+        <rotate
+            android:fromDegrees="15"
+            android:pivotX="0%"
+            android:pivotY="100%">
+            <shape>
+                <solid android:color="#22FFFFFF" />
+            </shape>
+        </rotate>
+    </item>
+
+    <!-- Bottom Wave / Game Basin -->
+    <item android:top="650dp">
+        <shape>
+            <gradient
+                android:angle="270"
+                android:startColor="#B2EBF2"
+                android:endColor="#80DEEA" />
+            <corners android:topLeftRadius="40dp" android:topRightRadius="40dp" />
+        </shape>
+    </item>
+</layer-list>

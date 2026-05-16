@@ -69,7 +69,10 @@
         <!--  New Speed Challenge game screen  -->
         <activity android:name=".SpeedGameActivity" android:exported="false"/>
         <!--  New Hidden Shapes (Scratch Reveal) game screen  -->
-        <activity android:name=".HiddenShapesActivity" android:exported="false"/>
+        <activity android:name=".HiddenShapesActivity"
+            android:screenOrientation="portrait"
+            android:theme="@style/Theme.EduLinguaGhana.Game"
+            android:exported="false"/>
         <!--  SettingsActivity  -->
         <activity android:name=".SettingsActivity" android:exported="false"/>
         <!--  ProfileActivity  -->
@@ -101,11 +104,13 @@
             android:name=".games.bubblepop.BubblePopActivity"
             android:screenOrientation="portrait"
             android:configChanges="keyboard|keyboardHidden|orientation|screenSize|screenLayout"
+            android:theme="@style/Theme.EduLinguaGhana.Game"
             android:exported="false"/>
         <activity
             android:name=".games.rocketsort.RocketSortActivity"
             android:screenOrientation="portrait"
             android:configChanges="keyboard|keyboardHidden|orientation|screenSize|screenLayout"
+            android:theme="@style/Theme.EduLinguaGhana.Game"
             android:exported="false"/>
 
         <!--  Progress Tracking Activities  -->

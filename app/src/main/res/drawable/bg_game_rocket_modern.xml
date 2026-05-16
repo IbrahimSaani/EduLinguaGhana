@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Deep Space Nebula Background -->
+    <item>
+        <shape>
+            <gradient
+                android:angle="270"
+                android:startColor="#FF1A237E"
+                android:centerColor="#FF0D1117"
+                android:endColor="#FF000000" />
+        </shape>
+    </item>
+
+    <!-- Tech Grid Overlay -->
+    <item>
+        <shape>
+            <stroke
+                android:width="0.5dp"
+                android:color="#22FFFFFF"
+                android:dashWidth="40dp"
+                android:dashGap="40dp" />
+        </shape>
+    </item>
+
+    <!-- Glossy Control Panel / Ground -->
+    <item android:top="600dp">
+        <shape>
+            <gradient
+                android:angle="270"
+                android:startColor="#455A64"
+                android:centerColor="#263238"
+                android:endColor="#101417" />
+        </shape>
+    </item>
+
+    <!-- Launchpad Glow Lights -->
+    <item android:top="600dp" android:left="50dp" android:right="300dp" android:bottom="210dp">
+        <shape><solid android:color="#44FFAB40"/><corners android:radius="10dp"/></shape>
+    </item>
+    <item android:top="600dp" android:left="300dp" android:right="50dp" android:bottom="210dp">
+        <shape><solid android:color="#444FC3F7"/><corners android:radius="10dp"/></shape>
+    </item>
+</layer-list>

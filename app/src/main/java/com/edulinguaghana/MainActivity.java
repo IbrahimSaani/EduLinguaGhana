@@ -1040,38 +1040,40 @@ public class MainActivity extends AppCompatActivity {
         );
     }
 
-    // UPDATED: now includes "Speed Challenge (Game)"
+    // UPDATED: now includes categories for Quizzes and Games
     private void showQuizTypeDialog(String langCode, String langName) {
         List<StyledMenuHelper.MenuItem> menuItems = new ArrayList<>();
+        
+        // --- CATEGORY: EDUCATIONAL QUIZZES ---
+        menuItems.add(new StyledMenuHelper.MenuItem(
+                "📚",
+                "Educational Quizzes",
+                "SECTION_HEADER",
+                null
+        ));
         menuItems.add(new StyledMenuHelper.MenuItem(
                 "🔤",
-                "Letter Quiz",
-                "Test your letter recognition",
+                "Letter Recognition",
+                "Identify letters you hear",
                 () -> openQuizScreen(langCode, langName, "basic", "beginner", "all")
         ));
         menuItems.add(new StyledMenuHelper.MenuItem(
                 "🔢",
-                "Numbers Quiz",
+                "Number Quiz",
                 "Listen and identify numbers",
                 () -> openQuizScreen(langCode, langName, "numbers", "beginner", "all")
         ));
         menuItems.add(new StyledMenuHelper.MenuItem(
                 "📊",
-                "Number Sequencing",
+                "Sequencing",
                 "Find the missing number",
                 () -> openQuizScreen(langCode, langName, "sequence", "beginner", "all")
         ));
         menuItems.add(new StyledMenuHelper.MenuItem(
                 "🎯",
-                "Matching",
+                "Matching Pairs",
                 "Match letters to words",
                 () -> openQuizScreen(langCode, langName, "matching", "beginner", "all")
-        ));
-        menuItems.add(new StyledMenuHelper.MenuItem(
-                "🎯",
-                "Shadow Match",
-                "Match items to their outlines",
-                () -> openQuizScreen(langCode, langName, "shadow_match", "beginner", "all")
         ));
         menuItems.add(new StyledMenuHelper.MenuItem(
                 "🔡",
@@ -1082,13 +1084,33 @@ public class MainActivity extends AppCompatActivity {
         menuItems.add(new StyledMenuHelper.MenuItem(
                 "🎲",
                 "Mixed Mode",
-                "All question types mixed",
+                "All educational types mixed",
                 () -> openQuizScreen(langCode, langName, "mixed", "beginner", "all")
+        ));
+
+        // --- CATEGORY: FUN MINI-GAMES ---
+        menuItems.add(new StyledMenuHelper.MenuItem(
+                "🎮",
+                "Fun Mini-Games",
+                "SECTION_HEADER",
+                null
+        ));
+        menuItems.add(new StyledMenuHelper.MenuItem(
+                "🚀",
+                "Rocket Sort",
+                "Drag asteroids into rockets",
+                () -> openRocketSortScreen(langCode, langName)
+        ));
+        menuItems.add(new StyledMenuHelper.MenuItem(
+                "🫧",
+                "Bubble Pop",
+                "Pop the target letters",
+                () -> openBubblePopScreen(langCode, langName)
         ));
         menuItems.add(new StyledMenuHelper.MenuItem(
                 "🏃",
-                "Speed Challenge (Game)",
-                "Fast-paced question game",
+                "Speed Challenge",
+                "Fast-paced quick reaction",
                 () -> openSpeedGameScreen(langCode, langName)
         ));
         menuItems.add(new StyledMenuHelper.MenuItem(
@@ -1097,24 +1119,12 @@ public class MainActivity extends AppCompatActivity {
                 "Rub the sand to reveal items",
                 () -> openHiddenShapesScreen(langCode, langName)
         ));
-        menuItems.add(new StyledMenuHelper.MenuItem(
-                "🫧",
-                "Bubble Pop (Mini-game)",
-                "Pop bubbles with correct letters",
-                () -> openBubblePopScreen(langCode, langName)
-        ));
-        menuItems.add(new StyledMenuHelper.MenuItem(
-                "🚀",
-                "Rocket Sort (Mini-game)",
-                "Sort letters and numbers into rockets",
-                () -> openRocketSortScreen(langCode, langName)
-        ));
 
         StyledMenuHelper.showStyledMenu(
                 this,
-                "❓",
-                "Quiz Mode - " + langName,
-                "Choose a quiz type",
+                "🎮",
+                "Pick an Activity",
+                "Choose between quizzes or games",
                 menuItems,
                 null
         );

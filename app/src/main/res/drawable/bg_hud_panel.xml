@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Outer Glow / Depth -->
+    <item>
+        <shape>
+            <solid android:color="#224FC3F7" />
+            <corners android:radius="20dp" />
+        </shape>
+    </item>
+    <!-- Main Glassy Panel -->
+    <item android:left="2dp" android:right="2dp" android:top="2dp" android:bottom="2dp">
+        <shape>
+            <gradient
+                android:startColor="#EE0D1117"
+                android:endColor="#EE1A1E29"
+                android:angle="270" />
+            <corners android:radius="18dp" />
+            <stroke android:width="1.5dp" android:color="#4FC3F7" />
+        </shape>
+    </item>
+    <!-- Top Highlight -->
+    <item android:left="10dp" android:right="10dp" android:top="4dp" android:bottom="40dp">
+        <shape>
+            <solid android:color="#11FFFFFF" />
+            <corners android:radius="10dp" />
+        </shape>
+    </item>
+</layer-list>

@@ -47,7 +47,7 @@ import nl.dionsegijn.konfetti.xml.KonfettiView;
 public class BubblePopActivity extends AppCompatActivity {
 
     private FrameLayout bubbleContainer, ambientParticles;
-    private TextView tvScore, tvTarget;
+    private TextView tvScore, tvTarget, tvCountdown, tvTimer;
     private View overlayLayout;
     private DynamicBackgroundView dynamicBackground;
     private KonfettiView konfettiView;
@@ -59,11 +59,15 @@ public class BubblePopActivity extends AppCompatActivity {
     private int score = 0;
     private boolean isGameOver = false;
     private int decoysSinceLastTarget = 0;
+    private boolean isPaused = false;
+    private long timeLeftMs = 60000;
+    private android.os.CountDownTimer gameTimer;
 
     private Random random = new Random();
     private Handler spawnHandler = new Handler(Looper.getMainLooper());
     private Runnable spawnRunnable;
     private List<View> activeBubbles = new ArrayList<>();
+    private java.util.Map<View, android.animation.AnimatorSet> bubbleAnimators = new java.util.HashMap<>();
 
     private TextToSpeech tts;
     private OfflineGhanaLPTtsService offlineTts;
@@ -98,19 +102,28 @@ public class BubblePopActivity extends AppCompatActivity {
         ambientParticles = findViewById(R.id.ambientParticles);
         tvScore = findViewById(R.id.tvScore);
         tvTarget = findViewById(R.id.tvTarget);
+        tvCountdown = findViewById(R.id.tvCountdown);
+        tvTimer = findViewById(R.id.tvTimer);
         overlayLayout = findViewById(R.id.overlayLayout);
         dynamicBackground = findViewById(R.id.dynamicBackground);
         konfettiView = findViewById(R.id.konfettiView);
+
+        findViewById(R.id.btnResume).setOnClickListener(v -> togglePause());
+        findViewById(R.id.btnRestart).setOnClickListener(v -> startNewGame());
+        findViewById(R.id.btnQuit).setOnClickListener(v -> finish());
+
+        // Pre-warm character arrays
+        new Handler(Looper.getMainLooper()).post(() -> {
+            if (alphabet != null && alphabet.length > 0) {
+                String first = alphabet[0];
+            }
+        });
 
         findViewById(R.id.btnRestart).setOnClickListener(v -> startNewGame());
         findViewById(R.id.btnQuit).setOnClickListener(v -> finish());
 
         if (dynamicBackground != null) {
-            dynamicBackground.setColors(
-                ContextCompat.getColor(this, R.color.bgDayStart),
-                ContextCompat.getColor(this, R.color.bgDayMid),
-                ContextCompat.getColor(this, R.color.bgDayEnd)
-            );
+            dynamicBackground.setVisibility(View.GONE);
         }
 
         setupAmbientBackground();
@@ -174,9 +187,12 @@ public class BubblePopActivity extends AppCompatActivity {
 
     private void startNewGame() {
         isGameOver = false;
+        isPaused = false;
         score = 0;
+        timeLeftMs = 60000;
         currentSpeed = 4000f;
         updateScoreDisplay();
+        updateTimerDisplay();
         overlayLayout.setVisibility(View.GONE);
         
         // Clear existing bubbles
@@ -185,19 +201,118 @@ public class BubblePopActivity extends AppCompatActivity {
         }
         activeBubbles.clear();
 
-        generateNewTarget();
-        startSpawning();
+        showCountdown();
+    }
+
+    private void updateTimerDisplay() {
+        if (tvTimer != null) {
+            tvTimer.setText((timeLeftMs / 1000) + "s");
+        }
+    }
+
+    private void showCountdown() {
+        if (tvCountdown == null) return;
+        
+        tvCountdown.setVisibility(View.VISIBLE);
+        final int[] count = {3};
+        
+        Runnable countdownRunnable = new Runnable() {
+            @Override
+            public void run() {
+                if (count[0] > 0) {
+                    tvCountdown.setText(String.valueOf(count[0]));
+                    tvCountdown.setScaleX(1.5f);
+                    tvCountdown.setScaleY(1.5f);
+                    tvCountdown.animate().scaleX(1f).scaleY(1f).setDuration(500).start();
+                    count[0]--;
+                    spawnHandler.postDelayed(this, 1000);
+                } else if (count[0] == 0) {
+                    tvCountdown.setText("GO!");
+                    count[0]--;
+                    spawnHandler.postDelayed(this, 800);
+                } else {
+                    tvCountdown.setVisibility(View.GONE);
+                    generateNewTarget();
+                    startSpawning();
+                    startTimer(timeLeftMs);
+                }
+            }
+        };
+        spawnHandler.post(countdownRunnable);
+    }
+
+    private void startTimer(long duration) {
+        if (gameTimer != null) gameTimer.cancel();
+        gameTimer = new android.os.CountDownTimer(duration, 1000) {
+            @Override
+            public void onTick(long millisUntilFinished) {
+                timeLeftMs = millisUntilFinished;
+                updateTimerDisplay();
+            }
+
+            @Override
+            public void onFinish() {
+                timeLeftMs = 0;
+                updateTimerDisplay();
+                endGame();
+            }
+        }.start();
+    }
+
+    private void endGame() {
+        isGameOver = true;
+        if (gameTimer != null) gameTimer.cancel();
+        spawnHandler.removeCallbacks(spawnRunnable);
+        showPauseOverlay("Time Up!");
+    }
+
+    private void togglePause() {
+        if (isGameOver) return;
+        
+        isPaused = !isPaused;
+        if (isPaused) {
+            if (gameTimer != null) gameTimer.cancel();
+            spawnHandler.removeCallbacks(spawnRunnable);
+            // Pause all bubble animations
+            for (android.animation.AnimatorSet anim : bubbleAnimators.values()) {
+                anim.pause();
+            }
+            showPauseOverlay("Paused");
+        } else {
+            overlayLayout.setVisibility(View.GONE);
+            // Resume all bubble animations
+            for (android.animation.AnimatorSet anim : bubbleAnimators.values()) {
+                anim.resume();
+            }
+            startTimer(timeLeftMs);
+            startSpawning();
+        }
+    }
+
+    private void showPauseOverlay(String title) {
+        overlayLayout.setVisibility(View.VISIBLE);
+        TextView tvTitle = findViewById(R.id.tvOverlayTitle);
+        TextView scoreText = findViewById(R.id.tvOverlayScore);
+        View resumeBtn = findViewById(R.id.btnResume);
+        View restartBtn = findViewById(R.id.btnRestart);
+
+        tvTitle.setText(title);
+        
+        if (isPaused && !isGameOver) {
+            scoreText.setText("Game Status: Paused");
+            resumeBtn.setVisibility(View.VISIBLE);
+            restartBtn.setVisibility(View.GONE);
+        } else {
+            scoreText.setText("Final Score: " + score);
+            resumeBtn.setVisibility(View.GONE);
+            restartBtn.setVisibility(View.VISIBLE);
+        }
     }
 
     @Override
     public void onBackPressed() {
         if (!isGameOver) {
-            isGameOver = true;
-            overlayLayout.setVisibility(View.VISIBLE);
-            TextView title = findViewById(R.id.tvOverlayTitle);
-            title.setText("Paused");
-            TextView scoreText = findViewById(R.id.tvOverlayScore);
-            scoreText.setText("Current Score: " + score);
+            togglePause();
         } else {
             super.onBackPressed();
         }
@@ -232,8 +347,9 @@ public class BubblePopActivity extends AppCompatActivity {
                 if (!isGameOver) {
                     spawnBubble();
                     // Spawn interval gets shorter as speed increases
-                    long interval = (long) (currentSpeed / 2.5f);
-                    spawnHandler.postDelayed(this, Math.max(800, interval));
+                    // Faster spawning: reduced ratio from 2.5f to 2.0f
+                    long interval = (long) (currentSpeed / 2.0f);
+                    spawnHandler.postDelayed(this, Math.max(600, interval));
                 }
             }
         };
@@ -345,21 +461,22 @@ public class BubblePopActivity extends AppCompatActivity {
         animator.setDuration((long) (currentSpeed + random.nextInt(1000)));
         animator.setInterpolator(new LinearInterpolator());
         
-        // FIXED SWAY: Animate around startX smoothly without jumping at start
+        // FIXED SWAY
         ObjectAnimator sway = ObjectAnimator.ofFloat(wrapper, View.TRANSLATION_X, startX, startX + swayRange, startX - swayRange, startX);
         sway.setDuration(2000 + random.nextInt(1000));
         sway.setRepeatCount(ValueAnimator.INFINITE);
         sway.setInterpolator(new AccelerateDecelerateInterpolator());
-        sway.start();
+
+        android.animation.AnimatorSet set = new android.animation.AnimatorSet();
+        set.playTogether(animator, sway);
+        bubbleAnimators.put(wrapper, set);
+        set.start();
 
         final String finalLetter = letter;
         animator.addListener(new AnimatorListenerAdapter() {
             @Override
             public void onAnimationEnd(Animator animation) {
-                sway.cancel();
                 if (bubbleContainer.indexOfChild(wrapper) != -1) {
-                    // Only show "escaped" if it's the CURRENT target to avoid confusing the user
-                    // with old targets that were replaced after a successful pop.
                     if (isTarget && !isGameOver && finalLetter.equals(targetLetter)) {
                         Toast.makeText(BubblePopActivity.this, R.string.bubble_pop_escaped, Toast.LENGTH_SHORT).show();
                     }
@@ -367,7 +484,6 @@ public class BubblePopActivity extends AppCompatActivity {
                 }
             }
         });
-        animator.start();
     }
 
     private void handleBubbleClick(TextView bubble, boolean isTarget) {
@@ -416,6 +532,10 @@ public class BubblePopActivity extends AppCompatActivity {
     private void removeBubble(View wrapper) {
         bubbleContainer.removeView(wrapper);
         activeBubbles.remove(wrapper);
+        android.animation.AnimatorSet set = bubbleAnimators.remove(wrapper);
+        if (set != null) {
+            set.cancel();
+        }
     }
 
     private void updateScoreDisplay() {
@@ -434,13 +554,15 @@ public class BubblePopActivity extends AppCompatActivity {
     @Override
     protected void onPause() {
         super.onPause();
-        isGameOver = true;
-        spawnHandler.removeCallbacks(spawnRunnable);
+        if (!isGameOver && !isPaused) {
+            togglePause();
+        }
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        if (gameTimer != null) gameTimer.cancel();
         if (tts != null) {
             tts.stop();
             tts.shutdown();

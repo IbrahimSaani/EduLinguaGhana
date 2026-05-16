@@ -4,7 +4,15 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/appBackground">
+    android:fitsSystemWindows="true">
+
+    <!-- THE GAME BACKGROUND LAYER -->
+    <ImageView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:src="@drawable/bg_hidden_shapes_modern"
+        android:scaleType="centerCrop"
+        android:contentDescription="Background" />
 
     <com.google.android.material.appbar.AppBarLayout
         android:layout_width="match_parent"
@@ -12,36 +20,16 @@
         android:background="@android:color/transparent"
         app:elevation="0dp">
 
-        <androidx.appcompat.widget.Toolbar
+        <com.google.android.material.appbar.MaterialToolbar
             android:id="@+id/toolbar"
             android:layout_width="match_parent"
-            android:layout_height="?attr/actionBarSize">
+            android:layout_height="?attr/actionBarSize"
+            app:navigationIcon="@drawable/ic_back"
+            app:navigationIconTint="@color/white"
+            app:title="Hidden Shapes"
+            app:titleTextAppearance="@style/ToolbarTitleStyle"
+            app:titleTextColor="@color/white" />
 
-            <RelativeLayout
-                android:layout_width="match_parent"
-                android:layout_height="match_parent">
-
-                <com.google.android.material.button.MaterialButton
-                    android:id="@+id/btnBack"
-                    style="@style/Widget.Material3.Button.IconButton"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_alignParentStart="true"
-                    android:layout_centerVertical="true"
-                    app:icon="@drawable/ic_back"
-                    app:iconTint="@color/colorPrimary" />
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_centerInParent="true"
-                    android:fontFamily="@font/agbalumo"
-                    android:text="@string/hidden_shapes_title"
-                    android:textColor="@color/colorPrimary"
-                    android:textSize="20sp"
-                    android:textStyle="bold" />
-            </RelativeLayout>
-        </androidx.appcompat.widget.Toolbar>
     </com.google.android.material.appbar.AppBarLayout>
 
     <LinearLayout
@@ -52,34 +40,62 @@
         android:padding="16dp"
         app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
-        <com.google.android.material.card.MaterialCardView
+        <!-- Modern Info HUD -->
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="24dp"
-            app:cardCornerRadius="16dp"
-            app:cardElevation="4dp"
-            app:strokeColor="@color/card_stroke"
-            app:strokeWidth="1dp">
+            android:background="@drawable/bg_hud_panel"
+            android:orientation="horizontal"
+            android:padding="16dp">
+
+            <TextView
+                android:id="@+id/tvScore"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="16dp"
+                android:fontFamily="@font/agbalumo"
+                android:text="⭐ 0"
+                android:textColor="#4FC3F7"
+                android:textSize="22sp"
+                android:textStyle="bold" />
 
             <TextView
                 android:id="@+id/tvPrompt"
-                android:layout_width="match_parent"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:gravity="center"
-                android:padding="16dp"
+                android:layout_weight="1"
+                android:fontFamily="@font/agbalumo"
                 android:text="@string/hidden_shapes_prompt"
-                android:textColor="@color/textColorSecondary"
+                android:textColor="@color/white"
                 android:textSize="18sp"
-                android:textStyle="bold" />
-        </com.google.android.material.card.MaterialCardView>
+                android:textStyle="bold"
+                android:shadowColor="#000000"
+                android:shadowDx="2"
+                android:shadowDy="2"
+                android:shadowRadius="4"/>
 
+            <TextView
+                android:id="@+id/tvTimer"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:fontFamily="@font/agbalumo"
+                android:text="60s"
+                android:textColor="#FFAB40"
+                android:textSize="22sp"
+                android:textStyle="bold" />
+        </LinearLayout>
+
+        <!-- Scratch Area with Professional Border -->
         <com.google.android.material.card.MaterialCardView
             android:layout_width="320dp"
             android:layout_height="400dp"
-            app:cardCornerRadius="24dp"
-            app:cardElevation="8dp"
-            app:strokeColor="@color/colorAccent"
-            app:strokeWidth="4dp">
+            app:cardCornerRadius="32dp"
+            app:cardElevation="16dp"
+            app:strokeColor="#FFAB40"
+            app:strokeWidth="6dp"
+            app:cardBackgroundColor="#F5F5FA">
 
             <com.edulinguaghana.ScratchRevealView
                 android:id="@+id/scratchView"
@@ -87,18 +103,120 @@
                 android:layout_height="match_parent" />
         </com.google.android.material.card.MaterialCardView>
 
+        <!-- Countdown Overlay -->
+        <TextView
+            android:id="@+id/tvCountdown"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="-250dp"
+            android:fontFamily="@font/agbalumo"
+            android:text="3"
+            android:textColor="#FFAB40"
+            android:textSize="100sp"
+            android:visibility="gone"
+            android:shadowColor="#000000"
+            android:shadowRadius="10" />
+
         <com.google.android.material.button.MaterialButton
             android:id="@+id/btnNext"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="32dp"
-            android:paddingStart="32dp"
-            android:paddingEnd="32dp"
+            android:paddingStart="40dp"
+            android:paddingEnd="40dp"
             android:text="@string/hidden_shapes_next"
-            android:visibility="invisible"
-            app:cornerRadius="12dp"
-            tools:visibility="visible" />
+            android:visibility="gone"
+            android:backgroundTint="#FFAB40"
+            android:textColor="@color/white"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            android:fontFamily="@font/agbalumo"
+            app:cornerRadius="24dp"
+            app:strokeColor="@color/white"
+            app:strokeWidth="1.5dp" />
 
+    </LinearLayout>
+
+    <!-- Overlay Menu -->
+    <LinearLayout
+        android:id="@+id/overlayLayout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="#CC000000"
+        android:gravity="center"
+        android:orientation="vertical"
+        android:visibility="gone"
+        android:clickable="true"
+        android:focusable="true">
+
+        <com.google.android.material.card.MaterialCardView
+            android:layout_width="300dp"
+            android:layout_height="wrap_content"
+            app:cardBackgroundColor="#F5F5FA"
+            app:cardCornerRadius="32dp"
+            app:cardElevation="24dp"
+            app:strokeColor="#FFAB40"
+            app:strokeWidth="2dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="32dp"
+                android:gravity="center">
+
+                <TextView
+                    android:id="@+id/tvOverlayTitle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Time Up!"
+                    android:textColor="#FFAB40"
+                    android:textSize="36sp"
+                    android:fontFamily="@font/agbalumo"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/tvOverlayScore"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
+                    android:text="Score: 0"
+                    android:textColor="@color/textColorPrimary"
+                    android:textSize="22sp" />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnResume"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="32dp"
+                    android:backgroundTint="#FFAB40"
+                    android:padding="16dp"
+                    android:text="Resume Search"
+                    android:textColor="#0D1117"
+                    android:visibility="gone"
+                    app:cornerRadius="24dp" />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnRestart"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
+                    android:backgroundTint="#2E7D32"
+                    android:padding="16dp"
+                    android:text="Start Over"
+                    android:textColor="@color/white"
+                    app:cornerRadius="24dp" />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnQuit"
+                    style="@style/Widget.MaterialComponents.Button.TextButton"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:text="Quit Game"
+                    android:textColor="@color/textColorSecondary" />
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
     </LinearLayout>
 
     <nl.dionsegijn.konfetti.xml.KonfettiView
