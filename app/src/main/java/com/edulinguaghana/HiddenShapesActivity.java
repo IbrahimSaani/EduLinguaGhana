@@ -76,6 +76,7 @@ public class HiddenShapesActivity extends AppCompatActivity {
         btnNext.setOnClickListener(v -> generateNewCharacter());
         btnRestart.setOnClickListener(v -> startNewGame());
         btnResume.setOnClickListener(v -> togglePause());
+        findViewById(R.id.btnPause).setOnClickListener(v -> togglePause());
         findViewById(R.id.btnQuit).setOnClickListener(v -> finish());
 
         initTts();
@@ -190,6 +191,9 @@ public class HiddenShapesActivity extends AppCompatActivity {
             runOnUiThread(() -> {
                 if (isGameOver) return;
                 
+                // Pause timer while celebrating/showing revealed item
+                if (gameTimer != null) gameTimer.cancel();
+                
                 score += 10; // 10 points per shape
                 updateScoreDisplay();
                 celebrate();
@@ -200,6 +204,8 @@ public class HiddenShapesActivity extends AppCompatActivity {
                 handler.postDelayed(() -> {
                     if (!isGameOver && !isPaused) {
                         generateNewCharacter();
+                        // Continue timer
+                        startTimer(timeLeftMs);
                     }
                 }, 1500);
             });
