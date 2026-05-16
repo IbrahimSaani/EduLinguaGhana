@@ -78,4 +78,14 @@
     <color name="notification_motivational_bg">#F3E5F5</color>
     <color name="notification_reminder_bg">#E8F5E9</color>
     <color name="random_avatar_stroke_color">#2E7D32</color>
+
+    <!-- Rocket Sort Game Colors -->
+    <color name="spaceDeep">#0B0E14</color>
+    <color name="spaceMid">#1A1E29</color>
+    <color name="rocketBody">#E0E0E0</color>
+    <color name="asteroidPrimary">#8D6E63</color>
+    <color name="asteroidSecondary">#5D4037</color>
+    <color name="nebulaPink">#4D214F</color>
+    <color name="nebulaBlue">#1A237E</color>
+    <color name="rocketFire">#FF5722</color>
 </resources>

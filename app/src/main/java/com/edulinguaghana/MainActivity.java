@@ -1103,6 +1103,12 @@ public class MainActivity extends AppCompatActivity {
                 "Pop bubbles with correct letters",
                 () -> openBubblePopScreen(langCode, langName)
         ));
+        menuItems.add(new StyledMenuHelper.MenuItem(
+                "🚀",
+                "Rocket Sort (Mini-game)",
+                "Sort letters and numbers into rockets",
+                () -> openRocketSortScreen(langCode, langName)
+        ));
 
         StyledMenuHelper.showStyledMenu(
                 this,
@@ -1185,6 +1191,13 @@ public class MainActivity extends AppCompatActivity {
 
     private void openBubblePopScreen(String langCode, String langName) {
         Intent intent = new Intent(MainActivity.this, com.edulinguaghana.games.bubblepop.BubblePopActivity.class);
+        intent.putExtra("LANG_CODE", langCode);
+        intent.putExtra("LANG_NAME", langName);
+        startActivity(intent);
+    }
+
+    private void openRocketSortScreen(String langCode, String langName) {
+        Intent intent = new Intent(MainActivity.this, com.edulinguaghana.games.rocketsort.RocketSortActivity.class);
         intent.putExtra("LANG_CODE", langCode);
         intent.putExtra("LANG_NAME", langName);
         startActivity(intent);

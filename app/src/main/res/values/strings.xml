@@ -364,4 +364,12 @@
     <string name="login_subtitle_engaging">Sign in to continue your journey</string>
     <string name="signup_create_account">✨ Create Account</string>
     <string name="signup_subtitle_adventure">Start your learning adventure today!</string>
+
+    <!-- Rocket Sort Game -->
+    <string name="rocket_sort_title">Rocket Sort</string>
+    <string name="rocket_sort_lives">Lives: %d</string>
+    <string name="rocket_sort_letters">LETTERS</string>
+    <string name="rocket_sort_numbers">NUMBERS</string>
+    <string name="rocket_sort_game_over">Mission Complete!</string>
+    <string name="rocket_sort_final_score">Sorted Items: %d</string>
 </resources>

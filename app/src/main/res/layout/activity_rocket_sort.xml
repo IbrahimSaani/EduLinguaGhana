@@ -1,0 +1,199 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/rocketSortRoot"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/spaceDeep">
+
+    <!-- Scrolling Star Field / Parallax Background -->
+    <FrameLayout
+        android:id="@+id/starFieldContainer"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <!-- Top UI Bar -->
+        <LinearLayout
+            android:id="@+id/topBar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="16dp"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+
+            <TextView
+                android:id="@+id/tvScore"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:fontFamily="@font/agbalumo"
+                android:text="⭐ 0"
+                android:textColor="@color/white"
+                android:textSize="24sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/tvLives"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="16dp"
+                android:fontFamily="@font/agbalumo"
+                android:text="❤️ ❤️ ❤️"
+                android:textColor="@color/white"
+                android:textSize="24sp" />
+
+            <ImageButton
+                android:id="@+id/btnPause"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:contentDescription="Pause"
+                android:src="@drawable/ic_pause"
+                app:tint="@color/white" />
+        </LinearLayout>
+
+        <!-- Game Area for Asteroids -->
+        <FrameLayout
+            android:id="@+id/asteroidContainer"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_above="@+id/rocketLayout"
+            android:layout_below="@+id/topBar" />
+
+        <!-- Rocket Launchpads -->
+        <LinearLayout
+            android:id="@+id/rocketLayout"
+            android:layout_width="match_parent"
+            android:layout_height="180dp"
+            android:layout_alignParentBottom="true"
+            android:gravity="bottom"
+            android:orientation="horizontal"
+            android:paddingBottom="16dp">
+
+            <!-- Left Rocket (Letters) -->
+            <FrameLayout
+                android:id="@+id/rocketLetters"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_horizontal|top"
+                    android:text="@string/rocket_sort_letters"
+                    android:textColor="@color/white"
+                    android:textSize="14sp"
+                    android:textStyle="bold" />
+
+                <ImageView
+                    android:id="@+id/ivRocketLeft"
+                    android:layout_width="80dp"
+                    android:layout_height="120dp"
+                    android:layout_gravity="bottom|center_horizontal"
+                    android:src="@drawable/ic_rocket" />
+            </FrameLayout>
+
+            <!-- Right Rocket (Numbers) -->
+            <FrameLayout
+                android:id="@+id/rocketNumbers"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_horizontal|top"
+                    android:text="@string/rocket_sort_numbers"
+                    android:textColor="@color/white"
+                    android:textSize="14sp"
+                    android:textStyle="bold" />
+
+                <ImageView
+                    android:id="@+id/ivRocketRight"
+                    android:layout_width="80dp"
+                    android:layout_height="120dp"
+                    android:layout_gravity="bottom|center_horizontal"
+                    android:src="@drawable/ic_rocket" />
+            </FrameLayout>
+        </LinearLayout>
+
+        <!-- Overlay for Game Over / Pause -->
+        <LinearLayout
+            android:id="@+id/overlayLayout"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="#CC000000"
+            android:clickable="true"
+            android:focusable="true"
+            android:gravity="center"
+            android:orientation="vertical"
+            android:visibility="gone">
+
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="300dp"
+                android:layout_height="wrap_content"
+                app:cardBackgroundColor="@color/white"
+                app:cardCornerRadius="32dp"
+                app:cardElevation="16dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:orientation="vertical"
+                    android:padding="32dp">
+
+                    <TextView
+                        android:id="@+id/tvOverlayTitle"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:fontFamily="@font/agbalumo"
+                        android:text="Game Over"
+                        android:textColor="@color/colorPrimary"
+                        android:textSize="32sp"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:id="@+id/tvOverlayScore"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="16dp"
+                        android:text="Final Score: 0"
+                        android:textColor="@color/textColorPrimary"
+                        android:textSize="20sp" />
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btnRestart"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="32dp"
+                        android:padding="16dp"
+                        android:text="Play Again"
+                        app:cornerRadius="24dp" />
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btnQuit"
+                        style="@style/Widget.MaterialComponents.Button.TextButton"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="8dp"
+                        android:text="Quit"
+                        android:textColor="@color/textColorSecondary" />
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+        </LinearLayout>
+
+    </RelativeLayout>
+
+    <nl.dionsegijn.konfetti.xml.KonfettiView
+        android:id="@+id/konfettiView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+
+</androidx.coordinatorlayout.widget.CoordinatorLayout>
