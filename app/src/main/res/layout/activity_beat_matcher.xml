@@ -129,6 +129,15 @@
                         android:textColor="@color/colorPrimary"
                         android:textSize="32sp" />
 
+                    <TextView
+                        android:id="@+id/tvOverlayScore"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="8dp"
+                        android:text="Score: 0"
+                        android:textColor="@color/colorTextSecondary"
+                        android:textSize="18sp" />
+
                     <com.google.android.material.button.MaterialButton
                         android:id="@+id/btnResume"
                         android:layout_width="match_parent"
@@ -154,6 +163,11 @@
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
         </LinearLayout>
+
+        <nl.dionsegijn.konfetti.xml.KonfettiView
+            android:id="@+id/konfettiView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
 
     </RelativeLayout>
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

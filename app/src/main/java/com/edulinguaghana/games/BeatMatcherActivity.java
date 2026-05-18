@@ -19,6 +19,7 @@ public class BeatMatcherActivity extends AppCompatActivity {
 
     private TextView tvScore, tvStatus, tvPattern;
     private View btnDrum, overlayLayout;
+    private nl.dionsegijn.konfetti.xml.KonfettiView konfettiView;
     
     private int score = 0;
     private boolean isPaused = false;
@@ -33,7 +34,10 @@ public class BeatMatcherActivity extends AppCompatActivity {
     
     private Handler handler = new Handler(Looper.getMainLooper());
     private Random random = new Random();
-    private MediaPlayer drumPlayer, correctPlayer, wrongPlayer;
+    private MediaPlayer drumPlayer, correctPlayer, wrongPlayer, gameOverPlayer;
+    private int bestScore = 0;
+    private static final String PREF_NAME = "EduLinguaPrefs";
+    private static final String KEY_HIGH_SCORE_BEAT = "high_score_beat_matcher";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -55,6 +59,7 @@ public class BeatMatcherActivity extends AppCompatActivity {
         tvPattern = findViewById(R.id.tvPattern);
         btnDrum = findViewById(R.id.btnDrum);
         overlayLayout = findViewById(R.id.overlayLayout);
+        konfettiView = findViewById(R.id.konfettiView);
 
         btnDrum.setOnClickListener(v -> handleDrumTap());
         findViewById(R.id.btnPause).setOnClickListener(v -> togglePause());
@@ -67,6 +72,10 @@ public class BeatMatcherActivity extends AppCompatActivity {
         drumPlayer = MediaPlayer.create(this, R.raw.bell); // Use bell as drum sound
         correctPlayer = MediaPlayer.create(this, R.raw.correct);
         wrongPlayer = MediaPlayer.create(this, R.raw.wrong);
+        gameOverPlayer = MediaPlayer.create(this, R.raw.gameover);
+
+        android.content.SharedPreferences prefs = getSharedPreferences(PREF_NAME, MODE_PRIVATE);
+        bestScore = prefs.getInt(KEY_HIGH_SCORE_BEAT, 0);
     }
 
     private void startNewGame() {
@@ -177,6 +186,23 @@ public class BeatMatcherActivity extends AppCompatActivity {
         handler.postDelayed(this::generateNewPattern, 1500);
     }
 
+    private void endGame() {
+        isGameOver = true;
+        if (gameOverPlayer != null) {
+            gameOverPlayer.start();
+        }
+
+        if (score > bestScore) {
+            bestScore = score;
+            getSharedPreferences(PREF_NAME, MODE_PRIVATE).edit().putInt(KEY_HIGH_SCORE_BEAT, bestScore).apply();
+        }
+
+        overlayLayout.setVisibility(View.VISIBLE);
+        ((TextView) findViewById(R.id.tvOverlayTitle)).setText("Game Over!");
+        ((TextView) findViewById(R.id.tvOverlayScore)).setText("Final Score: " + score);
+        findViewById(R.id.btnResume).setVisibility(View.GONE);
+    }
+
     private void togglePause() {
         isPaused = !isPaused;
         overlayLayout.setVisibility(isPaused ? View.VISIBLE : View.GONE);
@@ -192,5 +218,6 @@ public class BeatMatcherActivity extends AppCompatActivity {
         if (drumPlayer != null) drumPlayer.release();
         if (correctPlayer != null) correctPlayer.release();
         if (wrongPlayer != null) wrongPlayer.release();
+        if (gameOverPlayer != null) gameOverPlayer.release();
     }
 }

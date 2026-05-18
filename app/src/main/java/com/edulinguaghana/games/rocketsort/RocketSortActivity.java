@@ -59,6 +59,11 @@ public class RocketSortActivity extends AppCompatActivity {
 
     private MediaPlayer correctPlayer;
     private MediaPlayer wrongPlayer;
+    private MediaPlayer gameOverPlayer;
+    private MediaPlayer levelUpPlayer;
+    private int bestScore = 0;
+    private static final String PREF_NAME = "EduLinguaPrefs";
+    private static final String KEY_HIGH_SCORE_ROCKET = "high_score_rocket_sort";
 
     private float currentSpeed = 3200f; // Faster starting speed
     private float spawnInterval = 2200f; // More frequent starting spawns
@@ -110,7 +115,12 @@ public class RocketSortActivity extends AppCompatActivity {
 
     private void initSounds() {
         correctPlayer = MediaPlayer.create(this, R.raw.correct);
-        wrongPlayer = MediaPlayer.create(this, R.raw.wrong);
+        wrongPlayer = MediaPlayer.create(this, R.raw.shortexplosion);
+        gameOverPlayer = MediaPlayer.create(this, R.raw.gameover);
+        levelUpPlayer = MediaPlayer.create(this, R.raw.level);
+
+        android.content.SharedPreferences prefs = getSharedPreferences(PREF_NAME, MODE_PRIVATE);
+        bestScore = prefs.getInt(KEY_HIGH_SCORE_ROCKET, 0);
     }
 
     private void setupStarField() {
@@ -380,6 +390,7 @@ public class RocketSortActivity extends AppCompatActivity {
         }
         
         if (score % 5 == 0) {
+            if (levelUpPlayer != null) levelUpPlayer.start();
             currentSpeed = Math.max(MIN_SPEED, currentSpeed - 400); // More aggressive speed up
             spawnInterval = Math.max(MIN_SPAWN_INTERVAL, spawnInterval - 300); // Faster spawning
             android.widget.Toast.makeText(this, "Mission Speed Up! 🚀", android.widget.Toast.LENGTH_SHORT).show();
@@ -431,6 +442,15 @@ public class RocketSortActivity extends AppCompatActivity {
     private void endGame() {
         isGameOver = true;
         spawnHandler.removeCallbacks(spawnRunnable);
+        if (gameOverPlayer != null) {
+            gameOverPlayer.start();
+        }
+
+        if (score > bestScore) {
+            bestScore = score;
+            getSharedPreferences(PREF_NAME, MODE_PRIVATE).edit().putInt(KEY_HIGH_SCORE_ROCKET, bestScore).apply();
+        }
+
         showOverlay("Mission Complete!");
     }
 
@@ -476,5 +496,7 @@ public class RocketSortActivity extends AppCompatActivity {
         super.onDestroy();
         if (correctPlayer != null) correctPlayer.release();
         if (wrongPlayer != null) wrongPlayer.release();
+        if (gameOverPlayer != null) gameOverPlayer.release();
+        if (levelUpPlayer != null) levelUpPlayer.release();
     }
 }

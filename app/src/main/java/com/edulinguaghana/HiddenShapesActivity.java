@@ -1,5 +1,6 @@
 package com.edulinguaghana;
 
+import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.os.Handler;
 import android.speech.tts.TextToSpeech;
@@ -34,6 +35,10 @@ public class HiddenShapesActivity extends AppCompatActivity {
     
     private TextToSpeech tts;
     private OfflineGhanaLPTtsService offlineTts;
+    private MediaPlayer gameOverPlayer;
+    private int bestScore = 0;
+    private static final String PREF_NAME = "EduLinguaPrefs";
+    private static final String KEY_HIGH_SCORE_HIDDEN = "high_score_hidden_shapes";
     private boolean isTtsReady = false;
     private final Handler handler = new Handler(android.os.Looper.getMainLooper());
 
@@ -80,7 +85,15 @@ public class HiddenShapesActivity extends AppCompatActivity {
         findViewById(R.id.btnQuit).setOnClickListener(v -> finish());
 
         initTts();
+        initSounds();
         startNewGame();
+    }
+
+    private void initSounds() {
+        gameOverPlayer = MediaPlayer.create(this, R.raw.gameover);
+        
+        android.content.SharedPreferences prefs = getSharedPreferences(PREF_NAME, MODE_PRIVATE);
+        bestScore = prefs.getInt(KEY_HIGH_SCORE_HIDDEN, 0);
     }
 
     private void startNewGame() {
@@ -139,6 +152,15 @@ public class HiddenShapesActivity extends AppCompatActivity {
     private void endGame() {
         isGameOver = true;
         if (gameTimer != null) gameTimer.cancel();
+        if (gameOverPlayer != null) {
+            gameOverPlayer.start();
+        }
+
+        if (score > bestScore) {
+            bestScore = score;
+            getSharedPreferences(PREF_NAME, MODE_PRIVATE).edit().putInt(KEY_HIGH_SCORE_HIDDEN, bestScore).apply();
+        }
+
         showPauseOverlay("Time Up!");
     }
 
@@ -287,5 +309,9 @@ public class HiddenShapesActivity extends AppCompatActivity {
         super.onDestroy();
         if (tts != null) tts.shutdown();
         if (offlineTts != null) offlineTts.stop();
+        if (gameOverPlayer != null) {
+            gameOverPlayer.release();
+            gameOverPlayer = null;
+        }
     }
 }

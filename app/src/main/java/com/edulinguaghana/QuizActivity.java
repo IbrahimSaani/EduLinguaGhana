@@ -112,7 +112,7 @@ public class QuizActivity extends AppCompatActivity {
     private AudioCacheManager audioCacheManager;
 
     // Background music
-    private MediaPlayer backgroundMusicPlayer;
+    private MediaPlayer backgroundMusicPlayer, gameOverPlayer, highScorePlayer;
     private static final String KEY_BACKGROUND_MUSIC_ENABLED = "background_music_enabled";
     // Audio focus management
     private AudioManager audioManager;
@@ -167,6 +167,8 @@ public class QuizActivity extends AppCompatActivity {
 
         // Phase 3: Initialize Audio Cache Manager for TTS
         audioCacheManager = new AudioCacheManager(this);
+        gameOverPlayer = MediaPlayer.create(this, R.raw.gameover);
+        highScorePlayer = MediaPlayer.create(this, R.raw.highscore);
 
 
         initTTS();
@@ -1017,6 +1019,12 @@ public class QuizActivity extends AppCompatActivity {
             if (score > bestScore) {
                 bestScore = score;
                 saveHighScore();
+                
+                // Play high score sound and celebrate immediately when broken
+                if (highScorePlayer != null && !highScorePlayer.isPlaying()) {
+                    highScorePlayer.start();
+                }
+                celebrate();
             }
 
             // Animate and hide matched buttons
@@ -1116,6 +1124,12 @@ public class QuizActivity extends AppCompatActivity {
                 bestScore = score;
                 saveHighScore();
                 animateHighScore();
+                
+                // Play high score sound and celebrate immediately when broken
+                if (highScorePlayer != null && !highScorePlayer.isPlaying()) {
+                    highScorePlayer.start();
+                }
+                celebrate();
             }
         } else {
             tvGameFeedback.setText(getString(R.string.quiz_feedback_wrong, currentCorrectAnswer));
@@ -1179,6 +1193,10 @@ public class QuizActivity extends AppCompatActivity {
     private void endQuiz() {
         cancelTimer();
         setButtonsEnabled(false);
+        
+        if (gameOverPlayer != null) {
+            gameOverPlayer.start();
+        }
 
         boolean newHighScore = score > 0 && score >= bestScore;
 
@@ -1619,6 +1637,14 @@ public class QuizActivity extends AppCompatActivity {
         super.onDestroy();
         cancelTimer();
         stopBackgroundMusic();
+        if (gameOverPlayer != null) {
+            gameOverPlayer.release();
+            gameOverPlayer = null;
+        }
+        if (highScorePlayer != null) {
+            highScorePlayer.release();
+            highScorePlayer = null;
+        }
         if (tts != null) {
             tts.stop();
             tts.shutdown();

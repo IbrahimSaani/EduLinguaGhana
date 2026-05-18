@@ -43,7 +43,10 @@ public class PuzzleGameActivity extends AppCompatActivity {
     private int piecesMatched = 0;
     private final int PUZZLE_SIZE = 3;
 
-    private MediaPlayer correctPlayer, wrongPlayer;
+    private MediaPlayer correctPlayer, wrongPlayer, gameOverPlayer;
+    private int bestScore = 0;
+    private static final String PREF_NAME = "EduLinguaPrefs";
+    private static final String KEY_HIGH_SCORE_PUZZLE = "high_score_puzzle_game";
     private final Handler handler = new Handler(Looper.getMainLooper());
 
     @Override
@@ -88,6 +91,10 @@ public class PuzzleGameActivity extends AppCompatActivity {
     private void initSounds() {
         correctPlayer = MediaPlayer.create(this, R.raw.correct);
         wrongPlayer = MediaPlayer.create(this, R.raw.wrong);
+        gameOverPlayer = MediaPlayer.create(this, R.raw.gameover);
+
+        android.content.SharedPreferences prefs = getSharedPreferences(PREF_NAME, MODE_PRIVATE);
+        bestScore = prefs.getInt(KEY_HIGH_SCORE_PUZZLE, 0);
     }
 
     private void startNewGame() {
@@ -306,6 +313,15 @@ public class PuzzleGameActivity extends AppCompatActivity {
 
     private void endGame() {
         isGameOver = true;
+        if (gameOverPlayer != null) {
+            gameOverPlayer.start();
+        }
+
+        if (score > bestScore) {
+            bestScore = score;
+            getSharedPreferences(PREF_NAME, MODE_PRIVATE).edit().putInt(KEY_HIGH_SCORE_PUZZLE, bestScore).apply();
+        }
+
         overlayLayout.setVisibility(View.VISIBLE);
         TextView tvTitle = findViewById(R.id.tvOverlayTitle);
         tvTitle.setText("Mission Complete");
@@ -329,5 +345,6 @@ public class PuzzleGameActivity extends AppCompatActivity {
         if (gameTimer != null) gameTimer.cancel();
         if (correctPlayer != null) correctPlayer.release();
         if (wrongPlayer != null) wrongPlayer.release();
+        if (gameOverPlayer != null) gameOverPlayer.release();
     }
 }

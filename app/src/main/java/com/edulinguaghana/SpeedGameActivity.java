@@ -84,6 +84,7 @@ public class SpeedGameActivity extends AppCompatActivity {
     // SFX
     private boolean isSfxOn = true;
     private MediaPlayer sfxPlayer;
+    private MediaPlayer gameOverPlayer;
 
     private SharedPreferences prefs;
 
@@ -143,6 +144,8 @@ public class SpeedGameActivity extends AppCompatActivity {
         tvGameBest.setText(getString(R.string.quiz_best_score, bestScore));
         tvGameScore.setText(getString(R.string.quiz_score, 0));
         tvGameFeedback.setText("");
+
+        gameOverPlayer = MediaPlayer.create(this, R.raw.gameover);
 
         // --- Init TTS ---
         initTts();
@@ -592,7 +595,6 @@ public class SpeedGameActivity extends AppCompatActivity {
                 bestScore = score;
                 tvGameBest.setText(getString(R.string.quiz_best_score, bestScore));
                 saveHighScore(bestScore);
-                playHighScoreCelebration();
             }
         } else {
             tvGameFeedback.setText(getString(R.string.quiz_feedback_wrong, currentCorrectAnswer));
@@ -646,6 +648,10 @@ public class SpeedGameActivity extends AppCompatActivity {
                 timeLeftMs = 0;
                 tvGameTimer.setText(getString(R.string.quiz_timer_done));
                 tvGameFeedback.setText(getString(R.string.quiz_final_score, score));
+
+                if (gameOverPlayer != null) {
+                    gameOverPlayer.start();
+                }
 
                 // Disable buttons
                 setOptionsEnabled(false);
@@ -717,42 +723,6 @@ public class SpeedGameActivity extends AppCompatActivity {
         ed.apply();
     }
 
-    // -------------------------
-    // ANIMATIONS
-    // -------------------------
-    private void playHighScoreCelebration() {
-        // Glow pulse on best score
-        try {
-            Animation glow = AnimationUtils.loadAnimation(this, R.anim.glow_pulse);
-            tvGameBest.startAnimation(glow);
-        } catch (Exception ignored) {}
-
-        // Bounce on score
-        try {
-            Animation bounce = AnimationUtils.loadAnimation(this, R.anim.bounce_pop);
-            tvGameScore.startAnimation(bounce);
-        } catch (Exception ignored) {}
-
-        // Rainbow shine on title
-        try {
-            Animation shine = AnimationUtils.loadAnimation(this, R.anim.rainbow_shine);
-            tvGameTitle.startAnimation(shine);
-        } catch (Exception ignored) {}
-
-        // Confetti on feedback
-        try {
-            Animation confetti = AnimationUtils.loadAnimation(this, R.anim.confetti_fall);
-            tvGameFeedback.startAnimation(confetti);
-        } catch (Exception ignored) {}
-
-        // Screen shake for entire screen
-        try {
-            View root = findViewById(android.R.id.content);
-            Animation shake = AnimationUtils.loadAnimation(this, R.anim.screen_shake);
-            root.startAnimation(shake);
-        } catch (Exception ignored) {}
-    }
-
     private void playCorrectAnimation(View button) {
         try {
             Animation bounce = AnimationUtils.loadAnimation(this, R.anim.bounce_pop);
@@ -805,6 +775,9 @@ public class SpeedGameActivity extends AppCompatActivity {
         if (sfxPlayer != null) {
             sfxPlayer.release();
             sfxPlayer = null;
+        }
+        if (gameOverPlayer != null) {
+            gameOverPlayer.release();
         }
     }
 }

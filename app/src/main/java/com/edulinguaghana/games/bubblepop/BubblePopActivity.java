@@ -74,6 +74,12 @@ public class BubblePopActivity extends AppCompatActivity {
     private boolean isTtsReady = false;
     private MediaPlayer correctPlayer;
     private MediaPlayer wrongPlayer;
+    private MediaPlayer backgroundMusic;
+    private MediaPlayer gameOverPlayer;
+    private MediaPlayer levelUpPlayer;
+    private int bestScore = 0;
+    private static final String PREF_NAME = "EduLinguaPrefs";
+    private static final String KEY_HIGH_SCORE_BUBBLE = "high_score_bubble_pop";
 
     private float currentSpeed = 3500f; // Duration in ms for a bubble to cross screen (Faster start)
     private final float MIN_SPEED = 1200f; // Lower minimum duration (Higher max speed)
@@ -181,8 +187,18 @@ public class BubblePopActivity extends AppCompatActivity {
     }
 
     private void initSounds() {
-        correctPlayer = MediaPlayer.create(this, R.raw.correct);
+        correctPlayer = MediaPlayer.create(this, R.raw.bubblepop);
         wrongPlayer = MediaPlayer.create(this, R.raw.wrong);
+        backgroundMusic = MediaPlayer.create(this, R.raw.bubblepopmusic);
+        if (backgroundMusic != null) {
+            backgroundMusic.setLooping(true);
+            backgroundMusic.setVolume(0.4f, 0.4f);
+        }
+        gameOverPlayer = MediaPlayer.create(this, R.raw.gameover);
+        levelUpPlayer = MediaPlayer.create(this, R.raw.level);
+        
+        android.content.SharedPreferences prefs = getSharedPreferences(PREF_NAME, MODE_PRIVATE);
+        bestScore = prefs.getInt(KEY_HIGH_SCORE_BUBBLE, 0);
     }
 
     private void startNewGame() {
@@ -194,6 +210,10 @@ public class BubblePopActivity extends AppCompatActivity {
         updateScoreDisplay();
         updateTimerDisplay();
         overlayLayout.setVisibility(View.GONE);
+
+        if (backgroundMusic != null && !backgroundMusic.isPlaying()) {
+            backgroundMusic.start();
+        }
         
         // Clear existing bubbles
         for (View b : activeBubbles) {
@@ -263,6 +283,19 @@ public class BubblePopActivity extends AppCompatActivity {
         isGameOver = true;
         if (gameTimer != null) gameTimer.cancel();
         spawnHandler.removeCallbacks(spawnRunnable);
+
+        if (backgroundMusic != null && backgroundMusic.isPlaying()) {
+            backgroundMusic.pause();
+        }
+        if (gameOverPlayer != null) {
+            gameOverPlayer.start();
+        }
+
+        if (score > bestScore) {
+            bestScore = score;
+            getSharedPreferences(PREF_NAME, MODE_PRIVATE).edit().putInt(KEY_HIGH_SCORE_BUBBLE, bestScore).apply();
+        }
+
         showPauseOverlay("Time Up!");
     }
 
@@ -273,6 +306,9 @@ public class BubblePopActivity extends AppCompatActivity {
         if (isPaused) {
             if (gameTimer != null) gameTimer.cancel();
             spawnHandler.removeCallbacks(spawnRunnable);
+            if (backgroundMusic != null && backgroundMusic.isPlaying()) {
+                backgroundMusic.pause();
+            }
             // Pause all bubble animations
             for (android.animation.AnimatorSet anim : bubbleAnimators.values()) {
                 anim.pause();
@@ -280,6 +316,9 @@ public class BubblePopActivity extends AppCompatActivity {
             showPauseOverlay("Paused");
         } else {
             overlayLayout.setVisibility(View.GONE);
+            if (backgroundMusic != null && !isGameOver) {
+                backgroundMusic.start();
+            }
             // Resume all bubble animations
             for (android.animation.AnimatorSet anim : bubbleAnimators.values()) {
                 anim.resume();
@@ -495,6 +534,7 @@ public class BubblePopActivity extends AppCompatActivity {
             updateScoreDisplay();
             
             if (score % 5 == 0) {
+                if (levelUpPlayer != null) levelUpPlayer.start();
                 currentSpeed = Math.max(MIN_SPEED, currentSpeed - SPEED_INCREMENT);
                 Toast.makeText(this, R.string.bubble_pop_speed_up, Toast.LENGTH_SHORT).show();
             }
@@ -554,8 +594,19 @@ public class BubblePopActivity extends AppCompatActivity {
     @Override
     protected void onPause() {
         super.onPause();
+        if (backgroundMusic != null && backgroundMusic.isPlaying()) {
+            backgroundMusic.pause();
+        }
         if (!isGameOver && !isPaused) {
             togglePause();
+        }
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if (backgroundMusic != null && !isPaused && !isGameOver) {
+            backgroundMusic.start();
         }
     }
 
@@ -572,5 +623,11 @@ public class BubblePopActivity extends AppCompatActivity {
         }
         if (correctPlayer != null) correctPlayer.release();
         if (wrongPlayer != null) wrongPlayer.release();
+        if (backgroundMusic != null) {
+            backgroundMusic.stop();
+            backgroundMusic.release();
+        }
+        if (gameOverPlayer != null) gameOverPlayer.release();
+        if (levelUpPlayer != null) levelUpPlayer.release();
     }
 }
