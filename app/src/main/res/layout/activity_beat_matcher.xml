@@ -8,7 +8,7 @@
     <ImageView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:src="@drawable/bg_speed_game_modern"
+        android:src="@drawable/bg_playful_sky"
         android:scaleType="centerCrop" />
 
     <RelativeLayout
@@ -23,7 +23,8 @@
             android:layout_margin="16dp"
             android:background="@drawable/bg_hud_panel"
             android:orientation="horizontal"
-            android:padding="16dp">
+            android:padding="16dp"
+            android:elevation="8dp">
 
             <TextView
                 android:id="@+id/tvScore"
@@ -36,66 +37,82 @@
                 android:textSize="22sp"
                 android:textStyle="bold" />
 
-            <TextView
-                android:id="@+id/tvStatus"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:gravity="center"
-                android:fontFamily="@font/agbalumo"
-                android:text="Listen!"
-                android:textColor="@color/white"
-                android:textSize="20sp" />
+            <ImageButton
+                android:id="@+id/btnReplay"
+                android:layout_width="44dp"
+                android:layout_height="44dp"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:src="@drawable/ic_speak"
+                app:tint="#FFD54F" />
 
             <ImageButton
                 android:id="@+id/btnPause"
                 android:layout_width="44dp"
                 android:layout_height="44dp"
+                android:layout_marginStart="8dp"
                 android:background="?attr/selectableItemBackgroundBorderless"
                 android:src="@drawable/ic_pause"
                 app:tint="#4FC3F7" />
         </LinearLayout>
 
-        <!-- Main Game Area -->
+        <!-- Cards Area -->
         <LinearLayout
+            android:id="@+id/cardContainer"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_below="@id/hudPanel"
             android:gravity="center"
-            android:orientation="vertical">
+            android:orientation="horizontal"
+            android:padding="16dp">
 
-            <TextView
-                android:id="@+id/tvPattern"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="40dp"
-                android:fontFamily="@font/agbalumo"
-                android:text="1 - 1 - 2"
-                android:textColor="@color/white"
-                android:textSize="48sp"
-                android:textStyle="bold"
-                android:shadowColor="#000000"
-                android:shadowRadius="10" />
-
-            <View
-                android:id="@+id/btnDrum"
-                android:layout_width="280dp"
-                android:layout_height="280dp"
-                android:background="@drawable/drum_pad"
-                android:elevation="12dp" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="20dp"
-                android:text="TAP THE DRUM!"
-                android:textColor="#AAFFFFFF"
-                android:textSize="14sp"
-                android:textStyle="bold" />
+            <!-- Card 0 -->
+            <include layout="@layout/item_spell_card" android:id="@+id/card0" />
+            <!-- Card 1 -->
+            <include layout="@layout/item_spell_card" android:id="@+id/card1" />
+            <!-- Card 2 -->
+            <include layout="@layout/item_spell_card" android:id="@+id/card2" />
 
         </LinearLayout>
 
-        <!-- Menu Overlay -->
+        <!-- Start/Pause Overlay -->
+        <LinearLayout
+            android:id="@+id/startOverlay"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="#99000000"
+            android:gravity="center"
+            android:orientation="vertical"
+            android:padding="32dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Spell the Sound"
+                android:fontFamily="@font/agbalumo"
+                android:textColor="#FFD54F"
+                android:textSize="42sp" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:text="Listen to the sound...\nFind the matching letter card!"
+                android:gravity="center"
+                android:textColor="@color/white"
+                android:textSize="18sp" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnStart"
+                android:layout_width="200dp"
+                android:layout_height="64dp"
+                android:layout_marginTop="48dp"
+                android:text="PLAY"
+                app:cornerRadius="32dp"
+                app:backgroundTint="#FFD54F"
+                android:textColor="#000"
+                android:textSize="20sp" />
+        </LinearLayout>
+
         <LinearLayout
             android:id="@+id/overlayLayout"
             android:layout_width="match_parent"
@@ -128,15 +145,6 @@
                         android:fontFamily="@font/agbalumo"
                         android:textColor="@color/colorPrimary"
                         android:textSize="32sp" />
-
-                    <TextView
-                        android:id="@+id/tvOverlayScore"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="8dp"
-                        android:text="Score: 0"
-                        android:textColor="@color/textColorSecondary"
-                        android:textSize="18sp" />
 
                     <com.google.android.material.button.MaterialButton
                         android:id="@+id/btnResume"

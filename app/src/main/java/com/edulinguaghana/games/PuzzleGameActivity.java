@@ -49,6 +49,10 @@ public class PuzzleGameActivity extends AppCompatActivity {
     private static final String KEY_HIGH_SCORE_PUZZLE = "high_score_puzzle_game";
     private final Handler handler = new Handler(Looper.getMainLooper());
 
+    // Challenge mode
+    private boolean isChallengeMode = false;
+    private String challengeId;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -57,6 +61,13 @@ public class PuzzleGameActivity extends AppCompatActivity {
         languageCode = getIntent().getStringExtra("LANG_CODE");
         if (languageCode == null) languageCode = "en";
         alphabet = LanguageConversionUtils.getAlphabetForLanguage(languageCode);
+
+        // Check for challenge mode
+        isChallengeMode = getIntent().getBooleanExtra("CHALLENGE_MODE", false);
+        challengeId = getIntent().getStringExtra("CHALLENGE_ID");
+        if (isChallengeMode) {
+            timeLeftMs = getIntent().getLongExtra("CHALLENGE_DURATION", 60) * 1000;
+        }
 
         initViews();
         
@@ -99,7 +110,11 @@ public class PuzzleGameActivity extends AppCompatActivity {
 
     private void startNewGame() {
         score = 0;
-        timeLeftMs = 60000;
+        if (isChallengeMode) {
+            timeLeftMs = getIntent().getLongExtra("CHALLENGE_DURATION", 60) * 1000;
+        } else {
+            timeLeftMs = 60000;
+        }
         isGameOver = false;
         isPaused = false;
         overlayLayout.setVisibility(View.GONE);
@@ -323,6 +338,10 @@ public class PuzzleGameActivity extends AppCompatActivity {
             celebrate();
         }
 
+        if (isChallengeMode && challengeId != null) {
+            saveChallengeResult();
+        }
+
         overlayLayout.setVisibility(View.VISIBLE);
         TextView tvTitle = findViewById(R.id.tvOverlayTitle);
         tvTitle.setText("Mission Complete");
@@ -330,6 +349,28 @@ public class PuzzleGameActivity extends AppCompatActivity {
         tvScoreText.setText("Final Score: " + score);
         findViewById(R.id.btnResume).setVisibility(View.GONE);
         findViewById(R.id.btnRestart).setVisibility(View.VISIBLE);
+    }
+
+    private void saveChallengeResult() {
+        com.edulinguaghana.social.ChallengeManager challengeManager = new com.edulinguaghana.social.ChallengeManager();
+        com.google.firebase.auth.FirebaseUser user = com.google.firebase.auth.FirebaseAuth.getInstance().getCurrentUser();
+        
+        if (user == null) return;
+        
+        challengeManager.recordScore(challengeId, user.getUid(), score, new com.edulinguaghana.social.ChallengeManager.ScoreRecordingCallback() {
+            @Override
+            public void onSuccess(com.edulinguaghana.social.Challenge challenge) {
+                runOnUiThread(() -> {
+                    String msg = "Challenge score saved: " + score + " points! 🧩";
+                    android.widget.Toast.makeText(PuzzleGameActivity.this, msg, android.widget.Toast.LENGTH_LONG).show();
+                });
+            }
+
+            @Override
+            public void onFailure(String error) {
+                runOnUiThread(() -> android.widget.Toast.makeText(PuzzleGameActivity.this, "Failed to save challenge score: " + error, android.widget.Toast.LENGTH_SHORT).show());
+            }
+        });
     }
 
     private void celebrate() {

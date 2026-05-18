@@ -29,7 +29,7 @@ public class ChallengeManager {
      * Creates a new challenge with specified parameters
      */
     public void createChallenge(String challengerId, String challengedId, String language,
-                               String quizType, Long durationMinutes,
+                               String quizType, Long durationMinutes, Integer hearts,
                                ChallengeCreationCallback callback) {
         try {
             Challenge challenge = new Challenge();
@@ -39,6 +39,7 @@ public class ChallengeManager {
             challenge.language = language;
             challenge.quizType = quizType;
             challenge.durationMinutes = durationMinutes != null ? durationMinutes : 60L; // Use as seconds internally now
+            challenge.hearts = hearts;
             challenge.state = Challenge.State.PENDING;
             challenge.createdAt = System.currentTimeMillis();
             challenge.expiresAt = challenge.createdAt + (challenge.durationMinutes * 1000);

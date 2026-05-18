@@ -1259,8 +1259,8 @@ public class ProfileActivity extends AppCompatActivity {
                     ProfileActivity.this,
                     currentUserId,
                     targetUserId,
-                    (language, quizType, durationMinutes, targetId) -> {
-                        performCreateChallenge(currentUserId, targetId, language, quizType, durationMinutes);
+                    (language, quizType, durationMinutes, hearts, targetId) -> {
+                        performCreateChallenge(currentUserId, targetId, language, quizType, durationMinutes, hearts);
                     }
                 );
                 if (isFinishing() || isDestroyed()) return;
@@ -1275,10 +1275,10 @@ public class ProfileActivity extends AppCompatActivity {
     }
 
     private void performCreateChallenge(String fromUserId, String toUserId, String language,
-                                       String quizType, Long durationMinutes) {
+                                       String quizType, Long durationMinutes, Integer hearts) {
         com.edulinguaghana.social.ChallengeManager challengeManager = new com.edulinguaghana.social.ChallengeManager();
 
-        challengeManager.createChallenge(fromUserId, toUserId, language, quizType, durationMinutes,
+        challengeManager.createChallenge(fromUserId, toUserId, language, quizType, durationMinutes, hearts,
             new com.edulinguaghana.social.ChallengeManager.ChallengeCreationCallback() {
                 @Override
                 public void onSuccess(com.edulinguaghana.social.Challenge challenge) {
@@ -2177,17 +2177,34 @@ public class ProfileActivity extends AppCompatActivity {
             (challenge.challengerName != null ? challenge.challengerName : "Opponent") : 
             (challenge.challengedName != null ? challenge.challengedName : "Opponent");
             
-        String message = (isChallenged ? "From: " : "To: ") + otherPerson + "\n" +
-                        "Language: " + getLanguageNameFromCode(challenge.language) + "\n" +
-                        "Quiz: " + challenge.quizType + "\n" +
-                        "Time: " + challenge.durationMinutes + " min\n\n" +
-                        "Start the quiz now?";
+        String timeDisplay;
+        if (challenge.durationMinutes != null) {
+            if (challenge.durationMinutes >= 60) {
+                timeDisplay = (challenge.durationMinutes / 60) + " min";
+            } else {
+                timeDisplay = challenge.durationMinutes + " sec";
+            }
+        } else {
+            timeDisplay = "1 min";
+        }
+            
+        StringBuilder messageBuilder = new StringBuilder();
+        messageBuilder.append(isChallenged ? "From: " : "To: ").append(otherPerson).append("\n");
+        messageBuilder.append("Language: ").append(getLanguageNameFromCode(challenge.language)).append("\n");
+        messageBuilder.append("Quiz: ").append(challenge.quizType).append("\n");
+        messageBuilder.append("Time: ").append(timeDisplay).append("\n");
+        
+        if (challenge.hearts != null) {
+            messageBuilder.append("Hearts: ❤️ ").append(challenge.hearts).append("\n");
+        }
+        
+        messageBuilder.append("\nStart the quiz now?");
 
         StyledMenuHelper.showStyledConfirmationDialog(
             this,
             "⚔️",
             "Challenge Details",
-            message,
+            messageBuilder.toString(),
             "Start Quiz",
             isChallenged ? "Decline" : "Cancel",
             () -> acceptChallengeAndStartQuiz(challenge),
@@ -2332,12 +2349,27 @@ public class ProfileActivity extends AppCompatActivity {
                 repo.updateChallenge(challenge);
 
                 // Launch quiz with challenge info
-                Intent intent = new Intent(ProfileActivity.this, QuizActivity.class);
+                Intent intent;
+                String normalizedType = challenge.quizType.toLowerCase();
+                
+                if (normalizedType.contains("rocket")) {
+                    intent = new Intent(ProfileActivity.this, com.edulinguaghana.games.rocketsort.RocketSortActivity.class);
+                } else if (normalizedType.contains("bubble")) {
+                    intent = new Intent(ProfileActivity.this, com.edulinguaghana.games.bubblepop.BubblePopActivity.class);
+                } else if (normalizedType.contains("puzzle")) {
+                    intent = new Intent(ProfileActivity.this, com.edulinguaghana.games.PuzzleGameActivity.class);
+                } else if (normalizedType.contains("hidden")) {
+                    intent = new Intent(ProfileActivity.this, com.edulinguaghana.HiddenShapesActivity.class);
+                } else {
+                    intent = new Intent(ProfileActivity.this, QuizActivity.class);
+                }
+
                 intent.putExtra("LANG_CODE", challenge.language);
                 intent.putExtra("LANG_NAME", getLanguageNameFromCode(challenge.language));
                 intent.putExtra("QUIZ_TYPE", challenge.quizType);
                 intent.putExtra("CHALLENGE_ID", challenge.id);
-                intent.putExtra("CHALLENGE_DURATION", challenge.durationMinutes);
+                intent.putExtra("CHALLENGE_DURATION", (long) (challenge.durationMinutes != null ? challenge.durationMinutes : 60L));
+                intent.putExtra("CHALLENGE_HEARTS", challenge.hearts != null ? (int) challenge.hearts : 5);
                 intent.putExtra("CHALLENGE_MODE", true);
                 startActivity(intent);
 

@@ -81,6 +81,11 @@ public class BubblePopActivity extends AppCompatActivity {
     private static final String PREF_NAME = "EduLinguaPrefs";
     private static final String KEY_HIGH_SCORE_BUBBLE = "high_score_bubble_pop";
 
+    // Challenge mode
+    private boolean isChallengeMode = false;
+    private String challengeId;
+    private long challengeDuration = 60000;
+
     private float currentSpeed = 3500f; // Duration in ms for a bubble to cross screen (Faster start)
     private final float MIN_SPEED = 1200f; // Lower minimum duration (Higher max speed)
     private final float SPEED_INCREMENT = 350f; // More aggressive speed increase
@@ -93,6 +98,13 @@ public class BubblePopActivity extends AppCompatActivity {
         languageCode = getIntent().getStringExtra("LANG_CODE");
         languageName = getIntent().getStringExtra("LANG_NAME");
         if (languageCode == null) languageCode = "en";
+
+        // Check for challenge mode
+        isChallengeMode = getIntent().getBooleanExtra("CHALLENGE_MODE", false);
+        challengeId = getIntent().getStringExtra("CHALLENGE_ID");
+        if (isChallengeMode) {
+            challengeDuration = getIntent().getLongExtra("CHALLENGE_DURATION", 60) * 1000;
+        }
         
         alphabet = LanguageConversionUtils.getAlphabetForLanguage(languageCode);
 
@@ -219,7 +231,7 @@ public class BubblePopActivity extends AppCompatActivity {
         isGameOver = false;
         isPaused = false;
         score = 0;
-        timeLeftMs = 60000;
+        timeLeftMs = isChallengeMode ? challengeDuration : 60000;
         currentSpeed = 4000f;
         updateScoreDisplay();
         updateTimerDisplay();
@@ -313,7 +325,33 @@ public class BubblePopActivity extends AppCompatActivity {
             } catch (Exception ignored) {}
         }
 
+        if (isChallengeMode && challengeId != null) {
+            saveChallengeResult();
+        }
+
         showPauseOverlay("Time Up!");
+    }
+
+    private void saveChallengeResult() {
+        com.edulinguaghana.social.ChallengeManager challengeManager = new com.edulinguaghana.social.ChallengeManager();
+        com.google.firebase.auth.FirebaseUser user = com.google.firebase.auth.FirebaseAuth.getInstance().getCurrentUser();
+        
+        if (user == null) return;
+        
+        challengeManager.recordScore(challengeId, user.getUid(), score, new com.edulinguaghana.social.ChallengeManager.ScoreRecordingCallback() {
+            @Override
+            public void onSuccess(com.edulinguaghana.social.Challenge challenge) {
+                runOnUiThread(() -> {
+                    String msg = "Challenge score saved: " + score + " points! 🎈";
+                    Toast.makeText(BubblePopActivity.this, msg, Toast.LENGTH_LONG).show();
+                });
+            }
+
+            @Override
+            public void onFailure(String error) {
+                runOnUiThread(() -> Toast.makeText(BubblePopActivity.this, "Failed to save challenge score: " + error, Toast.LENGTH_SHORT).show());
+            }
+        });
     }
 
     private void togglePause() {

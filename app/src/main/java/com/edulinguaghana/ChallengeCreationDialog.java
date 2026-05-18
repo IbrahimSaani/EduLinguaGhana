@@ -4,10 +4,15 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.Spinner;
 import android.widget.Toast;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Dialog for creating a challenge with language, quiz type, and duration selection
@@ -19,7 +24,7 @@ public class ChallengeCreationDialog {
     private OnChallengeCreatedListener listener;
 
     public interface OnChallengeCreatedListener {
-        void onChallengeCreated(String language, String quizType, Long durationMinutes, String targetUserId);
+        void onChallengeCreated(String language, String quizType, Long durationMinutes, Integer hearts, String targetUserId);
     }
 
     public ChallengeCreationDialog(Context context, String userId, String targetUserId,
@@ -39,6 +44,8 @@ public class ChallengeCreationDialog {
         Spinner languageSpinner = dialogView.findViewById(R.id.spinnerLanguage);
         Spinner quizTypeSpinner = dialogView.findViewById(R.id.spinnerQuizType);
         Spinner durationSpinner = dialogView.findViewById(R.id.spinnerDuration);
+        LinearLayout layoutHearts = dialogView.findViewById(R.id.layoutHearts);
+        Spinner heartsSpinner = dialogView.findViewById(R.id.spinnerHearts);
 
         // Setup language spinner
         String[] languages = {"English", "French", "Twi", "Ewe", "Ga"};
@@ -48,7 +55,10 @@ public class ChallengeCreationDialog {
         languageSpinner.setAdapter(languageAdapter);
 
         // Setup quiz type spinner
-        String[] quizTypes = {"Letter Quiz", "Number Sequencing", "Matching", "Mixed Mode"};
+        String[] quizTypes = {
+            "Letter Quiz", "Number Sequencing", "Matching", "Mixed Mode",
+            "Rocket Sort", "Bubble Pop", "Hidden Shape", "Shape Match Puzzle"
+        };
         ArrayAdapter<String> quizAdapter = new ArrayAdapter<>(context,
             android.R.layout.simple_spinner_item, quizTypes);
         quizAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
@@ -62,6 +72,33 @@ public class ChallengeCreationDialog {
         durationSpinner.setAdapter(durationAdapter);
         durationSpinner.setSelection(1);  // Default to 1 minute
 
+        // Setup hearts spinner
+        List<String> heartsList = new ArrayList<>();
+        for (int i = 1; i <= 10; i++) {
+            heartsList.add(i + (i == 1 ? " Heart" : " Hearts"));
+        }
+        ArrayAdapter<String> heartsAdapter = new ArrayAdapter<>(context,
+            android.R.layout.simple_spinner_item, heartsList);
+        heartsAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        heartsSpinner.setAdapter(heartsAdapter);
+        heartsSpinner.setSelection(4); // Default to 5 hearts
+
+        // Show/hide hearts based on selection
+        quizTypeSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                String selected = quizTypes[position];
+                if (selected.equals("Rocket Sort")) {
+                    layoutHearts.setVisibility(View.VISIBLE);
+                } else {
+                    layoutHearts.setVisibility(View.GONE);
+                }
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {}
+        });
+
         StyledMenuHelper.showStyledCustomDialog(
             context,
             "⚔️",
@@ -74,9 +111,13 @@ public class ChallengeCreationDialog {
                 String language = getLanguageCode((String) languageSpinner.getSelectedItem());
                 String quizType = (String) quizTypeSpinner.getSelectedItem();
                 Long duration = parseDuration((String) durationSpinner.getSelectedItem());
+                Integer hearts = null;
+                if (quizType.equals("Rocket Sort")) {
+                    hearts = heartsSpinner.getSelectedItemPosition() + 1;
+                }
 
                 if (listener != null) {
-                    listener.onChallengeCreated(language, quizType, duration, targetUserId);
+                    listener.onChallengeCreated(language, quizType, duration, hearts, targetUserId);
                 }
             },
             null

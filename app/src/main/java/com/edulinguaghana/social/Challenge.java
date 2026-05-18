@@ -15,6 +15,7 @@ public class Challenge {
     public long createdAt;
     public Long expiresAt;
     public Long durationMinutes;  // Challenge duration in minutes
+    public Integer hearts;        // Number of hearts (for games like Rocket Sort)
 
     // Challenge configuration
     public String language;       // Language code (tw, ee, ga)

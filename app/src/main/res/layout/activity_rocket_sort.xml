@@ -46,6 +46,17 @@
                 android:textStyle="bold" />
 
             <TextView
+                android:id="@+id/tvTimer"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="16dp"
+                android:fontFamily="@font/agbalumo"
+                android:text="⏱️ 60s"
+                android:textColor="#4FC3F7"
+                android:textSize="22sp"
+                android:visibility="gone" />
+
+            <TextView
                 android:id="@+id/tvLives"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"

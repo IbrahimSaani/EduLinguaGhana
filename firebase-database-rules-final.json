@@ -57,6 +57,12 @@
         },
         "winnerId": {
           ".validate": "newData.isString() || !newData.exists()"
+        },
+        "hearts": {
+          ".validate": "newData.isNumber() || !newData.exists()"
+        },
+        "expiresAt": {
+          ".validate": "newData.isNumber() || !newData.exists()"
         }
       }
     },

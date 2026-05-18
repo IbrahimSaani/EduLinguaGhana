@@ -36,7 +36,7 @@ import nl.dionsegijn.konfetti.xml.KonfettiView;
 public class RocketSortActivity extends AppCompatActivity {
 
     private FrameLayout starFieldContainer, asteroidContainer;
-    private TextView tvScore, tvLives, tvCountdown;
+    private TextView tvScore, tvLives, tvCountdown, tvTimer;
     private View overlayLayout;
     private ImageView ivRocketLeft, ivRocketRight;
     private KonfettiView konfettiView;
@@ -66,6 +66,13 @@ public class RocketSortActivity extends AppCompatActivity {
     private static final String PREF_NAME = "EduLinguaPrefs";
     private static final String KEY_HIGH_SCORE_ROCKET = "high_score_rocket_sort";
 
+    // Challenge mode
+    private boolean isChallengeMode = false;
+    private String challengeId;
+    private int challengeHearts = 5;
+    private long timeLeftMs = 60000;
+    private android.os.CountDownTimer gameTimer;
+
     private float currentSpeed = 3200f; // Faster starting speed
     private float spawnInterval = 2200f; // More frequent starting spawns
     private final float MIN_SPEED = 1200f;
@@ -80,6 +87,14 @@ public class RocketSortActivity extends AppCompatActivity {
         if (languageCode == null) languageCode = "en";
         alphabet = LanguageConversionUtils.getAlphabetForLanguage(languageCode);
 
+        // Check for challenge mode
+        isChallengeMode = getIntent().getBooleanExtra("CHALLENGE_MODE", false);
+        challengeId = getIntent().getStringExtra("CHALLENGE_ID");
+        challengeHearts = getIntent().getIntExtra("CHALLENGE_HEARTS", 5);
+        if (isChallengeMode) {
+            timeLeftMs = getIntent().getLongExtra("CHALLENGE_DURATION", 60) * 1000;
+        }
+
         initViews();
         initSounds();
         setupStarField();
@@ -93,6 +108,7 @@ public class RocketSortActivity extends AppCompatActivity {
         tvScore = findViewById(R.id.tvScore);
         tvLives = findViewById(R.id.tvLives);
         tvCountdown = findViewById(R.id.tvCountdown);
+        tvTimer = findViewById(R.id.tvTimer);
         overlayLayout = findViewById(R.id.overlayLayout);
         ivRocketLeft = findViewById(R.id.ivRocketLeft);
         ivRocketRight = findViewById(R.id.ivRocketRight);
@@ -176,7 +192,16 @@ public class RocketSortActivity extends AppCompatActivity {
         isGameOver = false;
         isPaused = false;
         score = 0;
-        lives = 5;
+        lives = isChallengeMode ? challengeHearts : 5;
+        if (isChallengeMode) {
+            timeLeftMs = getIntent().getLongExtra("CHALLENGE_DURATION", 60) * 1000;
+            if (tvTimer != null) {
+                tvTimer.setVisibility(View.VISIBLE);
+                updateTimerDisplay();
+            }
+        } else {
+            if (tvTimer != null) tvTimer.setVisibility(View.GONE);
+        }
         currentSpeed = 3200f;
         spawnInterval = 2500f;
         
@@ -216,15 +241,43 @@ public class RocketSortActivity extends AppCompatActivity {
                 } else {
                     tvCountdown.setVisibility(View.GONE);
                     startSpawning();
+                    if (isChallengeMode) {
+                        startTimer(timeLeftMs);
+                    }
                 }
             }
         };
         spawnHandler.post(countdownRunnable);
     }
 
+    private void startTimer(long duration) {
+        if (gameTimer != null) gameTimer.cancel();
+        gameTimer = new android.os.CountDownTimer(duration, 1000) {
+            @Override
+            public void onTick(long millisUntilFinished) {
+                timeLeftMs = millisUntilFinished;
+                updateTimerDisplay();
+            }
+
+            @Override
+            public void onFinish() {
+                timeLeftMs = 0;
+                updateTimerDisplay();
+                endGame();
+            }
+        }.start();
+    }
+
+    private void updateTimerDisplay() {
+        if (tvTimer != null) {
+            tvTimer.setText("⏱️ " + (timeLeftMs / 1000) + "s");
+        }
+    }
+
     private void togglePause() {
         isPaused = !isPaused;
         if (isPaused) {
+            if (gameTimer != null) gameTimer.cancel();
             spawnHandler.removeCallbacks(spawnRunnable);
             if (backgroundMusic != null && backgroundMusic.isPlaying()) {
                 backgroundMusic.pause();
@@ -242,6 +295,9 @@ public class RocketSortActivity extends AppCompatActivity {
             // Properly resume all active ObjectAnimators
             for (ObjectAnimator animator : asteroidAnimators.values()) {
                 animator.resume();
+            }
+            if (isChallengeMode) {
+                startTimer(timeLeftMs);
             }
             startSpawning();
         }
@@ -463,6 +519,7 @@ public class RocketSortActivity extends AppCompatActivity {
 
     private void endGame() {
         isGameOver = true;
+        if (gameTimer != null) gameTimer.cancel();
         spawnHandler.removeCallbacks(spawnRunnable);
         if (backgroundMusic != null && backgroundMusic.isPlaying()) {
             backgroundMusic.pause();
@@ -477,7 +534,33 @@ public class RocketSortActivity extends AppCompatActivity {
             celebrate();
         }
 
+        if (isChallengeMode && challengeId != null) {
+            saveChallengeResult();
+        }
+
         showOverlay("Mission Complete!");
+    }
+
+    private void saveChallengeResult() {
+        com.edulinguaghana.social.ChallengeManager challengeManager = new com.edulinguaghana.social.ChallengeManager();
+        com.google.firebase.auth.FirebaseUser user = com.google.firebase.auth.FirebaseAuth.getInstance().getCurrentUser();
+        
+        if (user == null) return;
+        
+        challengeManager.recordScore(challengeId, user.getUid(), score, new com.edulinguaghana.social.ChallengeManager.ScoreRecordingCallback() {
+            @Override
+            public void onSuccess(com.edulinguaghana.social.Challenge challenge) {
+                runOnUiThread(() -> {
+                    String msg = "Challenge score saved: " + score + " points! 🚀";
+                    android.widget.Toast.makeText(RocketSortActivity.this, msg, android.widget.Toast.LENGTH_LONG).show();
+                });
+            }
+
+            @Override
+            public void onFailure(String error) {
+                runOnUiThread(() -> android.widget.Toast.makeText(RocketSortActivity.this, "Failed to save challenge score: " + error, android.widget.Toast.LENGTH_SHORT).show());
+            }
+        });
     }
 
     private void showOverlay(String title) {
@@ -514,6 +597,7 @@ public class RocketSortActivity extends AppCompatActivity {
     protected void onPause() {
         super.onPause();
         isPaused = true;
+        if (gameTimer != null) gameTimer.cancel();
         if (backgroundMusic != null && backgroundMusic.isPlaying()) {
             backgroundMusic.pause();
         }
@@ -526,11 +610,15 @@ public class RocketSortActivity extends AppCompatActivity {
         if (backgroundMusic != null && !isPaused && !isGameOver) {
             backgroundMusic.start();
         }
+        if (isChallengeMode && !isPaused && !isGameOver) {
+            startTimer(timeLeftMs);
+        }
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        if (gameTimer != null) gameTimer.cancel();
         if (correctPlayer != null) correctPlayer.release();
         if (wrongPlayer != null) wrongPlayer.release();
         if (gameOverPlayer != null) gameOverPlayer.release();

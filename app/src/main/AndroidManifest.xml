@@ -78,10 +78,6 @@
             android:theme="@style/Theme.EduLinguaGhana.Game"
             android:exported="false"/>
 
-        <activity android:name=".games.BeatMatcherActivity"
-            android:screenOrientation="portrait"
-            android:theme="@style/Theme.EduLinguaGhana.Game"
-            android:exported="false"/>
         <!--  SettingsActivity  -->
         <activity android:name=".SettingsActivity" android:exported="false"/>
         <!--  ProfileActivity  -->

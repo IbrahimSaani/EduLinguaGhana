@@ -379,11 +379,4 @@
     <string name="alphabet_bridge_win">Safe across! 🎉</string>
     <string name="alphabet_bridge_splash">Splash! Try again! 🌊</string>
 
-    <!-- Beat Matcher -->
-    <string name="beat_matcher_title">Beat Matcher</string>
-    <string name="beat_matcher_prompt">Listen to the rhythm and tap the drum!</string>
-    <string name="beat_matcher_listen">Listen…</string>
-    <string name="beat_matcher_tap">Your Turn!</string>
-    <string name="beat_matcher_perfect">Perfect Match! 🥁</string>
-    <string name="beat_matcher_miss">Off beat! Try again.</string>
 </resources>

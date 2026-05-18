@@ -536,7 +536,8 @@ public class QuizActivity extends AppCompatActivity {
         
         // Use challenge duration if available, else default to 30 seconds
         if (isChallengeMode) {
-            long durationSeconds = getIntent().getLongExtra("CHALLENGE_DURATION", 60);
+            // Ensure we get the duration as a long. default to 60 seconds if not found.
+            long durationSeconds = getIntent().getLongExtra("CHALLENGE_DURATION", 60L);
             remainingTime = durationSeconds * 1000;
         } else {
             remainingTime = 30000L;

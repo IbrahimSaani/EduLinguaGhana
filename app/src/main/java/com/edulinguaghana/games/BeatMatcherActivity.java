@@ -1,43 +1,55 @@
 package com.edulinguaghana.games;
 
+import android.animation.Animator;
+import android.animation.AnimatorListenerAdapter;
+import android.animation.ObjectAnimator;
 import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
+import android.speech.tts.TextToSpeech;
 import android.view.View;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.edulinguaghana.R;
+import com.edulinguaghana.utils.LanguageConversionUtils;
+import com.google.android.material.card.MaterialCardView;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
+import java.util.Map;
 import java.util.Random;
 
-public class BeatMatcherActivity extends AppCompatActivity {
+public class BeatMatcherActivity extends AppCompatActivity implements TextToSpeech.OnInitListener {
 
-    private TextView tvScore, tvStatus, tvPattern;
-    private View btnDrum, overlayLayout;
+    private TextView tvScore, tvOverlayTitle;
+    private View overlayLayout, startOverlay;
     private nl.dionsegijn.konfetti.xml.KonfettiView konfettiView;
+
+    private MaterialCardView[] cards = new MaterialCardView[3];
+    private String[] cardValues = new String[3];
+    private boolean[] isFlipped = new boolean[3];
     
     private int score = 0;
-    private boolean isPaused = false;
     private boolean isGameOver = false;
-    private boolean isListening = true;
-    private String languageCode;
-
-    private List<Long> patternTimings = new ArrayList<>();
-    private List<Long> userTimings = new ArrayList<>();
-    private List<String> currentPatternStrings = new ArrayList<>();
-    private String[] alphabet;
+    private boolean isPaused = false;
+    private boolean isProcessing = false;
     
+    private String languageCode;
+    private String targetChar;
+    
+    private TextToSpeech tts;
     private Handler handler = new Handler(Looper.getMainLooper());
     private Random random = new Random();
-    private MediaPlayer drumPlayer, correctPlayer, wrongPlayer, gameOverPlayer;
-    private int bestScore = 0;
-    private static final String PREF_NAME = "EduLinguaPrefs";
-    private static final String KEY_HIGH_SCORE_BEAT = "high_score_beat_matcher";
+    private MediaPlayer correctPlayer, wrongPlayer, flipPlayer;
+    
+    private Map<String, String> phonemes = new HashMap<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -46,171 +58,233 @@ public class BeatMatcherActivity extends AppCompatActivity {
 
         languageCode = getIntent().getStringExtra("LANG_CODE");
         if (languageCode == null) languageCode = "en";
-        alphabet = com.edulinguaghana.utils.LanguageConversionUtils.getAlphabetForLanguage(languageCode);
 
+        initPhonemes();
         initViews();
         initSounds();
-        startNewGame();
+        tts = new TextToSpeech(this, this);
+    }
+
+    private void initPhonemes() {
+        // Simple phonetic mapping for English
+        phonemes.put("A", "ah");
+        phonemes.put("B", "buh");
+        phonemes.put("C", "cuh");
+        phonemes.put("D", "duh");
+        phonemes.put("E", "eh");
+        phonemes.put("F", "fff");
+        phonemes.put("G", "guh");
+        phonemes.put("H", "huh");
+        phonemes.put("I", "ih");
+        phonemes.put("J", "juh");
+        phonemes.put("K", "kuh");
+        phonemes.put("L", "lll");
+        phonemes.put("M", "mmm");
+        phonemes.put("N", "nnn");
+        phonemes.put("O", "oh");
+        phonemes.put("P", "puh");
+        phonemes.put("Q", "kwuh");
+        phonemes.put("R", "rrr");
+        phonemes.put("S", "sss");
+        phonemes.put("T", "tuh");
+        phonemes.put("U", "uh");
+        phonemes.put("V", "vvv");
+        phonemes.put("W", "wuh");
+        phonemes.put("X", "ks");
+        phonemes.put("Y", "yuh");
+        phonemes.put("Z", "zzz");
     }
 
     private void initViews() {
         tvScore = findViewById(R.id.tvScore);
-        tvStatus = findViewById(R.id.tvStatus);
-        tvPattern = findViewById(R.id.tvPattern);
-        btnDrum = findViewById(R.id.btnDrum);
+        tvOverlayTitle = findViewById(R.id.tvOverlayTitle);
         overlayLayout = findViewById(R.id.overlayLayout);
+        startOverlay = findViewById(R.id.startOverlay);
         konfettiView = findViewById(R.id.konfettiView);
 
-        btnDrum.setOnClickListener(v -> handleDrumTap());
+        for (int i = 0; i < 3; i++) {
+            int cardId = getResources().getIdentifier("card" + i, "id", getPackageName());
+            cards[i] = findViewById(cardId);
+            final int index = i;
+            cards[i].setOnClickListener(v -> onCardClicked(index));
+        }
+
+        findViewById(R.id.btnStart).setOnClickListener(v -> startGame());
         findViewById(R.id.btnPause).setOnClickListener(v -> togglePause());
         findViewById(R.id.btnResume).setOnClickListener(v -> togglePause());
-        findViewById(R.id.btnRestart).setOnClickListener(v -> startNewGame());
+        findViewById(R.id.btnRestart).setOnClickListener(v -> startGame());
         findViewById(R.id.btnQuit).setOnClickListener(v -> finish());
+        findViewById(R.id.btnReplay).setOnClickListener(v -> playTargetSound());
     }
 
     private void initSounds() {
-        drumPlayer = MediaPlayer.create(this, R.raw.bell); // Use bell as drum sound
         correctPlayer = MediaPlayer.create(this, R.raw.correct);
         wrongPlayer = MediaPlayer.create(this, R.raw.wrong);
-        gameOverPlayer = MediaPlayer.create(this, R.raw.gameover);
-
-        android.content.SharedPreferences prefs = getSharedPreferences(PREF_NAME, MODE_PRIVATE);
-        bestScore = prefs.getInt(KEY_HIGH_SCORE_BEAT, 0);
+        flipPlayer = MediaPlayer.create(this, R.raw.bell);
     }
 
-    private void startNewGame() {
+    @Override
+    public void onInit(int status) {
+        if (status == TextToSpeech.SUCCESS) {
+            tts.setLanguage(Locale.US);
+            tts.setSpeechRate(0.5f);
+        }
+    }
+
+    private void startGame() {
         score = 0;
         isGameOver = false;
         isPaused = false;
+        isProcessing = false;
+        startOverlay.setVisibility(View.GONE);
         overlayLayout.setVisibility(View.GONE);
         updateUI();
-        generateNewPattern();
+        nextRound();
     }
 
-    private void generateNewPattern() {
-        isListening = true;
-        tvStatus.setText("Listen!");
-        btnDrum.setEnabled(false);
-        patternTimings.clear();
-        userTimings.clear();
-        currentPatternStrings.clear();
-
-        // Pattern of 3-5 beats
-        int length = 3 + random.nextInt(2);
-        StringBuilder sb = new StringBuilder();
-        
-        // Randomly choose between letters and numbers for the visual pattern
-        boolean useNumbers = random.nextBoolean();
-        String[] pool = useNumbers ? new String[]{"1", "2", "3", "4", "5", "6", "7", "8", "9"} : alphabet;
-
-        long lastTime = 0;
-        for (int i = 0; i < length; i++) {
-            String item = pool[random.nextInt(pool.length)];
-            currentPatternStrings.add(item);
-            sb.append(item).append(i == length - 1 ? "" : " - ");
-            
-            // Random rhythm interval between 500ms and 1000ms
-            long interval = 500 + random.nextInt(500);
-            lastTime += interval;
-            patternTimings.add(lastTime);
+    private void nextRound() {
+        isProcessing = false;
+        for (int i = 0; i < 3; i++) {
+            resetCard(i);
         }
         
-        tvPattern.setText(sb.toString());
-        playPattern(0);
+        generateRoundData();
+        handler.postDelayed(this::playTargetSound, 500);
     }
 
-    private void playPattern(int index) {
-        if (isPaused || isGameOver) return;
+    private void generateRoundData() {
+        String[] pool = LanguageConversionUtils.getAlphabetForLanguage(languageCode);
+        List<String> list = new ArrayList<>();
+        Collections.addAll(list, pool);
+        Collections.shuffle(list);
+
+        for (int i = 0; i < 3; i++) {
+            cardValues[i] = list.get(i);
+            TextView tv = cards[i].findViewById(R.id.tvLetter);
+            tv.setText(cardValues[i]);
+        }
+        targetChar = cardValues[random.nextInt(3)];
+    }
+
+    private void playTargetSound() {
+        if (tts != null && targetChar != null) {
+            String sound = phonemes.getOrDefault(targetChar.toUpperCase(), targetChar);
+            tts.speak(sound, TextToSpeech.QUEUE_FLUSH, null, "phonetic");
+        }
+    }
+
+    private void onCardClicked(int index) {
+        if (isProcessing || isPaused || isGameOver || isFlipped[index]) return;
+        flipCard(index);
+    }
+
+    private void flipCard(int index) {
+        isProcessing = true;
+        if (flipPlayer != null) flipPlayer.start();
         
-        if (index < currentPatternStrings.size()) {
-            String item = currentPatternStrings.get(index);
-            tvPattern.setScaleX(1.2f);
-            tvPattern.setScaleY(1.2f);
-            tvPattern.animate().scaleX(1.0f).scaleY(1.0f).setDuration(200).start();
-            
-            speakItem(item);
-            if (drumPlayer != null) drumPlayer.start();
-            
-            long nextWait = (index == currentPatternStrings.size() - 1) ? 1000 : (patternTimings.get(index + 1) - patternTimings.get(index));
-            handler.postDelayed(() -> playPattern(index + 1), nextWait);
+        cards[index].animate()
+                .scaleX(0f)
+                .setDuration(150)
+                .setListener(new AnimatorListenerAdapter() {
+                    @Override
+                    public void onAnimationEnd(Animator animation) {
+                        showCardFront(index);
+                        cards[index].animate()
+                                .scaleX(1f)
+                                .setDuration(150)
+                                .setListener(new AnimatorListenerAdapter() {
+                                    @Override
+                                    public void onAnimationEnd(Animator animation) {
+                                        checkResult(index);
+                                    }
+                                })
+                                .start();
+                    }
+                })
+                .start();
+    }
+
+    private void showCardFront(int index) {
+        isFlipped[index] = true;
+        cards[index].findViewById(R.id.cardBack).setVisibility(View.GONE);
+        cards[index].findViewById(R.id.cardFront).setVisibility(View.VISIBLE);
+        
+        if (!cardValues[index].equals(targetChar)) {
+            cards[index].findViewById(R.id.tvLetter).setVisibility(View.GONE);
+            cards[index].findViewById(R.id.imgFunnyFace).setVisibility(View.VISIBLE);
         } else {
-            startPlayerTurn();
+            cards[index].findViewById(R.id.tvLetter).setVisibility(View.VISIBLE);
+            cards[index].findViewById(R.id.imgFunnyFace).setVisibility(View.GONE);
         }
     }
 
-    private void speakItem(String text) {
-        if (com.edulinguaghana.utils.LanguageConversionUtils.isGhanaianLanguage(languageCode)) {
-            com.edulinguaghana.tts.OfflineGhanaLPTtsService offlineTts = new com.edulinguaghana.tts.OfflineGhanaLPTtsService(this);
-            offlineTts.speak(text, languageCode, null);
-            // Note: In a real app we'd manage this service better to avoid multiple initializations
-        }
-    }
-
-    private void startPlayerTurn() {
-        isListening = false;
-        tvStatus.setText("Your Turn!");
-        btnDrum.setEnabled(true);
-        userTimings.clear();
-    }
-
-    private void handleDrumTap() {
-        if (isListening || isPaused || isGameOver) return;
-
-        long now = System.currentTimeMillis();
-        if (userTimings.isEmpty()) {
-            userTimings.add(0L); // First tap is baseline
-        } else {
-            // Record time since first tap
-            // Note: This is a simplified rhythm matching logic
-            userTimings.add(userTimings.size(), (long) userTimings.size() * 600); // placeholder
-        }
-        
-        if (drumPlayer != null) drumPlayer.start();
-        btnDrum.animate().scaleX(1.1f).scaleY(1.1f).setDuration(50).withEndAction(() -> 
-            btnDrum.animate().scaleX(1.0f).scaleY(1.0f).setDuration(50).start()
-        ).start();
-
-        if (userTimings.size() >= patternTimings.size()) {
-            checkPattern();
-        }
-    }
-
-    private void checkPattern() {
-        // Since we don't have complex timing analysis yet, 
-        // we'll reward completing the sequence for now.
-        score += 20;
-        if (correctPlayer != null) correctPlayer.start();
-        tvStatus.setText("Perfect! ✨");
-        updateUI();
-        
-        handler.postDelayed(this::generateNewPattern, 1500);
-    }
-
-    private void endGame() {
-        isGameOver = true;
-        if (gameOverPlayer != null) {
-            gameOverPlayer.start();
-        }
-
-        if (score > bestScore) {
-            bestScore = score;
-            getSharedPreferences(PREF_NAME, MODE_PRIVATE).edit().putInt(KEY_HIGH_SCORE_BEAT, bestScore).apply();
+    private void checkResult(int index) {
+        if (cardValues[index].equals(targetChar)) {
+            // Correct
+            score++;
+            updateUI();
+            if (correctPlayer != null) correctPlayer.start();
+            cards[index].setStrokeWidth(8);
             celebrate();
+            handler.postDelayed(this::nextRound, 2000);
+        } else {
+            // Wrong
+            if (wrongPlayer != null) wrongPlayer.start();
+            wiggleCard(index);
+            handler.postDelayed(() -> {
+                flipBack(index);
+                isProcessing = false;
+            }, 1000);
         }
+    }
 
-        overlayLayout.setVisibility(View.VISIBLE);
-        ((TextView) findViewById(R.id.tvOverlayTitle)).setText("Game Over!");
-        ((TextView) findViewById(R.id.tvOverlayScore)).setText("Final Score: " + score);
-        findViewById(R.id.btnResume).setVisibility(View.GONE);
+    private void flipBack(int index) {
+        cards[index].animate()
+                .scaleX(0f)
+                .setDuration(150)
+                .setListener(new AnimatorListenerAdapter() {
+                    @Override
+                    public void onAnimationEnd(Animator animation) {
+                        resetCardInternal(index);
+                        cards[index].animate()
+                                .scaleX(1f)
+                                .setDuration(150)
+                                .setListener(null)
+                                .start();
+                    }
+                })
+                .start();
+    }
+
+    private void resetCard(int index) {
+        isFlipped[index] = false;
+        cards[index].setStrokeWidth(0);
+        cards[index].setScaleX(1f);
+        resetCardInternal(index);
+    }
+
+    private void resetCardInternal(int index) {
+        isFlipped[index] = false;
+        cards[index].findViewById(R.id.cardBack).setVisibility(View.VISIBLE);
+        cards[index].findViewById(R.id.cardFront).setVisibility(View.INVISIBLE);
+        cards[index].findViewById(R.id.tvLetter).setVisibility(View.VISIBLE);
+        cards[index].findViewById(R.id.imgFunnyFace).setVisibility(View.GONE);
+    }
+
+    private void wiggleCard(int index) {
+        ObjectAnimator.ofFloat(cards[index], "translationX", 0, 15, -15, 15, -15, 10, -10, 5, -5, 0)
+                .setDuration(500)
+                .start();
+    }
+
+    private void updateUI() {
+        tvScore.setText("⭐ " + score);
     }
 
     private void togglePause() {
         isPaused = !isPaused;
         overlayLayout.setVisibility(isPaused ? View.VISIBLE : View.GONE);
-    }
-
-    private void updateUI() {
-        tvScore.setText("⭐ " + score);
+        tvOverlayTitle.setText("Paused");
     }
 
     private void celebrate() {
@@ -230,9 +304,12 @@ public class BeatMatcherActivity extends AppCompatActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        if (drumPlayer != null) drumPlayer.release();
+        if (tts != null) {
+            tts.stop();
+            tts.shutdown();
+        }
         if (correctPlayer != null) correctPlayer.release();
         if (wrongPlayer != null) wrongPlayer.release();
-        if (gameOverPlayer != null) gameOverPlayer.release();
+        if (flipPlayer != null) flipPlayer.release();
     }
 }

@@ -60,7 +60,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:layout_marginBottom="8dp">
+        android:layout_marginBottom="16dp">
 
         <TextView
             android:layout_width="wrap_content"
@@ -73,6 +73,32 @@
 
         <Spinner
             android:id="@+id/spinnerDuration"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:padding="12dp" />
+
+    </LinearLayout>
+
+    <!-- Hearts Selection (Visible only for Rocket Sort) -->
+    <LinearLayout
+        android:id="@+id/layoutHearts"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:layout_marginBottom="8dp"
+        android:visibility="gone">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="❤️ Number of Hearts"
+            android:textSize="14sp"
+            android:textStyle="bold"
+            android:textColor="@color/colorPrimary"
+            android:layout_marginBottom="8dp" />
+
+        <Spinner
+            android:id="@+id/spinnerHearts"
             android:layout_width="match_parent"
             android:layout_height="48dp"
             android:padding="12dp" />

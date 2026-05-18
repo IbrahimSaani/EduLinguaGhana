@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="100dp"
+    android:layout_height="wrap_content"
+    android:gravity="center"
+    android:orientation="vertical"
+    android:padding="8dp">
+
+    <FrameLayout
+        android:layout_width="80dp"
+        android:layout_height="80dp">
+
+        <View
+            android:id="@+id/bush"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@drawable/circle_background"
+            android:backgroundTint="#2E7D32" />
+
+        <com.airbnb.lottie.LottieAnimationView
+            android:id="@+id/creature"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:visibility="invisible"
+            app:lottie_rawRes="@raw/angry_owl"
+            app:lottie_autoPlay="true"
+            app:lottie_loop="true" />
+
+        <TextView
+            android:id="@+id/label"
+            android:layout_width="36dp"
+            android:layout_height="24dp"
+            android:layout_gravity="bottom|center_horizontal"
+            android:background="@drawable/bg_hud_panel"
+            android:gravity="center"
+            android:text="A"
+            android:textColor="@color/white"
+            android:textSize="12sp"
+            android:textStyle="bold" />
+    </FrameLayout>
+
+    <ImageView
+        android:id="@+id/path"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:layout_marginTop="20dp"
+        android:src="@drawable/ic_decorative_circle"
+        app:tint="#8D6E63"
+        android:clickable="true"
+        android:focusable="true" />
+</LinearLayout>
