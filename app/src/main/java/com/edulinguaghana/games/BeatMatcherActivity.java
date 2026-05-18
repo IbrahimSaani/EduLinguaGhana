@@ -129,7 +129,7 @@ public class BeatMatcherActivity extends AppCompatActivity {
             tvPattern.animate().scaleX(1.0f).scaleY(1.0f).setDuration(200).start();
             
             speakItem(item);
-            drumPlayer.start();
+            if (drumPlayer != null) drumPlayer.start();
             
             long nextWait = (index == currentPatternStrings.size() - 1) ? 1000 : (patternTimings.get(index + 1) - patternTimings.get(index));
             handler.postDelayed(() -> playPattern(index + 1), nextWait);
@@ -165,7 +165,7 @@ public class BeatMatcherActivity extends AppCompatActivity {
             userTimings.add(userTimings.size(), (long) userTimings.size() * 600); // placeholder
         }
         
-        drumPlayer.start();
+        if (drumPlayer != null) drumPlayer.start();
         btnDrum.animate().scaleX(1.1f).scaleY(1.1f).setDuration(50).withEndAction(() -> 
             btnDrum.animate().scaleX(1.0f).scaleY(1.0f).setDuration(50).start()
         ).start();
@@ -179,7 +179,7 @@ public class BeatMatcherActivity extends AppCompatActivity {
         // Since we don't have complex timing analysis yet, 
         // we'll reward completing the sequence for now.
         score += 20;
-        correctPlayer.start();
+        if (correctPlayer != null) correctPlayer.start();
         tvStatus.setText("Perfect! ✨");
         updateUI();
         
@@ -195,6 +195,7 @@ public class BeatMatcherActivity extends AppCompatActivity {
         if (score > bestScore) {
             bestScore = score;
             getSharedPreferences(PREF_NAME, MODE_PRIVATE).edit().putInt(KEY_HIGH_SCORE_BEAT, bestScore).apply();
+            celebrate();
         }
 
         overlayLayout.setVisibility(View.VISIBLE);
@@ -210,6 +211,20 @@ public class BeatMatcherActivity extends AppCompatActivity {
 
     private void updateUI() {
         tvScore.setText("⭐ " + score);
+    }
+
+    private void celebrate() {
+        if (konfettiView == null) return;
+        konfettiView.start(
+            new nl.dionsegijn.konfetti.core.PartyFactory(
+                new nl.dionsegijn.konfetti.core.emitter.Emitter(1000L, java.util.concurrent.TimeUnit.MILLISECONDS).max(100)
+            )
+            .spread(360)
+            .colors(java.util.Arrays.asList(0xfce18a, 0xff726d, 0xf48fb1, 0xafdfff))
+            .setSpeedBetween(10f, 30f)
+            .position(new nl.dionsegijn.konfetti.core.Position.Relative(0.5, 0.3))
+            .build()
+        );
     }
 
     @Override

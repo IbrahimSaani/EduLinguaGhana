@@ -1263,6 +1263,7 @@ public class ProfileActivity extends AppCompatActivity {
                         performCreateChallenge(currentUserId, targetId, language, quizType, durationMinutes);
                     }
                 );
+                if (isFinishing() || isDestroyed()) return;
                 dialog.show();
             }
 

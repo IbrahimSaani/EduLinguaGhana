@@ -832,14 +832,22 @@ public class AlphabetActivity extends AppCompatActivity {
 
     private void playAudioResource(int resId) {
         if (mediaPlayer != null) {
-            mediaPlayer.release();
+            try {
+                mediaPlayer.release();
+            } catch (Exception ignored) {}
         }
         mediaPlayer = MediaPlayer.create(this, resId);
-        mediaPlayer.setOnCompletionListener(mp -> {
-            mp.release();
-            mediaPlayer = null;
-        });
-        mediaPlayer.start();
+        if (mediaPlayer != null) {
+            mediaPlayer.setOnCompletionListener(mp -> {
+                try {
+                    mp.release();
+                } catch (Exception ignored) {}
+                if (mediaPlayer == mp) {
+                    mediaPlayer = null;
+                }
+            });
+            mediaPlayer.start();
+        }
     }
 
     private void startPracticePronunciation() {

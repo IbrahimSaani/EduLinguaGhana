@@ -595,6 +595,7 @@ public class SpeedGameActivity extends AppCompatActivity {
                 bestScore = score;
                 tvGameBest.setText(getString(R.string.quiz_best_score, bestScore));
                 saveHighScore(bestScore);
+                celebrate();
             }
         } else {
             tvGameFeedback.setText(getString(R.string.quiz_feedback_wrong, currentCorrectAnswer));

@@ -147,38 +147,44 @@ public class OfflineGhanaLPTtsService {
             }
 
             // Create and play
-            mediaPlayer = MediaPlayer.create(context, resId);
+            final MediaPlayer mp = MediaPlayer.create(context, resId);
 
-            if (mediaPlayer == null) {
+            if (mp == null) {
                 if (callback != null) {
                     callback.onError("Failed to create MediaPlayer for: " + resourceName);
                 }
                 return;
             }
 
-            mediaPlayer.setOnCompletionListener(mp -> {
+            mediaPlayer = mp;
+
+            mp.setOnCompletionListener(player -> {
                 if (callback != null) {
                     callback.onComplete();
                 }
-                mp.release();
-                mediaPlayer = null;
+                player.release();
+                if (mediaPlayer == player) {
+                    mediaPlayer = null;
+                }
             });
 
-            mediaPlayer.setOnErrorListener((mp, what, extra) -> {
+            mp.setOnErrorListener((player, what, extra) -> {
                 String error = "MediaPlayer error: " + what + ", " + extra;
                 Log.e(TAG, error);
                 if (callback != null) {
                     callback.onError(error);
                 }
-                mp.release();
-                mediaPlayer = null;
+                player.release();
+                if (mediaPlayer == player) {
+                    mediaPlayer = null;
+                }
                 return true;
             });
 
             if (callback != null) {
                 callback.onStart();
             }
-            mediaPlayer.start();
+            mp.start();
             Log.d(TAG, "Playing audio: " + resourceName);
 
         } catch (Exception e) {

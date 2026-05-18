@@ -159,6 +159,7 @@ public class HiddenShapesActivity extends AppCompatActivity {
         if (score > bestScore) {
             bestScore = score;
             getSharedPreferences(PREF_NAME, MODE_PRIVATE).edit().putInt(KEY_HIGH_SCORE_HIDDEN, bestScore).apply();
+            celebrate();
         }
 
         showPauseOverlay("Time Up!");

@@ -449,6 +449,7 @@ public class RocketSortActivity extends AppCompatActivity {
         if (score > bestScore) {
             bestScore = score;
             getSharedPreferences(PREF_NAME, MODE_PRIVATE).edit().putInt(KEY_HIGH_SCORE_ROCKET, bestScore).apply();
+            celebrate();
         }
 
         showOverlay("Mission Complete!");

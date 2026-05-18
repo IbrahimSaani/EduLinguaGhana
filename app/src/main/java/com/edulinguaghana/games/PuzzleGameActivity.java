@@ -228,7 +228,7 @@ public class PuzzleGameActivity extends AppCompatActivity {
                         score += 1;
                         piecesMatched++;
                         updateUI();
-                        correctPlayer.start();
+                        if (correctPlayer != null) correctPlayer.start();
                         
                         ((ViewGroup) draggedView.getParent()).removeView(draggedView);
                         ((FrameLayout) v).removeAllViews();
@@ -250,7 +250,7 @@ public class PuzzleGameActivity extends AppCompatActivity {
                         }
                     } else {
                         // Wrong Match
-                        wrongPlayer.start();
+                        if (wrongPlayer != null) wrongPlayer.start();
                         draggedView.setVisibility(View.VISIBLE);
                     }
                     break;
@@ -320,6 +320,7 @@ public class PuzzleGameActivity extends AppCompatActivity {
         if (score > bestScore) {
             bestScore = score;
             getSharedPreferences(PREF_NAME, MODE_PRIVATE).edit().putInt(KEY_HIGH_SCORE_PUZZLE, bestScore).apply();
+            celebrate();
         }
 
         overlayLayout.setVisibility(View.VISIBLE);

@@ -105,6 +105,8 @@ public class StyledMenuHelper {
             List<MenuItem> menuItems,
             Runnable onDismiss
     ) {
+        if (isActivityInvalid(context)) return null;
+
         // Create custom header
         View headerView = LayoutInflater.from(context).inflate(R.layout.dialog_menu_header, null);
         TextView tvDialogIcon = headerView.findViewById(R.id.tvDialogIcon);
@@ -165,6 +167,8 @@ public class StyledMenuHelper {
             Runnable onPositive,
             Runnable onNegative
     ) {
+        if (isActivityInvalid(context)) return null;
+
         // Create custom header
         View headerView = LayoutInflater.from(context).inflate(R.layout.dialog_menu_header, null);
         TextView tvDialogIcon = headerView.findViewById(R.id.tvDialogIcon);
@@ -235,6 +239,8 @@ public class StyledMenuHelper {
             Runnable onNegative,
             Runnable onNeutral
     ) {
+        if (isActivityInvalid(context)) return null;
+
         // Create custom header
         View headerView = LayoutInflater.from(context).inflate(R.layout.dialog_menu_header, null);
         TextView tvDialogIcon = headerView.findViewById(R.id.tvDialogIcon);
@@ -310,6 +316,12 @@ public class StyledMenuHelper {
             Runnable onNegative
     ) {
         return showStyledCustomDialog(context, headerIcon, title, message, customView, positiveButtonText, negativeButtonText, null, onPositive, onNegative, null);
+    }
+
+    private static boolean isActivityInvalid(Context context) {
+        if (!(context instanceof android.app.Activity)) return false;
+        android.app.Activity activity = (android.app.Activity) context;
+        return activity.isFinishing() || activity.isDestroyed();
     }
 }
 

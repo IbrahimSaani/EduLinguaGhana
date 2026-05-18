@@ -501,6 +501,7 @@ public class SettingsActivity extends AppCompatActivity {
         input.setLayoutParams(params);
         container.addView(input);
 
+        if (isFinishing() || isDestroyed()) return;
         new com.google.android.material.dialog.MaterialAlertDialogBuilder(this)
             .setTitle("Test Upload Score")
             .setMessage("Upload a test score to the leaderboard:")

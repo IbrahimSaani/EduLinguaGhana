@@ -294,6 +294,7 @@ public class BubblePopActivity extends AppCompatActivity {
         if (score > bestScore) {
             bestScore = score;
             getSharedPreferences(PREF_NAME, MODE_PRIVATE).edit().putInt(KEY_HIGH_SCORE_BUBBLE, bestScore).apply();
+            celebrate();
         }
 
         showPauseOverlay("Time Up!");
@@ -543,7 +544,7 @@ public class BubblePopActivity extends AppCompatActivity {
             celebrate();
         } else {
             // Wrong bubble: Shake and sound
-            wrongPlayer.start();
+            if (wrongPlayer != null) wrongPlayer.start();
             ObjectAnimator shake = ObjectAnimator.ofFloat(bubble, View.TRANSLATION_X, bubble.getTranslationX(), bubble.getTranslationX() + 25f);
             shake.setDuration(100);
             shake.setRepeatCount(3);
@@ -553,7 +554,7 @@ public class BubblePopActivity extends AppCompatActivity {
     }
 
     private void popBubble(TextView bubble, boolean isCorrect) {
-        if (isCorrect) correctPlayer.start();
+        if (isCorrect && correctPlayer != null) correctPlayer.start();
         
         // Animation: Scale up and fade out
         bubble.animate()
