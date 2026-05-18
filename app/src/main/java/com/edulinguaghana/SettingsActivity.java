@@ -29,17 +29,20 @@ public class SettingsActivity extends AppCompatActivity {
     private SwitchMaterial switchMusic, switchSfx;
     private SwitchMaterial switchAnimations;
     private SwitchMaterial switchLowPowerAnimations;
+    private SwitchMaterial switchDailyReminders, switchStreakAlerts;
     private SeekBar seekBarQuizMusicVolume;
     private TextView tvQuizMusicVolumeValue;
     private Button btnResetProgress;
     private Button btnSyncToCloud;
     private Button btnSyncFromCloud;
     private Button btnChangeRole;
-     private View btnAppTutorial;
-     private View btnPrivacyPolicy;
-     private View btnContactUs;
+    private View btnAppTutorial;
+    private View btnPrivacyPolicy;
+    private View btnContactUs;
+    private View btnShareApp, btnRateApp, btnChangeAppLanguage;
     private TextView tvLastSync;
     private TextView tvCurrentRole;
+    private TextView tvCurrentAppLanguage, tvAppVersion;
 
     private static final String PREF_NAME = "EduLinguaPrefs";
     private static final String KEY_MUSIC_ENABLED = "MUSIC_ENABLED";
@@ -47,6 +50,9 @@ public class SettingsActivity extends AppCompatActivity {
     private static final String KEY_ANIMATIONS_ENABLED = "ANIMATIONS_ENABLED";
     private static final String KEY_LOW_POWER_ANIMATIONS = "LOW_POWER_ANIMATIONS";
     private static final String KEY_QUIZ_MUSIC_VOLUME = "QUIZ_MUSIC_VOLUME";
+    private static final String KEY_APP_LANGUAGE = "APP_LANGUAGE";
+    private static final String KEY_DAILY_REMINDERS = "DAILY_REMINDERS";
+    private static final String KEY_STREAK_ALERTS = "STREAK_ALERTS";
 
     private static final String KEY_HIGH_SCORE = "HIGH_SCORE";
     private static final String KEY_TOTAL_QUIZZES = "TOTAL_QUIZZES";
@@ -81,18 +87,26 @@ public class SettingsActivity extends AppCompatActivity {
         btnSyncFromCloud = findViewById(R.id.btnSyncFromCloud);
         btnChangeRole = findViewById(R.id.btnChangeRole);
          btnAppTutorial = findViewById(R.id.btnAppTutorial);
-         btnPrivacyPolicy = findViewById(R.id.btnPrivacyPolicy);
-         btnContactUs = findViewById(R.id.btnContactUs);
+        btnPrivacyPolicy = findViewById(R.id.btnPrivacyPolicy);
+        btnContactUs = findViewById(R.id.btnContactUs);
+        btnShareApp = findViewById(R.id.btnShareApp);
+        btnRateApp = findViewById(R.id.btnRateApp);
+        btnChangeAppLanguage = findViewById(R.id.btnChangeAppLanguage);
         tvLastSync = findViewById(R.id.tvLastSync);
         tvCurrentRole = findViewById(R.id.tvCurrentRole);
+        tvCurrentAppLanguage = findViewById(R.id.tvCurrentAppLanguage);
+        tvAppVersion = findViewById(R.id.tvAppVersion);
+        switchDailyReminders = findViewById(R.id.switchDailyReminders);
+        switchStreakAlerts = findViewById(R.id.switchStreakAlerts);
 
         // Apply custom font to section headers
         applySectionHeaderFonts();
 
-        // ...existing code...
-        updateLastSyncTime();
+        // Update App Version
+        updateAppVersionText();
 
-        // Display current role
+        // Update Sync and Role status
+        updateLastSyncTime();
         displayCurrentRole();
 
         // Load preferences
@@ -101,13 +115,19 @@ public class SettingsActivity extends AppCompatActivity {
         boolean sfxEnabled = prefs.getBoolean(KEY_SFX_ENABLED, true);
         boolean animationsEnabled = prefs.getBoolean(KEY_ANIMATIONS_ENABLED, true);
         boolean lowPowerEnabled = prefs.getBoolean(KEY_LOW_POWER_ANIMATIONS, false);
+        boolean dailyReminders = prefs.getBoolean(KEY_DAILY_REMINDERS, true);
+        boolean streakAlerts = prefs.getBoolean(KEY_STREAK_ALERTS, true);
         int quizMusicVolume = prefs.getInt(KEY_QUIZ_MUSIC_VOLUME, 50);
+        String appLanguage = prefs.getString(KEY_APP_LANGUAGE, "English");
 
         // Set UI states
         switchMusic.setChecked(musicEnabled);
         switchSfx.setChecked(sfxEnabled);
         switchAnimations.setChecked(animationsEnabled);
         switchLowPowerAnimations.setChecked(lowPowerEnabled);
+        switchDailyReminders.setChecked(dailyReminders);
+        switchStreakAlerts.setChecked(streakAlerts);
+        if (tvCurrentAppLanguage != null) tvCurrentAppLanguage.setText(appLanguage);
 
         // Set quiz music volume
         if (seekBarQuizMusicVolume != null) {
@@ -130,6 +150,14 @@ public class SettingsActivity extends AppCompatActivity {
 
         switchLowPowerAnimations.setOnCheckedChangeListener((buttonView, isChecked) -> {
             prefs.edit().putBoolean(KEY_LOW_POWER_ANIMATIONS, isChecked).apply();
+        });
+
+        switchDailyReminders.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            prefs.edit().putBoolean(KEY_DAILY_REMINDERS, isChecked).apply();
+        });
+
+        switchStreakAlerts.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            prefs.edit().putBoolean(KEY_STREAK_ALERTS, isChecked).apply();
         });
 
         // Quiz Music Volume SeekBar listener
@@ -210,6 +238,18 @@ public class SettingsActivity extends AppCompatActivity {
         if (btnContactUs != null) {
             btnContactUs.setOnClickListener(v -> contactDevelopers());
         }
+
+        if (btnShareApp != null) {
+            btnShareApp.setOnClickListener(v -> shareApp());
+        }
+
+        if (btnRateApp != null) {
+            btnRateApp.setOnClickListener(v -> rateApp());
+        }
+
+        if (btnChangeAppLanguage != null) {
+            btnChangeAppLanguage.setOnClickListener(v -> showAppLanguageDialog());
+        }
     }
 
     @Override
@@ -218,6 +258,65 @@ public class SettingsActivity extends AppCompatActivity {
         return true;
     }
 
+
+    private void updateAppVersionText() {
+        if (tvAppVersion == null) return;
+        try {
+            String versionName = getPackageManager().getPackageInfo(getPackageName(), 0).versionName;
+            tvAppVersion.setText(getString(R.string.settings_app_version, versionName));
+        } catch (Exception e) {
+            tvAppVersion.setText("App Version: 1.0.0");
+        }
+    }
+
+    private void shareApp() {
+        Intent sendIntent = new Intent();
+        sendIntent.setAction(Intent.ACTION_SEND);
+        sendIntent.putExtra(Intent.EXTRA_TEXT, 
+            "Check out EduLingua Ghana! Learn Ghanaian languages the fun way. 🚀\nDownload now: https://play.google.com/store/apps/details?id=" + getPackageName());
+        sendIntent.setType("text/plain");
+        startActivity(Intent.createChooser(sendIntent, "Share EduLingua Ghana"));
+    }
+
+    private void rateApp() {
+        Uri uri = Uri.parse("market://details?id=" + getPackageName());
+        Intent goToMarket = new Intent(Intent.ACTION_VIEW, uri);
+        goToMarket.addFlags(Intent.FLAG_ACTIVITY_NO_HISTORY |
+                Intent.FLAG_ACTIVITY_NEW_DOCUMENT |
+                Intent.FLAG_ACTIVITY_MULTIPLE_TASK);
+        try {
+            startActivity(goToMarket);
+        } catch (android.content.ActivityNotFoundException e) {
+            startActivity(new Intent(Intent.ACTION_VIEW,
+                    Uri.parse("http://play.google.com/store/apps/details?id=" + getPackageName())));
+        }
+    }
+
+    private void showAppLanguageDialog() {
+        String[] languages = {"English", "French"};
+        SharedPreferences prefs = getSharedPreferences(PREF_NAME, MODE_PRIVATE);
+        String currentLang = prefs.getString(KEY_APP_LANGUAGE, "English");
+        
+        int checkedItem = 0;
+        for (int i = 0; i < languages.length; i++) {
+            if (languages[i].equals(currentLang)) {
+                checkedItem = i;
+                break;
+            }
+        }
+
+        new com.google.android.material.dialog.MaterialAlertDialogBuilder(this)
+            .setTitle(R.string.settings_language_title)
+            .setSingleChoiceItems(languages, checkedItem, (dialog, which) -> {
+                String selected = languages[which];
+                prefs.edit().putString(KEY_APP_LANGUAGE, selected).apply();
+                if (tvCurrentAppLanguage != null) tvCurrentAppLanguage.setText(selected);
+                Toast.makeText(this, "App language changed to " + selected + " (Restart app to apply full changes)", Toast.LENGTH_LONG).show();
+                dialog.dismiss();
+            })
+            .setNegativeButton("Cancel", null)
+            .show();
+    }
 
     private void applyToolbarFont(Toolbar toolbar) {
         try {
@@ -246,6 +345,7 @@ public class SettingsActivity extends AppCompatActivity {
             // Apply font to all section headers
             TextView tvAudioHeader = findViewById(R.id.tvAudioHeader);
             TextView tvVisualHeader = findViewById(R.id.tvVisualHeader);
+            TextView tvNotificationsHeader = findViewById(R.id.tvNotificationsHeader);
             TextView tvProgressHeader = findViewById(R.id.tvProgressHeader);
             TextView tvAccountHeader = findViewById(R.id.tvAccountHeader);
             TextView tvCloudHeader = findViewById(R.id.tvCloudHeader);
@@ -253,6 +353,7 @@ public class SettingsActivity extends AppCompatActivity {
 
             if (tvAudioHeader != null) tvAudioHeader.setTypeface(typeface, android.graphics.Typeface.BOLD);
             if (tvVisualHeader != null) tvVisualHeader.setTypeface(typeface, android.graphics.Typeface.BOLD);
+            if (tvNotificationsHeader != null) tvNotificationsHeader.setTypeface(typeface, android.graphics.Typeface.BOLD);
             if (tvProgressHeader != null) tvProgressHeader.setTypeface(typeface, android.graphics.Typeface.BOLD);
             if (tvAccountHeader != null) tvAccountHeader.setTypeface(typeface, android.graphics.Typeface.BOLD);
             if (tvCloudHeader != null) tvCloudHeader.setTypeface(typeface, android.graphics.Typeface.BOLD);

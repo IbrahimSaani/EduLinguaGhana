@@ -137,7 +137,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginStart="8dp"
                 android:layout_marginBottom="8dp"
-                android:text="🎨 Display &amp; Visuals"
+                android:text="@string/settings_visual_title"
                 android:textColor="@color/colorPrimary"
                 android:textStyle="bold"
                 android:fontFamily="@font/agbalumo" />
@@ -160,14 +160,100 @@
                         android:id="@+id/switchAnimations"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="Enable Animations"
+                        android:text="@string/settings_background_animations"
                         android:padding="12dp" />
 
                     <com.google.android.material.switchmaterial.SwitchMaterial
                         android:id="@+id/switchLowPowerAnimations"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="Reduce Motion"
+                        android:text="@string/settings_low_power_animations"
+                        android:padding="12dp" />
+
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="1dp"
+                        android:layout_marginHorizontal="12dp"
+                        android:background="@color/dividerColor" />
+
+                    <LinearLayout
+                        android:id="@+id/btnChangeAppLanguage"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:padding="12dp"
+                        android:background="?attr/selectableItemBackground"
+                        android:clickable="true"
+                        android:focusable="true"
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical">
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:orientation="vertical">
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="@string/settings_language_title"
+                                android:textColor="@color/textColorPrimary"
+                                android:textStyle="bold" />
+                            <TextView
+                                android:id="@+id/tvCurrentAppLanguage"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="@string/lang_english"
+                                android:textSize="12sp"
+                                android:textColor="@color/textColorSecondary" />
+                        </LinearLayout>
+                        <ImageView
+                            android:layout_width="20dp"
+                            android:layout_height="20dp"
+                            android:src="@drawable/ic_arrow_forward"
+                            app:tint="@color/dividerColor" />
+                    </LinearLayout>
+
+                </LinearLayout>
+
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- Notifications Section -->
+            <TextView
+                android:id="@+id/tvNotificationsHeader"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:layout_marginBottom="8dp"
+                android:text="@string/settings_notifications_title"
+                android:textColor="@color/colorPrimary"
+                android:textStyle="bold"
+                android:fontFamily="@font/agbalumo" />
+
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="20dp"
+                app:cardCornerRadius="20dp"
+                app:cardElevation="4dp"
+                app:cardBackgroundColor="@color/white">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="12dp">
+
+                    <com.google.android.material.switchmaterial.SwitchMaterial
+                        android:id="@+id/switchDailyReminders"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="@string/settings_daily_reminder"
+                        android:padding="12dp" />
+
+                    <com.google.android.material.switchmaterial.SwitchMaterial
+                        android:id="@+id/switchStreakAlerts"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="@string/settings_streak_alerts"
                         android:padding="12dp" />
 
                 </LinearLayout>
@@ -294,7 +380,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginStart="8dp"
                 android:layout_marginBottom="8dp"
-                android:text="ℹ️ Support &amp; About"
+                android:text="@string/settings_about_title"
                 android:textColor="@color/colorPrimary"
                 android:textStyle="bold"
                 android:fontFamily="@font/agbalumo" />
@@ -333,8 +419,53 @@
                             app:tint="@color/dividerColor" />
                     </LinearLayout>
 
-                     <View android:layout_width="match_parent" android:layout_height="1dp" android:background="@color/dividerColor" android:layout_marginHorizontal="16dp" />
+                    <View android:layout_width="match_parent" android:layout_height="1dp" android:background="@color/dividerColor" android:layout_marginHorizontal="16dp" />
 
+                    <LinearLayout
+                        android:id="@+id/btnShareApp"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:padding="16dp"
+                        android:background="?attr/selectableItemBackground"
+                        android:clickable="true"
+                        android:focusable="true">
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="@string/settings_share_app"
+                            android:textColor="@color/textColorPrimary" />
+                        <ImageView
+                            android:layout_width="20dp"
+                            android:layout_height="20dp"
+                            android:src="@drawable/ic_share"
+                            app:tint="@color/dividerColor" />
+                    </LinearLayout>
+
+                    <View android:layout_width="match_parent" android:layout_height="1dp" android:background="@color/dividerColor" android:layout_marginHorizontal="16dp" />
+
+                    <LinearLayout
+                        android:id="@+id/btnRateApp"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:padding="16dp"
+                        android:background="?attr/selectableItemBackground"
+                        android:clickable="true"
+                        android:focusable="true">
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="@string/settings_rate_app"
+                            android:textColor="@color/textColorPrimary" />
+                        <ImageView
+                            android:layout_width="20dp"
+                            android:layout_height="20dp"
+                            android:src="@drawable/ic_achievement_star"
+                            app:tint="@color/dividerColor" />
+                    </LinearLayout>
+
+                    <View android:layout_width="match_parent" android:layout_height="1dp" android:background="@color/dividerColor" android:layout_marginHorizontal="16dp" />
 
                     <LinearLayout
                         android:id="@+id/btnContactUs"
@@ -379,6 +510,18 @@
                             android:src="@drawable/ic_arrow_forward"
                             app:tint="@color/dividerColor" />
                     </LinearLayout>
+
+                    <View android:layout_width="match_parent" android:layout_height="1dp" android:background="@color/dividerColor" android:layout_marginHorizontal="16dp" />
+
+                    <TextView
+                        android:id="@+id/tvAppVersion"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:padding="16dp"
+                        android:textAlignment="center"
+                        android:textSize="12sp"
+                        android:textColor="@color/textColorSecondary"
+                        tools:text="App Version: 1.0.0" />
 
                 </LinearLayout>
 

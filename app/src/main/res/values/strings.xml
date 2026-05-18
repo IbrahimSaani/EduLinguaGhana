@@ -12,19 +12,28 @@
 
     <!-- Settings Screen -->
     <string name="settings_title">Settings</string>
-    <string name="settings_audio_title">Audio Settings</string>
-    <string name="settings_background_music">Background music</string>
-    <string name="settings_sound_effects">Sound effects (SFX)</string>
-    <string name="settings_visual_title">Visual Settings</string>
-    <string name="settings_background_animations">Background animations</string>
-    <string name="settings_low_power_animations">Low-power animations (reduced motion)</string>
+    <string name="settings_audio_title">🔊 Audio &amp; Sound</string>
+    <string name="settings_background_music">Background Music</string>
+    <string name="settings_sound_effects">Sound Effects</string>
+    <string name="settings_visual_title">🎨 Display &amp; Visuals</string>
+    <string name="settings_background_animations">Enable Animations</string>
+    <string name="settings_low_power_animations">Reduce Motion</string>
     <string name="settings_theme_title">Theme</string>
     <string name="settings_theme_light">Light</string>
     <string name="settings_theme_dark">Dark</string>
     <string name="settings_theme_system">System Default</string>
-    <string name="settings_progress_title">Progress</string>
-    <string name="settings_reset_progress">Reset quiz progress</string>
-    <string name="settings_reset_warning">(This will clear your best score and quiz statistics.)</string>
+    <string name="settings_notifications_title">🔔 Notifications</string>
+    <string name="settings_daily_reminder">Daily Learning Reminders</string>
+    <string name="settings_streak_alerts">Streak Loss Alerts</string>
+    <string name="settings_language_title">🌐 App Language</string>
+    <string name="settings_language_desc">Change the interface language</string>
+    <string name="settings_progress_title">🧨 Danger Zone</string>
+    <string name="settings_reset_progress">Reset All Progress</string>
+    <string name="settings_reset_warning">This will permanently delete all your local progress and achievements.</string>
+    <string name="settings_about_title">ℹ️ Support &amp; About</string>
+    <string name="settings_share_app">Share App with Friends</string>
+    <string name="settings_rate_app">Rate Us on Play Store</string>
+    <string name="settings_app_version">App Version: %s</string>
 
     <!-- Reset Progress Dialog -->
     <string name="settings_reset_dialog_title">Reset Progress</string>
