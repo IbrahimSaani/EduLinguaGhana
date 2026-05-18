@@ -24,7 +24,7 @@ public class OfflineGhanaLPTtsService {
     }
 
     public OfflineGhanaLPTtsService(Context context) {
-        this.context = context.getApplicationContext();
+        this.context = context;
     }
 
     /**
@@ -69,6 +69,12 @@ public class OfflineGhanaLPTtsService {
      * Play any text - tries to find matching audio file
      */
     public void speak(String text, String language, PlaybackCallback callback) {
+        if (text == null || text.trim().isEmpty()) {
+            Log.w(TAG, "Empty text passed to speak()");
+            if (callback != null) callback.onError("Empty text");
+            return;
+        }
+
         String sanitized = sanitizeForFilename(text);
         // Normalize language code to match audio file naming convention
         String audioLangCode = normalizeLanguageForAudio(language);
@@ -81,7 +87,7 @@ public class OfflineGhanaLPTtsService {
                 numberPadded = String.format(Locale.US, "%03d", num);
                 Log.d(TAG, "Detected number: " + text + " -> formatted as: " + numberPadded);
             }
-        } catch (NumberFormatException e) {
+        } catch (NumberFormatException ignored) {
             // Not a number, continue with text patterns
         }
 

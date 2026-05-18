@@ -61,6 +61,7 @@ public class RocketSortActivity extends AppCompatActivity {
     private MediaPlayer wrongPlayer;
     private MediaPlayer gameOverPlayer;
     private MediaPlayer levelUpPlayer;
+    private MediaPlayer backgroundMusic;
     private int bestScore = 0;
     private static final String PREF_NAME = "EduLinguaPrefs";
     private static final String KEY_HIGH_SCORE_ROCKET = "high_score_rocket_sort";
@@ -114,10 +115,21 @@ public class RocketSortActivity extends AppCompatActivity {
     }
 
     private void initSounds() {
+        if (correctPlayer != null) correctPlayer.release();
         correctPlayer = MediaPlayer.create(this, R.raw.correct);
+        if (wrongPlayer != null) wrongPlayer.release();
         wrongPlayer = MediaPlayer.create(this, R.raw.shortexplosion);
+        if (gameOverPlayer != null) gameOverPlayer.release();
         gameOverPlayer = MediaPlayer.create(this, R.raw.gameover);
+        if (levelUpPlayer != null) levelUpPlayer.release();
         levelUpPlayer = MediaPlayer.create(this, R.raw.level);
+        
+        if (backgroundMusic != null) backgroundMusic.release();
+        backgroundMusic = MediaPlayer.create(this, R.raw.rocket);
+        if (backgroundMusic != null) {
+            backgroundMusic.setLooping(true);
+            backgroundMusic.setVolume(0.5f, 0.5f);
+        }
 
         android.content.SharedPreferences prefs = getSharedPreferences(PREF_NAME, MODE_PRIVATE);
         bestScore = prefs.getInt(KEY_HIGH_SCORE_ROCKET, 0);
@@ -171,6 +183,10 @@ public class RocketSortActivity extends AppCompatActivity {
         updateUI();
         overlayLayout.setVisibility(View.GONE);
         
+        if (backgroundMusic != null && !backgroundMusic.isPlaying()) {
+            backgroundMusic.start();
+        }
+        
         for (View a : activeAsteroids) {
             asteroidContainer.removeView(a);
         }
@@ -210,6 +226,9 @@ public class RocketSortActivity extends AppCompatActivity {
         isPaused = !isPaused;
         if (isPaused) {
             spawnHandler.removeCallbacks(spawnRunnable);
+            if (backgroundMusic != null && backgroundMusic.isPlaying()) {
+                backgroundMusic.pause();
+            }
             // Properly pause all active ObjectAnimators
             for (ObjectAnimator animator : asteroidAnimators.values()) {
                 animator.pause();
@@ -217,6 +236,9 @@ public class RocketSortActivity extends AppCompatActivity {
             showOverlay("Paused");
         } else {
             overlayLayout.setVisibility(View.GONE);
+            if (backgroundMusic != null && !isGameOver) {
+                backgroundMusic.start();
+            }
             // Properly resume all active ObjectAnimators
             for (ObjectAnimator animator : asteroidAnimators.values()) {
                 animator.resume();
@@ -442,6 +464,9 @@ public class RocketSortActivity extends AppCompatActivity {
     private void endGame() {
         isGameOver = true;
         spawnHandler.removeCallbacks(spawnRunnable);
+        if (backgroundMusic != null && backgroundMusic.isPlaying()) {
+            backgroundMusic.pause();
+        }
         if (gameOverPlayer != null) {
             gameOverPlayer.start();
         }
@@ -489,7 +514,18 @@ public class RocketSortActivity extends AppCompatActivity {
     protected void onPause() {
         super.onPause();
         isPaused = true;
+        if (backgroundMusic != null && backgroundMusic.isPlaying()) {
+            backgroundMusic.pause();
+        }
         spawnHandler.removeCallbacks(spawnRunnable);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if (backgroundMusic != null && !isPaused && !isGameOver) {
+            backgroundMusic.start();
+        }
     }
 
     @Override
@@ -499,5 +535,10 @@ public class RocketSortActivity extends AppCompatActivity {
         if (wrongPlayer != null) wrongPlayer.release();
         if (gameOverPlayer != null) gameOverPlayer.release();
         if (levelUpPlayer != null) levelUpPlayer.release();
+        if (backgroundMusic != null) {
+            backgroundMusic.stop();
+            backgroundMusic.release();
+            backgroundMusic = null;
+        }
     }
 }

@@ -650,10 +650,6 @@ public class SpeedGameActivity extends AppCompatActivity {
                 tvGameTimer.setText(getString(R.string.quiz_timer_done));
                 tvGameFeedback.setText(getString(R.string.quiz_final_score, score));
 
-                if (gameOverPlayer != null) {
-                    gameOverPlayer.start();
-                }
-
                 // Disable buttons
                 setOptionsEnabled(false);
 

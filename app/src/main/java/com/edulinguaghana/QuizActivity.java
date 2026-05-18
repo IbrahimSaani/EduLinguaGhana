@@ -1194,10 +1194,6 @@ public class QuizActivity extends AppCompatActivity {
         cancelTimer();
         setButtonsEnabled(false);
         
-        if (gameOverPlayer != null) {
-            gameOverPlayer.start();
-        }
-
         boolean newHighScore = score > 0 && score >= bestScore;
 
         // Update overall progress with language tracking

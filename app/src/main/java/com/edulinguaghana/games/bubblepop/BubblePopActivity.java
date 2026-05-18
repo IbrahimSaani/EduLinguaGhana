@@ -180,8 +180,10 @@ public class BubblePopActivity extends AppCompatActivity {
             if (status == TextToSpeech.SUCCESS) {
                 tts.setLanguage(LanguageConversionUtils.getLocaleForLanguage(languageCode));
                 isTtsReady = true;
-                // Speak first target once ready
-                speakTarget(targetLetter);
+                // Speak first target once ready, only if it has been generated
+                if (targetLetter != null) {
+                    speakTarget(targetLetter);
+                }
             }
         });
     }
@@ -371,10 +373,20 @@ public class BubblePopActivity extends AppCompatActivity {
     }
 
     private void speakTarget(String text) {
+        if (text == null || text.trim().isEmpty()) return;
+        
         if (LanguageConversionUtils.isGhanaianLanguage(languageCode) && offlineTts != null) {
-            offlineTts.speak(text, languageCode, null);
+            try {
+                offlineTts.speak(text, languageCode, null);
+            } catch (Exception e) {
+                android.util.Log.e("BubblePop", "Error with offline TTS", e);
+            }
         } else if (isTtsReady && tts != null) {
-            tts.speak(text, TextToSpeech.QUEUE_FLUSH, null, "bubble_pop");
+            try {
+                tts.speak(text, TextToSpeech.QUEUE_FLUSH, null, "bubble_pop");
+            } catch (Exception e) {
+                android.util.Log.e("BubblePop", "Error with system TTS", e);
+            }
         }
     }
 
@@ -535,16 +547,26 @@ public class BubblePopActivity extends AppCompatActivity {
             updateScoreDisplay();
             
             if (score % 5 == 0) {
-                if (levelUpPlayer != null) levelUpPlayer.start();
+                if (levelUpPlayer != null) {
+                    try {
+                        levelUpPlayer.start();
+                    } catch (Exception ignored) {}
+                }
                 currentSpeed = Math.max(MIN_SPEED, currentSpeed - SPEED_INCREMENT);
                 Toast.makeText(this, R.string.bubble_pop_speed_up, Toast.LENGTH_SHORT).show();
             }
             
             generateNewTarget();
-            celebrate();
+            try {
+                celebrate();
+            } catch (Exception ignored) {}
         } else {
             // Wrong bubble: Shake and sound
-            if (wrongPlayer != null) wrongPlayer.start();
+            if (wrongPlayer != null) {
+                try {
+                    wrongPlayer.start();
+                } catch (Exception ignored) {}
+            }
             ObjectAnimator shake = ObjectAnimator.ofFloat(bubble, View.TRANSLATION_X, bubble.getTranslationX(), bubble.getTranslationX() + 25f);
             shake.setDuration(100);
             shake.setRepeatCount(3);
@@ -554,7 +576,20 @@ public class BubblePopActivity extends AppCompatActivity {
     }
 
     private void popBubble(TextView bubble, boolean isCorrect) {
-        if (isCorrect && correctPlayer != null) correctPlayer.start();
+        if (isCorrect) {
+            // For frequent sounds like bubble popping, create a temporary player or reuse safely
+            try {
+                MediaPlayer mp = MediaPlayer.create(this, R.raw.bubblepop);
+                if (mp != null) {
+                    mp.setOnCompletionListener(MediaPlayer::release);
+                    mp.start();
+                }
+            } catch (Exception e) {
+                android.util.Log.e("BubblePop", "Error playing pop sound", e);
+            }
+        }
+        
+        final View parentWrapper = (View) bubble.getParent();
         
         // Animation: Scale up and fade out
         bubble.animate()
@@ -565,7 +600,11 @@ public class BubblePopActivity extends AppCompatActivity {
             .setListener(new AnimatorListenerAdapter() {
                 @Override
                 public void onAnimationEnd(Animator animation) {
-                    removeBubble(bubble);
+                    if (parentWrapper != null) {
+                        removeBubble(parentWrapper);
+                    } else {
+                        removeBubble(bubble);
+                    }
                 }
             });
     }
