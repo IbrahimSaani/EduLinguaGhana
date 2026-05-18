@@ -73,11 +73,20 @@ public class PendingRequestsAdapter extends RecyclerView.Adapter<PendingRequests
                         OnRequestActionListener rejectListener) {
             String fromName = request.getSupervisorName() != null ?
                             request.getSupervisorName() : "Unknown";
-            tvRequestFrom.setText(fromName);
+            
+            String gender = request.getSupervisorGender();
+            String prefix = "";
+            if ("Male".equalsIgnoreCase(gender)) {
+                prefix = "Mr. ";
+            } else if ("Female".equalsIgnoreCase(gender)) {
+                prefix = "Mrs. ";
+            }
+            
+            tvRequestFrom.setText(prefix + fromName);
 
-            String type = request.getType() == UserRelationship.RelationType.TEACHER_STUDENT ?
+            String roleType = request.getType() == UserRelationship.RelationType.TEACHER_STUDENT ?
                         "Teacher" : "Parent";
-            tvRequestType.setText(type + " wants to track your progress");
+            tvRequestType.setText(roleType + " wants to track your progress");
 
             btnAccept.setOnClickListener(v -> {
                 if (acceptListener != null) {

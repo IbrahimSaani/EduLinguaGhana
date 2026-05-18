@@ -10,6 +10,8 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import androidx.annotation.NonNull;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -150,51 +152,69 @@ public class RoleManager {
                                    String studentId, String studentName,
                                    UserRelationship.RelationType type,
                                    RelationshipActionCallback callback) {
-        // First check if relationship already exists
-        checkRelationshipExists(supervisorId, studentId, new RelationshipExistsCallback() {
-            @Override
-            public void onResult(boolean exists, UserRelationship existingRelationship) {
-                if (exists) {
-                    // Relationship already exists
-                    String status = existingRelationship.getStatus() == UserRelationship.RelationshipStatus.PENDING
-                        ? "A pending request already exists for this student"
-                        : "This student is already connected to you";
-                    callback.onError(status);
-                    return;
+        // Fetch supervisor gender first
+        usersRef.child(supervisorId).child("gender")
+            .addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot snapshot) {
+                    String gender = snapshot.getValue(String.class);
+                    if (gender == null) gender = "Not Specified";
+                    
+                    final String supervisorGender = gender;
+
+                    // First check if relationship already exists
+                    checkRelationshipExists(supervisorId, studentId, new RelationshipExistsCallback() {
+                        @Override
+                        public void onResult(boolean exists, UserRelationship existingRelationship) {
+                            if (exists) {
+                                // Relationship already exists
+                                String status = existingRelationship.getStatus() == UserRelationship.RelationshipStatus.PENDING
+                                    ? "A pending request already exists for this student"
+                                    : "This student is already connected to you";
+                                callback.onError(status);
+                                return;
+                            }
+
+                            // Create new relationship
+                            String relationshipId = java.util.UUID.randomUUID().toString();
+                            long now = System.currentTimeMillis();
+
+                            UserRelationship relationship = new UserRelationship(
+                                relationshipId,
+                                supervisorId,
+                                studentId,
+                                supervisorName,
+                                studentName,
+                                supervisorGender,
+                                type,
+                                UserRelationship.RelationshipStatus.PENDING,
+                                now,
+                                0
+                            );
+
+                            relationshipsRef.child(relationshipId).setValue(relationship)
+                                .addOnSuccessListener(aVoid -> {
+                                    Log.d(TAG, "Relationship created: " + relationshipId);
+                                    callback.onSuccess(relationship);
+                                })
+                                .addOnFailureListener(e -> {
+                                    Log.e(TAG, "Failed to create relationship", e);
+                                    callback.onError(e.getMessage());
+                                });
+                        }
+
+                        @Override
+                        public void onError(String error) {
+                            callback.onError("Failed to check existing relationships: " + error);
+                        }
+                    });
                 }
 
-                // Create new relationship
-                String relationshipId = UUID.randomUUID().toString();
-                long now = System.currentTimeMillis();
-
-                UserRelationship relationship = new UserRelationship(
-                    relationshipId,
-                    supervisorId,
-                    studentId,
-                    supervisorName,
-                    studentName,
-                    type,
-                    UserRelationship.RelationshipStatus.PENDING,
-                    now,
-                    0
-                );
-
-                relationshipsRef.child(relationshipId).setValue(relationship)
-                    .addOnSuccessListener(aVoid -> {
-                        Log.d(TAG, "Relationship created: " + relationshipId);
-                        callback.onSuccess(relationship);
-                    })
-                    .addOnFailureListener(e -> {
-                        Log.e(TAG, "Failed to create relationship", e);
-                        callback.onError(e.getMessage());
-                    });
-            }
-
-            @Override
-            public void onError(String error) {
-                callback.onError("Failed to check existing relationships: " + error);
-            }
-        });
+                @Override
+                public void onCancelled(@NonNull DatabaseError error) {
+                    callback.onError("Failed to fetch user gender: " + error.getMessage());
+                }
+            });
     }
 
     /**

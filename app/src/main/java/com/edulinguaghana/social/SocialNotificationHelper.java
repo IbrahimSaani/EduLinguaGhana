@@ -106,6 +106,53 @@ public class SocialNotificationHelper {
     }
 
     /**
+     * Show notification for new relationship request (Teacher/Parent)
+     */
+    @SuppressLint("MissingPermission")
+    public void showRelationshipRequestNotification(String fromUserId, String displayName, String gender, String type) {
+        if (!canShowNotification()) return;
+
+        String prefix = "";
+        if ("Male".equalsIgnoreCase(gender)) {
+            prefix = "Mr. ";
+        } else if ("Female".equalsIgnoreCase(gender)) {
+            prefix = "Mrs. ";
+        }
+        
+        String fromName = prefix + (displayName != null ? displayName : fromUserId);
+        String roleLabel = "Teacher".equalsIgnoreCase(type) ? "Teacher" : "Parent";
+
+        // Add to in-app notification manager
+        com.edulinguaghana.NotificationManager inAppManager = new com.edulinguaghana.NotificationManager(context);
+        inAppManager.addNotification(
+            "New Connection Request",
+            fromName + " (" + roleLabel + ") wants to track your progress!",
+            "👨‍🏫",
+            com.edulinguaghana.Notification.NotificationType.MOTIVATIONAL
+        );
+
+        Intent intent = new Intent(context, com.edulinguaghana.tracking.RelationshipManagementActivity.class);
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+
+        PendingIntent pendingIntent = PendingIntent.getActivity(
+            context,
+            5,
+            intent,
+            PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE
+        );
+
+        NotificationCompat.Builder builder = new NotificationCompat.Builder(context, CHANNEL_ID)
+            .setSmallIcon(R.drawable.ic_notifications)
+            .setContentTitle("New Connection Request 🤝")
+            .setContentText(fromName + " wants to track your progress!")
+            .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+            .setContentIntent(pendingIntent)
+            .setAutoCancel(true);
+
+        notificationManager.notify(("rel_" + fromUserId).hashCode(), builder.build());
+    }
+
+    /**
      * Show notification for new challenge
      */
     @SuppressLint("MissingPermission")

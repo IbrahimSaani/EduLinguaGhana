@@ -189,6 +189,7 @@ public class ProfileActivity extends AppCompatActivity {
                     userProfile.put("email", user.getEmail());
                     userProfile.put("displayName", user.getDisplayName());
                     userProfile.put("username", user.getDisplayName() != null ? user.getDisplayName() : user.getEmail());
+                    userProfile.put("gender", "Not Specified");
                     userProfile.put("age", "");
                     userProfile.put("school", "");
                     userProfile.put("studentClass", "");

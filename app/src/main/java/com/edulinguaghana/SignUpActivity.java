@@ -50,6 +50,7 @@ public class SignUpActivity extends AppCompatActivity {
     private static final int RC_GOOGLE_SIGN_IN = 9002;
 
     private TextInputEditText etName, etEmail, etPassword, etConfirmPassword;
+    private android.widget.RadioGroup rgGender;
     private MaterialButton btnSignUp, btnGoogleSignUp, btnFacebookSignUp;
     private TextView tvLogin, tvSkip;
     private ProgressBar progressBar;
@@ -103,6 +104,7 @@ public class SignUpActivity extends AppCompatActivity {
         etEmail = findViewById(R.id.etEmail);
         etPassword = findViewById(R.id.etPassword);
         etConfirmPassword = findViewById(R.id.etConfirmPassword);
+        rgGender = findViewById(R.id.rgGender);
         btnSignUp = findViewById(R.id.btnSignUp);
         btnGoogleSignUp = findViewById(R.id.btnGoogleSignUp);
         btnFacebookSignUp = findViewById(R.id.btnFacebookSignUp);
@@ -131,6 +133,13 @@ public class SignUpActivity extends AppCompatActivity {
          String email = etEmail.getText().toString().trim();
          String password = etPassword.getText().toString().trim();
          String confirmPassword = etConfirmPassword.getText().toString().trim();
+
+         int selectedGenderId = rgGender.getCheckedRadioButtonId();
+         if (selectedGenderId == -1) {
+             Toast.makeText(this, "Please select your gender", Toast.LENGTH_SHORT).show();
+             return;
+         }
+         String gender = selectedGenderId == R.id.rbMale ? "Male" : "Female";
 
          if (!validateInput(name, email, password, confirmPassword)) {
              return;
@@ -169,7 +178,7 @@ public class SignUpActivity extends AppCompatActivity {
                                      .addOnCompleteListener(updateTask -> {
                                          if (updateTask.isSuccessful()) {
                                              // Save user to database for friend lookups
-                                               saveUserToDatabase(user);
+                                               saveUserToDatabase(user, gender);
                                              Toast.makeText(SignUpActivity.this,
                                                      "Account created successfully!",
                                                      Toast.LENGTH_SHORT).show();
@@ -349,7 +358,7 @@ public class SignUpActivity extends AppCompatActivity {
             Toast.makeText(this, "Could not load your account", Toast.LENGTH_SHORT).show();
             return;
         }
-        saveUserToDatabase(user);
+        saveUserToDatabase(user, "Not Specified");
         Toast.makeText(SignUpActivity.this,
                 "Welcome " + user.getDisplayName() + "!",
                 Toast.LENGTH_SHORT).show();
@@ -359,7 +368,7 @@ public class SignUpActivity extends AppCompatActivity {
     /**
      * Save user profile to Firebase Realtime Database
      */
-    private void saveUserToDatabase(FirebaseUser user) {
+    private void saveUserToDatabase(FirebaseUser user, String gender) {
         if (user == null) return;
 
         DatabaseReference usersRef = FirebaseDatabase.getInstance().getReference("users");
@@ -368,6 +377,7 @@ public class SignUpActivity extends AppCompatActivity {
         userProfile.put("email", user.getEmail());
         userProfile.put("displayName", user.getDisplayName());
         userProfile.put("username", user.getDisplayName() != null ? user.getDisplayName() : user.getEmail());
+        userProfile.put("gender", gender);
         userProfile.put("lastLogin", System.currentTimeMillis());
 
         usersRef.child(user.getUid()).updateChildren(userProfile);

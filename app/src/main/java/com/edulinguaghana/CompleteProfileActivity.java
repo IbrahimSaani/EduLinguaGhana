@@ -32,6 +32,7 @@ public class CompleteProfileActivity extends AppCompatActivity {
     public static final String NEXT_STEP_PROFILE = "profile";
 
     private TextInputEditText etAge;
+    private android.widget.RadioGroup rgGender;
     private MaterialAutoCompleteTextView etStudentClass;
     private MaterialButton btnContinue;
     private android.widget.TextView tvDisplayName, tvEmail;
@@ -70,6 +71,7 @@ public class CompleteProfileActivity extends AppCompatActivity {
 
     private void initViews() {
         etAge = findViewById(R.id.etAge);
+        rgGender = findViewById(R.id.rgGender);
         etStudentClass = findViewById(R.id.etStudentClass);
         btnContinue = findViewById(R.id.btnContinue);
         tvDisplayName = findViewById(R.id.tvDisplayName);
@@ -93,6 +95,12 @@ public class CompleteProfileActivity extends AppCompatActivity {
     }
 
     private void configureModeUi() {
+        if (currentUserRole != UserRole.STUDENT) {
+            if (findViewById(R.id.tilAge) != null) findViewById(R.id.tilAge).setVisibility(android.view.View.GONE);
+            if (findViewById(R.id.tilStudentClass) != null) findViewById(R.id.tilStudentClass).setVisibility(android.view.View.GONE);
+            if (tvSubtitle != null) tvSubtitle.setText("Please confirm your details to continue");
+        }
+
         if (tvTitle != null && editMode) {
             tvTitle.setText(R.string.complete_profile_edit_title);
         }
@@ -135,12 +143,20 @@ public class CompleteProfileActivity extends AppCompatActivity {
                         if (snapshot.exists()) {
                             String age = snapshot.child("age").getValue(String.class);
                             String studentClass = snapshot.child("studentClass").getValue(String.class);
+                            String gender = snapshot.child("gender").getValue(String.class);
 
                             if (etAge != null && !TextUtils.isEmpty(age)) {
                                 etAge.setText(age);
                             }
                             if (etStudentClass != null && !TextUtils.isEmpty(studentClass)) {
                                 etStudentClass.setText(studentClass, false);
+                            }
+                            if (rgGender != null && !TextUtils.isEmpty(gender)) {
+                                if (gender.equalsIgnoreCase("Male")) {
+                                    rgGender.check(R.id.rbMale);
+                                } else if (gender.equalsIgnoreCase("Female")) {
+                                    rgGender.check(R.id.rbFemale);
+                                }
                             }
                         }
                     }
@@ -160,11 +176,19 @@ public class CompleteProfileActivity extends AppCompatActivity {
     }
 
     private void saveProfileAndContinue() {
-        if (currentUserRole != UserRole.STUDENT) {
-            routeAfterCompletion();
+        int selectedGenderId = rgGender.getCheckedRadioButtonId();
+        if (selectedGenderId == -1) {
+            Toast.makeText(this, "Please select your gender", Toast.LENGTH_SHORT).show();
             return;
         }
+        String gender = selectedGenderId == R.id.rbMale ? "Male" : "Female";
 
+        if (currentUserRole != UserRole.STUDENT) {
+            DatabaseReference usersRef = FirebaseDatabase.getInstance().getReference("users").child(currentUser.getUid());
+            usersRef.child("gender").setValue(gender).addOnCompleteListener(task -> routeAfterCompletion());
+            return;
+        }
+        
         String age = safeText(etAge);
         String studentClass = safeText(etStudentClass);
 
@@ -202,6 +226,7 @@ public class CompleteProfileActivity extends AppCompatActivity {
         updates.put("email", currentUser.getEmail());
         updates.put("displayName", currentUser.getDisplayName());
         updates.put("username", currentUser.getDisplayName() != null ? currentUser.getDisplayName() : currentUser.getEmail());
+        updates.put("gender", gender);
         updates.put("age", age);
         updates.put("school", "");
         updates.put("studentClass", studentClass);

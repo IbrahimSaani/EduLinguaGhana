@@ -137,6 +137,48 @@
 
                     </com.google.android.material.textfield.TextInputLayout>
 
+                    <!-- Gender Selection -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:layout_marginTop="16dp">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Select Gender"
+                            android:textSize="14sp"
+                            android:textStyle="bold"
+                            android:textColor="@color/colorPrimary"
+                            android:layout_marginBottom="8dp" />
+
+                        <RadioGroup
+                            android:id="@+id/rgGender"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal">
+
+                            <RadioButton
+                                android:id="@+id/rbMale"
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:text="Male"
+                                android:textColor="@color/textColorPrimary" />
+
+                            <RadioButton
+                                android:id="@+id/rbFemale"
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:text="Female"
+                                android:textColor="@color/textColorPrimary" />
+
+                        </RadioGroup>
+
+                    </LinearLayout>
+
                     <!-- Email Input with Icon -->
                     <com.google.android.material.textfield.TextInputLayout
                         android:id="@+id/tilEmail"

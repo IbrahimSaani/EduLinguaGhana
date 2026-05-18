@@ -184,7 +184,7 @@ public class RoleSelectionActivity extends AppCompatActivity {
         Toast.makeText(this, "Role set to " + selectedRole.name(), Toast.LENGTH_SHORT).show();
 
         boolean isFirstTime = getIntent().getBooleanExtra("first_time", false);
-        if (selectedRole == UserRole.STUDENT && isFirstTime) {
+        if (isFirstTime) {
             Intent intent = new Intent(this, CompleteProfileActivity.class);
             intent.putExtra(CompleteProfileActivity.EXTRA_NEXT_STEP, CompleteProfileActivity.NEXT_STEP_MAIN);
             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);

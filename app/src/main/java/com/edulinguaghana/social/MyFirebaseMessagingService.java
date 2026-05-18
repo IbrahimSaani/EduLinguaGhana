@@ -89,6 +89,12 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
                     notificationHelper.showChallengeCompletedNotification(fromUserId, displayName, won);
                     break;
 
+                case "relationship_request":
+                    String gender = remoteMessage.getData().get("gender");
+                    String relType = remoteMessage.getData().get("relationType");
+                    notificationHelper.showRelationshipRequestNotification(fromUserId, displayName, gender, relType);
+                    break;
+
                 case "update":
                     String updateTitle = remoteMessage.getData().get("title");
                     String updateMessage = remoteMessage.getData().get("message");

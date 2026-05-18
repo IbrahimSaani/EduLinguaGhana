@@ -9,6 +9,7 @@ public class UserRelationship {
     private String studentId; // Student UID
     private String supervisorName;
     private String studentName;
+    private String supervisorGender;
     private RelationType type;
     private RelationshipStatus status;
     private long requestedAt;
@@ -30,7 +31,7 @@ public class UserRelationship {
     }
 
     public UserRelationship(String id, String supervisorId, String studentId,
-                           String supervisorName, String studentName,
+                           String supervisorName, String studentName, String supervisorGender,
                            RelationType type, RelationshipStatus status,
                            long requestedAt, long acceptedAt) {
         this.id = id;
@@ -38,6 +39,7 @@ public class UserRelationship {
         this.studentId = studentId;
         this.supervisorName = supervisorName;
         this.studentName = studentName;
+        this.supervisorGender = supervisorGender;
         this.type = type;
         this.status = status;
         this.requestedAt = requestedAt;
@@ -59,6 +61,9 @@ public class UserRelationship {
 
     public String getStudentName() { return studentName; }
     public void setStudentName(String studentName) { this.studentName = studentName; }
+
+    public String getSupervisorGender() { return supervisorGender; }
+    public void setSupervisorGender(String supervisorGender) { this.supervisorGender = supervisorGender; }
 
     public RelationType getType() { return type; }
     public void setType(RelationType type) { this.type = type; }
