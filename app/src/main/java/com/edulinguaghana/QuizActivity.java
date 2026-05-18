@@ -112,7 +112,7 @@ public class QuizActivity extends AppCompatActivity {
     private AudioCacheManager audioCacheManager;
 
     // Background music
-    private MediaPlayer backgroundMusicPlayer, gameOverPlayer, highScorePlayer;
+    private MediaPlayer backgroundMusicPlayer, highScorePlayer;
     private static final String KEY_BACKGROUND_MUSIC_ENABLED = "background_music_enabled";
     // Audio focus management
     private AudioManager audioManager;
@@ -167,7 +167,6 @@ public class QuizActivity extends AppCompatActivity {
 
         // Phase 3: Initialize Audio Cache Manager for TTS
         audioCacheManager = new AudioCacheManager(this);
-        gameOverPlayer = MediaPlayer.create(this, R.raw.gameover);
         highScorePlayer = MediaPlayer.create(this, R.raw.highscore);
 
 
@@ -1633,10 +1632,6 @@ public class QuizActivity extends AppCompatActivity {
         super.onDestroy();
         cancelTimer();
         stopBackgroundMusic();
-        if (gameOverPlayer != null) {
-            gameOverPlayer.release();
-            gameOverPlayer = null;
-        }
         if (highScorePlayer != null) {
             highScorePlayer.release();
             highScorePlayer = null;

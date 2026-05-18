@@ -84,7 +84,6 @@ public class SpeedGameActivity extends AppCompatActivity {
     // SFX
     private boolean isSfxOn = true;
     private MediaPlayer sfxPlayer;
-    private MediaPlayer gameOverPlayer;
 
     private SharedPreferences prefs;
 
@@ -144,8 +143,6 @@ public class SpeedGameActivity extends AppCompatActivity {
         tvGameBest.setText(getString(R.string.quiz_best_score, bestScore));
         tvGameScore.setText(getString(R.string.quiz_score, 0));
         tvGameFeedback.setText("");
-
-        gameOverPlayer = MediaPlayer.create(this, R.raw.gameover);
 
         // --- Init TTS ---
         initTts();
@@ -772,9 +769,6 @@ public class SpeedGameActivity extends AppCompatActivity {
         if (sfxPlayer != null) {
             sfxPlayer.release();
             sfxPlayer = null;
-        }
-        if (gameOverPlayer != null) {
-            gameOverPlayer.release();
         }
     }
 }

@@ -72,11 +72,11 @@ public class BubblePopActivity extends AppCompatActivity {
     private TextToSpeech tts;
     private OfflineGhanaLPTtsService offlineTts;
     private boolean isTtsReady = false;
-    private MediaPlayer correctPlayer;
-    private MediaPlayer wrongPlayer;
+    
+    // Audio
+    private android.media.SoundPool soundPool;
+    private int soundPopId, soundWrongId, soundLevelUpId, soundGameOverId;
     private MediaPlayer backgroundMusic;
-    private MediaPlayer gameOverPlayer;
-    private MediaPlayer levelUpPlayer;
     private int bestScore = 0;
     private static final String PREF_NAME = "EduLinguaPrefs";
     private static final String KEY_HIGH_SCORE_BUBBLE = "high_score_bubble_pop";
@@ -189,15 +189,27 @@ public class BubblePopActivity extends AppCompatActivity {
     }
 
     private void initSounds() {
-        correctPlayer = MediaPlayer.create(this, R.raw.bubblepop);
-        wrongPlayer = MediaPlayer.create(this, R.raw.wrong);
+        // Use SoundPool for low-latency game effects
+        android.media.AudioAttributes audioAttributes = new android.media.AudioAttributes.Builder()
+                .setUsage(android.media.AudioAttributes.USAGE_GAME)
+                .setContentType(android.media.AudioAttributes.CONTENT_TYPE_SONIFICATION)
+                .build();
+        
+        soundPool = new android.media.SoundPool.Builder()
+                .setMaxStreams(5)
+                .setAudioAttributes(audioAttributes)
+                .build();
+
+        soundPopId = soundPool.load(this, R.raw.squash, 1);
+        soundWrongId = soundPool.load(this, R.raw.wrong, 1);
+        soundLevelUpId = soundPool.load(this, R.raw.level, 1);
+        soundGameOverId = soundPool.load(this, R.raw.gameover, 1);
+
         backgroundMusic = MediaPlayer.create(this, R.raw.bubblepopmusic);
         if (backgroundMusic != null) {
             backgroundMusic.setLooping(true);
             backgroundMusic.setVolume(0.4f, 0.4f);
         }
-        gameOverPlayer = MediaPlayer.create(this, R.raw.gameover);
-        levelUpPlayer = MediaPlayer.create(this, R.raw.level);
         
         android.content.SharedPreferences prefs = getSharedPreferences(PREF_NAME, MODE_PRIVATE);
         bestScore = prefs.getInt(KEY_HIGH_SCORE_BUBBLE, 0);
@@ -289,14 +301,16 @@ public class BubblePopActivity extends AppCompatActivity {
         if (backgroundMusic != null && backgroundMusic.isPlaying()) {
             backgroundMusic.pause();
         }
-        if (gameOverPlayer != null) {
-            gameOverPlayer.start();
+        if (soundPool != null) {
+            soundPool.play(soundGameOverId, 1f, 1f, 0, 0, 1f);
         }
 
         if (score > bestScore) {
             bestScore = score;
             getSharedPreferences(PREF_NAME, MODE_PRIVATE).edit().putInt(KEY_HIGH_SCORE_BUBBLE, bestScore).apply();
-            celebrate();
+            try {
+                celebrate();
+            } catch (Exception ignored) {}
         }
 
         showPauseOverlay("Time Up!");
@@ -528,9 +542,12 @@ public class BubblePopActivity extends AppCompatActivity {
         animator.addListener(new AnimatorListenerAdapter() {
             @Override
             public void onAnimationEnd(Animator animation) {
-                if (bubbleContainer.indexOfChild(wrapper) != -1) {
-                    if (isTarget && !isGameOver && finalLetter.equals(targetLetter)) {
-                        Toast.makeText(BubblePopActivity.this, R.string.bubble_pop_escaped, Toast.LENGTH_SHORT).show();
+                if (!isGameOver && !isFinishing() && bubbleContainer.indexOfChild(wrapper) != -1) {
+                    // Check if it was popped (we use a tag for this)
+                    if (wrapper.getTag(R.id.bubbleContainer) == null) {
+                        if (isTarget && finalLetter.equals(targetLetter)) {
+                            Toast.makeText(BubblePopActivity.this, R.string.bubble_pop_escaped, Toast.LENGTH_SHORT).show();
+                        }
                     }
                     removeBubble(wrapper);
                 }
@@ -540,17 +557,20 @@ public class BubblePopActivity extends AppCompatActivity {
 
     private void handleBubbleClick(TextView bubble, boolean isTarget) {
         if (isGameOver || bubble.getAlpha() < 1.0f) return;
+        final View wrapper = (View) bubble.getParent();
+        if (wrapper == null) return;
 
         if (isTarget) {
+            // Mark as popped to prevent "escaped" message
+            wrapper.setTag(R.id.bubbleContainer, true);
+            
             popBubble(bubble, true);
             score++;
             updateScoreDisplay();
             
             if (score % 5 == 0) {
-                if (levelUpPlayer != null) {
-                    try {
-                        levelUpPlayer.start();
-                    } catch (Exception ignored) {}
+                if (soundPool != null) {
+                    soundPool.play(soundLevelUpId, 1f, 1f, 0, 0, 1f);
                 }
                 currentSpeed = Math.max(MIN_SPEED, currentSpeed - SPEED_INCREMENT);
                 Toast.makeText(this, R.string.bubble_pop_speed_up, Toast.LENGTH_SHORT).show();
@@ -562,10 +582,8 @@ public class BubblePopActivity extends AppCompatActivity {
             } catch (Exception ignored) {}
         } else {
             // Wrong bubble: Shake and sound
-            if (wrongPlayer != null) {
-                try {
-                    wrongPlayer.start();
-                } catch (Exception ignored) {}
+            if (soundPool != null) {
+                soundPool.play(soundWrongId, 0.8f, 0.8f, 0, 0, 1f);
             }
             ObjectAnimator shake = ObjectAnimator.ofFloat(bubble, View.TRANSLATION_X, bubble.getTranslationX(), bubble.getTranslationX() + 25f);
             shake.setDuration(100);
@@ -577,15 +595,16 @@ public class BubblePopActivity extends AppCompatActivity {
 
     private void popBubble(TextView bubble, boolean isCorrect) {
         if (isCorrect) {
-            // For frequent sounds like bubble popping, create a temporary player or reuse safely
+            // Revert to MediaPlayer for the main pop sound to ensure it triggers correctly
             try {
-                MediaPlayer mp = MediaPlayer.create(this, R.raw.bubblepop);
+                MediaPlayer mp = MediaPlayer.create(this, R.raw.squash);
                 if (mp != null) {
+                    mp.setVolume(1.0f, 1.0f);
                     mp.setOnCompletionListener(MediaPlayer::release);
                     mp.start();
                 }
             } catch (Exception e) {
-                android.util.Log.e("BubblePop", "Error playing pop sound", e);
+                android.util.Log.e("BubblePop", "Error playing squash sound", e);
             }
         }
         
@@ -652,8 +671,26 @@ public class BubblePopActivity extends AppCompatActivity {
 
     @Override
     protected void onDestroy() {
+        isGameOver = true; // Important: set this first to stop callbacks
         super.onDestroy();
+        
         if (gameTimer != null) gameTimer.cancel();
+        spawnHandler.removeCallbacksAndMessages(null);
+        
+        // Stop and clear all animations
+        for (android.animation.AnimatorSet set : bubbleAnimators.values()) {
+            if (set != null) {
+                set.removeAllListeners();
+                set.cancel();
+            }
+        }
+        bubbleAnimators.clear();
+        
+        if (bubbleContainer != null) {
+            bubbleContainer.removeAllViews();
+        }
+        activeBubbles.clear();
+
         if (tts != null) {
             tts.stop();
             tts.shutdown();
@@ -661,13 +698,18 @@ public class BubblePopActivity extends AppCompatActivity {
         if (offlineTts != null) {
             offlineTts.release();
         }
-        if (correctPlayer != null) correctPlayer.release();
-        if (wrongPlayer != null) wrongPlayer.release();
-        if (backgroundMusic != null) {
-            backgroundMusic.stop();
-            backgroundMusic.release();
+        
+        if (soundPool != null) {
+            soundPool.release();
+            soundPool = null;
         }
-        if (gameOverPlayer != null) gameOverPlayer.release();
-        if (levelUpPlayer != null) levelUpPlayer.release();
+        
+        if (backgroundMusic != null) {
+            try {
+                backgroundMusic.stop();
+                backgroundMusic.release();
+            } catch (Exception ignored) {}
+            backgroundMusic = null;
+        }
     }
 }
