@@ -245,6 +245,13 @@ public class MainActivity extends AppCompatActivity {
             return;
         }
 
+        // Check email verification
+        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+        if (user != null && !user.isEmailVerified()) {
+            showVerificationRequiredDialog();
+            return;
+        }
+
         // Check internet connection
         if (!offlineManager.isOnline()) {
             StyledMenuHelper.showStyledConfirmationDialog(
@@ -1383,6 +1390,13 @@ public class MainActivity extends AppCompatActivity {
             return;
         }
 
+        // Check email verification
+        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+        if (user != null && !user.isEmailVerified()) {
+            showVerificationRequiredDialog();
+            return;
+        }
+
         // Check internet connection
         if (!offlineManager.isOnline()) {
             StyledMenuHelper.showStyledConfirmationDialog(
@@ -1410,6 +1424,26 @@ public class MainActivity extends AppCompatActivity {
     private void openNotificationsScreen() {
         Intent intent = new Intent(MainActivity.this, NotificationsActivity.class);
         startActivity(intent);
+    }
+
+    private void showVerificationRequiredDialog() {
+        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+        if (user == null) return;
+
+        StyledMenuHelper.showStyledConfirmationDialog(
+            this,
+            "📧",
+            "Email Verification Required",
+            "Please verify your email address to access social features and save your progress online.",
+            "Verify Now",
+            "Later",
+            () -> {
+                // Go to account management where they can resend/check
+                Intent intent = new Intent(this, AccountManagementActivity.class);
+                startActivity(intent);
+            },
+            null
+        );
     }
 
     /**

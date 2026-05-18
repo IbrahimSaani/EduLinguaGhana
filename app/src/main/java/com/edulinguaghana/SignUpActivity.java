@@ -177,12 +177,8 @@ public class SignUpActivity extends AppCompatActivity {
                              user.updateProfile(profileUpdates)
                                      .addOnCompleteListener(updateTask -> {
                                          if (updateTask.isSuccessful()) {
-                                             // Save user to database for friend lookups
-                                               saveUserToDatabase(user, gender);
-                                             Toast.makeText(SignUpActivity.this,
-                                                     "Account created successfully!",
-                                                     Toast.LENGTH_SHORT).show();
-                                             navigateToMain();
+                                             // Send verification email and show mandatory verification dialog
+                                             sendVerificationEmail(user, gender);
                                          }
                                      });
                          } else {
@@ -192,6 +188,58 @@ public class SignUpActivity extends AppCompatActivity {
                          }
                      });
          });
+     }
+
+     private void sendVerificationEmail(FirebaseUser user, String gender) {
+         if (user == null) return;
+
+         user.sendEmailVerification()
+                 .addOnCompleteListener(task -> {
+                     if (task.isSuccessful()) {
+                         showVerificationPendingDialog(user, gender);
+                     } else {
+                         Toast.makeText(SignUpActivity.this,
+                                 "Failed to send verification email: " + (task.getException() != null ? task.getException().getMessage() : "Unknown error"),
+                                 Toast.LENGTH_LONG).show();
+                         // Still show the dialog so they can try to resend or check
+                         showVerificationPendingDialog(user, gender);
+                     }
+                 });
+     }
+
+     private void showVerificationPendingDialog(FirebaseUser user, String gender) {
+         StyledMenuHelper.showStyledConfirmationDialog(
+                 SignUpActivity.this,
+                 "📧",
+                 "Verify Your Email",
+                 "A verification link has been sent to " + user.getEmail() +
+                         ".\n\nPlease check your inbox and verify your account to continue. This ensures your account is secure.",
+                 "I've Verified",
+                 "Resend Email",
+                 () -> {
+                     // Positive Action: Check if verified
+                     if (progressBar != null) progressBar.setVisibility(android.view.View.VISIBLE);
+                     user.reload().addOnCompleteListener(reloadTask -> {
+                         if (progressBar != null) progressBar.setVisibility(android.view.View.GONE);
+                         if (user.isEmailVerified()) {
+                             // Success! Now save to database and proceed
+                             saveUserToDatabase(user, gender);
+                             Toast.makeText(SignUpActivity.this, "Email verified! Welcome aboard.", Toast.LENGTH_SHORT).show();
+                             navigateToMain();
+                         } else {
+                             Toast.makeText(SignUpActivity.this,
+                                     "Still not verified. Please click the link in your email.",
+                                     Toast.LENGTH_LONG).show();
+                             // Show the dialog again
+                             showVerificationPendingDialog(user, gender);
+                         }
+                     });
+                 },
+                 () -> {
+                     // Negative Action: Resend
+                     sendVerificationEmail(user, gender);
+                 }
+         );
      }
 
      /**

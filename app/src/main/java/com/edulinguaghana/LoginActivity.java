@@ -152,18 +152,77 @@ public class LoginActivity extends AppCompatActivity {
                     if (progressBar != null) progressBar.setVisibility(android.view.View.GONE);
                     if (task.isSuccessful()) {
                         FirebaseUser user = mAuth.getCurrentUser();
-                        // Save user to database for friend lookups
-                        saveUserToDatabase(user);
-                        // Restore progress from database
-                        restoreUserProgress(user);
-                        Toast.makeText(LoginActivity.this, "Welcome back!", Toast.LENGTH_SHORT).show();
-                        navigateToMain();
+                        
+                        if (user != null && !user.isEmailVerified()) {
+                            // Check if it's a password provider (Google/FB are usually auto-verified)
+                            boolean isPasswordProvider = false;
+                            for (com.google.firebase.auth.UserInfo profile : user.getProviderData()) {
+                                if (profile.getProviderId().equals("password")) {
+                                    isPasswordProvider = true;
+                                    break;
+                                }
+                            }
+
+                            if (isPasswordProvider) {
+                                btnLogin.setEnabled(true);
+                                if (progressBar != null) progressBar.setVisibility(android.view.View.GONE);
+                                
+                                showEmailVerificationDialog(user);
+                                return;
+                            }
+                        }
+
+                        proceedAfterLogin(user);
                     } else {
                         String message = (task.getException() != null) ? task.getException().getMessage() : "Unknown error";
                         Toast.makeText(LoginActivity.this, "Login failed: " + message,
                                 Toast.LENGTH_LONG).show();
                     }
                 });
+    }
+
+    private void showEmailVerificationDialog(FirebaseUser user) {
+        StyledMenuHelper.showStyledConfirmationDialog(
+            LoginActivity.this,
+            "📧",
+            "Email Verification Required",
+            "Your email is not verified yet. Please check your inbox for the verification link.",
+            "I've Verified",
+            "Resend Email",
+            () -> {
+                // Positive: Check verification
+                if (progressBar != null) progressBar.setVisibility(android.view.View.VISIBLE);
+                user.reload().addOnCompleteListener(reloadTask -> {
+                    if (progressBar != null) progressBar.setVisibility(android.view.View.GONE);
+                    if (user.isEmailVerified()) {
+                        proceedAfterLogin(user);
+                    } else {
+                        Toast.makeText(LoginActivity.this, "Still not verified. Please check your email.", Toast.LENGTH_LONG).show();
+                        showEmailVerificationDialog(user); // Re-show dialog
+                    }
+                });
+            },
+            () -> {
+                // Negative: Resend
+                user.sendEmailVerification().addOnCompleteListener(task -> {
+                    if (task.isSuccessful()) {
+                        Toast.makeText(LoginActivity.this, "Verification email resent!", Toast.LENGTH_SHORT).show();
+                    } else {
+                        Toast.makeText(LoginActivity.this, "Failed to resend: " + (task.getException() != null ? task.getException().getMessage() : "error"), Toast.LENGTH_SHORT).show();
+                    }
+                    showEmailVerificationDialog(user); // Re-show dialog
+                });
+            }
+        );
+    }
+
+    private void proceedAfterLogin(FirebaseUser user) {
+        // Save user to database for friend lookups
+        saveUserToDatabase(user);
+        // Restore progress from database
+        restoreUserProgress(user);
+        Toast.makeText(LoginActivity.this, "Welcome back!", Toast.LENGTH_SHORT).show();
+        navigateToMain();
     }
 
     private void signInWithGoogle() {
