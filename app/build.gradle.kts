@@ -85,6 +85,9 @@ dependencies {
     // Celebratory effects
     implementation("nl.dionsegijn:konfetti-xml:2.0.4")
 
+    // WorkManager for background tasks and notifications
+    implementation("androidx.work:work-runtime:2.9.0")
+
     testImplementation(libs.junit)
 
     androidTestImplementation(libs.ext.junit)

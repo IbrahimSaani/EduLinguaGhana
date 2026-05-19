@@ -18,8 +18,8 @@ public class StreakManager {
     private static final String KEY_LAST_PRACTICE_TIMESTAMP = "LAST_PRACTICE_TIMESTAMP";
     private static final String KEY_TOTAL_PRACTICE_DAYS = "TOTAL_PRACTICE_DAYS";
 
-    private Context context;
-    private SharedPreferences prefs;
+    private final Context context;
+    private final SharedPreferences prefs;
 
     public StreakManager(Context context) {
         this.context = context;
@@ -32,7 +32,6 @@ public class StreakManager {
         int currentDay = today.get(Calendar.DAY_OF_YEAR);
         int currentYear = today.get(Calendar.YEAR);
 
-        int lastPracticeDay = prefs.getInt(KEY_LAST_PRACTICE_DAY, -1);
         String lastPracticeDate = prefs.getString(KEY_LAST_PRACTICE_DATE, "");
 
         // Check if already practiced today
@@ -52,10 +51,10 @@ public class StreakManager {
         int yesterdayYear = yesterday.get(Calendar.YEAR);
         String yesterdayDate = yesterdayYear + "-" + yesterdayDay;
 
-        if (lastPracticeDate.equals(yesterdayDate)) {
+        if (yesterdayDate.equals(lastPracticeDate)) {
             // Streak continues
             currentStreak++;
-        } else if (lastPracticeDate.isEmpty()) {
+        } else if (lastPracticeDate == null || lastPracticeDate.isEmpty()) {
             // First time practicing
             currentStreak = 1;
         } else {
@@ -106,7 +105,7 @@ public class StreakManager {
         } catch (Exception ignored) { }
 
         // Send notification for streak milestones
-        if (currentStreak % 7 == 0 && currentStreak > 0) {
+        if (currentStreak % 7 == 0 && currentStreak > 0 && AppPreferences.isStreakAlertsEnabled(context)) {
             NotificationManager notificationManager = new NotificationManager(context);
             notificationManager.sendStreakNotification(currentStreak);
         }
@@ -122,7 +121,7 @@ public class StreakManager {
 
         String lastPracticeDate = prefs.getString(KEY_LAST_PRACTICE_DATE, "");
 
-        if (lastPracticeDate.isEmpty()) {
+        if (lastPracticeDate == null || lastPracticeDate.isEmpty()) {
             return 0;
         }
 

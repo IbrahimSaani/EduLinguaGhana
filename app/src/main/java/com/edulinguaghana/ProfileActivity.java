@@ -115,6 +115,15 @@ public class ProfileActivity extends AppCompatActivity {
     private void setupDynamicBackground() {
         if (dynamicBackground == null) return;
 
+        boolean dynamicEnabled = AppPreferences.isDynamicBackgroundEnabled(this);
+        boolean isDark = ThemeUtils.isDarkMode(this);
+
+        if (!dynamicEnabled || isDark) {
+            // Hide dynamic background when user disabled it or device in dark mode
+            dynamicBackground.setVisibility(android.view.View.GONE);
+            return;
+        }
+
         int hour = Calendar.getInstance().get(Calendar.HOUR_OF_DAY);
         int colorStart, colorMid, colorEnd;
 
@@ -132,6 +141,7 @@ public class ProfileActivity extends AppCompatActivity {
             colorEnd = ContextCompat.getColor(this, R.color.bgNightEnd);
         }
 
+        dynamicBackground.setVisibility(android.view.View.VISIBLE);
         dynamicBackground.setColors(colorStart, colorMid, colorEnd);
     }
 

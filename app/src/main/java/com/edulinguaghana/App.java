@@ -3,6 +3,10 @@ package com.edulinguaghana;
 import android.app.Application;
 import android.util.Log;
 
+import androidx.work.ExistingPeriodicWorkPolicy;
+import androidx.work.PeriodicWorkRequest;
+import androidx.work.WorkManager;
+
 import com.facebook.FacebookSdk;
 import com.facebook.appevents.AppEventsLogger;
 import com.google.firebase.FirebaseApp;
@@ -11,6 +15,8 @@ import com.edulinguaghana.social.impl.FirebaseSocialRepository;
 import com.edulinguaghana.social.SocialRepository;
 import com.edulinguaghana.social.SocialProvider;
 import com.edulinguaghana.social.FCMTokenManager;
+
+import java.util.concurrent.TimeUnit;
 
 public class App extends Application {
     private static final String TAG = "App";
@@ -50,5 +56,36 @@ public class App extends Application {
         } catch (Exception e) {
             Log.e(TAG, "Failed to initialize FCM token", e);
         }
+
+        // Initialize background notification worker
+        try {
+            scheduleLearningNotificationWorker();
+        } catch (Exception e) {
+            Log.e(TAG, "Failed to schedule learning notification worker", e);
+        }
+    }
+
+    /**
+     * Schedule the background notification worker to run once per day
+     */
+    private void scheduleLearningNotificationWorker() {
+        // Create a periodic work request that runs daily
+        PeriodicWorkRequest notificationWorkRequest =
+                new PeriodicWorkRequest.Builder(
+                        LearningNotificationWorker.class,
+                        1,  // Interval value
+                        TimeUnit.DAYS  // Interval unit
+                )
+                .build();
+
+        // Schedule the work, replacing any existing work with the same tag
+        WorkManager.getInstance(this).enqueueUniquePeriodicWork(
+                "learning_notifications",
+                ExistingPeriodicWorkPolicy.KEEP,  // Keep existing if already scheduled
+                notificationWorkRequest
+        );
+
+        Log.d(TAG, "Learning notification worker scheduled");
     }
 }
+

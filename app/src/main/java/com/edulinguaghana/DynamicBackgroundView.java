@@ -8,6 +8,7 @@ import android.graphics.Paint;
 import android.graphics.Shader;
 import android.util.AttributeSet;
 import android.view.View;
+import android.content.res.Configuration;
 import android.view.animation.LinearInterpolator;
 
 import androidx.annotation.Nullable;
@@ -31,6 +32,7 @@ public class DynamicBackgroundView extends View {
     private Random random = new Random();
 
     private int colorStart, colorMid, colorEnd;
+    private boolean isNightMode = false;
 
     public DynamicBackgroundView(Context context) {
         super(context);
@@ -52,9 +54,21 @@ public class DynamicBackgroundView extends View {
         particlePaint = new Paint(Paint.ANTI_ALIAS_FLAG);
         particles = new ArrayList<>();
 
-        colorStart = ContextCompat.getColor(context, R.color.bgDayStart);
-        colorMid = ContextCompat.getColor(context, R.color.bgDayMid);
-        colorEnd = ContextCompat.getColor(context, R.color.bgDayEnd);
+        // Determine current UI mode and choose colors accordingly. When in dark (night) mode
+        // we use a fixed dark palette and avoid dynamic color updates/animations so the app
+        // remains consistently dark and readable.
+        isNightMode = (context.getResources().getConfiguration().uiMode &
+                Configuration.UI_MODE_NIGHT_MASK) == Configuration.UI_MODE_NIGHT_YES;
+
+        if (isNightMode) {
+            colorStart = ContextCompat.getColor(context, R.color.bgNightStart);
+            colorMid = ContextCompat.getColor(context, R.color.bgNightMid);
+            colorEnd = ContextCompat.getColor(context, R.color.bgNightEnd);
+        } else {
+            colorStart = ContextCompat.getColor(context, R.color.bgDayStart);
+            colorMid = ContextCompat.getColor(context, R.color.bgDayMid);
+            colorEnd = ContextCompat.getColor(context, R.color.bgDayEnd);
+        }
 
         // Animate gradient shift
         gradientAnimator = ValueAnimator.ofFloat(0f, 1f);
@@ -63,15 +77,21 @@ public class DynamicBackgroundView extends View {
         gradientAnimator.setRepeatMode(ValueAnimator.REVERSE);
         gradientAnimator.setInterpolator(new LinearInterpolator());
         gradientAnimator.addUpdateListener(animation -> {
-            animationOffset = (float) animation.getAnimatedValue();
-            invalidate();
+            // Only update animation offset when not in night mode. In night mode we keep
+            // a static dark background so text/UI remain readable.
+            if (!isNightMode) {
+                animationOffset = (float) animation.getAnimatedValue();
+                invalidate();
+            }
         });
     }
 
     @Override
     protected void onAttachedToWindow() {
         super.onAttachedToWindow();
-        if (gradientAnimator != null && !gradientAnimator.isStarted()) {
+        // Only run the background animation when in light mode. In dark mode we keep the
+        // background static to ensure contrast and readability.
+        if (!isNightMode && gradientAnimator != null && !gradientAnimator.isStarted()) {
             gradientAnimator.start();
         }
     }
@@ -164,9 +184,38 @@ public class DynamicBackgroundView extends View {
     }
     
     public void setColors(int start, int mid, int end) {
+        // If the device/app is in night mode, ignore dynamic color changes so the UI stays
+        // reliably dark. In light mode allow dynamic updates.
+        if (isNightMode) return;
+
         this.colorStart = start;
         this.colorMid = mid;
         this.colorEnd = end;
+        invalidate();
+    }
+
+    @Override
+    protected void onConfigurationChanged(Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+        boolean nowNight = (newConfig.uiMode & Configuration.UI_MODE_NIGHT_MASK)
+                == Configuration.UI_MODE_NIGHT_YES;
+        if (nowNight == isNightMode) return; // no change
+
+        isNightMode = nowNight;
+        Context ctx = getContext();
+        if (isNightMode) {
+            // switch to dark fixed palette and stop animation
+            colorStart = ContextCompat.getColor(ctx, R.color.bgNightStart);
+            colorMid = ContextCompat.getColor(ctx, R.color.bgNightMid);
+            colorEnd = ContextCompat.getColor(ctx, R.color.bgNightEnd);
+            if (gradientAnimator != null) gradientAnimator.cancel();
+        } else {
+            // switch back to day palette and resume animation
+            colorStart = ContextCompat.getColor(ctx, R.color.bgDayStart);
+            colorMid = ContextCompat.getColor(ctx, R.color.bgDayMid);
+            colorEnd = ContextCompat.getColor(ctx, R.color.bgDayEnd);
+            if (gradientAnimator != null && !gradientAnimator.isStarted()) gradientAnimator.start();
+        }
         invalidate();
     }
 }

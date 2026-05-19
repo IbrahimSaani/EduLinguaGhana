@@ -841,7 +841,13 @@ public class MainActivity extends AppCompatActivity {
 
         // previously read high score to show in removed UI; keep prefs access in case other features rely on it
         applyDynamicBackground();
-        if (animationsEnabled()) {
+
+        // Only start the dynamic overlay pulse when animations are enabled, dynamic
+        // backgrounds are allowed by user preference and the system is not in dark mode.
+        boolean dynamicEnabled = AppPreferences.isDynamicBackgroundEnabled(this);
+        boolean isDark = ThemeUtils.isDarkMode(this);
+
+        if (animationsEnabled() && dynamicEnabled && !isDark) {
             startOverlayPulse();
             if (heroGlowAnimator != null && !heroGlowAnimator.isStarted()) {
                 heroGlowAnimator.start();
@@ -852,7 +858,7 @@ public class MainActivity extends AppCompatActivity {
             if (bubbleMidAnimator != null && !bubbleMidAnimator.isStarted()) bubbleMidAnimator.start();
             if (bubbleBottomAnimator != null && !bubbleBottomAnimator.isStarted()) bubbleBottomAnimator.start();
         } else {
-            // ensure overlay alpha is set to default when animations disabled
+            // ensure overlay alpha is set to default when animations disabled or overlay hidden
             if (dynamicBackgroundOverlay != null) dynamicBackgroundOverlay.setAlpha(0.45f);
         }
     }
@@ -1268,6 +1274,9 @@ public class MainActivity extends AppCompatActivity {
     private void applyDynamicBackground() {
         if (rootCoordinator == null || dynamicBackgroundOverlay == null) return;
 
+        boolean dynamicEnabled = AppPreferences.isDynamicBackgroundEnabled(this);
+        boolean isDark = ThemeUtils.isDarkMode(this);
+
         int hour = Calendar.getInstance().get(Calendar.HOUR_OF_DAY);
         int backgroundRes;
         int overlayTintRes;
@@ -1297,10 +1306,22 @@ public class MainActivity extends AppCompatActivity {
             colorEnd = ContextCompat.getColor(this, R.color.bgNightEnd);
         }
 
+        // If dynamic backgrounds are disabled or device is in dark mode we keep the
+        // background static and hide overlays to preserve contrast.
+        if (!dynamicEnabled || isDark) {
+            rootCoordinator.setBackgroundResource(backgroundRes);
+            if (dynamicBackground != null) dynamicBackground.setVisibility(View.GONE);
+            dynamicBackgroundOverlay.setVisibility(View.GONE);
+            stopOverlayPulse();
+            return;
+        }
+
         rootCoordinator.setBackgroundResource(backgroundRes);
         if (dynamicBackground != null) {
+            dynamicBackground.setVisibility(View.VISIBLE);
             dynamicBackground.setColors(colorStart, colorMid, colorEnd);
         }
+        dynamicBackgroundOverlay.setVisibility(View.VISIBLE);
         dynamicBackgroundOverlay.setImageResource(R.drawable.bg_dynamic_sparkle);
         ImageViewCompat.setImageTintList(dynamicBackgroundOverlay,
                 ColorStateList.valueOf(ContextCompat.getColor(this, overlayTintRes)));

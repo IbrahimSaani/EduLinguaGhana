@@ -47,6 +47,11 @@ public class ProgressManager {
         editor.putInt(KEY_TOTAL_QUESTIONS, totalQuestionsAcc + totalQuestions);
         editor.apply();
 
+        // Record that user practiced today for notification system
+        try {
+            PracticeTracker.recordPractice(context);
+        } catch (Exception ignored) { }
+
         // --- Gamification: award XP and progress quests ---
         try {
             int xpAward = Math.max(5, correctCount * 2 + score / 5); // conservative formula

@@ -17,17 +17,29 @@ public class NotificationManager {
     private static final String PREF_NAME = "NotificationsPrefs";
     private static final String KEY_NOTIFICATIONS = "NOTIFICATIONS_LIST";
     private static final String KEY_LAST_CHECK = "LAST_CHECK_TIME";
-    private static final String KEY_STREAK_NOTIF_SHOWN = "STREAK_NOTIF_SHOWN";
     private static final String KEY_INACTIVITY_NOTIF_SHOWN = "INACTIVITY_NOTIF_SHOWN";
 
-    private Context context;
-    private SharedPreferences prefs;
-    private Gson gson;
+    private final Context context;
+    private final SharedPreferences prefs;
+    private final Gson gson;
 
     public NotificationManager(Context context) {
         this.context = context;
         this.prefs = context.getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE);
         this.gson = new Gson();
+    }
+
+    public static long getLastCheckTime(Context context) {
+        if (context == null) return 0L;
+        return context.getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE).getLong(KEY_LAST_CHECK, 0L);
+    }
+
+    public static void markChecked(Context context, long timestamp) {
+        if (context == null) return;
+        context.getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE)
+                .edit()
+                .putLong(KEY_LAST_CHECK, timestamp)
+                .apply();
     }
 
     // Get all notifications
@@ -130,14 +142,19 @@ public class NotificationManager {
 
         prefs.edit().putLong(KEY_LAST_CHECK, now).apply();
 
+        boolean dailyRemindersEnabled = AppPreferences.isDailyRemindersEnabled(context);
+        boolean streakAlertsEnabled = AppPreferences.isStreakAlertsEnabled(context);
+
         // Generate notifications based on progress
         generateProgressNotifications();
-        generateStreakNotifications();
+        generateStreakNotifications(dailyRemindersEnabled);
         generateMotivationalNotifications();
-        generateInactivityNotifications();
+        generateInactivityNotifications(streakAlertsEnabled);
     }
 
-    private void generateInactivityNotifications() {
+    private void generateInactivityNotifications(boolean enabled) {
+        if (!enabled) return;
+
         SharedPreferences streakPrefs = context.getSharedPreferences("StreakPrefs", Context.MODE_PRIVATE);
         long lastPracticeTime = streakPrefs.getLong("LAST_PRACTICE_TIMESTAMP", 0);
         
@@ -146,17 +163,12 @@ public class NotificationManager {
         long now = System.currentTimeMillis();
         long daysInactive = (now - lastPracticeTime) / (24 * 60 * 60 * 1000);
 
-        if (daysInactive >= 3) {
+        if (daysInactive >= 1) {
             String lastShownId = prefs.getString(KEY_INACTIVITY_NOTIF_SHOWN, "");
-            String currentInactivityId = "inactivity_" + (daysInactive / 3); // Trigger every 3 days
+            String currentInactivityId = "streak_loss_" + daysInactive; // Trigger once per missed-day bucket
 
             if (lastShownId == null || !lastShownId.equals(currentInactivityId)) {
-                addNotification(
-                    "We miss you! 🦉",
-                    "It's been " + daysInactive + " days since your last lesson. Kojo is waiting to learn with you!",
-                    "🦉",
-                    Notification.NotificationType.MOTIVATIONAL
-                );
+                sendStreakLossAlert((int) daysInactive);
                 prefs.edit().putString(KEY_INACTIVITY_NOTIF_SHOWN, currentInactivityId).apply();
             }
         }
@@ -240,7 +252,9 @@ public class NotificationManager {
         }
     }
 
-    private void generateStreakNotifications() {
+    private void generateStreakNotifications(boolean enabled) {
+        if (!enabled) return;
+
         // Check if user practiced today
         Calendar today = Calendar.getInstance();
         int dayOfYear = today.get(Calendar.DAY_OF_YEAR);
@@ -250,12 +264,10 @@ public class NotificationManager {
 
         if (lastPracticeDay != dayOfYear) {
             // User hasn't practiced today
-            addNotification(
-                "Time to Practice! 📚",
-                "Don't break your streak! Complete a lesson today.",
-                "📚",
-                Notification.NotificationType.REMINDER
-            );
+                sendReminderNotification(
+                    "Time to Practice! 📚",
+                    "Don't break your streak! Complete a lesson today."
+                );
         }
     }
 
@@ -299,6 +311,15 @@ public class NotificationManager {
             "Streak Milestone! " + emoji,
             "You're on a " + streakDays + " day streak! Amazing!",
             emoji,
+            Notification.NotificationType.STREAK
+        );
+    }
+
+    public void sendStreakLossAlert(int daysInactive) {
+        addNotification(
+            "Streak at Risk! 🔥",
+            "You haven't practiced for " + daysInactive + " day(s). Come back today to keep learning!",
+            "🔥",
             Notification.NotificationType.STREAK
         );
     }
