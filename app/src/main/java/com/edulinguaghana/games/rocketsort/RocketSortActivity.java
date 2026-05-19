@@ -22,6 +22,7 @@ import android.widget.TextView;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.edulinguaghana.R;
+import com.edulinguaghana.gamification.FunGameProgressManager;
 import com.edulinguaghana.utils.LanguageConversionUtils;
 
 import java.util.ArrayList;
@@ -537,6 +538,10 @@ public class RocketSortActivity extends AppCompatActivity {
         if (isChallengeMode && challengeId != null) {
             saveChallengeResult();
         }
+
+        try {
+            FunGameProgressManager.recordGameCompleted(this, "rocket_sort", score, languageCode);
+        } catch (Exception ignored) { }
 
         showOverlay("Mission Complete!");
     }

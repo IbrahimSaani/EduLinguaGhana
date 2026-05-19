@@ -15,6 +15,7 @@ import android.widget.TextView;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.edulinguaghana.R;
+import com.edulinguaghana.gamification.FunGameProgressManager;
 import com.edulinguaghana.utils.LanguageConversionUtils;
 import com.google.android.material.card.MaterialCardView;
 
@@ -48,7 +49,8 @@ public class BeatMatcherActivity extends AppCompatActivity implements TextToSpee
     private Handler handler = new Handler(Looper.getMainLooper());
     private Random random = new Random();
     private MediaPlayer correctPlayer, wrongPlayer, flipPlayer;
-    
+    private boolean funSessionRecorded = false;
+
     private Map<String, String> phonemes = new HashMap<>();
 
     @Override
@@ -132,14 +134,25 @@ public class BeatMatcherActivity extends AppCompatActivity implements TextToSpee
     }
 
     private void startGame() {
+        recordFunSessionIfNeeded();
         score = 0;
         isGameOver = false;
         isPaused = false;
         isProcessing = false;
+        funSessionRecorded = false;
         startOverlay.setVisibility(View.GONE);
         overlayLayout.setVisibility(View.GONE);
         updateUI();
         nextRound();
+    }
+
+    private void recordFunSessionIfNeeded() {
+        if (funSessionRecorded || score <= 0) return;
+        funSessionRecorded = true;
+        try {
+            FunGameProgressManager.recordGameCompleted(this, "beat_matcher", score, languageCode);
+        } catch (Exception ignored) {
+        }
     }
 
     private void nextRound() {
@@ -304,6 +317,7 @@ public class BeatMatcherActivity extends AppCompatActivity implements TextToSpee
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        recordFunSessionIfNeeded();
         if (tts != null) {
             tts.stop();
             tts.shutdown();

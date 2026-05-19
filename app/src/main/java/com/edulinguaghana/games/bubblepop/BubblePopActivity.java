@@ -20,11 +20,13 @@ import android.widget.FrameLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.activity.OnBackPressedCallback;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 
 import com.edulinguaghana.DynamicBackgroundView;
 import com.edulinguaghana.R;
+import com.edulinguaghana.gamification.FunGameProgressManager;
 import com.edulinguaghana.StyledMenuHelper;
 import com.edulinguaghana.tts.OfflineGhanaLPTtsService;
 import com.edulinguaghana.utils.LanguageConversionUtils;
@@ -111,6 +113,16 @@ public class BubblePopActivity extends AppCompatActivity {
         initViews();
         initSounds();
         initTts();
+        getOnBackPressedDispatcher().addCallback(this, new OnBackPressedCallback(true) {
+            @Override
+            public void handleOnBackPressed() {
+                if (!isGameOver) {
+                    togglePause();
+                } else {
+                    finish();
+                }
+            }
+        });
         
         startNewGame();
     }
@@ -329,6 +341,10 @@ public class BubblePopActivity extends AppCompatActivity {
             saveChallengeResult();
         }
 
+        try {
+            FunGameProgressManager.recordGameCompleted(this, "bubble_pop", score, languageCode);
+        } catch (Exception ignored) { }
+
         showPauseOverlay("Time Up!");
     }
 
@@ -403,14 +419,6 @@ public class BubblePopActivity extends AppCompatActivity {
         }
     }
 
-    @Override
-    public void onBackPressed() {
-        if (!isGameOver) {
-            togglePause();
-        } else {
-            super.onBackPressed();
-        }
-    }
 
     private void generateNewTarget() {
         targetLetter = alphabet[random.nextInt(alphabet.length)];

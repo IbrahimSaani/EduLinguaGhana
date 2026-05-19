@@ -1690,32 +1690,51 @@ public class ProfileActivity extends AppCompatActivity {
         com.google.firebase.database.DatabaseReference friendsRef =
             com.google.firebase.database.FirebaseDatabase.getInstance().getReference("friends");
 
-        friendsRef.orderByChild("friendUserId").equalTo(userId)
-            .addListenerForSingleValueEvent(new com.google.firebase.database.ValueEventListener() {
-                @Override
-                public void onDataChange(com.google.firebase.database.DataSnapshot snapshot) {
-                    java.util.List<Friend> pendingRequests = new java.util.ArrayList<>();
-                    for (com.google.firebase.database.DataSnapshot child : snapshot.getChildren()) {
+        friendsRef.addListenerForSingleValueEvent(new com.google.firebase.database.ValueEventListener() {
+            @Override
+            public void onDataChange(com.google.firebase.database.DataSnapshot snapshot) {
+                java.util.List<Friend> pendingRequests = new java.util.ArrayList<>();
+                for (com.google.firebase.database.DataSnapshot child : snapshot.getChildren()) {
+                    String targetUserId = child.child("friendUserId").getValue(String.class);
+                    String statusValue = child.child("status").getValue(String.class);
+
+                    if (userId.equals(targetUserId) && statusValue != null && "PENDING".equalsIgnoreCase(statusValue)) {
                         Friend friend = child.getValue(Friend.class);
-                        if (friend != null && friend.status == Friend.Status.PENDING) {
-                            pendingRequests.add(friend);
+                        if (friend == null) {
+                            friend = new Friend();
                         }
-                    }
+                        friend.id = child.getKey();
+                        friend.userId = child.child("userId").getValue(String.class);
+                        friend.friendUserId = targetUserId;
+                        friend.displayName = child.child("displayName").getValue(String.class);
+                        friend.avatarUrl = child.child("avatarUrl").getValue(String.class);
+                        friend.status = Friend.Status.PENDING;
 
-                    if (pendingRequests.isEmpty()) {
-                        Toast.makeText(ProfileActivity.this, "No pending friend requests", Toast.LENGTH_SHORT).show();
-                        return;
-                    }
+                        Long requestedAt = child.child("requestedAt").getValue(Long.class);
+                        if (requestedAt != null) {
+                            friend.requestedAt = requestedAt;
+                        }
 
-                    // Show dialog with friend requests
-                    showFriendRequestsDialog(pendingRequests);
+                        Long acceptedAt = child.child("acceptedAt").getValue(Long.class);
+                        friend.acceptedAt = acceptedAt;
+                        pendingRequests.add(friend);
+                    }
                 }
 
-                @Override
-                public void onCancelled(com.google.firebase.database.DatabaseError error) {
-                    Toast.makeText(ProfileActivity.this, "Failed to load friend requests", Toast.LENGTH_SHORT).show();
+                if (pendingRequests.isEmpty()) {
+                    Toast.makeText(ProfileActivity.this, "No pending friend requests", Toast.LENGTH_SHORT).show();
+                    return;
                 }
-            });
+
+                // Show dialog with friend requests
+                showFriendRequestsDialog(pendingRequests);
+            }
+
+            @Override
+            public void onCancelled(com.google.firebase.database.DatabaseError error) {
+                Toast.makeText(ProfileActivity.this, "Failed to load friend requests", Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 
     private void showFriendRequestsDialog(java.util.List<Friend> requests) {

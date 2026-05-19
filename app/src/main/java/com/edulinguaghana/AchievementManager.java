@@ -3,6 +3,7 @@ package com.edulinguaghana;
 import android.content.Context;
 import android.content.SharedPreferences;
 
+import com.edulinguaghana.gamification.FunGameProgressManager;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
@@ -106,6 +107,12 @@ public class AchievementManager {
         list.add(new Achievement("accuracy_85", "Sharpshooter", "Reach 85% accuracy", "🎯🎯", "ic_achievement_target_silver", Achievement.AchievementType.ACCURACY, 85));
         list.add(new Achievement("accuracy_95", "Sniper", "Reach 95% accuracy", "🎯🎯🎯", "ic_achievement_target", Achievement.AchievementType.ACCURACY, 95));
 
+        // Fun game achievements
+        list.add(new Achievement("fun_game_1", "Game On", "Complete your first fun game", "🎮", "ic_achievement_gamepad", Achievement.AchievementType.SPEED, 1));
+        list.add(new Achievement("fun_game_5", "Arcade Rookie", "Complete 5 fun game sessions", "🕹️", "ic_achievement_arcade", Achievement.AchievementType.SPEED, 5));
+        list.add(new Achievement("fun_game_15", "Arcade Star", "Complete 15 fun game sessions", "🌟", "ic_achievement_star_silver", Achievement.AchievementType.SPEED, 15));
+        list.add(new Achievement("fun_game_30", "Arcade Legend", "Complete 30 fun game sessions", "👑", "ic_achievement_crown", Achievement.AchievementType.SPEED, 30));
+
         return list;
     }
 
@@ -151,6 +158,7 @@ public class AchievementManager {
         int accuracy = progressManager.getAccuracy(context);
         int currentStreak = streakManager.getCurrentStreak();
         int totalCorrect = progressManager.getTotalCorrect(context);
+        int totalFunGames = FunGameProgressManager.getTotalFunGamesPlayed(context);
 
         boolean newUnlock = false;
         NotificationManager notificationManager = new NotificationManager(context);
@@ -178,6 +186,9 @@ public class AchievementManager {
                     break;
                 case ACCURACY:
                     shouldUnlock = accuracy >= achievement.getRequiredValue();
+                    break;
+                case SPEED:
+                    shouldUnlock = totalFunGames >= achievement.getRequiredValue();
                     break;
             }
 

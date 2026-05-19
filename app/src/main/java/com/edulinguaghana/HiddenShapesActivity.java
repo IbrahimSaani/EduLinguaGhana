@@ -10,6 +10,7 @@ import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.edulinguaghana.gamification.FunGameProgressManager;
 import com.edulinguaghana.tts.OfflineGhanaLPTtsService;
 import com.edulinguaghana.utils.LanguageConversionUtils;
 import com.google.android.material.button.MaterialButton;
@@ -180,6 +181,10 @@ public class HiddenShapesActivity extends AppCompatActivity {
         if (isChallengeMode && challengeId != null) {
             saveChallengeResult();
         }
+
+        try {
+            FunGameProgressManager.recordGameCompleted(this, "hidden_shapes", score, languageCode);
+        } catch (Exception ignored) { }
 
         showPauseOverlay("Time Up!");
     }

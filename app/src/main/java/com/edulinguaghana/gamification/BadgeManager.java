@@ -27,12 +27,36 @@ public class BadgeManager {
             try {
                 JSONArray arr = new JSONArray(j);
                 for (int i = 0; i < arr.length(); i++) out.add(Badge.fromJson(arr.getJSONObject(i)));
+                boolean changed = mergeMissingDefaultBadges(out);
+                if (changed) {
+                    saveBadges(ctx, out);
+                }
             } catch (JSONException e) {
                 out = generateDefaultBadges();
                 saveBadges(ctx, out);
             }
             return out;
         }
+    }
+
+    private static boolean mergeMissingDefaultBadges(List<Badge> existing) {
+        if (existing == null) return false;
+        List<Badge> defaults = generateDefaultBadges();
+        boolean changed = false;
+        for (Badge def : defaults) {
+            boolean found = false;
+            for (Badge b : existing) {
+                if (b != null && b.id != null && b.id.equals(def.id)) {
+                    found = true;
+                    break;
+                }
+            }
+            if (!found) {
+                existing.add(def);
+                changed = true;
+            }
+        }
+        return changed;
     }
 
     public static void saveBadges(Context ctx, List<Badge> badges) {
@@ -127,6 +151,51 @@ public class BadgeManager {
         b8.unlocked = false;
         b8.unlockedAt = 0;
         list.add(b8);
+
+        Badge b9 = new Badge();
+        b9.id = "fun_starter";
+        b9.title = "Fun Starter";
+        b9.description = "Complete your first fun game.";
+        b9.iconName = "ic_badge_fun";
+        b9.unlocked = false;
+        b9.unlockedAt = 0;
+        list.add(b9);
+
+        Badge b10 = new Badge();
+        b10.id = "puzzle_pro";
+        b10.title = "Puzzle Pro";
+        b10.description = "Complete 5 puzzle game sessions.";
+        b10.iconName = "ic_badge_puzzle";
+        b10.unlocked = false;
+        b10.unlockedAt = 0;
+        list.add(b10);
+
+        Badge b11 = new Badge();
+        b11.id = "beat_expert";
+        b11.title = "Beat Expert";
+        b11.description = "Complete 5 Beat Matcher sessions.";
+        b11.iconName = "ic_badge_beat";
+        b11.unlocked = false;
+        b11.unlockedAt = 0;
+        list.add(b11);
+
+        Badge b12 = new Badge();
+        b12.id = "game_explorer";
+        b12.title = "Game Explorer";
+        b12.description = "Play all fun games at least once.";
+        b12.iconName = "ic_badge_explorer";
+        b12.unlocked = false;
+        b12.unlockedAt = 0;
+        list.add(b12);
+
+        Badge b13 = new Badge();
+        b13.id = "fun_legend";
+        b13.title = "Fun Legend";
+        b13.description = "Complete 10 fun game sessions.";
+        b13.iconName = "ic_badge_legend";
+        b13.unlocked = false;
+        b13.unlockedAt = 0;
+        list.add(b13);
 
         return list;
     }

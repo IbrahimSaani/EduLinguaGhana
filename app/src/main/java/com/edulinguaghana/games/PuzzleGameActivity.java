@@ -20,6 +20,7 @@ import android.widget.TextView;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.edulinguaghana.R;
+import com.edulinguaghana.gamification.FunGameProgressManager;
 import com.edulinguaghana.utils.LanguageConversionUtils;
 
 import java.util.ArrayList;
@@ -48,6 +49,7 @@ public class PuzzleGameActivity extends AppCompatActivity {
     private static final String PREF_NAME = "EduLinguaPrefs";
     private static final String KEY_HIGH_SCORE_PUZZLE = "high_score_puzzle_game";
     private final Handler handler = new Handler(Looper.getMainLooper());
+    private boolean funSessionRecorded = false;
 
     // Challenge mode
     private boolean isChallengeMode = false;
@@ -109,6 +111,7 @@ public class PuzzleGameActivity extends AppCompatActivity {
     }
 
     private void startNewGame() {
+        funSessionRecorded = false;
         score = 0;
         if (isChallengeMode) {
             timeLeftMs = getIntent().getLongExtra("CHALLENGE_DURATION", 60) * 1000;
@@ -340,6 +343,14 @@ public class PuzzleGameActivity extends AppCompatActivity {
 
         if (isChallengeMode && challengeId != null) {
             saveChallengeResult();
+        }
+
+        if (!funSessionRecorded) {
+            funSessionRecorded = true;
+            try {
+                FunGameProgressManager.recordGameCompleted(this, "puzzle_game", score, languageCode);
+            } catch (Exception ignored) {
+            }
         }
 
         overlayLayout.setVisibility(View.VISIBLE);

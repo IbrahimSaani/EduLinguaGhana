@@ -39,6 +39,7 @@ import com.airbnb.lottie.LottieAnimationView;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.edulinguaghana.roles.RoleManager;
+import com.edulinguaghana.gamification.FunGameProgressManager;
 import com.edulinguaghana.roles.UserRole;
 import com.edulinguaghana.tracking.TeacherDashboardActivity;
 import com.edulinguaghana.tracking.ParentDashboardActivity;
@@ -221,6 +222,28 @@ public class MainActivity extends AppCompatActivity {
         View badgesClickArea = findViewById(R.id.badgesClickArea);
         if (badgesClickArea != null) {
             badgesClickArea.setOnClickListener(v -> openAchievementsScreen());
+        }
+
+        // Fun Games stats (total, best, per-game counts)
+        android.widget.TextView tvFunGamesTotal = findViewById(R.id.tvFunGamesTotal);
+        android.widget.TextView tvFunGamesBest = findViewById(R.id.tvFunGamesBest);
+        android.widget.TextView tvFunGamesPerGame = findViewById(R.id.tvFunGamesPerGame);
+
+        if (tvFunGamesTotal != null) {
+            int totalFun = FunGameProgressManager.getTotalFunGamesPlayed(this);
+            tvFunGamesTotal.setText(String.valueOf(totalFun));
+        }
+
+        if (tvFunGamesBest != null) {
+            int best = FunGameProgressManager.getBestFunGameScore(this);
+            tvFunGamesBest.setText(String.valueOf(best));
+        }
+
+        if (tvFunGamesPerGame != null) {
+            int speed = FunGameProgressManager.getSpeedGamesPlayed(this);
+            int puzzle = FunGameProgressManager.getPuzzleGamesPlayed(this);
+            int beat = FunGameProgressManager.getBeatGamesPlayed(this);
+            tvFunGamesPerGame.setText("S:" + speed + " P:" + puzzle + " B:" + beat);
         }
     }
 

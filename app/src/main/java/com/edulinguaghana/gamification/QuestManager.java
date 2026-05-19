@@ -31,12 +31,36 @@ public class QuestManager {
                     JSONObject o = arr.getJSONObject(i);
                     out.add(Quest.fromJson(o));
                 }
+                boolean changed = mergeMissingDefaultQuests(out);
+                if (changed) {
+                    saveQuests(ctx, out);
+                }
             } catch (JSONException e) {
                 out = generateDefaultDailyQuests();
                 saveQuests(ctx, out);
             }
             return out;
         }
+    }
+
+    private static boolean mergeMissingDefaultQuests(List<Quest> existing) {
+        if (existing == null) return false;
+        List<Quest> defaults = generateDefaultDailyQuests();
+        boolean changed = false;
+        for (Quest def : defaults) {
+            boolean found = false;
+            for (Quest q : existing) {
+                if (q != null && q.id != null && q.id.equals(def.id)) {
+                    found = true;
+                    break;
+                }
+            }
+            if (!found) {
+                existing.add(def);
+                changed = true;
+            }
+        }
+        return changed;
     }
 
     public static void saveQuests(Context ctx, List<Quest> quests) {
@@ -148,6 +172,54 @@ public class QuestManager {
         q8.progress = 0;
         q8.expiresAt = System.currentTimeMillis() + 24L*60*60*1000L;
         list.add(q8);
+
+        // Quest 9: Play any fun game
+        Quest q9 = new Quest();
+        q9.id = "fun_game_daily";
+        q9.title = "Play a fun game";
+        q9.description = "Complete one fun game from Quiz Mode.";
+        q9.xpReward = 20;
+        q9.completed = false;
+        q9.target = 1;
+        q9.progress = 0;
+        q9.expiresAt = System.currentTimeMillis() + 24L * 60 * 60 * 1000L;
+        list.add(q9);
+
+        // Quest 10: Puzzle sessions
+        Quest q10 = new Quest();
+        q10.id = "puzzle_solver";
+        q10.title = "Puzzle Solver";
+        q10.description = "Complete 3 puzzle game sessions.";
+        q10.xpReward = 30;
+        q10.completed = false;
+        q10.target = 3;
+        q10.progress = 0;
+        q10.expiresAt = System.currentTimeMillis() + 24L * 60 * 60 * 1000L;
+        list.add(q10);
+
+        // Quest 11: Beat Matcher sessions
+        Quest q11 = new Quest();
+        q11.id = "beat_master";
+        q11.title = "Beat Master";
+        q11.description = "Complete 3 Beat Matcher sessions.";
+        q11.xpReward = 30;
+        q11.completed = false;
+        q11.target = 3;
+        q11.progress = 0;
+        q11.expiresAt = System.currentTimeMillis() + 24L * 60 * 60 * 1000L;
+        list.add(q11);
+
+        // Quest 12: Explore all fun games
+        Quest q12 = new Quest();
+        q12.id = "fun_game_explorer";
+        q12.title = "Fun Game Explorer";
+        q12.description = "Play Speed, Puzzle, and Beat Matcher.";
+        q12.xpReward = 40;
+        q12.completed = false;
+        q12.target = 1;
+        q12.progress = 0;
+        q12.expiresAt = System.currentTimeMillis() + 24L * 60 * 60 * 1000L;
+        list.add(q12);
 
         return list;
     }

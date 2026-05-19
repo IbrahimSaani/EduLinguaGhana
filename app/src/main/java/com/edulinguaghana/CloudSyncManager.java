@@ -16,11 +16,15 @@ import com.google.firebase.database.ValueEventListener;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 public class CloudSyncManager {
     private static final String TAG = "CloudSyncManager";
     private static final String PREF_NAME = "CloudSyncPrefs";
     private static final String KEY_LAST_SYNC = "LAST_SYNC_TIME";
+    private static final String EDU_PREFS = "EduLinguaPrefs";
+    private static final String GAMIFICATION_PREFS = "gamification_prefs";
+    private static final String ACHIEVEMENT_PREFS = "AchievementsPrefs";
 
     private Context context;
     private DatabaseReference databaseRef;
@@ -94,6 +98,25 @@ public class CloudSyncManager {
             userData.put("unlockedAchievements", achievementManager.getUnlockedCount());
             userData.put("totalAchievements", achievementManager.getTotalCount());
 
+            // Full gamification snapshots to preserve quests/badges/achievements across devices
+            SharedPreferences gamificationPrefs = context.getSharedPreferences(GAMIFICATION_PREFS, Context.MODE_PRIVATE);
+            SharedPreferences achievementsPrefs = context.getSharedPreferences(ACHIEVEMENT_PREFS, Context.MODE_PRIVATE);
+            SharedPreferences eduPrefs = context.getSharedPreferences(EDU_PREFS, Context.MODE_PRIVATE);
+
+            userData.put("questsJson", gamificationPrefs.getString("quests", null));
+            userData.put("badgesJson", gamificationPrefs.getString("badges", null));
+            userData.put("achievementsJson", achievementsPrefs.getString("ACHIEVEMENTS_LIST", null));
+
+            userData.put("totalFunGames", eduPrefs.getInt("TOTAL_FUN_GAMES", 0));
+            userData.put("speedGamesPlayed", eduPrefs.getInt("SPEED_GAMES_PLAYED", 0));
+            userData.put("puzzleGamesPlayed", eduPrefs.getInt("PUZZLE_GAMES_PLAYED", 0));
+            userData.put("beatGamesPlayed", eduPrefs.getInt("BEAT_GAMES_PLAYED", 0));
+            userData.put("funGameBestScore", eduPrefs.getInt("FUN_GAME_BEST_SCORE", 0));
+            Set<String> playedGames = eduPrefs.getStringSet("FUN_GAMES_PLAYED_SET", null);
+            if (playedGames != null) {
+                userData.put("funGamesPlayedSet", playedGames);
+            }
+
             // Timestamp
             userData.put("lastSyncTime", System.currentTimeMillis());
             userData.put("deviceType", "Android");
@@ -159,7 +182,68 @@ public class CloudSyncManager {
                                 editor.putInt("HIGH_SCORE", cloudHighScore);
                             }
 
+                            Integer cloudTotalFunGames = snapshot.child("totalFunGames").getValue(Integer.class);
+                            Integer cloudSpeedGames = snapshot.child("speedGamesPlayed").getValue(Integer.class);
+                            Integer cloudPuzzleGames = snapshot.child("puzzleGamesPlayed").getValue(Integer.class);
+                            Integer cloudBeatGames = snapshot.child("beatGamesPlayed").getValue(Integer.class);
+                            Integer cloudFunBest = snapshot.child("funGameBestScore").getValue(Integer.class);
+
+                            int localTotalFunGames = prefs.getInt("TOTAL_FUN_GAMES", 0);
+                            int localSpeedGames = prefs.getInt("SPEED_GAMES_PLAYED", 0);
+                            int localPuzzleGames = prefs.getInt("PUZZLE_GAMES_PLAYED", 0);
+                            int localBeatGames = prefs.getInt("BEAT_GAMES_PLAYED", 0);
+                            int localFunBest = prefs.getInt("FUN_GAME_BEST_SCORE", 0);
+
+                            if (cloudTotalFunGames != null) {
+                                editor.putInt("TOTAL_FUN_GAMES", Math.max(localTotalFunGames, cloudTotalFunGames));
+                            }
+                            if (cloudSpeedGames != null) {
+                                editor.putInt("SPEED_GAMES_PLAYED", Math.max(localSpeedGames, cloudSpeedGames));
+                            }
+                            if (cloudPuzzleGames != null) {
+                                editor.putInt("PUZZLE_GAMES_PLAYED", Math.max(localPuzzleGames, cloudPuzzleGames));
+                            }
+                            if (cloudBeatGames != null) {
+                                editor.putInt("BEAT_GAMES_PLAYED", Math.max(localBeatGames, cloudBeatGames));
+                            }
+                            if (cloudFunBest != null) {
+                                editor.putInt("FUN_GAME_BEST_SCORE", Math.max(localFunBest, cloudFunBest));
+                            }
+
+                            DataSnapshot playedGamesSnapshot = snapshot.child("funGamesPlayedSet");
+                            if (playedGamesSnapshot.exists()) {
+                                java.util.HashSet<String> restoredSet = new java.util.HashSet<>();
+                                for (DataSnapshot child : playedGamesSnapshot.getChildren()) {
+                                    String value = child.getValue(String.class);
+                                    if (value != null && !value.trim().isEmpty()) {
+                                        restoredSet.add(value);
+                                    }
+                                }
+                                if (!restoredSet.isEmpty()) {
+                                    editor.putStringSet("FUN_GAMES_PLAYED_SET", restoredSet);
+                                }
+                            }
+
                             editor.apply();
+
+                            String questsJson = snapshot.child("questsJson").getValue(String.class);
+                            String badgesJson = snapshot.child("badgesJson").getValue(String.class);
+                            String achievementsJson = snapshot.child("achievementsJson").getValue(String.class);
+
+                            if (questsJson != null || badgesJson != null) {
+                                SharedPreferences.Editor gamificationEditor =
+                                        context.getSharedPreferences(GAMIFICATION_PREFS, Context.MODE_PRIVATE).edit();
+                                if (questsJson != null) gamificationEditor.putString("quests", questsJson);
+                                if (badgesJson != null) gamificationEditor.putString("badges", badgesJson);
+                                gamificationEditor.apply();
+                            }
+
+                            if (achievementsJson != null) {
+                                context.getSharedPreferences(ACHIEVEMENT_PREFS, Context.MODE_PRIVATE)
+                                        .edit()
+                                        .putString("ACHIEVEMENTS_LIST", achievementsJson)
+                                        .apply();
+                            }
 
                             saveLastSyncTime();
                             Log.d(TAG, "Data synced from cloud successfully");
