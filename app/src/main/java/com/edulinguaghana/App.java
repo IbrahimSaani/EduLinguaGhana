@@ -63,6 +63,13 @@ public class App extends Application {
         } catch (Exception e) {
             Log.e(TAG, "Failed to schedule learning notification worker", e);
         }
+
+        // Initialize social activity listener for real-time notifications
+        try {
+            com.edulinguaghana.social.SocialActivityListener.getInstance(this).startListening();
+        } catch (Exception e) {
+            Log.e(TAG, "Failed to initialize SocialActivityListener", e);
+        }
     }
 
     /**
