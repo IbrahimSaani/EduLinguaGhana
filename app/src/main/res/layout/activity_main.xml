@@ -742,7 +742,7 @@
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:text="0"
-                                android:textSize="24sp"
+                                android:textSize="20sp"
                                 android:textStyle="bold"
                                 android:textColor="@color/colorPrimary"
                                 android:fontFamily="@font/agbalumo" />
@@ -752,11 +752,11 @@
                                 android:layout_height="wrap_content"
                                 android:layout_marginTop="4dp"
                                 android:text="Quizzes"
-                                android:textSize="12sp"
+                                android:textSize="11sp"
                                 android:textColor="@color/textColorSecondary" />
                         </LinearLayout>
 
-                        <!-- Accuracy -->
+                        <!-- Total Games -->
                         <LinearLayout
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
@@ -765,21 +765,21 @@
                             android:gravity="center">
 
                             <TextView
-                                android:id="@+id/tvAccuracy"
+                                android:id="@+id/tvTotalGames"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="0%"
-                                android:textSize="24sp"
+                                android:text="0"
+                                android:textSize="20sp"
                                 android:textStyle="bold"
-                                android:textColor="@color/colorAccent"
+                                android:textColor="#FF9800"
                                 android:fontFamily="@font/agbalumo" />
 
                             <TextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:layout_marginTop="4dp"
-                                android:text="Accuracy"
-                                android:textSize="12sp"
+                                android:text="Games"
+                                android:textSize="11sp"
                                 android:textColor="@color/textColorSecondary" />
                         </LinearLayout>
 
@@ -793,15 +793,14 @@
                             android:gravity="center"
                             android:clickable="true"
                             android:focusable="true"
-                            android:background="?attr/selectableItemBackgroundBorderless"
-                            android:padding="8dp">
+                            android:background="?attr/selectableItemBackgroundBorderless">
 
                             <TextView
                                 android:id="@+id/tvAchievements"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:text="0/18"
-                                android:textSize="24sp"
+                                android:textSize="20sp"
                                 android:textStyle="bold"
                                 android:textColor="#4CAF50"
                                 android:fontFamily="@font/agbalumo" />
@@ -811,7 +810,7 @@
                                 android:layout_height="wrap_content"
                                 android:layout_marginTop="4dp"
                                 android:text="Badges"
-                                android:textSize="12sp"
+                                android:textSize="11sp"
                                 android:textColor="@color/textColorSecondary" />
                         </LinearLayout>
 

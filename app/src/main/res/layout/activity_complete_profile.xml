@@ -17,17 +17,25 @@
         <com.google.android.material.card.MaterialCardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:cardCornerRadius="24dp"
-            app:cardElevation="8dp"
+            app:cardCornerRadius="32dp"
+            app:cardElevation="12dp"
             app:cardBackgroundColor="@android:color/white"
-            app:strokeWidth="1dp"
-            app:strokeColor="@color/dividerColor">
+            app:strokeWidth="0dp">
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
                 android:padding="24dp">
+
+                <ImageView
+                    android:layout_width="80dp"
+                    android:layout_height="80dp"
+                    android:layout_gravity="center"
+                    android:layout_marginBottom="16dp"
+                    android:src="@drawable/ic_launcher_foreground"
+                    android:contentDescription="@null"
+                    app:tint="@color/colorPrimary" />
 
                 <TextView
                     android:id="@+id/tvTitle"
@@ -36,7 +44,8 @@
                     android:text="@string/complete_profile_title"
                     android:textAlignment="center"
                     android:textColor="@color/colorPrimary"
-                    android:textSize="28sp"
+                    android:textSize="26sp"
+                    android:fontFamily="@font/agbalumo"
                     android:textStyle="bold" />
 
                 <TextView
@@ -47,7 +56,7 @@
                     android:text="@string/complete_profile_subtitle"
                     android:textAlignment="center"
                     android:textColor="@color/textColorSecondary"
-                    android:textSize="15sp" />
+                    android:textSize="14sp" />
 
                 <com.google.android.material.card.MaterialCardView
                     android:id="@+id/userInfoCard"

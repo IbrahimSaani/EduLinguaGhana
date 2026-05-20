@@ -93,10 +93,18 @@ public class CompleteProfileActivity extends AppCompatActivity {
     }
 
     private void configureModeUi() {
-        if (currentUserRole != UserRole.STUDENT) {
+        if (currentUserRole == UserRole.TEACHER || currentUserRole == UserRole.PARENT) {
             if (findViewById(R.id.tilAge) != null) findViewById(R.id.tilAge).setVisibility(android.view.View.GONE);
             if (findViewById(R.id.tilStudentClass) != null) findViewById(R.id.tilStudentClass).setVisibility(android.view.View.GONE);
-            if (tvSubtitle != null) tvSubtitle.setText("Please confirm your details to continue");
+            if (findViewById(R.id.userInfoCard) != null) findViewById(R.id.userInfoCard).setVisibility(android.view.View.VISIBLE);
+            if (tvSubtitle != null) tvSubtitle.setText("Confirm your profile details below");
+            
+            // For teachers/parents in non-edit mode, we really shouldn't be here
+            // but if we are, allow them to just click through.
+        } else {
+            // Student specific UI
+            if (findViewById(R.id.tilAge) != null) findViewById(R.id.tilAge).setVisibility(android.view.View.VISIBLE);
+            if (findViewById(R.id.tilStudentClass) != null) findViewById(R.id.tilStudentClass).setVisibility(android.view.View.VISIBLE);
         }
 
         if (tvTitle != null && editMode) {

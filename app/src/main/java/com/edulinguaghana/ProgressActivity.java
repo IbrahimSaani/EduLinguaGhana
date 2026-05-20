@@ -22,7 +22,7 @@ import com.google.android.material.progressindicator.CircularProgressIndicator;
 public class ProgressActivity extends AppCompatActivity {
 
     private static final String TAG = "ProgressActivity";
-    private TextView tvStatHighScore, tvStatTotalQuizzes, tvStatTotalCorrect, tvStatAccuracy, tvAchievements;
+    private TextView tvStatHighScore, tvStatTotalQuizzes, tvStatTotalCorrect, tvStatTotalGames, tvStatAccuracy, tvAchievements;
     private MaterialButton btnCloseProgress, btnShareProgress;
     private CircularProgressIndicator progressAccuracy;
     private MaterialToolbar toolbar;
@@ -44,6 +44,7 @@ public class ProgressActivity extends AppCompatActivity {
         tvStatHighScore    = findViewById(R.id.tvStatHighScore);
         tvStatTotalQuizzes = findViewById(R.id.tvStatTotalQuizzes);
         tvStatTotalCorrect = findViewById(R.id.tvStatTotalCorrect);
+        tvStatTotalGames   = findViewById(R.id.tvStatTotalGames);
         tvStatAccuracy     = findViewById(R.id.tvStatAccuracy);
         tvAchievements     = findViewById(R.id.tvAchievements);
         btnCloseProgress   = findViewById(R.id.btnCloseProgress);
@@ -62,6 +63,7 @@ public class ProgressActivity extends AppCompatActivity {
         // Set initial data
         final int highScore     = ProgressManager.getHighScore(this);
         final int totalQuizzes  = ProgressManager.getTotalQuizzes(this);
+        final int totalGames    = com.edulinguaghana.gamification.FunGameProgressManager.getTotalFunGamesPlayed(this);
         final int totalCorrect  = ProgressManager.getTotalCorrect(this);
         final int percentage    = ProgressManager.getAccuracy(this);
 
@@ -71,6 +73,9 @@ public class ProgressActivity extends AppCompatActivity {
         tvStatHighScore.setText("Best quiz score: " + displayHighScore + " / 10");
         tvStatTotalQuizzes.setText("Total quizzes taken: " + totalQuizzes);
         tvStatTotalCorrect.setText("Total correct answers: " + totalCorrect);
+        if (tvStatTotalGames != null) {
+            tvStatTotalGames.setText("Total games played: " + totalGames);
+        }
         tvStatAccuracy.setText("Overall accuracy: " + percentage + "%");
         progressAccuracy.setMax(100);
 

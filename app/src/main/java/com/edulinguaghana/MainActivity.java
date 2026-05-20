@@ -72,7 +72,7 @@ public class MainActivity extends AppCompatActivity {
     private android.widget.TextView tvStreakCount;
     private android.widget.TextView tvFunFact;
     private android.widget.TextView tvTotalQuizzes;
-    private android.widget.TextView tvAccuracy;
+    private android.widget.TextView tvTotalGames;
     private android.widget.TextView tvAchievements;
     private android.view.View offlineBanner;
     private BottomNavigationView bottomNavigation;
@@ -135,7 +135,7 @@ public class MainActivity extends AppCompatActivity {
         tvStreakCount = findViewById(R.id.tvStreakCount);
         tvFunFact = findViewById(R.id.tvFunFact);
         tvTotalQuizzes = findViewById(R.id.tvTotalQuizzes);
-        tvAccuracy = findViewById(R.id.tvAccuracy);
+        tvTotalGames = findViewById(R.id.tvTotalGames);
         tvAchievements = findViewById(R.id.tvAchievements);
         offlineBanner = findViewById(R.id.offlineBanner);
         languageChipGroup = findViewById(R.id.languageChipGroup);
@@ -204,10 +204,10 @@ public class MainActivity extends AppCompatActivity {
             tvTotalQuizzes.setText(String.valueOf(totalQuizzes));
         }
 
-        // Update Accuracy
-        if (tvAccuracy != null) {
-            int accuracy = ProgressManager.getAccuracy(this);
-            tvAccuracy.setText(accuracy + "%");
+        // Update Total Games
+        if (tvTotalGames != null) {
+            int totalGames = FunGameProgressManager.getTotalFunGamesPlayed(this);
+            tvTotalGames.setText(String.valueOf(totalGames));
         }
 
         // Update Achievements

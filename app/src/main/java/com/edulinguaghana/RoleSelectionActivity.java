@@ -185,6 +185,15 @@ public class RoleSelectionActivity extends AppCompatActivity {
 
         boolean isFirstTime = getIntent().getBooleanExtra("first_time", false);
         if (isFirstTime) {
+            // For Teachers and Parents, skip profile completion (age/class) and go straight to Main
+            if (selectedRole == UserRole.TEACHER || selectedRole == UserRole.PARENT) {
+                Intent intent = new Intent(this, MainActivity.class);
+                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                startActivity(intent);
+                finish();
+                return;
+            }
+
             Intent intent = new Intent(this, CompleteProfileActivity.class);
             intent.putExtra(CompleteProfileActivity.EXTRA_NEXT_STEP, CompleteProfileActivity.NEXT_STEP_MAIN);
             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
