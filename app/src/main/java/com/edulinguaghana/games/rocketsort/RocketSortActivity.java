@@ -72,6 +72,7 @@ public class RocketSortActivity extends AppCompatActivity {
     private String challengeId;
     private int challengeHearts = 5;
     private long timeLeftMs = 60000;
+    private long gameStartTime;
     private android.os.CountDownTimer gameTimer;
 
     private float currentSpeed = 3200f; // Faster starting speed
@@ -192,6 +193,7 @@ public class RocketSortActivity extends AppCompatActivity {
     private void startNewGame() {
         isGameOver = false;
         isPaused = false;
+        gameStartTime = System.currentTimeMillis();
         score = 0;
         lives = isChallengeMode ? challengeHearts : 5;
         if (isChallengeMode) {
@@ -540,7 +542,7 @@ public class RocketSortActivity extends AppCompatActivity {
         }
 
         try {
-            FunGameProgressManager.recordGameCompleted(this, "rocket_sort", score, languageCode);
+            FunGameProgressManager.recordGameCompleted(this, "rocket_sort", score, languageCode, (System.currentTimeMillis() - gameStartTime) / 1000);
         } catch (Exception ignored) { }
 
         showOverlay("Mission Complete!");

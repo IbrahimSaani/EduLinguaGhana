@@ -32,6 +32,7 @@ public class HiddenShapesActivity extends AppCompatActivity {
     private boolean isGameOver = false;
     private boolean isPaused = false;
     private long timeLeftMs = 60000;
+    private long gameStartTime;
     private android.os.CountDownTimer gameTimer;
     
     private TextToSpeech tts;
@@ -111,6 +112,7 @@ public class HiddenShapesActivity extends AppCompatActivity {
     private void startNewGame() {
         isGameOver = false;
         isPaused = false;
+        gameStartTime = System.currentTimeMillis();
         score = 0;
         if (isChallengeMode) {
             timeLeftMs = getIntent().getLongExtra("CHALLENGE_DURATION", 60) * 1000;
@@ -183,7 +185,7 @@ public class HiddenShapesActivity extends AppCompatActivity {
         }
 
         try {
-            FunGameProgressManager.recordGameCompleted(this, "hidden_shapes", score, languageCode);
+            FunGameProgressManager.recordGameCompleted(this, "hidden_shapes", score, languageCode, (System.currentTimeMillis() - gameStartTime) / 1000);
         } catch (Exception ignored) { }
 
         showPauseOverlay("Time Up!");

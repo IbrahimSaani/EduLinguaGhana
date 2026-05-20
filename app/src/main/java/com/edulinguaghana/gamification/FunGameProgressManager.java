@@ -35,6 +35,10 @@ public final class FunGameProgressManager {
     }
 
     public static void recordGameCompleted(Context context, String gameId, int score, String languageCode) {
+        recordGameCompleted(context, gameId, score, languageCode, 0);
+    }
+
+    public static void recordGameCompleted(Context context, String gameId, int score, String languageCode, long durationSeconds) {
         if (context == null || gameId == null) return;
 
         SharedPreferences prefs = context.getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE);
@@ -110,7 +114,7 @@ public final class FunGameProgressManager {
             FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
             if (user != null) {
                 com.edulinguaghana.tracking.ProgressTracker tracker = new com.edulinguaghana.tracking.ProgressTracker();
-                tracker.logFunGameCompletion(context, user.getUid(), gameId, score, null);
+                tracker.logFunGameCompletion(context, user.getUid(), gameId, score, durationSeconds, null);
             }
         } catch (Exception e) {
             android.util.Log.e("FunGameProgressManager", "Failed to log fun game to Firebase", e);

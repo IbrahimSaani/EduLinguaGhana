@@ -44,6 +44,7 @@ public class BeatMatcherActivity extends AppCompatActivity implements TextToSpee
     
     private String languageCode;
     private String targetChar;
+    private long gameStartTime;
     
     private TextToSpeech tts;
     private Handler handler = new Handler(Looper.getMainLooper());
@@ -134,6 +135,7 @@ public class BeatMatcherActivity extends AppCompatActivity implements TextToSpee
     }
 
     private void startGame() {
+        gameStartTime = System.currentTimeMillis();
         recordFunSessionIfNeeded();
         score = 0;
         isGameOver = false;
@@ -150,7 +152,7 @@ public class BeatMatcherActivity extends AppCompatActivity implements TextToSpee
         if (funSessionRecorded || score <= 0) return;
         funSessionRecorded = true;
         try {
-            FunGameProgressManager.recordGameCompleted(this, "beat_matcher", score, languageCode);
+            FunGameProgressManager.recordGameCompleted(this, "beat_matcher", score, languageCode, (System.currentTimeMillis() - gameStartTime) / 1000);
         } catch (Exception ignored) {
         }
     }

@@ -63,6 +63,7 @@ public class BubblePopActivity extends AppCompatActivity {
     private int decoysSinceLastTarget = 0;
     private boolean isPaused = false;
     private long timeLeftMs = 60000;
+    private long gameStartTime;
     private android.os.CountDownTimer gameTimer;
 
     private Random random = new Random();
@@ -242,6 +243,7 @@ public class BubblePopActivity extends AppCompatActivity {
     private void startNewGame() {
         isGameOver = false;
         isPaused = false;
+        gameStartTime = System.currentTimeMillis();
         score = 0;
         timeLeftMs = isChallengeMode ? challengeDuration : 60000;
         currentSpeed = 4000f;
@@ -342,7 +344,7 @@ public class BubblePopActivity extends AppCompatActivity {
         }
 
         try {
-            FunGameProgressManager.recordGameCompleted(this, "bubble_pop", score, languageCode);
+            FunGameProgressManager.recordGameCompleted(this, "bubble_pop", score, languageCode, (System.currentTimeMillis() - gameStartTime) / 1000);
         } catch (Exception ignored) { }
 
         showPauseOverlay("Time Up!");

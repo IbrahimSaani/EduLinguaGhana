@@ -39,6 +39,7 @@ public class PuzzleGameActivity extends AppCompatActivity {
     private String[] alphabet;
     private int score = 0;
     private long timeLeftMs = 60000;
+    private long gameStartTime;
     private boolean isGameOver = false, isPaused = false;
     private CountDownTimer gameTimer;
     private int piecesMatched = 0;
@@ -113,6 +114,7 @@ public class PuzzleGameActivity extends AppCompatActivity {
     private void startNewGame() {
         funSessionRecorded = false;
         score = 0;
+        gameStartTime = System.currentTimeMillis();
         if (isChallengeMode) {
             timeLeftMs = getIntent().getLongExtra("CHALLENGE_DURATION", 60) * 1000;
         } else {
@@ -348,7 +350,7 @@ public class PuzzleGameActivity extends AppCompatActivity {
         if (!funSessionRecorded) {
             funSessionRecorded = true;
             try {
-                FunGameProgressManager.recordGameCompleted(this, "puzzle_game", score, languageCode);
+                FunGameProgressManager.recordGameCompleted(this, "puzzle_game", score, languageCode, (System.currentTimeMillis() - gameStartTime) / 1000);
             } catch (Exception ignored) {
             }
         }

@@ -57,6 +57,7 @@ public class SpeedGameActivity extends AppCompatActivity {
     private String currentCorrectAnswer;
     private CountDownTimer countDownTimer;
     private long timeLeftMs;
+    private long gameStartTime;
     private String quizType = "letters";  // NEW: Support different quiz modes
     private String[] alphabet;  // NEW: Language-specific alphabet
 
@@ -253,6 +254,7 @@ public class SpeedGameActivity extends AppCompatActivity {
 
     private void startNewRound() {
         score = 0;
+        gameStartTime = System.currentTimeMillis();
         tvGameScore.setText(getString(R.string.quiz_score, score));
         tvGameFeedback.setText("");
         timeLeftMs = TOTAL_TIME_MS;
@@ -651,12 +653,14 @@ public class SpeedGameActivity extends AppCompatActivity {
                 // Disable buttons
                 setOptionsEnabled(false);
 
+                long durationSeconds = (System.currentTimeMillis() - gameStartTime) / 1000;
                 try {
                     FunGameProgressManager.recordGameCompleted(
                             SpeedGameActivity.this,
                             "speed_game",
                             score,
-                            languageCode
+                            languageCode,
+                            durationSeconds
                     );
                 } catch (Exception ignored) { }
             }
