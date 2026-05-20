@@ -8,7 +8,9 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 /**
@@ -31,103 +33,168 @@ public class FirebaseSocialRepository implements SocialRepository {
 
     @Override
     public Friend addFriend(String requesterId, String friendId) {
-        // Simple validation - just create the friend request
-        // The UI layer should validate user existence before calling this
         android.util.Log.d("FirebaseSocialRepository", "addFriend called - requesterId: " + requesterId + ", friendId: " + friendId);
 
-        String id = UUID.randomUUID().toString();
-        long now = System.currentTimeMillis();
-        Friend f = new Friend(id, requesterId, friendId, null, Friend.Status.PENDING, now, null);
+        // Check for existing request to prevent duplicates
+        rootRef.child("friends").orderByChild("userId").equalTo(requesterId)
+            .addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(DataSnapshot snapshot) {
+                    for (DataSnapshot child : snapshot.getChildren()) {
+                        String targetId = child.child("friendUserId").getValue(String.class);
+                        if (friendId.equals(targetId)) {
+                            android.util.Log.d("FirebaseSocialRepository", "Friend request already exists");
+                            return; 
+                        }
+                    }
+                    
+                    // No existing request, create new one
+                    String id = UUID.randomUUID().toString();
+                    long now = System.currentTimeMillis();
+                    
+                    Map<String, Object> f = new HashMap<>();
+                    f.put("id", id);
+                    f.put("userId", requesterId);
+                    f.put("friendUserId", friendId);
+                    f.put("status", Friend.Status.PENDING.name());
+                    f.put("requestedAt", now);
 
-        android.util.Log.d("FirebaseSocialRepository", "Creating friend request with ID: " + id);
-
-        rootRef.child("friends").child(id).setValue(f)
-            .addOnSuccessListener(aVoid -> {
-                android.util.Log.d("FirebaseSocialRepository", "Friend request saved successfully: " + id);
-            })
-            .addOnFailureListener(e -> {
-                android.util.Log.e("FirebaseSocialRepository", "Failed to save friend request", e);
+                    rootRef.child("friends").child(id).setValue(f);
+                }
+                @Override
+                public void onCancelled(DatabaseError error) {}
             });
 
-        return f;
+        return null;
     }
 
 
 
     @Override
     public boolean removeFriend(String userId, String friendId) {
-        // simple remove by query: scan children and remove matching entries (not efficient but simple)
-        rootRef.child("friends").addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot snapshot) {
-                for (DataSnapshot child : snapshot.getChildren()) {
-                    Friend f = child.getValue(Friend.class);
-                    if (f != null) {
-                        if ((userId.equals(f.userId) && friendId.equals(f.friendUserId)) || (userId.equals(f.friendUserId) && friendId.equals(f.userId))) {
-                            child.getRef().removeValue();
-                        }
-                    }
-                }
-            }
-
-            @Override
-            public void onCancelled(DatabaseError error) {
-            }
-        });
-        return true;
-    }
-
-    @Override
-    public Friend acceptFriend(String userId, String requesterId) {
-        // Mark the request as accepted and add reciprocal entry
-        // Find the pending request and update
-        rootRef.child("friends").addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot snapshot) {
-                for (DataSnapshot child : snapshot.getChildren()) {
-                    Friend f = child.getValue(Friend.class);
-                    if (f != null && requesterId.equals(f.userId) && userId.equals(f.friendUserId) && f.status == Friend.Status.PENDING) {
-                        f.status = Friend.Status.ACCEPTED;
-                        f.acceptedAt = System.currentTimeMillis();
-                        child.getRef().setValue(f);
-                        // create reciprocal
-                        String id2 = UUID.randomUUID().toString();
-                        Friend f2 = new Friend(id2, userId, requesterId, null, Friend.Status.ACCEPTED, f.requestedAt, f.acceptedAt);
-                        rootRef.child("friends").child(id2).setValue(f2);
-                    }
-                }
-            }
-
-            @Override
-            public void onCancelled(DatabaseError error) {
-            }
-        });
-        return null;
-    }
-
-    @Override
-    public List<Friend> getFriendRequests(String userId) {
-        // This is a placeholder for a synchronous call which isn't ideal for Firebase
-        // Real-time updates should use listeners, but we'll implement this as requested
-        // for compatibility with the service layer.
-        List<Friend> requests = new ArrayList<>();
-        rootRef.child("friends").orderByChild("friendUserId").equalTo(userId)
+        // Use a query to find the specific friend records to remove
+        rootRef.child("friends").orderByChild("userId").equalTo(userId)
             .addListenerForSingleValueEvent(new ValueEventListener() {
                 @Override
                 public void onDataChange(DataSnapshot snapshot) {
                     for (DataSnapshot child : snapshot.getChildren()) {
                         Friend f = child.getValue(Friend.class);
-                        if (f != null && f.status == Friend.Status.PENDING) {
-                            requests.add(f);
+                        if (f != null && friendId.equals(f.friendUserId)) {
+                            child.getRef().removeValue();
                         }
+                    }
+                }
+                @Override
+                public void onCancelled(DatabaseError error) {}
+            });
+
+        // Remove the reciprocal entry as well
+        rootRef.child("friends").orderByChild("userId").equalTo(friendId)
+            .addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(DataSnapshot snapshot) {
+                    for (DataSnapshot child : snapshot.getChildren()) {
+                        Friend f = child.getValue(Friend.class);
+                        if (f != null && userId.equals(f.friendUserId)) {
+                            child.getRef().removeValue();
+                        }
+                    }
+                }
+                @Override
+                public void onCancelled(DatabaseError error) {}
+            });
+
+        return true;
+    }
+
+    @Override
+    public Friend acceptFriend(String currentUserId, String requesterId) {
+        android.util.Log.d("FirebaseSocialRepository", "acceptFriend: " + currentUserId + " accepting " + requesterId);
+        
+        // Find ALL pending requests WHERE the current user is the recipient (friendUserId)
+        // This matches the security rule: query.orderByChild == 'friendUserId' && query.equalTo == auth.uid
+        rootRef.child("friends")
+            .orderByChild("friendUserId").equalTo(currentUserId)
+            .addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(DataSnapshot snapshot) {
+                    boolean updated = false;
+                    long now = System.currentTimeMillis();
+                    
+                    for (DataSnapshot child : snapshot.getChildren()) {
+                        Object senderIdObj = child.child("userId").getValue();
+                        String senderId = senderIdObj != null ? String.valueOf(senderIdObj) : "";
+                        
+                        Object statusObj = child.child("status").getValue();
+                        String statusStr = statusObj != null ? String.valueOf(statusObj) : "";
+                        
+                        // Verify this is the specific request from requesterId
+                        if (requesterId.equals(senderId) && "PENDING".equalsIgnoreCase(statusStr)) {
+                            android.util.Log.d("FirebaseSocialRepository", "Updating request " + child.getKey() + " to ACCEPTED");
+                            
+                            Map<String, Object> update = new HashMap<>();
+                            update.put("status", "ACCEPTED");
+                            update.put("acceptedAt", now);
+                            
+                            child.getRef().updateChildren(update);
+                            updated = true;
+                        }
+                    }
+                    
+                    if (updated) {
+                        // Create reciprocal entry so both users see each other
+                        // (Similar check for existing reciprocal record...)
+                        rootRef.child("friends").orderByChild("userId").equalTo(currentUserId)
+                            .addListenerForSingleValueEvent(new ValueEventListener() {
+                                @Override
+                                public void onDataChange(DataSnapshot recSnapshot) {
+                                    boolean reciprocalExists = false;
+                                    for (DataSnapshot recChild : recSnapshot.getChildren()) {
+                                        Object fIdObj = recChild.child("friendUserId").getValue();
+                                        if (requesterId.equals(String.valueOf(fIdObj))) {
+                                            reciprocalExists = true;
+                                            // Ensure existing reciprocal is also ACCEPTED
+                                            recChild.getRef().child("status").setValue("ACCEPTED");
+                                            recChild.getRef().child("acceptedAt").setValue(now);
+                                            break;
+                                        }
+                                    }
+                                    
+                                    if (!reciprocalExists) {
+                                        android.util.Log.d("FirebaseSocialRepository", "Creating reciprocal friend record");
+                                        String reciprocalId = UUID.randomUUID().toString();
+                                        Map<String, Object> reciprocal = new HashMap<>();
+                                        reciprocal.put("id", reciprocalId);
+                                        reciprocal.put("userId", currentUserId);
+                                        reciprocal.put("friendUserId", requesterId);
+                                        reciprocal.put("status", "ACCEPTED");
+                                        reciprocal.put("requestedAt", now);
+                                        reciprocal.put("acceptedAt", now);
+                                        
+                                        rootRef.child("friends").child(reciprocalId).setValue(reciprocal);
+                                    }
+                                }
+                                @Override
+                                public void onCancelled(DatabaseError error) {}
+                            });
+                    } else {
+                        android.util.Log.w("FirebaseSocialRepository", "No pending request found to accept from " + requesterId);
                     }
                 }
 
                 @Override
                 public void onCancelled(DatabaseError error) {
+                    android.util.Log.e("FirebaseSocialRepository", "acceptFriend failed: " + error.getMessage());
                 }
             });
-        return requests;
+        return null;
+    }
+
+    @Override
+    public List<Friend> getFriendRequests(String userId) {
+        // This method is synchronous but Firebase is async. 
+        // Returning empty list; recommended to use direct listeners in the UI.
+        return new ArrayList<>();
     }
 
     @Override

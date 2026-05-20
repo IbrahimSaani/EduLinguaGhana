@@ -15,13 +15,14 @@
       "$userId": {
         ".write": "$userId === auth.uid && (auth.token.email_verified === true || !data.exists())",
         ".read": "auth != null",
+        "fcmToken": {
+          ".read": "$userId === auth.uid",
+          ".write": "$userId === auth.uid && auth.token.email_verified === true",
+          ".validate": "newData.isString()"
+        },
         "role": {
           ".write": "$userId === auth.uid && auth.token.email_verified === true",
           ".validate": "newData.isString() && (newData.val() === 'STUDENT' || newData.val() === 'TEACHER' || newData.val() === 'PARENT')"
-        },
-        "fcmToken": {
-          ".write": "$userId === auth.uid && auth.token.email_verified === true",
-          ".validate": "newData.isString()"
         },
         "displayName": {
           ".write": "$userId === auth.uid && auth.token.email_verified === true"
@@ -46,10 +47,10 @@
       }
     },
     "friends": {
-      ".read": "auth != null && (query.orderByChild == 'userId' && query.equalTo == auth.uid || query.orderByChild == 'friendUserId' && query.equalTo == auth.uid)",
+      ".read": "auth != null && (query.orderByChild == 'userId' && query.equalTo == auth.uid || query.orderByChild == 'friendUserId' && query.equalTo == auth.uid || root.child('users').child(auth.uid).child('role').val() === 'TEACHER' || root.child('users').child(auth.uid).child('role').val() === 'PARENT')",
       ".indexOn": ["userId", "friendUserId", "status"],
       "$friendshipId": {
-        ".read": "auth != null && (data.child('userId').val() === auth.uid || data.child('friendUserId').val() === auth.uid)",
+        ".read": "auth != null && (data.child('userId').val() === auth.uid || data.child('friendUserId').val() === auth.uid || root.child('users').child(auth.uid).child('role').val() === 'TEACHER' || root.child('users').child(auth.uid).child('role').val() === 'PARENT')",
         ".write": "auth != null && auth.token.email_verified === true && (!data.exists() || data.child('userId').val() === auth.uid || data.child('friendUserId').val() === auth.uid) && (newData.child('userId').val() === auth.uid || newData.child('friendUserId').val() === auth.uid)",
         ".validate": "newData.hasChildren(['userId', 'friendUserId', 'status'])"
       }

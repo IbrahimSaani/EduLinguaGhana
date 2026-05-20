@@ -1411,14 +1411,44 @@ public class ProfileActivity extends AppCompatActivity {
                 @Override
                 public void onDataChange(com.google.firebase.database.DataSnapshot snapshot) {
                     java.util.List<Friend> acceptedFriends = new java.util.ArrayList<>();
+                    android.util.Log.d("ProfileActivity", "Friends query found " + snapshot.getChildrenCount() + " records");
+                    
                     for (com.google.firebase.database.DataSnapshot child : snapshot.getChildren()) {
                         Friend friend = child.getValue(Friend.class);
-                        if (friend != null && friend.status == Friend.Status.ACCEPTED) {
-                            acceptedFriends.add(friend);
+                        if (friend != null) {
+                            friend.id = child.getKey();
+                            
+                            Object statusObj = child.child("status").getValue();
+                            String statusStr = statusObj != null ? String.valueOf(statusObj) : "";
+                            
+                            if ("ACCEPTED".equalsIgnoreCase(statusStr) || (friend.status != null && friend.status == Friend.Status.ACCEPTED)) {
+                                // Ensure IDs are present
+                                Object uIdObj = child.child("userId").getValue();
+                                if (friend.userId == null || "null".equals(friend.userId)) friend.userId = String.valueOf(uIdObj);
+                                
+                                Object fIdObj = child.child("friendUserId").getValue();
+                                if (friend.friendUserId == null || "null".equals(friend.friendUserId)) friend.friendUserId = String.valueOf(fIdObj);
+                                
+                                // Validation: userId should be the current user, friendUserId should be the friend
+                                if (userId.equals(friend.userId)) {
+                                    // De-duplicate
+                                    boolean exists = false;
+                                    for (Friend f : acceptedFriends) {
+                                        if (f.friendUserId != null && f.friendUserId.equals(friend.friendUserId)) {
+                                            exists = true;
+                                            break;
+                                        }
+                                    }
+                                    if (!exists) {
+                                        acceptedFriends.add(friend);
+                                    }
+                                }
+                            }
                         }
                     }
 
                     if (acceptedFriends.isEmpty()) {
+                        android.util.Log.d("ProfileActivity", "No accepted friends found in query results");
                         Toast.makeText(ProfileActivity.this, "No friends yet. Add some!", Toast.LENGTH_SHORT).show();
                         return;
                     }
@@ -1447,33 +1477,43 @@ public class ProfileActivity extends AppCompatActivity {
         final int totalCount = friends.size();
 
         for (Friend friend : friends) {
-            usersRef.child(friend.friendUserId).addListenerForSingleValueEvent(
+            String uidToFetch = friend.friendUserId;
+            android.util.Log.d("ProfileActivity", "Fetching friend name for UID: " + uidToFetch);
+
+            usersRef.child(uidToFetch).addListenerForSingleValueEvent(
                 new com.google.firebase.database.ValueEventListener() {
                     @Override
                     public void onDataChange(com.google.firebase.database.DataSnapshot snapshot) {
                         if (snapshot.exists()) {
-                            String displayName = snapshot.child("displayName").getValue(String.class);
-                            if (displayName != null && !displayName.isEmpty()) {
+                            String displayName = snapshot.child("displayName").getValue() != null ? 
+                                                String.valueOf(snapshot.child("displayName").getValue()) : null;
+                            String username = snapshot.child("username").getValue() != null ? 
+                                             String.valueOf(snapshot.child("username").getValue()) : null;
+                            String email = snapshot.child("email").getValue() != null ? 
+                                          String.valueOf(snapshot.child("email").getValue()) : null;
+                            
+                            if (displayName != null && !displayName.isEmpty() && !"null".equals(displayName)) {
                                 friend.displayName = displayName;
+                            } else if (username != null && !username.isEmpty() && !"null".equals(username)) {
+                                friend.displayName = username;
+                            } else if (email != null && !email.isEmpty() && !"null".equals(email)) {
+                                friend.displayName = email;
                             } else {
-                                // Fallback to email or UID
-                                String email = snapshot.child("email").getValue(String.class);
-                                friend.displayName = email != null ? email : friend.friendUserId;
+                                friend.displayName = uidToFetch;
                             }
                         } else {
-                            friend.displayName = friend.friendUserId; // Fallback to UID
+                            friend.displayName = "Friend (" + uidToFetch.substring(0, Math.min(5, uidToFetch.length())) + ")";
                         }
 
                         fetchedCount[0]++;
                         if (fetchedCount[0] == totalCount) {
-                            // All usernames fetched, show the dialog
                             showFriendsListDialog(friends, currentUserId);
                         }
                     }
 
                     @Override
                     public void onCancelled(com.google.firebase.database.DatabaseError error) {
-                        friend.displayName = friend.friendUserId; // Fallback to UID on error
+                        friend.displayName = uidToFetch;
                         fetchedCount[0]++;
                         if (fetchedCount[0] == totalCount) {
                             showFriendsListDialog(friends, currentUserId);
@@ -1703,17 +1743,31 @@ public class ProfileActivity extends AppCompatActivity {
                     Friend friend = child.getValue(Friend.class);
                     if (friend != null) {
                         friend.id = child.getKey();
-                        // Check status case-insensitively
-                        String statusStr = child.child("status").getValue() != null ? 
-                                          child.child("status").getValue().toString() : "";
+                        
+                        Object statusObj = child.child("status").getValue();
+                        String statusStr = statusObj != null ? String.valueOf(statusObj) : "";
+                        android.util.Log.d("ProfileActivity", "Processing request from " + child.child("userId").getValue() + " with status: " + statusStr);
                                           
-                        if ("PENDING".equalsIgnoreCase(statusStr)) {
-                            // Ensure we have IDs if getValue failed to map them
-                            if (friend.userId == null) friend.userId = child.child("userId").getValue(String.class);
-                            if (friend.friendUserId == null) friend.friendUserId = child.child("friendUserId").getValue(String.class);
+                        if ("PENDING".equalsIgnoreCase(statusStr) || (friend.status != null && friend.status == Friend.Status.PENDING)) {
+                            // Ensure we have IDs
+                            if (friend.userId == null) friend.userId = String.valueOf(child.child("userId").getValue());
+                            if (friend.friendUserId == null) friend.friendUserId = String.valueOf(child.child("friendUserId").getValue());
                             
-                            pendingRequests.add(friend);
-                            android.util.Log.d("ProfileActivity", "Added pending request from: " + friend.userId);
+                            if (friend.userId == null || "null".equals(friend.userId)) continue;
+                            
+                            // Check if already in list (avoid duplicates from multiple records)
+                            boolean alreadyAdded = false;
+                            for (Friend existing : pendingRequests) {
+                                if (existing.userId != null && existing.userId.equals(friend.userId)) {
+                                    alreadyAdded = true;
+                                    break;
+                                }
+                            }
+                            
+                            if (!alreadyAdded) {
+                                pendingRequests.add(friend);
+                                android.util.Log.d("ProfileActivity", "Added pending request from: " + friend.userId);
+                            }
                         }
                     }
                 }
@@ -1724,8 +1778,8 @@ public class ProfileActivity extends AppCompatActivity {
                     return;
                 }
 
-                // Show dialog with friend requests
-                showFriendRequestsDialog(pendingRequests);
+                // Fetch usernames for each requester before showing dialog
+                fetchUsernamesForRequests(pendingRequests, userId);
             }
 
             @Override
@@ -1736,15 +1790,85 @@ public class ProfileActivity extends AppCompatActivity {
         });
     }
 
+    private void fetchUsernamesForRequests(java.util.List<Friend> requests, String currentUserId) {
+        com.google.firebase.database.DatabaseReference usersRef =
+            com.google.firebase.database.FirebaseDatabase.getInstance().getReference("users");
+
+        final int[] fetchedCount = {0};
+        final int totalCount = requests.size();
+
+        for (Friend request : requests) {
+            String uidToFetch = request.userId;
+            android.util.Log.d("ProfileActivity", "Fetching username for UID: " + uidToFetch);
+
+            usersRef.child(uidToFetch).addListenerForSingleValueEvent(
+                new com.google.firebase.database.ValueEventListener() {
+                    @Override
+                    public void onDataChange(com.google.firebase.database.DataSnapshot snapshot) {
+                        if (snapshot.exists()) {
+                            // Use String.valueOf to be safe with different types in DB
+                            String displayName = snapshot.child("displayName").getValue() != null ? 
+                                                String.valueOf(snapshot.child("displayName").getValue()) : null;
+                            String username = snapshot.child("username").getValue() != null ? 
+                                             String.valueOf(snapshot.child("username").getValue()) : null;
+                            String email = snapshot.child("email").getValue() != null ? 
+                                          String.valueOf(snapshot.child("email").getValue()) : null;
+                            
+                            android.util.Log.d("ProfileActivity", "User info found for " + uidToFetch + ": name=" + displayName + ", user=" + username + ", email=" + email);
+
+                            if (displayName != null && !displayName.isEmpty() && !"null".equals(displayName)) {
+                                request.displayName = displayName;
+                            } else if (username != null && !username.isEmpty() && !"null".equals(username)) {
+                                request.displayName = username;
+                            } else if (email != null && !email.isEmpty() && !"null".equals(email)) {
+                                request.displayName = email;
+                            } else {
+                                request.displayName = uidToFetch;
+                            }
+                        } else {
+                            android.util.Log.w("ProfileActivity", "No user record found in 'users' for UID: " + uidToFetch);
+                            request.displayName = "User (" + uidToFetch.substring(0, Math.min(5, uidToFetch.length())) + ")";
+                        }
+                        
+                        fetchedCount[0]++;
+                        if (fetchedCount[0] == totalCount) {
+                            showFriendRequestsDialog(requests);
+                        }
+                    }
+
+                    @Override
+                    public void onCancelled(com.google.firebase.database.DatabaseError error) {
+                        request.displayName = uidToFetch;
+                        fetchedCount[0]++;
+                        if (fetchedCount[0] == totalCount) {
+                            showFriendRequestsDialog(requests);
+                        }
+                    }
+                }
+            );
+        }
+    }
+
     private void showFriendRequestsDialog(java.util.List<Friend> requests) {
         java.util.List<StyledMenuHelper.MenuItem> menuItems = new java.util.ArrayList<>();
 
         for (Friend request : requests) {
+            String label = request.displayName != null ? request.displayName : request.userId;
             menuItems.add(new StyledMenuHelper.MenuItem(
                 "📬",
-                "Request from " + request.userId,
-                request.userId,
+                "Request from " + label,
+                "Tap to respond",
                 () -> showAcceptRejectDialog(request)
+            ));
+        }
+
+        // Add Accept All option as a menu item instead of onDismiss
+        if (requests.size() > 1) {
+            menuItems.add(new StyledMenuHelper.MenuItem(
+                "✅",
+                "Accept All",
+                "Accept all " + requests.size() + " requests",
+                () -> showAcceptAllConfirmation(requests)
             ));
         }
 
@@ -1754,12 +1878,7 @@ public class ProfileActivity extends AppCompatActivity {
             "Friend Requests",
             "Review pending requests",
             menuItems,
-            new Runnable() {
-                @Override
-                public void run() {
-                    showAcceptAllConfirmation(requests);
-                }
-            }
+            null // Removed dangerous onDismiss loop
         );
     }
 
@@ -1820,6 +1939,11 @@ public class ProfileActivity extends AppCompatActivity {
                     message += "\n❌ Failed: " + failed[0];
                 }
                 Toast.makeText(this, message, Toast.LENGTH_LONG).show();
+                
+                // Refresh after a longer delay to allow DB sync and background task completion
+                new android.os.Handler(android.os.Looper.getMainLooper()).postDelayed(() -> {
+                    showFriendRequests(currentUserId);
+                }, 1500);
             }
         }
     }
@@ -1827,6 +1951,7 @@ public class ProfileActivity extends AppCompatActivity {
 
     private void showAcceptRejectDialog(Friend request) {
         java.util.List<StyledMenuHelper.MenuItem> menuItems = new java.util.ArrayList<>();
+        String label = request.displayName != null ? request.displayName : request.userId;
 
         menuItems.add(new StyledMenuHelper.MenuItem(
             "✅",
@@ -1844,10 +1969,15 @@ public class ProfileActivity extends AppCompatActivity {
                                 this,
                                 "✅",
                                 "Success!",
-                                "Friend request from " + request.userId + " accepted!",
+                                "Friend request from " + label + " accepted!",
                                 "OK",
                                 null,
-                                () -> showFriendRequests(currentUserId),
+                                () -> {
+                                    // Refresh after a longer delay to allow DB sync and background task completion
+                                    new android.os.Handler(android.os.Looper.getMainLooper()).postDelayed(() -> {
+                                        showFriendRequests(currentUserId);
+                                    }, 1200);
+                                },
                                 null
                             );
                         }
@@ -1874,10 +2004,15 @@ public class ProfileActivity extends AppCompatActivity {
                                 this,
                                 "❌",
                                 "Request Rejected",
-                                "Friend request from " + request.userId + " has been rejected.",
+                                "Friend request from " + label + " has been rejected.",
                                 "OK",
                                 null,
-                                () -> showFriendRequests(currentUserId),
+                                () -> {
+                                    // Refresh after a short delay
+                                    new android.os.Handler(android.os.Looper.getMainLooper()).postDelayed(() -> {
+                                        showFriendRequests(currentUserId);
+                                    }, 500);
+                                },
                                 null
                             );
                         }
@@ -1892,7 +2027,7 @@ public class ProfileActivity extends AppCompatActivity {
             this,
             "📬",
             "Friend Request",
-            "From: " + request.userId,
+            "From: " + label,
             menuItems,
             null
         );
