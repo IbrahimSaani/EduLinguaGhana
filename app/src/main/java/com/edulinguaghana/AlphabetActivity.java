@@ -8,6 +8,7 @@ import androidx.core.content.ContextCompat;
 import android.Manifest;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.content.res.ColorStateList;
 import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.os.VibrationEffect;
@@ -1048,11 +1049,52 @@ public class AlphabetActivity extends AppCompatActivity {
 
     private void handleSuccess(String recognized, String expected) {
         practiceRetryCount = 0; // Reset retry count on success
-        celebrateAction();
+
+        // Visual indication on the card
+        if (letterCard != null) {
+            // Store original values
+            ColorStateList originalStrokeColor = letterCard.getStrokeColorStateList();
+            ColorStateList originalBgColor = letterCard.getCardBackgroundColor();
+            float originalElevation = letterCard.getCardElevation();
+
+            // Success state - change colors and pop out
+            letterCard.setStrokeColor(ColorStateList.valueOf(getColor(R.color.correctAnswer)));
+            letterCard.setCardBackgroundColor(ColorStateList.valueOf(getColor(R.color.modeProgressStart))); // Light green success background
+            letterCard.setCardElevation(originalElevation * 1.5f);
+
+            // Revert after a delay
+            letterCard.postDelayed(() -> {
+                if (letterCard != null) {
+                    letterCard.setStrokeColor(originalStrokeColor);
+                    letterCard.setCardBackgroundColor(originalBgColor);
+                    letterCard.setCardElevation(originalElevation);
+                }
+            }, 2500);
+        }
+
+        // Change emoji temporarily and trigger celebration
+        if (celebrationEmoji != null) {
+            String originalEmoji = celebrationEmoji.getText().toString();
+            celebrationEmoji.setText("✅");
+            celebrateAction();
+
+            celebrationEmoji.postDelayed(() -> {
+                if (celebrationEmoji != null) {
+                    celebrationEmoji.setText(originalEmoji);
+                }
+            }, 2500);
+        }
+
+        // Play success sound
+        playAudioResource(R.raw.correct);
+
         Toast.makeText(this,
             "🎉 Excellent! You said: '" + recognized + "'" +
             "\n✅ Correct pronunciation of '" + expected + "'!",
             Toast.LENGTH_LONG).show();
+
+        // Trigger haptic feedback for success
+        triggerHapticFeedback(100); // Slightly longer for success
     }
 
     private boolean handleSpecialMisrecognitions(String expected, String recognized) {
