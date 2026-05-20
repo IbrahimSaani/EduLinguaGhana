@@ -224,7 +224,7 @@ public class MainActivity extends AppCompatActivity {
             badgesClickArea.setOnClickListener(v -> openAchievementsScreen());
         }
 
-        // Fun Games stats (total, best, per-game counts)
+        /* Fun Games stats (total, best, per-game counts) - removed from layout
         android.widget.TextView tvFunGamesTotal = findViewById(R.id.tvFunGamesTotal);
         android.widget.TextView tvFunGamesBest = findViewById(R.id.tvFunGamesBest);
         android.widget.TextView tvFunGamesPerGame = findViewById(R.id.tvFunGamesPerGame);
@@ -244,7 +244,7 @@ public class MainActivity extends AppCompatActivity {
             int puzzle = FunGameProgressManager.getPuzzleGamesPlayed(this);
             int beat = FunGameProgressManager.getBeatGamesPlayed(this);
             tvFunGamesPerGame.setText("S:" + speed + " P:" + puzzle + " B:" + beat);
-        }
+        } */
     }
 
     private void openAchievementsScreen() {

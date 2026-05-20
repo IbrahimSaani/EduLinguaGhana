@@ -97,6 +97,52 @@ public class ProgressTracker {
     }
 
     /**
+     * Log a fun game completion activity
+     */
+    public void logFunGameCompletion(Context context, String userId, String gameId, int score, ProgressCallback callback) {
+        if (userId == null) {
+            FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+            if (user != null) {
+                userId = user.getUid();
+            } else {
+                if (callback != null) callback.onError("User not logged in");
+                return;
+            }
+        }
+
+        final String finalUserId = userId;
+        String activityId = UUID.randomUUID().toString();
+        long timestamp = System.currentTimeMillis();
+
+        // Calculate XP earned (same formula as FunGameProgressManager)
+        int xpEarned = Math.max(5, Math.min(50, score / 2 + 8));
+
+        ProgressActivity activity = new ProgressActivity(
+            activityId,
+            finalUserId,
+            ProgressActivity.ActivityType.FUN_GAME_COMPLETED,
+            timestamp,
+            score,
+            0, 0,
+            xpEarned,
+            gameId,
+            0
+        );
+
+        progressRef.child(finalUserId).child("activities").child(activityId).setValue(activity)
+            .addOnSuccessListener(aVoid -> {
+                Log.d(TAG, "Fun game activity logged: " + activityId);
+                // Update aggregates to push achievements/quests/badges to Firebase
+                updateAggregates(context, finalUserId);
+                if (callback != null) callback.onSuccess();
+            })
+            .addOnFailureListener(e -> {
+                Log.e(TAG, "Failed to log fun game activity", e);
+                if (callback != null) callback.onError(e.getMessage());
+            });
+    }
+
+    /**
      * Log XP earned activity
      */
     public void logXPEarned(String userId, int xpAmount, String reason, ProgressCallback callback) {
@@ -204,7 +250,7 @@ public class ProgressTracker {
     /**
      * Update aggregated statistics for a user
      */
-    private void updateAggregates(Context context, String userId) {
+    public void updateAggregates(Context context, String userId) {
         aggregatesRef.child(userId).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot snapshot) {

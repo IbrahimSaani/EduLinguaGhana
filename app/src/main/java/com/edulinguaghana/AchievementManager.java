@@ -196,6 +196,17 @@ public class AchievementManager {
                 achievement.unlock();
                 newUnlock = true;
 
+                // Log to Firebase progress tracker
+                try {
+                    com.google.firebase.auth.FirebaseUser user = com.google.firebase.auth.FirebaseAuth.getInstance().getCurrentUser();
+                    if (user != null) {
+                        com.edulinguaghana.tracking.ProgressTracker tracker = new com.edulinguaghana.tracking.ProgressTracker();
+                        tracker.logAchievement(user.getUid(), achievement.getId(), achievement.getTitle(), null);
+                    }
+                } catch (Exception e) {
+                    android.util.Log.e("AchievementManager", "Failed to log achievement to Firebase", e);
+                }
+
                 // Send notification
                 notificationManager.addNotification(
                     "Achievement Unlocked! " + achievement.getEmoji(),

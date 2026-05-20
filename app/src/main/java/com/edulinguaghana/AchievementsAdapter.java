@@ -132,6 +132,7 @@ public class AchievementsAdapter extends RecyclerView.Adapter<AchievementsAdapte
                 currentVal = streakManager.getCurrentStreak(); 
                 break;
             case ACCURACY: currentVal = ProgressManager.getAccuracy(context); break;
+            case SPEED: currentVal = com.edulinguaghana.gamification.FunGameProgressManager.getTotalFunGamesPlayed(context); break;
         }
         
         int target = achievement.getRequiredValue();

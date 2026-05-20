@@ -318,10 +318,35 @@ public class RoleManager {
     }
 
     /**
-     * Get pending relationship requests for a student
+     * Get pending relationship requests for a student (received requests)
      */
     public void getPendingRequests(String studentId, RelationshipCallback callback) {
         relationshipsRef.orderByChild("studentId").equalTo(studentId)
+            .addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(DataSnapshot snapshot) {
+                    List<UserRelationship> relationships = new ArrayList<>();
+                    for (DataSnapshot child : snapshot.getChildren()) {
+                        UserRelationship rel = child.getValue(UserRelationship.class);
+                        if (rel != null && rel.getStatus() == UserRelationship.RelationshipStatus.PENDING) {
+                            relationships.add(rel);
+                        }
+                    }
+                    callback.onRelationshipsRetrieved(relationships);
+                }
+
+                @Override
+                public void onCancelled(DatabaseError error) {
+                    callback.onError(error.getMessage());
+                }
+            });
+    }
+
+    /**
+     * Get pending relationship requests sent by a supervisor
+     */
+    public void getSentPendingRequests(String supervisorId, RelationshipCallback callback) {
+        relationshipsRef.orderByChild("supervisorId").equalTo(supervisorId)
             .addListenerForSingleValueEvent(new ValueEventListener() {
                 @Override
                 public void onDataChange(DataSnapshot snapshot) {

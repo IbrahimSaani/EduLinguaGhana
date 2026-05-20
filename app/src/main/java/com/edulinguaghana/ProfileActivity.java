@@ -1686,42 +1686,40 @@ public class ProfileActivity extends AppCompatActivity {
             return;
         }
 
-        // Use Firebase listener to get friend requests
+        android.util.Log.d("ProfileActivity", "Loading friend requests for: " + userId);
+
+        // Use Firebase listener to get friend requests specifically for this user
         com.google.firebase.database.DatabaseReference friendsRef =
             com.google.firebase.database.FirebaseDatabase.getInstance().getReference("friends");
 
-        friendsRef.addListenerForSingleValueEvent(new com.google.firebase.database.ValueEventListener() {
+        friendsRef.orderByChild("friendUserId").equalTo(userId)
+            .addListenerForSingleValueEvent(new com.google.firebase.database.ValueEventListener() {
             @Override
             public void onDataChange(com.google.firebase.database.DataSnapshot snapshot) {
                 java.util.List<Friend> pendingRequests = new java.util.ArrayList<>();
+                android.util.Log.d("ProfileActivity", "Found " + snapshot.getChildrenCount() + " total requests for user");
+                
                 for (com.google.firebase.database.DataSnapshot child : snapshot.getChildren()) {
-                    String targetUserId = child.child("friendUserId").getValue(String.class);
-                    String statusValue = child.child("status").getValue(String.class);
-
-                    if (userId.equals(targetUserId) && statusValue != null && "PENDING".equalsIgnoreCase(statusValue)) {
-                        Friend friend = child.getValue(Friend.class);
-                        if (friend == null) {
-                            friend = new Friend();
-                        }
+                    Friend friend = child.getValue(Friend.class);
+                    if (friend != null) {
                         friend.id = child.getKey();
-                        friend.userId = child.child("userId").getValue(String.class);
-                        friend.friendUserId = targetUserId;
-                        friend.displayName = child.child("displayName").getValue(String.class);
-                        friend.avatarUrl = child.child("avatarUrl").getValue(String.class);
-                        friend.status = Friend.Status.PENDING;
-
-                        Long requestedAt = child.child("requestedAt").getValue(Long.class);
-                        if (requestedAt != null) {
-                            friend.requestedAt = requestedAt;
+                        // Check status case-insensitively
+                        String statusStr = child.child("status").getValue() != null ? 
+                                          child.child("status").getValue().toString() : "";
+                                          
+                        if ("PENDING".equalsIgnoreCase(statusStr)) {
+                            // Ensure we have IDs if getValue failed to map them
+                            if (friend.userId == null) friend.userId = child.child("userId").getValue(String.class);
+                            if (friend.friendUserId == null) friend.friendUserId = child.child("friendUserId").getValue(String.class);
+                            
+                            pendingRequests.add(friend);
+                            android.util.Log.d("ProfileActivity", "Added pending request from: " + friend.userId);
                         }
-
-                        Long acceptedAt = child.child("acceptedAt").getValue(Long.class);
-                        friend.acceptedAt = acceptedAt;
-                        pendingRequests.add(friend);
                     }
                 }
 
                 if (pendingRequests.isEmpty()) {
+                    android.util.Log.d("ProfileActivity", "No pending requests found after filtering");
                     Toast.makeText(ProfileActivity.this, "No pending friend requests", Toast.LENGTH_SHORT).show();
                     return;
                 }
@@ -1732,6 +1730,7 @@ public class ProfileActivity extends AppCompatActivity {
 
             @Override
             public void onCancelled(com.google.firebase.database.DatabaseError error) {
+                android.util.Log.e("ProfileActivity", "Error loading requests: " + error.getMessage());
                 Toast.makeText(ProfileActivity.this, "Failed to load friend requests", Toast.LENGTH_SHORT).show();
             }
         });

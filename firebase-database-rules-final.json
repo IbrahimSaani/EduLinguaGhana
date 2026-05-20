@@ -46,18 +46,20 @@
       }
     },
     "friends": {
-      ".read": "auth != null",
-
-      ".write": "auth != null && (newData.child('userId').val() === auth.uid || newData.child('friendUserId').val() === auth.uid || data.child('userId').val() === auth.uid || data.child('friendUserId').val() === auth.uid)",
-      ".indexOn": ["userId", "friendUserId", "status"]
+      ".read": "auth != null && (query.orderByChild == 'userId' && query.equalTo == auth.uid || query.orderByChild == 'friendUserId' && query.equalTo == auth.uid)",
+      ".indexOn": ["userId", "friendUserId", "status"],
+      "$friendshipId": {
+        ".read": "auth != null && (data.child('userId').val() === auth.uid || data.child('friendUserId').val() === auth.uid)",
+        ".write": "auth != null && auth.token.email_verified === true && (!data.exists() || data.child('userId').val() === auth.uid || data.child('friendUserId').val() === auth.uid) && (newData.child('userId').val() === auth.uid || newData.child('friendUserId').val() === auth.uid)",
+        ".validate": "newData.hasChildren(['userId', 'friendUserId', 'status'])"
+      }
     },
     "challenges": {
       ".read": "auth != null",
       ".indexOn": ["state", "challengedId", "challengerId", "completedAt", "createdAt"],
       "$challengeId": {
         ".read": "auth != null",
-
-        ".write": "auth != null && (!data.exists() || data.child('challengerId').val() === auth.uid || data.child('challengedId').val() === auth.uid || newData.child('challengerId').val() === auth.uid || newData.child('challengedId').val() === auth.uid)",
+        ".write": "auth != null && auth.token.email_verified === true && (!data.exists() || data.child('challengerId').val() === auth.uid || data.child('challengedId').val() === auth.uid || newData.child('challengerId').val() === auth.uid || newData.child('challengedId').val() === auth.uid)",
         ".validate": "newData.hasChildren(['challengerId', 'challengedId', 'state']) && newData.child('state').isString() && (newData.child('state').val() === 'pending' || newData.child('state').val() === 'in_progress' || newData.child('state').val() === 'completed' || newData.child('state').val() === 'PENDING' || newData.child('state').val() === 'ONGOING' || newData.child('state').val() === 'COMPLETED' || newData.child('state').val() === 'EXPIRED' || newData.child('state').val() === 'CANCELLED') && newData.child('challengerId').isString() && newData.child('challengedId').isString() && newData.child('createdAt').isNumber() && newData.child('language').isString() && newData.child('quizType').isString() && newData.child('durationMinutes').isNumber()",
         "challengerScore": {
           ".validate": "newData.isNumber() || !newData.exists()"
@@ -81,8 +83,7 @@
       ".indexOn": ["userId", "winRate", "totalChallenges"],
       "$userId": {
         ".read": "auth != null",
-
-        ".write": "auth != null",
+        ".write": "auth != null && $userId === auth.uid",
         ".validate": "newData.hasChildren(['userId', 'challengesWon', 'challengesLost', 'challengesTied', 'challengesDeclined', 'totalChallenges', 'winRate']) && newData.child('userId').val() === $userId && newData.child('challengesWon').isNumber() && newData.child('challengesLost').isNumber() && newData.child('challengesTied').isNumber() && newData.child('challengesDeclined').isNumber() && newData.child('totalChallenges').isNumber() && newData.child('winRate').isNumber()",
         "challengesWon": {
           ".validate": "newData.isNumber()"
@@ -108,11 +109,11 @@
       }
     },
     "relationships": {
-      ".read": "auth != null",
+      ".read": "auth != null && (query.orderByChild == 'supervisorId' && query.equalTo == auth.uid || query.orderByChild == 'studentId' && query.equalTo == auth.uid)",
       ".indexOn": ["supervisorId", "studentId", "status"],
       "$relationshipId": {
-        ".read": "auth != null",
-        ".write": "auth != null && ((!data.exists() && (newData.child('supervisorId').val() === auth.uid || newData.child('studentId').val() === auth.uid)) || (data.exists() && (data.child('supervisorId').val() === auth.uid || data.child('studentId').val() === auth.uid || newData.child('supervisorId').val() === auth.uid || newData.child('studentId').val() === auth.uid)))",
+        ".read": "auth != null && (data.child('supervisorId').val() === auth.uid || data.child('studentId').val() === auth.uid)",
+        ".write": "auth != null && auth.token.email_verified === true && ((!data.exists() && (newData.child('supervisorId').val() === auth.uid || newData.child('studentId').val() === auth.uid)) || (data.exists() && (data.child('supervisorId').val() === auth.uid || data.child('studentId').val() === auth.uid || newData.child('supervisorId').val() === auth.uid || newData.child('studentId').val() === auth.uid)))",
         ".validate": "newData.hasChildren(['supervisorId', 'studentId', 'status', 'type', 'supervisorGender']) || !newData.exists()"
       }
     },
@@ -120,27 +121,24 @@
       ".read": "auth != null",
       ".indexOn": ["userId"],
       "$userId": {
-        ".read": "($userId === auth.uid || auth != null)",
-
+        ".read": "auth != null && ($userId === auth.uid || root.child('users').child(auth.uid).child('role').val() === 'TEACHER' || root.child('users').child(auth.uid).child('role').val() === 'PARENT')",
         ".write": "$userId === auth.uid",
         "activities": {
-          ".read": "($userId === auth.uid || auth != null)",
+          ".read": "auth != null && ($userId === auth.uid || root.child('users').child(auth.uid).child('role').val() === 'TEACHER' || root.child('users').child(auth.uid).child('role').val() === 'PARENT')",
           ".write": "$userId === auth.uid",
           ".indexOn": ["timestamp"],
           "$activityId": {
-            ".read": "($userId === auth.uid || auth != null)",
+            ".read": "auth != null && ($userId === auth.uid || root.child('users').child(auth.uid).child('role').val() === 'TEACHER' || root.child('users').child(auth.uid).child('role').val() === 'PARENT')",
             ".write": "$userId === auth.uid"
           }
         }
       }
     },
-
-
     "funGames": {
       ".read": "auth != null",
       ".indexOn": ["userId"],
       "$userId": {
-        ".read": "($userId === auth.uid || auth != null)",
+        ".read": "auth != null && ($userId === auth.uid || root.child('users').child(auth.uid).child('role').val() === 'TEACHER' || root.child('users').child(auth.uid).child('role').val() === 'PARENT')",
         ".write": "$userId === auth.uid",
         ".validate": "newData.hasChildren(['userId','total','bestScore']) || !newData.exists()"
       }
@@ -149,7 +147,7 @@
       ".read": "auth != null",
       ".indexOn": ["userId"],
       "$userId": {
-        ".read": "$userId === auth.uid || auth != null",
+        ".read": "auth != null && ($userId === auth.uid || root.child('users').child(auth.uid).child('role').val() === 'TEACHER' || root.child('users').child(auth.uid).child('role').val() === 'PARENT')",
         ".write": "$userId === auth.uid && auth.token.email_verified === true"
       }
     },
@@ -162,10 +160,10 @@
       ".read": "auth != null && auth.token.email_verified === true",
       ".indexOn": ["userId"],
       "$userId": {
-        ".read": "auth != null && auth.token.email_verified === true",
+        ".read": "auth != null && ($userId === auth.uid || root.child('users').child(auth.uid).child('role').val() === 'TEACHER' || root.child('users').child(auth.uid).child('role').val() === 'PARENT')",
         ".write": "$userId === auth.uid && auth.token.email_verified === true",
         "$milestoneId": {
-          ".read": "($userId === auth.uid || auth != null) && auth.token.email_verified === true",
+          ".read": "auth != null && ($userId === auth.uid || root.child('users').child(auth.uid).child('role').val() === 'TEACHER' || root.child('users').child(auth.uid).child('role').val() === 'PARENT')",
           ".write": "$userId === auth.uid && auth.token.email_verified === true"
         }
       }
@@ -174,7 +172,7 @@
       ".read": "auth != null && auth.token.email_verified === true",
       ".indexOn": ["userId"],
       "$userId": {
-        ".read": "($userId === auth.uid || auth != null) && auth.token.email_verified === true",
+        ".read": "auth != null && ($userId === auth.uid || root.child('users').child(auth.uid).child('role').val() === 'TEACHER' || root.child('users').child(auth.uid).child('role').val() === 'PARENT')",
         ".write": "$userId === auth.uid && auth.token.email_verified === true"
       }
     }

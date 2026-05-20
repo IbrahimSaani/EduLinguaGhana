@@ -8,7 +8,7 @@ public class Achievement {
     private String iconName;
     private AchievementType type;
     private int requiredValue;
-    private boolean isUnlocked;
+    private boolean unlocked;
     private long unlockedTimestamp;
 
     public enum AchievementType {
@@ -33,7 +33,7 @@ public class Achievement {
         this.iconName = iconName;
         this.type = type;
         this.requiredValue = requiredValue;
-        this.isUnlocked = false;
+        this.unlocked = false;
         this.unlockedTimestamp = 0;
     }
 
@@ -51,7 +51,7 @@ public class Achievement {
     public String getIconName() { return iconName; }
     public AchievementType getType() { return type; }
     public int getRequiredValue() { return requiredValue; }
-    public boolean isUnlocked() { return isUnlocked; }
+    public boolean isUnlocked() { return unlocked; }
     public long getUnlockedTimestamp() { return unlockedTimestamp; }
 
     // Setters
@@ -62,11 +62,11 @@ public class Achievement {
     public void setIconName(String iconName) { this.iconName = iconName; }
     public void setType(AchievementType type) { this.type = type; }
     public void setRequiredValue(int requiredValue) { this.requiredValue = requiredValue; }
-    public void setUnlocked(boolean unlocked) { isUnlocked = unlocked; }
+    public void setUnlocked(boolean unlocked) { this.unlocked = unlocked; }
     public void setUnlockedTimestamp(long unlockedTimestamp) { this.unlockedTimestamp = unlockedTimestamp; }
 
     public void unlock() {
-        this.isUnlocked = true;
+        this.unlocked = true;
         this.unlockedTimestamp = System.currentTimeMillis();
     }
 }

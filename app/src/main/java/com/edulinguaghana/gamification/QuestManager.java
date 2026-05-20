@@ -239,7 +239,19 @@ public class QuestManager {
                     }
                 }
             }
-            if (changed) saveQuests(ctx, list);
+            if (changed) {
+                saveQuests(ctx, list);
+                // Sync with Firebase
+                try {
+                    com.google.firebase.auth.FirebaseUser user = com.google.firebase.auth.FirebaseAuth.getInstance().getCurrentUser();
+                    if (user != null) {
+                        com.edulinguaghana.tracking.ProgressTracker tracker = new com.edulinguaghana.tracking.ProgressTracker();
+                        tracker.updateAggregates(ctx, user.getUid());
+                    }
+                } catch (Exception e) {
+                    android.util.Log.e("QuestManager", "Failed to sync quest completion to Firebase", e);
+                }
+            }
             return changed;
         }
     }
@@ -258,7 +270,20 @@ public class QuestManager {
                     changed = true;
                 }
             }
-            if (changed) saveQuests(ctx, list);
+            if (changed) {
+                saveQuests(ctx, list);
+
+                // Sync with Firebase
+                try {
+                    com.google.firebase.auth.FirebaseUser user = com.google.firebase.auth.FirebaseAuth.getInstance().getCurrentUser();
+                    if (user != null) {
+                        com.edulinguaghana.tracking.ProgressTracker tracker = new com.edulinguaghana.tracking.ProgressTracker();
+                        tracker.updateAggregates(ctx, user.getUid());
+                    }
+                } catch (Exception e) {
+                    android.util.Log.e("QuestManager", "Failed to sync quests to Firebase", e);
+                }
+            }
         }
     }
 

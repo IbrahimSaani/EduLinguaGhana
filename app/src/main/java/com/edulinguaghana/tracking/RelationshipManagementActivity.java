@@ -116,6 +116,7 @@ public class RelationshipManagementActivity extends AppCompatActivity {
                 // Default to student
                 currentUserRole = UserRole.STUDENT;
                 setupUIForRole(UserRole.STUDENT);
+                loadPendingRequests();
             }
         });
     }
@@ -257,32 +258,58 @@ public class RelationshipManagementActivity extends AppCompatActivity {
     }
 
     private void loadPendingRequests() {
-        // Students see pending requests from teachers/parents
-        // Teachers/Parents see their sent requests
+        // Students see pending requests from teachers/parents (incoming)
+        // Teachers/Parents see their sent requests (outgoing)
+
+        loadingProgress.setVisibility(View.VISIBLE);
+        emptyStateLayout.setVisibility(View.GONE);
+        pendingRequestsRecyclerView.setVisibility(View.GONE);
 
         if (currentUserRole == UserRole.STUDENT) {
             roleManager.getPendingRequests(currentUserId, new RoleManager.RelationshipCallback() {
                 @Override
                 public void onRelationshipsRetrieved(List<UserRelationship> relationships) {
-                    loadingProgress.setVisibility(View.GONE);
-                    if (relationships.isEmpty()) {
-                        emptyStateLayout.setVisibility(View.VISIBLE);
-                        pendingRequestsRecyclerView.setVisibility(View.GONE);
-                    } else {
-                        emptyStateLayout.setVisibility(View.GONE);
-                        pendingRequestsRecyclerView.setVisibility(View.VISIBLE);
-                        setupPendingRequestsAdapter(relationships);
-                    }
+                    displayRelationships(relationships);
                 }
 
                 @Override
                 public void onError(String error) {
-                    loadingProgress.setVisibility(View.GONE);
-                    emptyStateLayout.setVisibility(View.VISIBLE);
-                    emptyTextView.setText(R.string.relationship_mgmt_error_loading_requests);
+                    handleLoadError(error);
+                }
+            });
+        } else {
+            roleManager.getSentPendingRequests(currentUserId, new RoleManager.RelationshipCallback() {
+                @Override
+                public void onRelationshipsRetrieved(List<UserRelationship> relationships) {
+                    displayRelationships(relationships);
+                }
+
+                @Override
+                public void onError(String error) {
+                    handleLoadError(error);
                 }
             });
         }
+    }
+
+    private void displayRelationships(List<UserRelationship> relationships) {
+        loadingProgress.setVisibility(View.GONE);
+        if (relationships.isEmpty()) {
+            emptyStateLayout.setVisibility(View.VISIBLE);
+            pendingRequestsRecyclerView.setVisibility(View.GONE);
+            // Using the hardcoded text from the layout if resource is missing
+            emptyTextView.setText("No pending requests");
+        } else {
+            emptyStateLayout.setVisibility(View.GONE);
+            pendingRequestsRecyclerView.setVisibility(View.VISIBLE);
+            setupPendingRequestsAdapter(relationships);
+        }
+    }
+
+    private void handleLoadError(String error) {
+        loadingProgress.setVisibility(View.GONE);
+        emptyStateLayout.setVisibility(View.VISIBLE);
+        emptyTextView.setText(getString(R.string.relationship_mgmt_error_loading_requests) + ": " + error);
     }
 
     private void setupPendingRequestsAdapter(List<UserRelationship> relationships) {

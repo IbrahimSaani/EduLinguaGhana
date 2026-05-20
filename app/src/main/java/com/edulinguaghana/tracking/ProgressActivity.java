@@ -26,7 +26,8 @@ public class ProgressActivity {
         STREAK_MILESTONE,
         XP_EARNED,
         CHALLENGE_COMPLETED,
-        BADGE_EARNED
+        BADGE_EARNED,
+        FUN_GAME_COMPLETED
     }
 
     public ProgressActivity() {

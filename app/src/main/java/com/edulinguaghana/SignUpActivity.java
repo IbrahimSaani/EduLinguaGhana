@@ -220,13 +220,17 @@ public class SignUpActivity extends AppCompatActivity {
                      // Positive Action: Check if verified
                      if (progressBar != null) progressBar.setVisibility(android.view.View.VISIBLE);
                      user.reload().addOnCompleteListener(reloadTask -> {
-                         if (progressBar != null) progressBar.setVisibility(android.view.View.GONE);
                          if (user.isEmailVerified()) {
-                             // Success! Now save to database and proceed
-                             saveUserToDatabase(user, gender);
-                             Toast.makeText(SignUpActivity.this, "Email verified! Welcome aboard.", Toast.LENGTH_SHORT).show();
-                             navigateToMain();
+                             // Force refresh the token to update the email_verified claim
+                             user.getIdToken(true).addOnCompleteListener(tokenTask -> {
+                                 if (progressBar != null) progressBar.setVisibility(android.view.View.GONE);
+                                 // Success! Now save to database and proceed
+                                 saveUserToDatabase(user, gender);
+                                 Toast.makeText(SignUpActivity.this, "Email verified! Welcome aboard.", Toast.LENGTH_SHORT).show();
+                                 navigateToMain();
+                             });
                          } else {
+                             if (progressBar != null) progressBar.setVisibility(android.view.View.GONE);
                              Toast.makeText(SignUpActivity.this,
                                      "Still not verified. Please click the link in your email.",
                                      Toast.LENGTH_LONG).show();

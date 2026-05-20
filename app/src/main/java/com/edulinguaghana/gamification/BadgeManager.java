@@ -211,6 +211,18 @@ public class BadgeManager {
                     changed = true;
                     // grant xp for unlocking badge
                     XPManager.awardXP(ctx, 25, "badge:" + badgeId);
+
+                    // Log to Firebase progress tracker
+                    try {
+                        com.google.firebase.auth.FirebaseUser user = com.google.firebase.auth.FirebaseAuth.getInstance().getCurrentUser();
+                        if (user != null) {
+                            com.edulinguaghana.tracking.ProgressTracker tracker = new com.edulinguaghana.tracking.ProgressTracker();
+                            // ProgressTracker doesn't have logBadge yet, let's use a generic method or update aggregates
+                            tracker.updateAggregates(ctx, user.getUid());
+                        }
+                    } catch (Exception e) {
+                        android.util.Log.e("BadgeManager", "Failed to log badge to Firebase", e);
+                    }
                 }
             }
             if (changed) {

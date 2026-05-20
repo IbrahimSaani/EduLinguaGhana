@@ -105,6 +105,17 @@ public final class FunGameProgressManager {
         // Re-evaluate achievements after updating counters.
         new AchievementManager(context).checkAndUnlockAchievements();
 
+        // Real-time Progress Tracking: Log to Firebase and update aggregates
+        try {
+            FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+            if (user != null) {
+                com.edulinguaghana.tracking.ProgressTracker tracker = new com.edulinguaghana.tracking.ProgressTracker();
+                tracker.logFunGameCompletion(context, user.getUid(), gameId, score, null);
+            }
+        } catch (Exception e) {
+            android.util.Log.e("FunGameProgressManager", "Failed to log fun game to Firebase", e);
+        }
+
         // Best-effort cloud persistence for cross-device continuity.
         try {
             CloudSyncManager cloudSyncManager = new CloudSyncManager(context);

@@ -107,7 +107,27 @@ public class FirebaseSocialRepository implements SocialRepository {
 
     @Override
     public List<Friend> getFriendRequests(String userId) {
-        return new ArrayList<>();
+        // This is a placeholder for a synchronous call which isn't ideal for Firebase
+        // Real-time updates should use listeners, but we'll implement this as requested
+        // for compatibility with the service layer.
+        List<Friend> requests = new ArrayList<>();
+        rootRef.child("friends").orderByChild("friendUserId").equalTo(userId)
+            .addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(DataSnapshot snapshot) {
+                    for (DataSnapshot child : snapshot.getChildren()) {
+                        Friend f = child.getValue(Friend.class);
+                        if (f != null && f.status == Friend.Status.PENDING) {
+                            requests.add(f);
+                        }
+                    }
+                }
+
+                @Override
+                public void onCancelled(DatabaseError error) {
+                }
+            });
+        return requests;
     }
 
     @Override
