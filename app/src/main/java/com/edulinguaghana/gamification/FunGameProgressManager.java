@@ -50,7 +50,14 @@ public final class FunGameProgressManager {
 
         switch (gameId) {
             case "speed_game":
+            case "speed_challenge":
                 editor.putInt(KEY_SPEED_GAMES_PLAYED, prefs.getInt(KEY_SPEED_GAMES_PLAYED, 0) + 1);
+                break;
+            case "bubble_pop":
+                editor.putInt("BUBBLE_POP_PLAYED", prefs.getInt("BUBBLE_POP_PLAYED", 0) + 1);
+                break;
+            case "rocket_sort":
+                editor.putInt("ROCKET_SORT_PLAYED", prefs.getInt("ROCKET_SORT_PLAYED", 0) + 1);
                 break;
             case "puzzle_game":
                 editor.putInt(KEY_PUZZLE_GAMES_PLAYED, prefs.getInt(KEY_PUZZLE_GAMES_PLAYED, 0) + 1);
@@ -76,11 +83,20 @@ public final class FunGameProgressManager {
         QuestManager.progressQuest(context, "fun_game_explorer", gamesPlayed.size() >= 3 ? 1 : 0);
         QuestManager.progressQuest(context, "marathon_learner", 1);
 
-        if ("speed_game".equals(gameId)) {
-            QuestManager.progressQuest(context, "speed_game", 1);
-            BadgeManager.unlockBadge(context, "speed_champion");
-        } else if ("puzzle_game".equals(gameId)) {
-            QuestManager.progressQuest(context, "puzzle_solver", 1);
+        switch (gameId) {
+            case "speed_game":
+            case "speed_challenge":
+            case "bubble_pop":
+                QuestManager.progressQuest(context, "bubble_pop_quest", 1);
+                BadgeManager.unlockBadge(context, "bubble_master");
+                break;
+            case "rocket_sort":
+                QuestManager.progressQuest(context, "rocket_sort_quest", 1);
+                BadgeManager.unlockBadge(context, "rocket_master");
+                break;
+            case "puzzle_game":
+                QuestManager.progressQuest(context, "puzzle_solver", 1);
+                break;
         }
 
         // Badges based on cumulative fun game progress

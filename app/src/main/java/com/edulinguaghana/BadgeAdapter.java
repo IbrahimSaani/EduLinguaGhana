@@ -123,8 +123,10 @@ public class BadgeAdapter extends RecyclerView.Adapter<BadgeAdapter.BadgeViewHol
                     return "💯";
                 case "multilingual":
                     return "🌍";
-                case "speed_champion":
-                    return "⚡";
+                case "bubble_master":
+                    return "🫧";
+                case "rocket_master":
+                    return "🚀";
                 case "achievement_collector":
                     return "🏆";
                 default:

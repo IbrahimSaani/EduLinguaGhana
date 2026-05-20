@@ -8,7 +8,6 @@ import com.google.gson.reflect.TypeToken;
 
 import java.lang.reflect.Type;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
@@ -132,11 +131,15 @@ public class NotificationManager {
 
     // Generate automatic notifications based on user activity
     public void checkAndGenerateNotifications() {
+        checkAndGenerateNotifications(false);
+    }
+
+    public void checkAndGenerateNotifications(boolean forceCheck) {
         long lastCheck = prefs.getLong(KEY_LAST_CHECK, 0);
         long now = System.currentTimeMillis();
 
-        // Check once per day
-        if (now - lastCheck < 24 * 60 * 60 * 1000) {
+        // Check once per day unless forced (e.g. from settings toggle)
+        if (!forceCheck && (now - lastCheck < 24 * 60 * 60 * 1000)) {
             return;
         }
 
@@ -155,8 +158,7 @@ public class NotificationManager {
     private void generateInactivityNotifications(boolean enabled) {
         if (!enabled) return;
 
-        SharedPreferences streakPrefs = context.getSharedPreferences("StreakPrefs", Context.MODE_PRIVATE);
-        long lastPracticeTime = streakPrefs.getLong("LAST_PRACTICE_TIMESTAMP", 0);
+        long lastPracticeTime = PracticeTracker.getLastPracticeTime(context);
         
         if (lastPracticeTime == 0) return; // Never practiced, handled by welcome
 
@@ -170,6 +172,16 @@ public class NotificationManager {
             if (lastShownId == null || !lastShownId.equals(currentInactivityId)) {
                 sendStreakLossAlert((int) daysInactive);
                 prefs.edit().putString(KEY_INACTIVITY_NOTIF_SHOWN, currentInactivityId).apply();
+
+                // If inactive for 3+ days, also suggest sending a Gmail reminder (if possible)
+                if (daysInactive >= 3) {
+                    addNotification(
+                        "We Miss You! 📧",
+                        "It's been " + daysInactive + " days. We've sent a reminder to your email too!",
+                        "📧",
+                        Notification.NotificationType.REMINDER
+                    );
+                }
             }
         }
     }
@@ -255,19 +267,13 @@ public class NotificationManager {
     private void generateStreakNotifications(boolean enabled) {
         if (!enabled) return;
 
-        // Check if user practiced today
-        Calendar today = Calendar.getInstance();
-        int dayOfYear = today.get(Calendar.DAY_OF_YEAR);
-
-        SharedPreferences mainPrefs = context.getSharedPreferences("EduLinguaPrefs", Context.MODE_PRIVATE);
-        int lastPracticeDay = mainPrefs.getInt("LAST_PRACTICE_DAY", -1);
-
-        if (lastPracticeDay != dayOfYear) {
+        // Check if user practiced today using PracticeTracker
+        if (!PracticeTracker.hasPracticedToday(context)) {
             // User hasn't practiced today
-                sendReminderNotification(
-                    "Time to Practice! 📚",
-                    "Don't break your streak! Complete a lesson today."
-                );
+            sendReminderNotification(
+                "Time to Practice! 📚",
+                "Don't break your streak! Complete a lesson today."
+            );
         }
     }
 

@@ -144,11 +144,11 @@ public class QuestManager {
         q5.expiresAt = System.currentTimeMillis() + 24L*60*60*1000L;
         list.add(q5);
 
-        // Quest 6: Speed game ← NEW
+        // Quest 6: Bubble Pop ← REPLACED from speed_game
         Quest q6 = new Quest();
-        q6.id = "speed_game";
-        q6.title = "Play speed game";
-        q6.description = "Try the speed challenge game.";
+        q6.id = "bubble_pop_quest";
+        q6.title = "Bubble Popper";
+        q6.description = "Pop bubbles in the Bubble Pop game.";
         q6.xpReward = 35;
         q6.completed = false;
         q6.target = 1;
@@ -203,6 +203,18 @@ public class QuestManager {
         q10.progress = 0;
         q10.expiresAt = System.currentTimeMillis() + 24L * 60 * 60 * 1000L;
         list.add(q10);
+
+        // Quest 11: Rocket Sort ← NEW (Fixed missing index)
+        Quest q11 = new Quest();
+        q11.id = "rocket_sort_quest";
+        q11.title = "Rocket Sorter";
+        q11.description = "Sort items into the correct rockets.";
+        q11.xpReward = 45;
+        q11.completed = false;
+        q11.target = 1;
+        q11.progress = 0;
+        q11.expiresAt = System.currentTimeMillis() + 24L * 60 * 60 * 1000L;
+        list.add(q11);
 
         // Quest 12: Explore all fun games
         Quest q12 = new Quest();

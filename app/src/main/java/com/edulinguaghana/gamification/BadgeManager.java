@@ -139,12 +139,12 @@ public class BadgeManager {
         b6.unlockedAt = 0;
         list.add(b6);
 
-        // Speed Champion badge
+        // Bubble Master badge (Replaced speed_champion)
         Badge b7 = new Badge();
-        b7.id = "speed_champion";
-        b7.title = "Speed Champion";
-        b7.description = "Win a speed challenge game.";
-        b7.iconName = "ic_badge_speed";
+        b7.id = "bubble_master";
+        b7.title = "Bubble Master";
+        b7.description = "Show your skills in Bubble Pop.";
+        b7.iconName = "ic_badge_bubble";
         b7.unlocked = false;
         b7.unlockedAt = 0;
         list.add(b7);
@@ -176,6 +176,16 @@ public class BadgeManager {
         b10.unlocked = false;
         b10.unlockedAt = 0;
         list.add(b10);
+
+        // Rocket Master badge (Fixed missing index)
+        Badge b11 = new Badge();
+        b11.id = "rocket_master";
+        b11.title = "Rocket Master";
+        b11.description = "Become a pro at Rocket Sort.";
+        b11.iconName = "ic_badge_rocket";
+        b11.unlocked = false;
+        b11.unlockedAt = 0;
+        list.add(b11);
 
         Badge b12 = new Badge();
         b12.id = "game_explorer";

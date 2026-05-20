@@ -100,10 +100,30 @@ public class LearningNotificationWorker extends Worker {
                         (int) daysInactive,
                         1002
                 );
+
+                // If inactive for 3+ days, show a special Gmail-related message
+                if (daysInactive >= 3) {
+                    LearningNotificationHelper.showReminder(
+                            context,
+                            "We Miss You! 📧",
+                            "Check your Gmail! We've sent you a special motivational message to " + getUserEmail(),
+                            1003
+                    );
+                }
             }
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    private String getUserEmail() {
+        try {
+            com.google.firebase.auth.FirebaseUser user = com.google.firebase.auth.FirebaseAuth.getInstance().getCurrentUser();
+            if (user != null && user.getEmail() != null) {
+                return user.getEmail();
+            }
+        } catch (Exception ignored) {}
+        return "your email";
     }
 }
 

@@ -154,10 +154,16 @@ public class SettingsActivity extends AppCompatActivity {
 
         switchDailyReminders.setOnCheckedChangeListener((buttonView, isChecked) -> {
             AppPreferences.setDailyRemindersEnabled(SettingsActivity.this, isChecked);
+            if (isChecked) {
+                new NotificationManager(SettingsActivity.this).checkAndGenerateNotifications(true);
+            }
         });
 
         switchStreakAlerts.setOnCheckedChangeListener((buttonView, isChecked) -> {
             AppPreferences.setStreakAlertsEnabled(SettingsActivity.this, isChecked);
+            if (isChecked) {
+                new NotificationManager(SettingsActivity.this).checkAndGenerateNotifications(true);
+            }
         });
 
         // Quiz Music Volume SeekBar listener
