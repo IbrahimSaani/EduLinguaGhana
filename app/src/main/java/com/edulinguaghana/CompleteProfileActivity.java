@@ -97,7 +97,7 @@ public class CompleteProfileActivity extends AppCompatActivity {
             if (findViewById(R.id.tilAge) != null) findViewById(R.id.tilAge).setVisibility(android.view.View.GONE);
             if (findViewById(R.id.tilStudentClass) != null) findViewById(R.id.tilStudentClass).setVisibility(android.view.View.GONE);
             if (findViewById(R.id.userInfoCard) != null) findViewById(R.id.userInfoCard).setVisibility(android.view.View.VISIBLE);
-            if (tvSubtitle != null) tvSubtitle.setText("Confirm your profile details below");
+            if (tvSubtitle != null) tvSubtitle.setText(R.string.complete_profile_confirm_details);
             
             // For teachers/parents in non-edit mode, we really shouldn't be here
             // but if we are, allow them to just click through.
@@ -145,7 +145,7 @@ public class CompleteProfileActivity extends AppCompatActivity {
         FirebaseDatabase.getInstance().getReference("users").child(currentUser.getUid())
                 .addListenerForSingleValueEvent(new com.google.firebase.database.ValueEventListener() {
                     @Override
-                    public void onDataChange(com.google.firebase.database.DataSnapshot snapshot) {
+                    public void onDataChange(@androidx.annotation.NonNull com.google.firebase.database.DataSnapshot snapshot) {
                         if (snapshot.exists()) {
                             String age = snapshot.child("age").getValue(String.class);
                             String studentClass = snapshot.child("studentClass").getValue(String.class);

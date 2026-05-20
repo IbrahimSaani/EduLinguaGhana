@@ -33,7 +33,6 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.List;
-import java.util.Objects;
 
 /**
  * Activity for managing teacher-student and parent-child relationships
@@ -297,8 +296,7 @@ public class RelationshipManagementActivity extends AppCompatActivity {
         if (relationships.isEmpty()) {
             emptyStateLayout.setVisibility(View.VISIBLE);
             pendingRequestsRecyclerView.setVisibility(View.GONE);
-            // Using the hardcoded text from the layout if resource is missing
-            emptyTextView.setText("No pending requests");
+            emptyTextView.setText(R.string.relationship_mgmt_no_pending);
         } else {
             emptyStateLayout.setVisibility(View.GONE);
             pendingRequestsRecyclerView.setVisibility(View.VISIBLE);
@@ -309,7 +307,7 @@ public class RelationshipManagementActivity extends AppCompatActivity {
     private void handleLoadError(String error) {
         loadingProgress.setVisibility(View.GONE);
         emptyStateLayout.setVisibility(View.VISIBLE);
-        emptyTextView.setText(getString(R.string.relationship_mgmt_error_loading_requests) + ": " + error);
+        emptyTextView.setText(getString(R.string.relationship_mgmt_error_loading_requests, error));
     }
 
     private void setupPendingRequestsAdapter(List<UserRelationship> relationships) {

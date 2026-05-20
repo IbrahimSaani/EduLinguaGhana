@@ -26,10 +26,8 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.GoogleAuthProvider;
 import com.google.firebase.auth.UserProfileChangeRequest;
-import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ValueEventListener;
 
 import com.facebook.AccessToken;
 import com.facebook.CallbackManager;
@@ -42,6 +40,7 @@ import java.util.Arrays;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
 import androidx.core.content.ContextCompat;
 
@@ -129,10 +128,10 @@ public class SignUpActivity extends AppCompatActivity {
     }
 
     private void signUpWithEmail() {
-         String name = etName.getText().toString().trim();
-         String email = etEmail.getText().toString().trim();
-         String password = etPassword.getText().toString().trim();
-         String confirmPassword = etConfirmPassword.getText().toString().trim();
+         String name = etName != null && etName.getText() != null ? etName.getText().toString().trim() : "";
+         String email = etEmail != null && etEmail.getText() != null ? etEmail.getText().toString().trim() : "";
+         String password = etPassword != null && etPassword.getText() != null ? etPassword.getText().toString().trim() : "";
+         String confirmPassword = etConfirmPassword != null && etConfirmPassword.getText() != null ? etConfirmPassword.getText().toString().trim() : "";
 
          int selectedGenderId = rgGender.getCheckedRadioButtonId();
          if (selectedGenderId == -1) {
@@ -195,15 +194,13 @@ public class SignUpActivity extends AppCompatActivity {
 
          user.sendEmailVerification()
                  .addOnCompleteListener(task -> {
-                     if (task.isSuccessful()) {
-                         showVerificationPendingDialog(user, gender);
-                     } else {
+                     if (!task.isSuccessful()) {
                          Toast.makeText(SignUpActivity.this,
                                  "Failed to send verification email: " + (task.getException() != null ? task.getException().getMessage() : "Unknown error"),
                                  Toast.LENGTH_LONG).show();
-                         // Still show the dialog so they can try to resend or check
-                         showVerificationPendingDialog(user, gender);
                      }
+                     // Always show the dialog so they can try to resend or check
+                     showVerificationPendingDialog(user, gender);
                  });
      }
 
@@ -285,11 +282,11 @@ public class SignUpActivity extends AppCompatActivity {
     private void signUpWithFacebook() {
         LoginManager.getInstance().logInWithReadPermissions(
                 this,
-                Arrays.asList("public_profile")
+                java.util.Collections.singletonList("public_profile")
         );
 
         LoginManager.getInstance().registerCallback(mCallbackManager,
-                new FacebookCallback<LoginResult>() {
+                new FacebookCallback<>() {
                     @Override
                     public void onSuccess(LoginResult loginResult) {
                         handleFacebookAccessToken(loginResult.getAccessToken());
@@ -302,7 +299,7 @@ public class SignUpActivity extends AppCompatActivity {
                     }
 
                     @Override
-                    public void onError(FacebookException error) {
+                    public void onError(@androidx.annotation.NonNull FacebookException error) {
                         Toast.makeText(SignUpActivity.this,
                                 "Facebook sign up error: " + error.getMessage(),
                                 Toast.LENGTH_LONG).show();
@@ -362,7 +359,7 @@ public class SignUpActivity extends AppCompatActivity {
             return false;
         }
 
-        if (!password.equals(confirmPassword)) {
+        if (!Objects.equals(password, confirmPassword)) {
             etConfirmPassword.setError("Passwords do not match");
             etConfirmPassword.requestFocus();
             return false;

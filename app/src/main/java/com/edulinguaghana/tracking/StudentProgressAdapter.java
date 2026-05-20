@@ -13,6 +13,7 @@ import com.edulinguaghana.R;
 
 import com.edulinguaghana.roles.UserRole;
 import java.util.List;
+import java.util.Locale;
 
 /**
  * Adapter for displaying student progress cards
@@ -20,17 +21,12 @@ import java.util.List;
 public class StudentProgressAdapter extends RecyclerView.Adapter<StudentProgressAdapter.ViewHolder> {
 
     private List<StudentProgressItem> students;
-    private OnStudentClickListener listener;
+    private final OnStudentClickListener listener;
     private UserRole viewRole = UserRole.STUDENT;
 
     public interface OnStudentClickListener {
         void onStudentClick(String studentId);
         void onRemoveStudent(StudentProgressItem student);
-    }
-
-    public StudentProgressAdapter(List<StudentProgressItem> students, OnStudentClickListener listener) {
-        this.students = students;
-        this.listener = listener;
     }
 
     public StudentProgressAdapter(List<StudentProgressItem> students, UserRole role, OnStudentClickListener listener) {
@@ -64,18 +60,18 @@ public class StudentProgressAdapter extends RecyclerView.Adapter<StudentProgress
     }
 
     static class ViewHolder extends RecyclerView.ViewHolder {
-        private CardView cardView;
-        private TextView tvStudentName;
-        private TextView tvLevel;
-        private TextView tvXP;
-        private TextView tvQuizzes;
-        private TextView tvAccuracy;
-        private TextView tvStreak;
-        private TextView tvLastActive;
-        private TextView tvStudentClass;
-        private View streakLayout;
-        private View btnViewDetails;
-        private View btnRemove;
+        private final CardView cardView;
+        private final TextView tvStudentName;
+        private final TextView tvLevel;
+        private final TextView tvXP;
+        private final TextView tvQuizzes;
+        private final TextView tvAccuracy;
+        private final TextView tvStreak;
+        private final TextView tvLastActive;
+        private final TextView tvStudentClass;
+        private final View streakLayout;
+        private final View btnViewDetails;
+        private final View btnRemove;
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -95,32 +91,32 @@ public class StudentProgressAdapter extends RecyclerView.Adapter<StudentProgress
 
         public void bind(StudentProgressItem item, UserRole role, OnStudentClickListener listener) {
             ProgressAggregate progress = item.getProgress();
+            android.content.Context context = itemView.getContext();
 
-            tvStudentName.setText(item.getStudentName() != null ? item.getStudentName() : "Unknown Student");
-            tvLevel.setText("Lvl " + progress.getCurrentLevel());
+            tvStudentName.setText(item.getStudentName() != null ? item.getStudentName() : context.getString(R.string.student_unknown));
+            tvLevel.setText(context.getString(R.string.student_level_short, progress.getCurrentLevel()));
             tvXP.setText(String.valueOf(progress.getTotalXP()));
             tvQuizzes.setText(String.valueOf(progress.getTotalQuizzes()));
-            tvAccuracy.setText(String.format("%.0f%%", progress.getAccuracy()));
+            tvAccuracy.setText(String.format(Locale.getDefault(), "%.0f%%", progress.getAccuracy()));
 
             // Role-based customization
-            if (role == UserRole.PARENT) {
-                // Parents might care less about accuracy percentage on the summary card
-                // Maybe we can show something else, but for now we'll just keep it consistent 
-                // with what we decided for the detail screen if needed.
-                // However, the detail screen hide Accuracy for parents.
-                // Let's hide the accuracy column for parents to make it feel different.
-                if (tvAccuracy != null && tvAccuracy.getParent() instanceof View) {
-                    ((View) tvAccuracy.getParent()).setVisibility(View.GONE);
-                }
-            } else if (role == UserRole.TEACHER) {
-                // Teachers focus on accuracy, maybe hide streak to keep it academic
-                if (streakLayout != null) {
-                    streakLayout.setVisibility(View.GONE);
-                }
+            switch (role) {
+                case PARENT:
+                    // Parents might care less about accuracy percentage on the summary card
+                    if (tvAccuracy.getParent() instanceof View) {
+                        ((View) tvAccuracy.getParent()).setVisibility(View.GONE);
+                    }
+                    break;
+                case TEACHER:
+                    // Teachers focus on accuracy, maybe hide streak to keep it academic
+                    if (streakLayout != null) {
+                        streakLayout.setVisibility(View.GONE);
+                    }
+                    break;
             }
 
             if (role != UserRole.TEACHER && progress.getCurrentStreak() > 0) {
-                tvStreak.setText("🔥 " + progress.getCurrentStreak() + " day streak");
+                tvStreak.setText(context.getString(R.string.student_streak_label, progress.getCurrentStreak()));
                 if (streakLayout != null) {
                     streakLayout.setVisibility(View.VISIBLE);
                 }
@@ -134,22 +130,23 @@ public class StudentProgressAdapter extends RecyclerView.Adapter<StudentProgress
             if (progress.getLastUpdated() > 0) {
                 long hoursSince = (System.currentTimeMillis() - progress.getLastUpdated()) / (1000 * 60 * 60);
                 if (hoursSince < 1) {
-                    tvLastActive.setText("Active just now");
+                    tvLastActive.setText(context.getString(R.string.student_active_now));
                 } else if (hoursSince < 24) {
-                    tvLastActive.setText("Active " + hoursSince + "h ago");
+                    tvLastActive.setText(context.getString(R.string.student_active_hours_ago, (int)hoursSince));
                 } else {
                     long daysSince = hoursSince / 24;
-                    tvLastActive.setText("Active " + daysSince + "d ago");
+                    tvLastActive.setText(context.getString(R.string.student_active_days_ago, (int)daysSince));
                 }
             } else {
-                tvLastActive.setText("Not active yet");
+                tvLastActive.setText(context.getString(R.string.student_detail_not_active));
             }
 
             if (tvStudentClass != null) {
                 String studentClass = item.getStudentClass();
-                tvStudentClass.setText("Class: " + (studentClass != null && !studentClass.trim().isEmpty()
+                String classValue = (studentClass != null && !studentClass.trim().isEmpty())
                         ? studentClass.trim()
-                        : "Not set"));
+                        : context.getString(R.string.student_detail_not_set);
+                tvStudentClass.setText(context.getString(R.string.student_class_label, classValue));
             }
 
             // Click listeners

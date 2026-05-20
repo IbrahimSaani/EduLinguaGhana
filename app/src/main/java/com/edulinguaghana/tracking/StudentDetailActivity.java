@@ -152,50 +152,53 @@ public class StudentDetailActivity extends AppCompatActivity {
 
     private void applyRoleBasedUI() {
         // Differentiate view based on role
-        if (currentUserRole == UserRole.PARENT) {
-            // Parents focus on engagement and rewards
-            if (tvLabelQuizPerformance != null) tvLabelQuizPerformance.setVisibility(View.GONE);
-            if (layoutQuizStats != null) layoutQuizStats.setVisibility(View.GONE);
-            if (dividerQuizStats != null) dividerQuizStats.setVisibility(View.GONE);
+        switch (currentUserRole) {
+            case PARENT:
+                // Parents focus on engagement and rewards
+                if (tvLabelQuizPerformance != null) tvLabelQuizPerformance.setVisibility(View.GONE);
+                if (layoutQuizStats != null) layoutQuizStats.setVisibility(View.GONE);
+                if (dividerQuizStats != null) dividerQuizStats.setVisibility(View.GONE);
 
-            if (tvLabelEngagement != null) tvLabelEngagement.setVisibility(View.GONE);
-            if (layoutEngagement != null) layoutEngagement.setVisibility(View.GONE);
-            if (dividerEngagement != null) dividerEngagement.setVisibility(View.GONE);
+                if (tvLabelEngagement != null) tvLabelEngagement.setVisibility(View.GONE);
+                if (layoutEngagement != null) layoutEngagement.setVisibility(View.GONE);
+                if (dividerEngagement != null) dividerEngagement.setVisibility(View.GONE);
 
-            if (tvLabelStreaks != null) tvLabelStreaks.setVisibility(View.VISIBLE);
-            if (layoutStreaks != null) layoutStreaks.setVisibility(View.VISIBLE);
-            if (dividerStreaks != null) dividerStreaks.setVisibility(View.VISIBLE);
+                if (tvLabelStreaks != null) tvLabelStreaks.setVisibility(View.VISIBLE);
+                if (layoutStreaks != null) layoutStreaks.setVisibility(View.VISIBLE);
+                if (dividerStreaks != null) dividerStreaks.setVisibility(View.VISIBLE);
 
-            if (tvLabelAchievements != null) tvLabelAchievements.setVisibility(View.VISIBLE);
-            if (layoutAchievements != null) layoutAchievements.setVisibility(View.VISIBLE);
-            if (dividerAchievements != null) dividerAchievements.setVisibility(View.VISIBLE);
+                if (tvLabelAchievements != null) tvLabelAchievements.setVisibility(View.VISIBLE);
+                if (layoutAchievements != null) layoutAchievements.setVisibility(View.VISIBLE);
+                if (dividerAchievements != null) dividerAchievements.setVisibility(View.VISIBLE);
 
-            // Challenges visible to both
-            if (tvLabelChallenges != null) tvLabelChallenges.setVisibility(View.VISIBLE);
-            if (layoutChallenges != null) layoutChallenges.setVisibility(View.VISIBLE);
-            if (dividerChallenges != null) dividerChallenges.setVisibility(View.VISIBLE);
-        } else if (currentUserRole == UserRole.TEACHER) {
-            // Teachers focus on academic performance
-            if (tvLabelStreaks != null) tvLabelStreaks.setVisibility(View.GONE);
-            if (layoutStreaks != null) layoutStreaks.setVisibility(View.GONE);
-            if (dividerStreaks != null) dividerStreaks.setVisibility(View.GONE);
+                // Challenges visible to both
+                if (tvLabelChallenges != null) tvLabelChallenges.setVisibility(View.VISIBLE);
+                if (layoutChallenges != null) layoutChallenges.setVisibility(View.VISIBLE);
+                if (dividerChallenges != null) dividerChallenges.setVisibility(View.VISIBLE);
+                break;
+            case TEACHER:
+                // Teachers focus on academic performance
+                if (tvLabelStreaks != null) tvLabelStreaks.setVisibility(View.GONE);
+                if (layoutStreaks != null) layoutStreaks.setVisibility(View.GONE);
+                if (dividerStreaks != null) dividerStreaks.setVisibility(View.GONE);
 
-            if (tvLabelAchievements != null) tvLabelAchievements.setVisibility(View.GONE);
-            if (layoutAchievements != null) layoutAchievements.setVisibility(View.GONE);
-            if (dividerAchievements != null) dividerAchievements.setVisibility(View.GONE);
+                if (tvLabelAchievements != null) tvLabelAchievements.setVisibility(View.GONE);
+                if (layoutAchievements != null) layoutAchievements.setVisibility(View.GONE);
+                if (dividerAchievements != null) dividerAchievements.setVisibility(View.GONE);
 
-            if (tvLabelQuizPerformance != null) tvLabelQuizPerformance.setVisibility(View.VISIBLE);
-            if (layoutQuizStats != null) layoutQuizStats.setVisibility(View.VISIBLE);
-            if (dividerQuizStats != null) dividerQuizStats.setVisibility(View.VISIBLE);
+                if (tvLabelQuizPerformance != null) tvLabelQuizPerformance.setVisibility(View.VISIBLE);
+                if (layoutQuizStats != null) layoutQuizStats.setVisibility(View.VISIBLE);
+                if (dividerQuizStats != null) dividerQuizStats.setVisibility(View.VISIBLE);
 
-            if (tvLabelEngagement != null) tvLabelEngagement.setVisibility(View.VISIBLE);
-            if (layoutEngagement != null) layoutEngagement.setVisibility(View.VISIBLE);
-            if (dividerEngagement != null) dividerEngagement.setVisibility(View.VISIBLE);
+                if (tvLabelEngagement != null) tvLabelEngagement.setVisibility(View.VISIBLE);
+                if (layoutEngagement != null) layoutEngagement.setVisibility(View.VISIBLE);
+                if (dividerEngagement != null) dividerEngagement.setVisibility(View.VISIBLE);
 
-            // Challenges visible to both, but we explicitly set it here for clarity
-            if (tvLabelChallenges != null) tvLabelChallenges.setVisibility(View.VISIBLE);
-            if (layoutChallenges != null) layoutChallenges.setVisibility(View.VISIBLE);
-            if (dividerChallenges != null) dividerChallenges.setVisibility(View.VISIBLE);
+                // Challenges visible to both, but we explicitly set it here for clarity
+                if (tvLabelChallenges != null) tvLabelChallenges.setVisibility(View.VISIBLE);
+                if (layoutChallenges != null) layoutChallenges.setVisibility(View.VISIBLE);
+                if (dividerChallenges != null) dividerChallenges.setVisibility(View.VISIBLE);
+                break;
         }
     }
 
@@ -285,11 +288,11 @@ public class StudentDetailActivity extends AppCompatActivity {
                     }
 
                     if (tvStudentAge != null) {
-                        tvStudentAge.setText(!isEmptyValue(age) ? age : getString(R.string.student_detail_not_set));
+                        tvStudentAge.setText(isValidValue(age) ? age : getString(R.string.student_detail_not_set));
                     }
 
                     if (tvStudentClass != null) {
-                        tvStudentClass.setText(!isEmptyValue(studentClass) ? studentClass : getString(R.string.student_detail_not_set));
+                        tvStudentClass.setText(isValidValue(studentClass) ? studentClass : getString(R.string.student_detail_not_set));
                     }
 
                     updateTitle();
@@ -304,8 +307,8 @@ public class StudentDetailActivity extends AppCompatActivity {
         });
     }
 
-    private boolean isEmptyValue(String value) {
-        return value == null || value.trim().isEmpty() || "null".equalsIgnoreCase(value.trim());
+    private boolean isValidValue(String value) {
+        return value != null && !value.trim().isEmpty() && !"null".equalsIgnoreCase(value.trim());
     }
 
     private void loadProgressData() {

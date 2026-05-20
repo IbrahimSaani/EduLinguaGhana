@@ -202,7 +202,8 @@
     <string name="relationship_mgmt_request_sent_student">Student connection request sent!</string>
     <string name="relationship_mgmt_request_sent_child">Child connection request sent!</string>
     <string name="relationship_mgmt_create_failed">Failed to create connection: %1$s</string>
-    <string name="relationship_mgmt_error_loading_requests">Error loading requests</string>
+    <string name="relationship_mgmt_error_loading_requests">Error loading requests: %1$s</string>
+    <string name="relationship_mgmt_no_pending">No pending requests</string>
     <string name="relationship_mgmt_connection_accepted">Connection accepted!</string>
     <string name="relationship_mgmt_accept_failed">Failed to accept: %1$s</string>
     <string name="relationship_mgmt_reject_dialog_title">Reject Request</string>
@@ -228,6 +229,13 @@
     <string name="student_detail_hours_minutes_suffix">%1$dh %2$dm</string>
     <string name="student_detail_date_format">MMM d, yyyy \'at\' h:mm a</string>
     <string name="student_detail_not_active">Not active yet</string>
+    <string name="student_active_now">Active just now</string>
+    <string name="student_active_hours_ago">Active %1$dh ago</string>
+    <string name="student_active_days_ago">Active %1$dd ago</string>
+    <string name="student_class_label">Class: %1$s</string>
+    <string name="student_streak_label">🔥 %1$d day streak</string>
+    <string name="student_level_short">Lvl %1$d</string>
+    <string name="student_unknown">Unknown Student</string>
 
     <!-- Role Manager Errors -->
     <string name="role_manager_pending_exists">A pending request already exists for this student</string>
@@ -249,6 +257,7 @@
     <string name="complete_profile_required_age">Please enter your age.</string>
     <string name="complete_profile_required_school">Please enter your school.</string>
     <string name="complete_profile_required_class">Please select your class.</string>
+    <string name="complete_profile_confirm_details">Confirm your profile details below</string>
     <string name="complete_profile_save_failed">Failed to save profile: %1$s</string>
 
     <string-array name="basic_class_options">
