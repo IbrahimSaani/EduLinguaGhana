@@ -381,7 +381,7 @@ public class RoleManager {
      */
     public void clearCache(Context context) {
         SharedPreferences prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
-        prefs.edit().clear().apply();
+        prefs.edit().clear().commit();
     }
 }
 

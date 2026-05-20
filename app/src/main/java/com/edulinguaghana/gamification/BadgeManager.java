@@ -72,7 +72,7 @@ public class BadgeManager {
     public static void resetBadges(Context ctx) {
         synchronized (BadgeManager.class) {
             SharedPreferences p = ctx.getSharedPreferences(PREFS, Context.MODE_PRIVATE);
-            p.edit().remove(KEY_BADGES).apply();
+            p.edit().remove(KEY_BADGES).commit();
         }
     }
 
@@ -176,15 +176,6 @@ public class BadgeManager {
         b10.unlocked = false;
         b10.unlockedAt = 0;
         list.add(b10);
-
-        Badge b11 = new Badge();
-        b11.id = "beat_expert";
-        b11.title = "Beat Expert";
-        b11.description = "Complete 5 Beat Matcher sessions.";
-        b11.iconName = "ic_badge_beat";
-        b11.unlocked = false;
-        b11.unlockedAt = 0;
-        list.add(b11);
 
         Badge b12 = new Badge();
         b12.id = "game_explorer";

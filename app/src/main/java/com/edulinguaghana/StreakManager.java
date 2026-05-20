@@ -175,7 +175,7 @@ public class StreakManager {
     }
 
     public void resetAllData() {
-        prefs.edit().clear().apply();
+        prefs.edit().clear().commit();
     }
 
     public void saveAllStreakData(int currentStreak, int longestStreak, int totalPracticeDays) {

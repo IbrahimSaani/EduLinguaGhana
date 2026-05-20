@@ -118,12 +118,17 @@ public class AchievementManager {
 
     public void saveAchievements() {
         String json = gson.toJson(achievements);
-        prefs.edit().putString(KEY_ACHIEVEMENTS, json).apply();
+        prefs.edit().putString(KEY_ACHIEVEMENTS, json).commit();
     }
 
     public void saveAllAchievements(List<Achievement> achievements) {
         this.achievements = achievements;
         saveAchievements();
+    }
+
+    public void resetAchievements() {
+        prefs.edit().remove(KEY_ACHIEVEMENTS).commit();
+        initializeAchievements();
     }
 
     public List<Achievement> getAllAchievements() {

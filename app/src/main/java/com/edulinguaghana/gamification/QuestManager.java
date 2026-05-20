@@ -76,7 +76,7 @@ public class QuestManager {
     public static void resetQuests(Context ctx) {
         synchronized (QuestManager.class) {
             SharedPreferences p = ctx.getSharedPreferences(PREFS, Context.MODE_PRIVATE);
-            p.edit().remove(KEY_QUESTS).apply();
+            p.edit().remove(KEY_QUESTS).commit();
         }
     }
 
@@ -204,23 +204,11 @@ public class QuestManager {
         q10.expiresAt = System.currentTimeMillis() + 24L * 60 * 60 * 1000L;
         list.add(q10);
 
-        // Quest 11: Beat Matcher sessions
-        Quest q11 = new Quest();
-        q11.id = "beat_master";
-        q11.title = "Beat Master";
-        q11.description = "Complete 3 Beat Matcher sessions.";
-        q11.xpReward = 30;
-        q11.completed = false;
-        q11.target = 3;
-        q11.progress = 0;
-        q11.expiresAt = System.currentTimeMillis() + 24L * 60 * 60 * 1000L;
-        list.add(q11);
-
         // Quest 12: Explore all fun games
         Quest q12 = new Quest();
         q12.id = "fun_game_explorer";
         q12.title = "Fun Game Explorer";
-        q12.description = "Play Speed, Puzzle, and Beat Matcher.";
+        q12.description = "Play Speed, Puzzle, and other games.";
         q12.xpReward = 40;
         q12.completed = false;
         q12.target = 1;

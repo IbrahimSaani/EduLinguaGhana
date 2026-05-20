@@ -110,7 +110,6 @@ public class CloudSyncManager {
             userData.put("totalFunGames", eduPrefs.getInt("TOTAL_FUN_GAMES", 0));
             userData.put("speedGamesPlayed", eduPrefs.getInt("SPEED_GAMES_PLAYED", 0));
             userData.put("puzzleGamesPlayed", eduPrefs.getInt("PUZZLE_GAMES_PLAYED", 0));
-            userData.put("beatGamesPlayed", eduPrefs.getInt("BEAT_GAMES_PLAYED", 0));
             userData.put("funGameBestScore", eduPrefs.getInt("FUN_GAME_BEST_SCORE", 0));
             Set<String> playedGames = eduPrefs.getStringSet("FUN_GAMES_PLAYED_SET", null);
             if (playedGames != null) {
@@ -185,13 +184,11 @@ public class CloudSyncManager {
                             Integer cloudTotalFunGames = snapshot.child("totalFunGames").getValue(Integer.class);
                             Integer cloudSpeedGames = snapshot.child("speedGamesPlayed").getValue(Integer.class);
                             Integer cloudPuzzleGames = snapshot.child("puzzleGamesPlayed").getValue(Integer.class);
-                            Integer cloudBeatGames = snapshot.child("beatGamesPlayed").getValue(Integer.class);
                             Integer cloudFunBest = snapshot.child("funGameBestScore").getValue(Integer.class);
 
                             int localTotalFunGames = prefs.getInt("TOTAL_FUN_GAMES", 0);
                             int localSpeedGames = prefs.getInt("SPEED_GAMES_PLAYED", 0);
                             int localPuzzleGames = prefs.getInt("PUZZLE_GAMES_PLAYED", 0);
-                            int localBeatGames = prefs.getInt("BEAT_GAMES_PLAYED", 0);
                             int localFunBest = prefs.getInt("FUN_GAME_BEST_SCORE", 0);
 
                             if (cloudTotalFunGames != null) {
@@ -202,9 +199,6 @@ public class CloudSyncManager {
                             }
                             if (cloudPuzzleGames != null) {
                                 editor.putInt("PUZZLE_GAMES_PLAYED", Math.max(localPuzzleGames, cloudPuzzleGames));
-                            }
-                            if (cloudBeatGames != null) {
-                                editor.putInt("BEAT_GAMES_PLAYED", Math.max(localBeatGames, cloudBeatGames));
                             }
                             if (cloudFunBest != null) {
                                 editor.putInt("FUN_GAME_BEST_SCORE", Math.max(localFunBest, cloudFunBest));

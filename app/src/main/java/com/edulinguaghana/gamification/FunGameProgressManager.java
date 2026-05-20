@@ -19,7 +19,7 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * Tracks fun game progress (speed/puzzle/beat matcher) and feeds quests, badges, XP, and achievements.
+ * Tracks fun game progress (speed/puzzle/etc.) and feeds quests, badges, XP, and achievements.
  */
 public final class FunGameProgressManager {
     private static final String PREF_NAME = "EduLinguaPrefs";
@@ -27,7 +27,6 @@ public final class FunGameProgressManager {
     private static final String KEY_TOTAL_FUN_GAMES = "TOTAL_FUN_GAMES";
     private static final String KEY_SPEED_GAMES_PLAYED = "SPEED_GAMES_PLAYED";
     private static final String KEY_PUZZLE_GAMES_PLAYED = "PUZZLE_GAMES_PLAYED";
-    private static final String KEY_BEAT_GAMES_PLAYED = "BEAT_GAMES_PLAYED";
     private static final String KEY_FUN_GAME_BEST_SCORE = "FUN_GAME_BEST_SCORE";
     private static final String KEY_FUN_GAMES_PLAYED_SET = "FUN_GAMES_PLAYED_SET";
 
@@ -56,9 +55,6 @@ public final class FunGameProgressManager {
             case "puzzle_game":
                 editor.putInt(KEY_PUZZLE_GAMES_PLAYED, prefs.getInt(KEY_PUZZLE_GAMES_PLAYED, 0) + 1);
                 break;
-            case "beat_matcher":
-                editor.putInt(KEY_BEAT_GAMES_PLAYED, prefs.getInt(KEY_BEAT_GAMES_PLAYED, 0) + 1);
-                break;
             default:
                 break;
         }
@@ -85,18 +81,14 @@ public final class FunGameProgressManager {
             BadgeManager.unlockBadge(context, "speed_champion");
         } else if ("puzzle_game".equals(gameId)) {
             QuestManager.progressQuest(context, "puzzle_solver", 1);
-        } else if ("beat_matcher".equals(gameId)) {
-            QuestManager.progressQuest(context, "beat_master", 1);
         }
 
         // Badges based on cumulative fun game progress
         int puzzleCount = prefs.getInt(KEY_PUZZLE_GAMES_PLAYED, 0);
-        int beatCount = prefs.getInt(KEY_BEAT_GAMES_PLAYED, 0);
 
         if (total >= 1) BadgeManager.unlockBadge(context, "fun_starter");
         if (total >= 10) BadgeManager.unlockBadge(context, "fun_legend");
         if (puzzleCount >= 5) BadgeManager.unlockBadge(context, "puzzle_pro");
-        if (beatCount >= 5) BadgeManager.unlockBadge(context, "beat_expert");
         if (gamesPlayed.size() >= 3) BadgeManager.unlockBadge(context, "game_explorer");
 
         // XP, streak and language usage
@@ -153,11 +145,6 @@ public final class FunGameProgressManager {
         return context.getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE).getInt(KEY_PUZZLE_GAMES_PLAYED, 0);
     }
 
-    public static int getBeatGamesPlayed(Context context) {
-        if (context == null) return 0;
-        return context.getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE).getInt(KEY_BEAT_GAMES_PLAYED, 0);
-    }
-
     public static int getDistinctFunGamesPlayedCount(Context context) {
         if (context == null) return 0;
         Set<String> set = context.getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE).getStringSet(KEY_FUN_GAMES_PLAYED_SET, null);
@@ -171,10 +158,9 @@ public final class FunGameProgressManager {
                 .remove(KEY_TOTAL_FUN_GAMES)
                 .remove(KEY_SPEED_GAMES_PLAYED)
                 .remove(KEY_PUZZLE_GAMES_PLAYED)
-                .remove(KEY_BEAT_GAMES_PLAYED)
                 .remove(KEY_FUN_GAME_BEST_SCORE)
                 .remove(KEY_FUN_GAMES_PLAYED_SET)
-                .apply();
+                .commit();
     }
 
     private static void persistFunGameProgressToCloud(Context context, String gameId, int score, String languageCode,
@@ -192,7 +178,6 @@ public final class FunGameProgressManager {
             funGamesUpdate.put("funGameBestScore", bestScore);
             funGamesUpdate.put("speedGamesPlayed", getSpeedGamesPlayed(context));
             funGamesUpdate.put("puzzleGamesPlayed", getPuzzleGamesPlayed(context));
-            funGamesUpdate.put("beatGamesPlayed", getBeatGamesPlayed(context));
             funGamesUpdate.put("distinctFunGamesPlayed", gamesPlayed.size());
             funGamesUpdate.put("funGamesPlayedSet", new ArrayList<>(gamesPlayed));
             funGamesUpdate.put("lastGameId", gameId);
@@ -209,7 +194,6 @@ public final class FunGameProgressManager {
             progressUpdate.put("funGameBestScore", bestScore);
             progressUpdate.put("speedGamesPlayed", getSpeedGamesPlayed(context));
             progressUpdate.put("puzzleGamesPlayed", getPuzzleGamesPlayed(context));
-            progressUpdate.put("beatGamesPlayed", getBeatGamesPlayed(context));
             progressUpdate.put("distinctFunGamesPlayed", gamesPlayed.size());
             progressUpdate.put("funGamesPlayedSet", new ArrayList<>(gamesPlayed));
             progressUpdate.put("lastFunGameId", gameId);

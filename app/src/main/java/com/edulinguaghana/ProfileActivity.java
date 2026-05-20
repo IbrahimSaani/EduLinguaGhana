@@ -2584,6 +2584,7 @@ public class ProfileActivity extends AppCompatActivity {
                 new StreakManager(this).resetAllData();
                 com.edulinguaghana.gamification.BadgeManager.resetBadges(this);
                 com.edulinguaghana.gamification.QuestManager.resetQuests(this);
+                new com.edulinguaghana.AchievementManager(this).resetAchievements();
 
                 // Sign out from Firebase
                 mAuth.signOut();

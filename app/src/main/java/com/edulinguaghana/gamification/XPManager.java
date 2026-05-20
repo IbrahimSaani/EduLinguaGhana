@@ -35,12 +35,12 @@ public class XPManager {
 
     public static void saveState(Context ctx, XPState s) {
         SharedPreferences p = ctx.getSharedPreferences(PREFS, Context.MODE_PRIVATE);
-        p.edit().putString(KEY_XP, s.toJson().toString()).apply();
+        p.edit().putString(KEY_XP, s.toJson().toString()).commit();
     }
 
     public static void resetXP(Context ctx) {
         SharedPreferences p = ctx.getSharedPreferences(PREFS, Context.MODE_PRIVATE);
-        p.edit().remove(KEY_XP).apply();
+        p.edit().remove(KEY_XP).commit();
     }
 
     public static void awardXP(Context ctx, int amount, String reason) {

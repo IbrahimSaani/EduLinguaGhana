@@ -702,6 +702,7 @@ public class AccountManagementActivity extends AppCompatActivity {
                         new StreakManager(this).resetAllData();
                         com.edulinguaghana.gamification.BadgeManager.resetBadges(this);
                         com.edulinguaghana.gamification.QuestManager.resetQuests(this);
+                        new com.edulinguaghana.AchievementManager(this).resetAchievements();
                         AvatarBuilder.clearCache(this);
 
                         // Sign out and return to main activity

@@ -202,6 +202,6 @@ public class ProgressManager {
         context.getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE)
                 .edit()
                 .clear()
-                .apply();
+                .commit();
     }
 }

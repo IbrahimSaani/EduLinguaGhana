@@ -1618,7 +1618,7 @@ public class AvatarBuilder {
      */
     public static void clearCache(Context context) {
         SharedPreferences prefs = context.getSharedPreferences(getPrefsName(context), Context.MODE_PRIVATE);
-        prefs.edit().clear().apply();
+        prefs.edit().clear().commit();
     }
 
     public AvatarConfig getConfig() {
