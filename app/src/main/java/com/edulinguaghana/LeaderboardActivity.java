@@ -99,7 +99,6 @@ public class LeaderboardActivity extends AppCompatActivity {
         if (swipeRefreshLayout != null) {
             swipeRefreshLayout.setOnRefreshListener(() -> {
                 // When user pulls to refresh, reload leaderboard
-                playSfx(true);
                 loadLeaderboard();
             });
             // Use same color as accent for the refresh spinner
@@ -324,9 +323,6 @@ public class LeaderboardActivity extends AppCompatActivity {
             // Update user's rank and score with celebration
             updateUserRank();
 
-            // Play success sound
-            playSfx(true);
-
             if (swipeTriggered) {
                 Snackbar.make(findViewById(android.R.id.content), "Leaderboard updated! 🏆", Snackbar.LENGTH_SHORT).show();
             }
@@ -418,25 +414,6 @@ public class LeaderboardActivity extends AppCompatActivity {
             View root = findViewById(android.R.id.content);
             if (root != null) {
                 root.startAnimation(shake);
-            }
-        } catch (Exception ignored) {}
-    }
-
-    private void playSfx(boolean isCorrect) {
-        try {
-            if (sfxPlayer != null) {
-                sfxPlayer.release();
-                sfxPlayer = null;
-            }
-            int resId = isCorrect ? R.raw.correct : R.raw.wrong;
-            sfxPlayer = MediaPlayer.create(this, resId);
-            if (sfxPlayer != null) {
-                sfxPlayer.setVolume(0.3f, 0.3f);
-                sfxPlayer.setOnCompletionListener(mp -> {
-                    mp.release();
-                    sfxPlayer = null;
-                });
-                sfxPlayer.start();
             }
         } catch (Exception ignored) {}
     }
