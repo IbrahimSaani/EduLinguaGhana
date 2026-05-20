@@ -3,6 +3,8 @@ package com.edulinguaghana;
 import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.VibrationEffect;
+import android.os.Vibrator;
 import android.speech.tts.TextToSpeech;
 import android.view.View;
 import android.view.animation.AnimationUtils;
@@ -38,6 +40,11 @@ public class HiddenShapesActivity extends AppCompatActivity {
     private TextToSpeech tts;
     private OfflineGhanaLPTtsService offlineTts;
     private MediaPlayer gameOverPlayer;
+    private android.media.SoundPool soundPool;
+    private int scratchSoundId;
+    private int correctSoundId;
+    private long lastScratchSoundTime = 0;
+    private Vibrator vibrator;
     private int bestScore = 0;
     private static final String PREF_NAME = "EduLinguaPrefs";
     private static final String KEY_HIGH_SCORE_HIDDEN = "high_score_hidden_shapes";
@@ -99,11 +106,45 @@ public class HiddenShapesActivity extends AppCompatActivity {
 
         initTts();
         initSounds();
+        
+        // Setup scratch sound and vibration
+        vibrator = (Vibrator) getSystemService(VIBRATOR_SERVICE);
+        scratchView.setOnScratchListener(() -> {
+            long currentTime = System.currentTimeMillis();
+            if (currentTime - lastScratchSoundTime > 150) {
+                if (soundPool != null && scratchSoundId != 0) {
+                    soundPool.play(scratchSoundId, 0.4f, 0.4f, 1, 0, 1.0f);
+                }
+                if (vibrator != null) {
+                    if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+                        vibrator.vibrate(android.os.VibrationEffect.createOneShot(10, 50));
+                    } else {
+                        vibrator.vibrate(10L);
+                    }
+                }
+                lastScratchSoundTime = currentTime;
+            }
+        });
+
         startNewGame();
     }
 
     private void initSounds() {
         gameOverPlayer = MediaPlayer.create(this, R.raw.gameover);
+        
+        // Initialize SoundPool for scratch sound
+        android.media.AudioAttributes audioAttributes = new android.media.AudioAttributes.Builder()
+                .setUsage(android.media.AudioAttributes.USAGE_GAME)
+                .setContentType(android.media.AudioAttributes.CONTENT_TYPE_SONIFICATION)
+                .build();
+        soundPool = new android.media.SoundPool.Builder()
+                .setMaxStreams(3)
+                .setAudioAttributes(audioAttributes)
+                .build();
+        
+        // Use squash as a temporary scratch sound if a better one isn't found
+        scratchSoundId = soundPool.load(this, R.raw.squash, 1);
+        correctSoundId = soundPool.load(this, R.raw.correct, 1);
         
         android.content.SharedPreferences prefs = getSharedPreferences(PREF_NAME, MODE_PRIVATE);
         bestScore = prefs.getInt(KEY_HIGH_SCORE_HIDDEN, 0);
@@ -318,6 +359,9 @@ public class HiddenShapesActivity extends AppCompatActivity {
     }
 
     private void celebrate() {
+        if (soundPool != null && correctSoundId != 0) {
+            soundPool.play(correctSoundId, 1.0f, 1.0f, 1, 0, 1.0f);
+        }
         if (konfettiView == null) return;
         konfettiView.start(
             new nl.dionsegijn.konfetti.core.PartyFactory(
@@ -356,11 +400,20 @@ public class HiddenShapesActivity extends AppCompatActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        if (tts != null) tts.shutdown();
+        if (gameTimer != null) gameTimer.cancel();
+        if (tts != null) {
+            tts.stop();
+            tts.shutdown();
+        }
         if (offlineTts != null) offlineTts.stop();
         if (gameOverPlayer != null) {
             gameOverPlayer.release();
             gameOverPlayer = null;
         }
+        if (soundPool != null) {
+            soundPool.release();
+            soundPool = null;
+        }
+        handler.removeCallbacksAndMessages(null);
     }
 }

@@ -35,6 +35,7 @@ public class ScratchRevealView extends View {
     
     private String hiddenText = "";
     private RevealListener revealListener;
+    private OnScratchListener scratchListener;
     private boolean isRevealed = false;
     private final Random random = new Random();
     private int overlayAlpha = 255;
@@ -45,6 +46,14 @@ public class ScratchRevealView extends View {
 
     public interface RevealListener {
         void onRevealed(String text);
+    }
+
+    public interface OnScratchListener {
+        void onScratch();
+    }
+
+    public void setOnScratchListener(OnScratchListener listener) {
+        this.scratchListener = listener;
     }
 
     private static class Particle {
@@ -76,7 +85,6 @@ public class ScratchRevealView extends View {
         
         textPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
         textPaint.setColor(Color.parseColor("#1A237E")); // primary color
-        textPaint.setTextSize(320f);
         textPaint.setTextAlign(Paint.Align.CENTER);
         textPaint.setFakeBoldText(true);
         textPaint.setShadowLayer(10, 0, 0, Color.LTGRAY);
@@ -101,6 +109,9 @@ public class ScratchRevealView extends View {
         if (getWidth() > 0 && getHeight() > 0) {
             initOverlay();
             invalidate();
+        } else {
+            // Post reset for when layout is ready
+            post(this::reset);
         }
     }
 
@@ -112,6 +123,9 @@ public class ScratchRevealView extends View {
 
     private void initOverlay() {
         if (getWidth() <= 0 || getHeight() <= 0) return;
+
+        // Set text size based on view height
+        textPaint.setTextSize(getHeight() * 0.6f);
 
         overlayBitmap = Bitmap.createBitmap(getWidth(), getHeight(), Bitmap.Config.ARGB_8888);
         overlayCanvas = new Canvas(overlayBitmap);
@@ -194,6 +208,7 @@ public class ScratchRevealView extends View {
                 scratchPath.reset();
                 scratchPath.moveTo(x, y);
                 addParticles(x, y);
+                if (scratchListener != null) scratchListener.onScratch();
                 break;
             case MotionEvent.ACTION_MOVE:
                 scratchPath.lineTo(x, y);
@@ -202,6 +217,9 @@ public class ScratchRevealView extends View {
                 }
                 addParticles(x, y);
                 checkRevealProgress();
+                if (scratchListener != null && random.nextInt(3) == 0) {
+                    scratchListener.onScratch();
+                }
                 break;
             case MotionEvent.ACTION_UP:
                 performClick();
