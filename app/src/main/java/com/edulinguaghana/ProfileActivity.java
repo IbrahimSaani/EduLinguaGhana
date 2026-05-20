@@ -1707,7 +1707,12 @@ public class ProfileActivity extends AppCompatActivity {
                             friend.friendUserId + " has been removed from your friends.",
                             "OK",
                             null,
-                            () -> showFriendsList(currentUserId),
+                            () -> {
+                                // Refresh after a short delay to allow DB sync
+                                new android.os.Handler(android.os.Looper.getMainLooper()).postDelayed(() -> {
+                                    showFriendsList(currentUserId);
+                                }, 800);
+                            },
                             null
                         );
                     } catch (Exception ex) {

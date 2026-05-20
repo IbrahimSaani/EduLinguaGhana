@@ -51,7 +51,7 @@
       ".indexOn": ["userId", "friendUserId", "status"],
       "$friendshipId": {
         ".read": "auth != null && (data.child('userId').val() === auth.uid || data.child('friendUserId').val() === auth.uid || root.child('users').child(auth.uid).child('role').val() === 'TEACHER' || root.child('users').child(auth.uid).child('role').val() === 'PARENT')",
-        ".write": "auth != null && auth.token.email_verified === true && (!data.exists() || data.child('userId').val() === auth.uid || data.child('friendUserId').val() === auth.uid) && (newData.child('userId').val() === auth.uid || newData.child('friendUserId').val() === auth.uid)",
+        ".write": "auth != null && auth.token.email_verified === true && ((!newData.exists() && (data.child('userId').val() === auth.uid || data.child('friendUserId').val() === auth.uid)) || (newData.exists() && (!data.exists() || data.child('userId').val() === auth.uid || data.child('friendUserId').val() === auth.uid) && (newData.child('userId').val() === auth.uid || newData.child('friendUserId').val() === auth.uid)))",
         ".validate": "newData.hasChildren(['userId', 'friendUserId', 'status'])"
       }
     },

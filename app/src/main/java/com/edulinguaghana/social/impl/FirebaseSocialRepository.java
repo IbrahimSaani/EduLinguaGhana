@@ -72,14 +72,17 @@ public class FirebaseSocialRepository implements SocialRepository {
 
     @Override
     public boolean removeFriend(String userId, String friendId) {
-        // Use a query to find the specific friend records to remove
+        android.util.Log.d("FirebaseSocialRepository", "Removing friend connection between " + userId + " and " + friendId);
+        
+        // Remove entry where current user is the owner
         rootRef.child("friends").orderByChild("userId").equalTo(userId)
             .addListenerForSingleValueEvent(new ValueEventListener() {
                 @Override
                 public void onDataChange(DataSnapshot snapshot) {
                     for (DataSnapshot child : snapshot.getChildren()) {
-                        Friend f = child.getValue(Friend.class);
-                        if (f != null && friendId.equals(f.friendUserId)) {
+                        Object fIdObj = child.child("friendUserId").getValue();
+                        if (friendId.equals(String.valueOf(fIdObj))) {
+                            android.util.Log.d("FirebaseSocialRepository", "Deleting record: " + child.getKey());
                             child.getRef().removeValue();
                         }
                     }
@@ -88,14 +91,15 @@ public class FirebaseSocialRepository implements SocialRepository {
                 public void onCancelled(DatabaseError error) {}
             });
 
-        // Remove the reciprocal entry as well
+        // Remove the reciprocal entry (where friend is the owner)
         rootRef.child("friends").orderByChild("userId").equalTo(friendId)
             .addListenerForSingleValueEvent(new ValueEventListener() {
                 @Override
                 public void onDataChange(DataSnapshot snapshot) {
                     for (DataSnapshot child : snapshot.getChildren()) {
-                        Friend f = child.getValue(Friend.class);
-                        if (f != null && userId.equals(f.friendUserId)) {
+                        Object fIdObj = child.child("friendUserId").getValue();
+                        if (userId.equals(String.valueOf(fIdObj))) {
+                            android.util.Log.d("FirebaseSocialRepository", "Deleting reciprocal record: " + child.getKey());
                             child.getRef().removeValue();
                         }
                     }
