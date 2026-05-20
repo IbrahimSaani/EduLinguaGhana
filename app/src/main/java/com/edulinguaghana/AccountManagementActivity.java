@@ -694,6 +694,16 @@ public class AccountManagementActivity extends AppCompatActivity {
                     if (task.isSuccessful()) {
                         Toast.makeText(AccountManagementActivity.this,
                                 "Account deleted successfully", Toast.LENGTH_SHORT).show();
+                        
+                        // Clear all local user statistics
+                        ProgressManager.resetProgress(this);
+                        com.edulinguaghana.gamification.FunGameProgressManager.resetProgress(this);
+                        com.edulinguaghana.gamification.XPManager.resetXP(this);
+                        new StreakManager(this).resetAllData();
+                        com.edulinguaghana.gamification.BadgeManager.resetBadges(this);
+                        com.edulinguaghana.gamification.QuestManager.resetQuests(this);
+                        AvatarBuilder.clearCache(this);
+
                         // Sign out and return to main activity
                         mAuth.signOut();
                         finishAffinity();

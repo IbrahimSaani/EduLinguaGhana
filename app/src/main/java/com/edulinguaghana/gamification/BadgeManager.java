@@ -69,6 +69,13 @@ public class BadgeManager {
         }
     }
 
+    public static void resetBadges(Context ctx) {
+        synchronized (BadgeManager.class) {
+            SharedPreferences p = ctx.getSharedPreferences(PREFS, Context.MODE_PRIVATE);
+            p.edit().remove(KEY_BADGES).apply();
+        }
+    }
+
     private static List<Badge> generateDefaultBadges() {
         List<Badge> list = new ArrayList<>();
 

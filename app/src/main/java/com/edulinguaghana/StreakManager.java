@@ -174,6 +174,10 @@ public class StreakManager {
             .apply();
     }
 
+    public void resetAllData() {
+        prefs.edit().clear().apply();
+    }
+
     public void saveAllStreakData(int currentStreak, int longestStreak, int totalPracticeDays) {
         prefs.edit()
                 .putInt(KEY_CURRENT_STREAK, currentStreak)

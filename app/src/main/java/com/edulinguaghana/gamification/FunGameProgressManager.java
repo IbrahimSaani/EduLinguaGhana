@@ -164,6 +164,19 @@ public final class FunGameProgressManager {
         return set == null ? 0 : set.size();
     }
 
+    public static void resetProgress(Context context) {
+        if (context == null) return;
+        context.getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE)
+                .edit()
+                .remove(KEY_TOTAL_FUN_GAMES)
+                .remove(KEY_SPEED_GAMES_PLAYED)
+                .remove(KEY_PUZZLE_GAMES_PLAYED)
+                .remove(KEY_BEAT_GAMES_PLAYED)
+                .remove(KEY_FUN_GAME_BEST_SCORE)
+                .remove(KEY_FUN_GAMES_PLAYED_SET)
+                .apply();
+    }
+
     private static void persistFunGameProgressToCloud(Context context, String gameId, int score, String languageCode,
                                                       int totalFunGames, int bestScore, Set<String> gamesPlayed) {
         try {

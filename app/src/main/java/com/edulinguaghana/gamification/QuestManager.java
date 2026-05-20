@@ -73,6 +73,13 @@ public class QuestManager {
         }
     }
 
+    public static void resetQuests(Context ctx) {
+        synchronized (QuestManager.class) {
+            SharedPreferences p = ctx.getSharedPreferences(PREFS, Context.MODE_PRIVATE);
+            p.edit().remove(KEY_QUESTS).apply();
+        }
+    }
+
     // Made public so pure unit tests can verify generation logic without Android
     public static List<Quest> generateDefaultDailyQuests() {
         List<Quest> list = new ArrayList<>();

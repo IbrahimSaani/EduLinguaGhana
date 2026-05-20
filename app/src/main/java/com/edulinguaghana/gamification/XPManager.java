@@ -38,6 +38,11 @@ public class XPManager {
         p.edit().putString(KEY_XP, s.toJson().toString()).apply();
     }
 
+    public static void resetXP(Context ctx) {
+        SharedPreferences p = ctx.getSharedPreferences(PREFS, Context.MODE_PRIVATE);
+        p.edit().remove(KEY_XP).apply();
+    }
+
     public static void awardXP(Context ctx, int amount, String reason) {
         if (amount <= 0) return;
         XPState s = getState(ctx);

@@ -1161,6 +1161,12 @@ public class MainActivity extends AppCompatActivity {
                 "Match the letters to the slots",
                 () -> openPuzzleGameScreen(langCode, langName)
         ));
+        menuItems.add(new StyledMenuHelper.MenuItem(
+                "🎵",
+                "Beat Matcher",
+                "Match phonemes to sounds",
+                () -> openBeatMatcherScreen(langCode, langName)
+        ));
 
         StyledMenuHelper.showStyledMenu(
                 this,
@@ -1257,6 +1263,13 @@ public class MainActivity extends AppCompatActivity {
 
     private void openRocketSortScreen(String langCode, String langName) {
         Intent intent = new Intent(MainActivity.this, com.edulinguaghana.games.rocketsort.RocketSortActivity.class);
+        intent.putExtra("LANG_CODE", langCode);
+        intent.putExtra("LANG_NAME", langName);
+        startActivity(intent);
+    }
+
+    private void openBeatMatcherScreen(String langCode, String langName) {
+        Intent intent = new Intent(MainActivity.this, com.edulinguaghana.games.BeatMatcherActivity.class);
         intent.putExtra("LANG_CODE", langCode);
         intent.putExtra("LANG_NAME", langName);
         startActivity(intent);

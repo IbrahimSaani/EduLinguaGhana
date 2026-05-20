@@ -2577,6 +2577,14 @@ public class ProfileActivity extends AppCompatActivity {
                 RoleManager roleManager = new RoleManager();
                 roleManager.clearCache(this);
 
+                // Clear all local user statistics
+                ProgressManager.resetProgress(this);
+                com.edulinguaghana.gamification.FunGameProgressManager.resetProgress(this);
+                com.edulinguaghana.gamification.XPManager.resetXP(this);
+                new StreakManager(this).resetAllData();
+                com.edulinguaghana.gamification.BadgeManager.resetBadges(this);
+                com.edulinguaghana.gamification.QuestManager.resetQuests(this);
+
                 // Sign out from Firebase
                 mAuth.signOut();
 
