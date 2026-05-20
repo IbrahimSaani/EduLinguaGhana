@@ -31,6 +31,7 @@ import android.widget.SeekBar;
 import android.widget.ArrayAdapter;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Locale;
 
 import com.edulinguaghana.tts.OfflineGhanaLPTtsService;
@@ -63,6 +64,8 @@ public class AlphabetActivity extends AppCompatActivity {
     private String[] letters;
     private String[] words;
     private int currentIndex = 0;
+    private int practiceRetryCount = 0;
+    private static final int MAX_RETRIES_BEFORE_TIP = 2;
 
     // --- ALPHABET & WORD DATA ---
     private final String[] lettersEnFr = {"A","B","C","D","E","F","G","H","I","J","K","L","M","N","O","P","Q","R","S","T","U","V","W","X","Y","Z"};
@@ -330,6 +333,7 @@ public class AlphabetActivity extends AppCompatActivity {
     }
 
     private void updateLetter() {
+        practiceRetryCount = 0; // Reset retry count when changing letters
         try {
             // Update text with letter
             String letter = letters[currentIndex];
@@ -984,38 +988,155 @@ public class AlphabetActivity extends AppCompatActivity {
     }
 
     private void evaluatePronunciation(String recognized) {
+        if (recognized == null || recognized.trim().isEmpty()) {
+            Toast.makeText(this, "🔇 Could not detect any sound.\n\n🎤 Please try again and speak clearly!", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
         String expectedLetter = letters[currentIndex];
+        String recognizedClean = recognized.trim().toLowerCase();
+        String expectedLetterLower = expectedLetter.toLowerCase();
 
-        if (recognized.length() > 0) {
-            String simplifiedRecognized = recognized.toUpperCase().substring(0, 1);
+        // 1. Direct match (letter itself or case-insensitive)
+        if (recognizedClean.equals(expectedLetterLower) || recognized.equalsIgnoreCase(expectedLetter)) {
+            handleSuccess(recognized, expectedLetter);
+            return;
+        }
 
-            if (simplifiedRecognized.equals(expectedLetter)) {
-                // Perfect match!
-                celebrateAction();
-                Toast.makeText(this,
-                    "🎉 Excellent! Perfect pronunciation of '" + recognized + "'" +
-                    "\n✅ You got it right!",
-                    Toast.LENGTH_LONG).show();
-            } else if (recognized.equalsIgnoreCase(expectedLetter)) {
-                // Case-insensitive match (still correct)
-                celebrateAction();
-                Toast.makeText(this,
-                    "✅ Great! '" + recognized + "' matches '" + expectedLetter + "'" +
-                    "\n\n🎯 Pronunciation is correct!",
-                    Toast.LENGTH_LONG).show();
-            } else {
-                // Didn't match
-                Toast.makeText(this,
-                    "🎤 I heard: \"" + recognized + "\"" +
-                    "\n📝 Expected: \"" + expectedLetter + "\"" +
-                    "\n\n💡 Listen to the audio again and try once more!",
-                    Toast.LENGTH_LONG).show();
+        // 2. First letter match (e.g., user says "Bee" for "B")
+        if (recognizedClean.length() > 0 && String.valueOf(recognizedClean.charAt(0)).equalsIgnoreCase(expectedLetter)) {
+            handleSuccess(recognized, expectedLetter);
+            return;
+        }
+
+        // 3. Phonetic match (check if any of our accepted phonetic spellings match)
+        List<String> acceptedSpellings = getAcceptedPhoneticSpellings(expectedLetter, languageCode);
+        for (String spelling : acceptedSpellings) {
+            if (recognizedClean.contains(spelling.toLowerCase())) {
+                handleSuccess(recognized, expectedLetter);
+                return;
             }
+        }
+
+        // 4. Example word match (if they say the example word instead of just the letter)
+        String exampleWord = words[currentIndex].toLowerCase();
+        if (recognizedClean.contains(exampleWord)) {
+            handleSuccess(recognized, expectedLetter);
+            return;
+        }
+
+        // 5. Special handling for common misrecognitions
+        if (handleSpecialMisrecognitions(expectedLetter, recognizedClean)) {
+            handleSuccess(recognized, expectedLetter);
+            return;
+        }
+
+        // If all else fails
+        practiceRetryCount++;
+        
+        if (practiceRetryCount >= MAX_RETRIES_BEFORE_TIP) {
+             showPronunciationTips();
+             practiceRetryCount = 0; // Reset after showing tip
         } else {
             Toast.makeText(this,
-                "🔇 Could not detect any sound.\n\n🎤 Please try again and speak clearly!",
-                Toast.LENGTH_SHORT).show();
+                "🎤 I heard: \"" + recognized + "\"" +
+                "\n📝 Expected: \"" + expectedLetter + "\"" +
+                "\n\n💡 Try to say it clearly. Listen again if you need to!",
+                Toast.LENGTH_LONG).show();
         }
+    }
+
+    private void handleSuccess(String recognized, String expected) {
+        practiceRetryCount = 0; // Reset retry count on success
+        celebrateAction();
+        Toast.makeText(this,
+            "🎉 Excellent! You said: '" + recognized + "'" +
+            "\n✅ Correct pronunciation of '" + expected + "'!",
+            Toast.LENGTH_LONG).show();
+    }
+
+    private boolean handleSpecialMisrecognitions(String expected, String recognized) {
+        // Add common misrecognitions here that aren't strictly phonetic
+        if (expected.equalsIgnoreCase("W") && (recognized.contains("double") || recognized.contains("you"))) return true;
+        if (expected.equalsIgnoreCase("Ɛ") && (recognized.contains("air") || recognized.contains("eh") || recognized.contains("at"))) return true;
+        if (expected.equalsIgnoreCase("Ɔ") && (recognized.contains("awe") || recognized.contains("oh") || recognized.contains("or"))) return true;
+        return false;
+    }
+
+    private List<String> getAcceptedPhoneticSpellings(String letter, String language) {
+        List<String> spellings = new ArrayList<>();
+        String upper = letter.toUpperCase();
+
+        if ("fr".equals(language)) {
+            switch (upper) {
+                case "A": spellings.add("a"); break;
+                case "B": spellings.add("be"); spellings.add("bé"); break;
+                case "C": spellings.add("ce"); spellings.add("cé"); break;
+                case "D": spellings.add("de"); spellings.add("dé"); break;
+                case "E": spellings.add("e"); break;
+                case "F": spellings.add("effe"); break;
+                case "G": spellings.add("ge"); spellings.add("gé"); break;
+                case "H": spellings.add("ache"); break;
+                case "I": spellings.add("i"); break;
+                case "J": spellings.add("ji"); break;
+                case "K": spellings.add("ka"); break;
+                case "L": spellings.add("elle"); break;
+                case "M": spellings.add("emme"); break;
+                case "N": spellings.add("enne"); break;
+                case "O": spellings.add("o"); break;
+                case "P": spellings.add("pe"); spellings.add("pé"); break;
+                case "Q": spellings.add("ku"); break;
+                case "R": spellings.add("erre"); break;
+                case "S": spellings.add("esse"); break;
+                case "T": spellings.add("te"); spellings.add("té"); break;
+                case "U": spellings.add("u"); break;
+                case "V": spellings.add("ve"); spellings.add("vé"); break;
+                case "W": spellings.add("double"); break;
+                case "X": spellings.add("ixe"); break;
+                case "Y": spellings.add("grec"); break;
+                case "Z": spellings.add("zed"); break;
+            }
+        } else {
+            // English or general phonetic
+            switch (upper) {
+                case "A": spellings.add("ay"); spellings.add("ey"); break;
+                case "B": spellings.add("bee"); break;
+                case "C": spellings.add("see"); spellings.add("sea"); break;
+                case "D": spellings.add("dee"); break;
+                case "E": spellings.add("ee"); break;
+                case "F": spellings.add("ef"); break;
+                case "G": spellings.add("gee"); spellings.add("jee"); break;
+                case "H": spellings.add("aitch"); break;
+                case "I": spellings.add("eye"); break;
+                case "J": spellings.add("jay"); break;
+                case "K": spellings.add("kay"); break;
+                case "L": spellings.add("el"); break;
+                case "M": spellings.add("em"); break;
+                case "N": spellings.add("en"); break;
+                case "O": spellings.add("oh"); break;
+                case "P": spellings.add("pee"); break;
+                case "Q": spellings.add("cue"); break;
+                case "R": spellings.add("are"); break;
+                case "S": spellings.add("es"); break;
+                case "T": spellings.add("tee"); break;
+                case "U": spellings.add("you"); break;
+                case "V": spellings.add("vee"); break;
+                case "W": spellings.add("double"); break;
+                case "X": spellings.add("ex"); break;
+                case "Y": spellings.add("why"); break;
+                case "Z": spellings.add("zee"); spellings.add("zed"); break;
+                
+                // Ghanaian special characters (how they might be recognized by English-trained model)
+                case "Ɛ": spellings.add("eh"); spellings.add("air"); break;
+                case "Ɔ": spellings.add("aw"); spellings.add("oh"); break;
+                case "Ɖ": spellings.add("de"); break;
+                case "Ƒ": spellings.add("ef"); break;
+                case "Ɣ": spellings.add("ga"); break;
+                case "Ŋ": spellings.add("ng"); break;
+                case "Ʋ": spellings.add("vu"); break;
+            }
+        }
+        return spellings;
     }
 
     @Override

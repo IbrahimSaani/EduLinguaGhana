@@ -256,6 +256,7 @@ public class NumbersActivity extends AppCompatActivity {
     }
 
     private void updateNumber() {
+        speechRetryCount = 0; // Reset retry count when changing numbers
         try {
             tvNumber.setText(String.valueOf(currentNumber));
             // USE CENTRALIZED UTILITY - Remove duplicate code
@@ -612,9 +613,11 @@ public class NumbersActivity extends AppCompatActivity {
         // Try to parse common english words (one..twenty, tens, hundred)
         String lower = cleaned.toLowerCase();
         java.util.Map<String, Integer> map = new java.util.HashMap<>();
-        map.put("one", 1); map.put("two", 2); map.put("three", 3); map.put("four", 4); map.put("for", 4);
-        map.put("five", 5); map.put("six", 6); map.put("seven", 7); map.put("eight", 8); map.put("nine", 9);
-        map.put("ten", 10); map.put("eleven", 11); map.put("twelve", 12); map.put("thirteen", 13);
+        map.put("one", 1); map.put("won", 1); map.put("two", 2); map.put("to", 2); map.put("too", 2);
+        map.put("three", 3); map.put("tree", 3); map.put("four", 4); map.put("for", 4); map.put("fore", 4);
+        map.put("five", 5); map.put("six", 6); map.put("seven", 7); map.put("eight", 8); map.put("ate", 8);
+        map.put("nine", 9); map.put("ten", 10); map.put("then", 10);
+        map.put("eleven", 11); map.put("twelve", 12); map.put("thirteen", 13);
         map.put("fourteen", 14); map.put("fifteen", 15); map.put("sixteen", 16); map.put("seventeen", 17);
         map.put("eighteen", 18); map.put("nineteen", 19); map.put("twenty", 20); map.put("thirty", 30);
         map.put("forty", 40); map.put("fifty", 50); map.put("sixty", 60); map.put("seventy", 70);
@@ -640,31 +643,56 @@ public class NumbersActivity extends AppCompatActivity {
     }
 
     private void evaluatePronunciation(String recognized) {
-        int expected = currentNumber;
+        if (recognized == null || recognized.trim().isEmpty()) {
+            Toast.makeText(this, "🔇 Could not detect any sound.\n\n🎤 Please try again and speak clearly!", Toast.LENGTH_SHORT).show();
+            return;
+        }
 
-        try {
-            int recognizedNumber = Integer.parseInt(recognized);
+        int expected = currentNumber;
+        Integer recognizedNumber = parseRecognizedToNumber(recognized);
+
+        if (recognizedNumber != null) {
             if (recognizedNumber == expected) {
                 // Perfect match!
+                speechRetryCount = 0; // Reset
                 celebrateAction();
                 Toast.makeText(this,
-                    "🎉 Excellent! Perfect pronunciation of " + recognized +
-                    "\n✅ You got it right!",
+                    "🎉 Excellent! You said: " + recognized +
+                    "\n✅ Correct pronunciation of " + expected + "!",
                     Toast.LENGTH_LONG).show();
             } else {
                 // Didn't match
+                speechRetryCount++;
+                if (speechRetryCount >= MAX_SPEECH_RETRIES) {
+                    showPronunciationTips();
+                    speechRetryCount = 0;
+                } else {
+                    Toast.makeText(this,
+                        "🎤 I heard: \"" + recognized + "\"" +
+                        "\n📝 Expected: \"" + expected + "\"" +
+                        "\n\n💡 Try again! Listen to the audio once more.",
+                        Toast.LENGTH_LONG).show();
+                }
+            }
+        } else {
+            // Check for direct string match if parsing failed (for non-standard results)
+            if (recognized.equalsIgnoreCase(String.valueOf(expected))) {
+                speechRetryCount = 0;
+                celebrateAction();
+                return;
+            }
+            
+            speechRetryCount++;
+            if (speechRetryCount >= MAX_SPEECH_RETRIES) {
+                showPronunciationTips();
+                speechRetryCount = 0;
+            } else {
                 Toast.makeText(this,
                     "🎤 I heard: \"" + recognized + "\"" +
-                    "\n📝 Expected: \"" + expected + "\"" +
-                    "\n\n💡 Listen to the audio again and try once more!",
+                    "\n📝 Expected number: " + expected +
+                    "\n\n💡 Try to say just the number clearly!",
                     Toast.LENGTH_LONG).show();
             }
-        } catch (NumberFormatException e) {
-            Toast.makeText(this,
-                "🎤 I heard: \"" + recognized + "\" (not a number)" +
-                "\n📝 Expected number: " + expected +
-                "\n\n💡 Try again and speak clearly!",
-                Toast.LENGTH_LONG).show();
         }
     }
 
