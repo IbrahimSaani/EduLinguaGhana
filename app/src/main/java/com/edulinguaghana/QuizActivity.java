@@ -89,6 +89,7 @@ public class QuizActivity extends AppCompatActivity {
     private int bestScore = 0;
     private CountDownTimer countDownTimer;
     private long remainingTime;
+    private long quizStartTime;
 
     // Challenge mode
     private boolean isChallengeMode = false;
@@ -533,6 +534,7 @@ public class QuizActivity extends AppCompatActivity {
 
     private void startGame() {
         score = 0;
+        quizStartTime = System.currentTimeMillis();
         
         // Use challenge duration if available, else default to 30 seconds
         if (isChallengeMode) {
@@ -1194,10 +1196,11 @@ public class QuizActivity extends AppCompatActivity {
         cancelTimer();
         setButtonsEnabled(false);
         
+        long durationSeconds = (System.currentTimeMillis() - quizStartTime) / 1000;
         boolean newHighScore = score > 0 && score >= bestScore;
 
         // Update overall progress with language tracking
-        ProgressManager.updateProgressWithLanguage(this, quizType, score, score, languageCode);
+        ProgressManager.updateProgressWithLanguage(this, quizType, score, score, languageCode, durationSeconds);
 
         // Record practice for streak
         StreakManager streakManager = new StreakManager(this);

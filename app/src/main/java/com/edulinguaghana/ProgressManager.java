@@ -23,11 +23,16 @@ public class ProgressManager {
 
     // Update global progress stats
     public static void updateProgress(Context context, String mode, int score, int correctCount) {
-        updateProgress(context, mode, score, correctCount, 10); // Default 10 questions
+        updateProgress(context, mode, score, correctCount, 10, 0); // Default 10 questions, 0 duration
     }
 
     // Update global progress stats with total questions parameter
     public static void updateProgress(Context context, String mode, int score, int correctCount, int totalQuestions) {
+        updateProgress(context, mode, score, correctCount, totalQuestions, 0);
+    }
+
+    // Update global progress stats with total questions and duration
+    public static void updateProgress(Context context, String mode, int score, int correctCount, int totalQuestions, long durationSeconds) {
         SharedPreferences prefs = context.getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = prefs.edit();
 
@@ -82,7 +87,7 @@ public class ProgressManager {
             if (user != null) {
                 ProgressTracker tracker = new ProgressTracker();
                 tracker.logQuizCompletion(context, user.getUid(), mode, score,
-                                        correctCount, totalQuestions, 0, null);
+                                        correctCount, totalQuestions, durationSeconds, null);
             }
         } catch (Exception e) {
             // Silently fail if Firebase is not available
@@ -92,7 +97,11 @@ public class ProgressManager {
 
     // Update progress with language tracking for language_explorer quest
     public static void updateProgressWithLanguage(Context context, String mode, int score, int correctCount, String languageCode) {
-        updateProgress(context, mode, score, correctCount, 10); // Default 10 questions
+        updateProgressWithLanguage(context, mode, score, correctCount, languageCode, 0);
+    }
+
+    public static void updateProgressWithLanguage(Context context, String mode, int score, int correctCount, String languageCode, long durationSeconds) {
+        updateProgress(context, mode, score, correctCount, 10, durationSeconds); // Default 10 questions
 
         // Track language usage for language_explorer quest
         try {
