@@ -26,16 +26,18 @@
         app:layout_constraintGuide_percent="0.45" />
 
     <!-- Mascot Presenter -->
-    <ImageView
+    <com.airbnb.lottie.LottieAnimationView
         android:id="@+id/ivMascotTutorial"
-        android:layout_width="100dp"
-        android:layout_height="100dp"
-        android:layout_marginStart="16dp"
-        android:src="@drawable/mascot_owl"
+        android:layout_width="120dp"
+        android:layout_height="120dp"
+        android:layout_marginStart="8dp"
+        app:lottie_rawRes="@raw/angry_owl"
+        app:lottie_autoPlay="true"
+        app:lottie_loop="true"
         android:contentDescription="Mascot"
         app:layout_constraintBottom_toTopOf="@+id/bubbleCard"
         app:layout_constraintStart_toStartOf="parent"
-        android:translationY="20dp"
+        android:translationY="30dp"
         android:elevation="6dp"/>
 
     <!-- Speech Bubble Card -->

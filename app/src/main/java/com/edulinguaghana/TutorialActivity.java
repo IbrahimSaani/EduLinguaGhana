@@ -17,7 +17,6 @@ import android.view.ViewGroup;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.view.animation.OvershootInterpolator;
-import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
@@ -26,6 +25,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.viewpager2.widget.ViewPager2;
 
+import com.airbnb.lottie.LottieAnimationView;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.tabs.TabLayout;
 import com.google.android.material.tabs.TabLayoutMediator;
@@ -295,17 +295,7 @@ public class TutorialActivity extends AppCompatActivity {
                 holder.ivMascot.setTranslationX(-100f);
                 holder.ivMascot.animate().translationX(0f).setStartDelay(400).setDuration(600).setInterpolator(new OvershootInterpolator()).start();
                 
-                // Jump animation for the mascot
-                Animation jump = AnimationUtils.loadAnimation(context, R.anim.mascot_jump);
-                jump.setStartOffset(1000);
-                holder.ivMascot.startAnimation(jump);
-                
-                // Add idle animation after entrance
-                holder.ivMascot.postDelayed(() -> {
-                    if (holder.ivMascot.getAnimation() == null || !holder.ivMascot.getAnimation().hasStarted()) {
-                         holder.ivMascot.startAnimation(AnimationUtils.loadAnimation(context, R.anim.mascot_idle));
-                    }
-                }, 2500);
+                holder.ivMascot.playAnimation();
             }
 
             // Interactive emoji
@@ -324,7 +314,7 @@ public class TutorialActivity extends AppCompatActivity {
             // Also make mascot interactive
             if (holder.ivMascot != null) {
                 holder.ivMascot.setOnClickListener(v -> {
-                    v.startAnimation(AnimationUtils.loadAnimation(context, R.anim.mascot_jump));
+                    holder.ivMascot.playAnimation();
                     vibrate(30);
                 });
             }
@@ -347,7 +337,7 @@ public class TutorialActivity extends AppCompatActivity {
 
         static class ViewHolder extends RecyclerView.ViewHolder {
             TextView tvEmoji, tvTitle, tvDescription, tvSparkle1, tvSparkle2;
-            ImageView ivMascot;
+            LottieAnimationView ivMascot;
             View bubbleCard;
             ViewHolder(View itemView) {
                 super(itemView);
