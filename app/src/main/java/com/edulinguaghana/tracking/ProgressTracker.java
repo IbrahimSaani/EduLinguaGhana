@@ -146,6 +146,51 @@ public class ProgressTracker {
     }
 
     /**
+     * Log a lesson completion activity (e.g., finishing an alphabet)
+     */
+    public void logLessonCompletion(Context context, String userId, String lessonName, String category, long durationSeconds, ProgressCallback callback) {
+        if (userId == null) {
+            FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+            if (user != null) {
+                userId = user.getUid();
+            } else {
+                if (callback != null) callback.onError("User not logged in");
+                return;
+            }
+        }
+
+        final String finalUserId = userId;
+        String activityId = UUID.randomUUID().toString();
+        long timestamp = System.currentTimeMillis();
+
+        // Standard XP for completing a lesson
+        int xpEarned = 20;
+
+        ProgressActivity activity = new ProgressActivity(
+            activityId,
+            finalUserId,
+            ProgressActivity.ActivityType.LESSON_COMPLETED,
+            timestamp,
+            100, // Score as 100% completion
+            0, 0,
+            xpEarned,
+            category + ": " + lessonName,
+            durationSeconds
+        );
+
+        progressRef.child(finalUserId).child("activities").child(activityId).setValue(activity)
+            .addOnSuccessListener(aVoid -> {
+                Log.d(TAG, "Lesson activity logged: " + activityId);
+                updateAggregates(context, finalUserId);
+                if (callback != null) callback.onSuccess();
+            })
+            .addOnFailureListener(e -> {
+                Log.e(TAG, "Failed to log lesson activity", e);
+                if (callback != null) callback.onError(e.getMessage());
+            });
+    }
+
+    /**
      * Log XP earned activity
      */
     public void logXPEarned(String userId, int xpAmount, String reason, ProgressCallback callback) {

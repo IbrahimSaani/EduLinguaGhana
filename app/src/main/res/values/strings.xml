@@ -237,6 +237,23 @@
     <string name="student_level_short">Lvl %1$d</string>
     <string name="student_unknown">Unknown Student</string>
 
+    <!-- Alphabet Activity -->
+    <string name="alphabet_progress_counter">Letter %1$d of %2$d</string>
+    <string name="alphabet_mode_recital">RECITAL</string>
+    <string name="alphabet_mode_practice">PRACTICE</string>
+    <string name="alphabet_mode_recital_desc">Listen &amp; Learn</string>
+    <string name="alphabet_mode_practice_desc">Speak &amp; Learn</string>
+    <string name="alphabet_toast_success">🎉 Excellent! You said: \'%1$s\'\n✅ Correct pronunciation of \'%2$s\'!</string>
+    <string name="alphabet_toast_mic_needed">Microphone permission is needed for pronunciation practice.</string>
+    <string name="alphabet_toast_speech_not_supported">Speech recognition not supported on this device.</string>
+    <string name="alphabet_toast_not_heard">Could not hear you. Try again.</string>
+    <string name="alphabet_toast_tts_failed">TTS initialization failed</string>
+    <string name="alphabet_pronunciation_prompt">Please repeat the letter</string>
+    <string name="alphabet_practice_instruction">🎤 Try to pronounce: %1$s\n\n📝 Listen carefully to the audio above and repeat it!\n\nTap the letter again to hear it.</string>
+    <string name="alphabet_tip_prefix">💡 Tip: </string>
+    <string name="alphabet_lesson_complete">🎉 Lesson Complete! You explored all letters in %1$s!</string>
+    <string name="alphabet_grid_title">Pick a Letter</string>
+
     <!-- Role Manager Errors -->
     <string name="role_manager_pending_exists">A pending request already exists for this student</string>
     <string name="role_manager_already_connected">This student is already connected to you</string>

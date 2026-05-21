@@ -6,26 +6,35 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
 import android.Manifest;
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.res.ColorStateList;
+import android.media.AudioAttributes;
+import android.media.AudioFocusRequest;
+import android.media.AudioManager;
 import android.media.MediaPlayer;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.VibrationEffect;
 import android.os.Vibrator;
 import android.speech.RecognizerIntent;
 import android.speech.tts.TextToSpeech;
+import android.view.HapticFeedbackConstants;
+import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.edulinguaghana.tracking.ProgressTracker;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.card.MaterialCardView;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.progressindicator.LinearProgressIndicator;
+import com.google.firebase.auth.FirebaseAuth;
 
 import android.widget.GridView;
 import android.widget.SeekBar;
@@ -84,6 +93,19 @@ public class AlphabetActivity extends AppCompatActivity {
 
     private TextToSpeech tts;
     private MediaPlayer mediaPlayer;
+    private AudioManager audioManager;
+    private AudioFocusRequest focusRequest;
+    private final AudioManager.OnAudioFocusChangeListener focusChangeListener = focusChange -> {
+        if (focusChange == AudioManager.AUDIOFOCUS_LOSS) {
+            if (mediaPlayer != null && mediaPlayer.isPlaying()) mediaPlayer.pause();
+            if (tts != null) tts.stop();
+        }
+    };
+
+    // Progress tracking
+    private ProgressTracker progressTracker;
+    private long startTime;
+    private boolean lessonCompletedLogSent = false;
 
     // Offline TTS for native Ghanaian languages (loads from res/raw)
     private OfflineGhanaLPTtsService offlineTts;
@@ -91,6 +113,13 @@ public class AlphabetActivity extends AppCompatActivity {
 
     private static final int REQ_CODE_SPEECH_INPUT = 100;
     private static final int REQ_CODE_RECORD_AUDIO = 200;
+
+    @Override
+    protected void onSaveInstanceState(@NonNull Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putInt("CURRENT_INDEX", currentIndex);
+        outState.putBoolean("LESSON_LOGGED", lessonCompletedLogSent);
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -134,19 +163,27 @@ public class AlphabetActivity extends AppCompatActivity {
 
         // Initialize vibrator for haptic feedback
         vibrator = (Vibrator) getSystemService(VIBRATOR_SERVICE);
+        audioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
+        progressTracker = new ProgressTracker();
+        startTime = System.currentTimeMillis();
 
 
         languageCode = getIntent().getStringExtra("LANG_CODE");
         languageName = getIntent().getStringExtra("LANG_NAME");
         mode = getIntent().getStringExtra("MODE");
 
+        if (savedInstanceState != null) {
+            currentIndex = savedInstanceState.getInt("CURRENT_INDEX", 0);
+            lessonCompletedLogSent = savedInstanceState.getBoolean("LESSON_LOGGED", false);
+        }
+
         if (languageName == null) languageName = "Unknown";
         if (mode == null) mode = "practice";
 
         isRecitalMode = mode.equals("recital");
 
-        tvLanguageTitle.setText("Language: " + languageName);
-        btnSpeak.setText(isRecitalMode ? "Repeat" : "Practice");
+        tvLanguageTitle.setText(getString(R.string.language_prefix) + " " + languageName);
+        btnSpeak.setText(isRecitalMode ? getString(R.string.alphabet_mode_recital) : getString(R.string.alphabet_mode_practice));
         updateModeBadge();
 
         // --- DYNAMICALLY SET ALPHABET & WORDS ---
@@ -213,14 +250,17 @@ public class AlphabetActivity extends AppCompatActivity {
 
         btnNext.setOnClickListener(v -> {
             try {
-                triggerHapticFeedback(30);  // Light haptic
+                v.performHapticFeedback(HapticFeedbackConstants.KEYBOARD_TAP);
                 animateButtonPress(btnNext);
             } catch (Exception e) {
                 android.util.Log.w("AlphabetActivity", "Haptic feedback failed", e);
             }
             try {
                 currentIndex++;
-                if (currentIndex >= letters.length) currentIndex = 0;
+                if (currentIndex >= letters.length) {
+                    currentIndex = 0;
+                    checkAndLogCompletion();
+                }
                 updateLetterWithAnimation();
                 if (isRecitalMode) speakCurrentLetter();
             } catch (Exception e) {
@@ -230,7 +270,7 @@ public class AlphabetActivity extends AppCompatActivity {
 
         btnPrev.setOnClickListener(v -> {
             try {
-                triggerHapticFeedback(30);  // Light haptic
+                v.performHapticFeedback(HapticFeedbackConstants.KEYBOARD_TAP);
                 animateButtonPress(btnPrev);
             } catch (Exception e) {
                 android.util.Log.w("AlphabetActivity", "Haptic feedback failed", e);
@@ -247,7 +287,7 @@ public class AlphabetActivity extends AppCompatActivity {
 
         btnBack.setOnClickListener(v -> {
             try {
-                triggerHapticFeedback(50);  // Medium haptic
+                v.performHapticFeedback(HapticFeedbackConstants.VIRTUAL_KEY);
                 animateButtonPress(btnBack);
             } catch (Exception e) {
                 android.util.Log.w("AlphabetActivity", "Haptic feedback failed", e);
@@ -257,7 +297,7 @@ public class AlphabetActivity extends AppCompatActivity {
 
         btnSpeak.setOnClickListener(v -> {
             try {
-                triggerHapticFeedback(50);  // Medium haptic
+                v.performHapticFeedback(HapticFeedbackConstants.LONG_PRESS);
                 animateButtonPress(btnSpeak);
                 celebrateAction();  // Celebration animation
             } catch (Exception e) {
@@ -277,7 +317,7 @@ public class AlphabetActivity extends AppCompatActivity {
         // Make letter card tappable to speak
         letterCard.setOnClickListener(v -> {
             try {
-                triggerHapticFeedback(40);  // Light-medium haptic
+                v.performHapticFeedback(HapticFeedbackConstants.VIRTUAL_KEY);
                 speakCurrentLetter();
                 celebrateAction();  // Show celebration
             } catch (Exception e) {
@@ -313,7 +353,7 @@ public class AlphabetActivity extends AppCompatActivity {
         // Quick access grid button
         btnShowGrid.setOnClickListener(v -> {
             try {
-                triggerHapticFeedback(30);
+                v.performHapticFeedback(HapticFeedbackConstants.VIRTUAL_KEY);
                 showLetterPickerDialog();
             } catch (Exception e) {
                 android.util.Log.e("AlphabetActivity", "Error showing letter picker", e);
@@ -323,7 +363,7 @@ public class AlphabetActivity extends AppCompatActivity {
         // Quick speak button
         btnSpeakQuick.setOnClickListener(v -> {
             try {
-                triggerHapticFeedback(40);
+                v.performHapticFeedback(HapticFeedbackConstants.KEYBOARD_TAP);
                 animateButtonPress(btnSpeakQuick);
                 speakCurrentLetter();
                 celebrateAction();
@@ -382,7 +422,7 @@ public class AlphabetActivity extends AppCompatActivity {
 
     private void updateProgressCounter() {
         if (tvProgressCounter != null) {
-            String progressText = "Letter " + (currentIndex + 1) + " of " + letters.length;
+            String progressText = getString(R.string.alphabet_progress_counter, (currentIndex + 1), letters.length);
             tvProgressCounter.setText(progressText);
 
             // Animate counter update
@@ -510,6 +550,7 @@ public class AlphabetActivity extends AppCompatActivity {
     }
 
     private void speakCurrentLetter() {
+        if (!requestAudioFocus()) return;
         try {
             String letter = letters[currentIndex];
 
@@ -836,6 +877,7 @@ public class AlphabetActivity extends AppCompatActivity {
     }
 
     private void playAudioResource(int resId) {
+        if (!requestAudioFocus()) return;
         if (mediaPlayer != null) {
             try {
                 mediaPlayer.release();
@@ -868,9 +910,7 @@ public class AlphabetActivity extends AppCompatActivity {
         } else {
             // For Ghanaian languages: Show friendly message and provide audio example
             Toast.makeText(this,
-                "🎤 Try to pronounce: " + letters[currentIndex] +
-                "\n\n📝 Listen carefully to the audio above and repeat it!\n\n" +
-                "Tap the letter again to hear it.",
+                getString(R.string.alphabet_practice_instruction, letters[currentIndex]),
                 Toast.LENGTH_LONG).show();
 
             // Show helpful tips for Ghanaian languages
@@ -896,7 +936,7 @@ public class AlphabetActivity extends AppCompatActivity {
         }
 
         if (!tips.isEmpty()) {
-            Toast.makeText(this, "💡 Tip: " + tips, Toast.LENGTH_LONG).show();
+            Toast.makeText(this, getString(R.string.alphabet_tip_prefix) + tips, Toast.LENGTH_LONG).show();
         }
     }
 
@@ -946,12 +986,12 @@ public class AlphabetActivity extends AppCompatActivity {
         intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE, getSpeechLocaleCode());
         intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL,
                 RecognizerIntent.LANGUAGE_MODEL_FREE_FORM);
-        intent.putExtra(RecognizerIntent.EXTRA_PROMPT, "Please repeat the letter");
+        intent.putExtra(RecognizerIntent.EXTRA_PROMPT, getString(R.string.alphabet_pronunciation_prompt));
 
         try {
             startActivityForResult(intent, REQ_CODE_SPEECH_INPUT);
         } catch (Exception e) {
-            Toast.makeText(this, "Speech recognition not supported on this device.", Toast.LENGTH_LONG).show();
+            Toast.makeText(this, getString(R.string.alphabet_toast_speech_not_supported), Toast.LENGTH_LONG).show();
         }
     }
 
@@ -983,7 +1023,7 @@ public class AlphabetActivity extends AppCompatActivity {
                 String recognized = result.get(0).trim();
                 evaluatePronunciation(recognized);
             } else {
-                Toast.makeText(this, "Could not hear you. Try again.", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, getString(R.string.alphabet_toast_not_heard), Toast.LENGTH_SHORT).show();
             }
         }
     }
@@ -1089,12 +1129,16 @@ public class AlphabetActivity extends AppCompatActivity {
         playAudioResource(R.raw.correct);
 
         Toast.makeText(this,
-            "🎉 Excellent! You said: '" + recognized + "'" +
-            "\n✅ Correct pronunciation of '" + expected + "'!",
+            getString(R.string.alphabet_toast_success, recognized, expected),
             Toast.LENGTH_LONG).show();
 
         // Trigger haptic feedback for success
         triggerHapticFeedback(100); // Slightly longer for success
+        
+        // Mark progress - if they complete 50% or more, consider it a good session
+        if (currentIndex > letters.length / 2) {
+             checkAndLogCompletion();
+        }
     }
 
     private boolean handleSpecialMisrecognitions(String expected, String recognized) {
@@ -1191,7 +1235,7 @@ public class AlphabetActivity extends AppCompatActivity {
                     grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                 promptSpeechInput();
             } else {
-                Toast.makeText(this, "Microphone permission is needed for pronunciation practice.", Toast.LENGTH_LONG).show();
+                Toast.makeText(this, getString(R.string.alphabet_toast_mic_needed), Toast.LENGTH_LONG).show();
             }
         }
     }
@@ -1238,20 +1282,16 @@ public class AlphabetActivity extends AppCompatActivity {
     }
 
     /**
-     * Show letter picker in a bottom sheet dialog
+     * Show letter picker in a bottom sheet dialog with enhanced UI
      */
     private void showLetterPickerDialog() {
         BottomSheetDialog dialog = new BottomSheetDialog(this);
         
-        android.view.View bottomSheetView = android.view.LayoutInflater.from(this)
-            .inflate(android.R.layout.simple_list_item_1, null);
+        View bottomSheetView = getLayoutInflater().inflate(R.layout.dialog_letter_picker, null);
+        TextView tvTitle = bottomSheetView.findViewById(R.id.tvGridTitle);
+        GridView gridView = bottomSheetView.findViewById(R.id.letterGrid);
         
-        // Create a custom grid view for letters
-        GridView gridView = new GridView(this);
-        gridView.setNumColumns(6);
-        gridView.setPadding(16, 16, 16, 16);
-        gridView.setVerticalSpacing(8);
-        gridView.setHorizontalSpacing(8);
+        if (tvTitle != null) tvTitle.setText(R.string.alphabet_grid_title);
         
         // Create adapter for letters
         java.util.ArrayList<String> letterList = new java.util.ArrayList<>();
@@ -1261,25 +1301,33 @@ public class AlphabetActivity extends AppCompatActivity {
         
         ArrayAdapter<String> adapter = new ArrayAdapter<String>(
             this,
-            android.R.layout.simple_list_item_1,
+            R.layout.item_letter_picker,
             letterList
         ) {
+            @NonNull
             @Override
-            public android.view.View getView(int position, android.view.View convertView, android.view.ViewGroup parent) {
-                android.widget.TextView textView = new android.widget.TextView(AlphabetActivity.this);
-                textView.setText(getItem(position));
-                textView.setTextSize(20);
-                textView.setTextColor(currentIndex == position ? 
-                    getColor(R.color.colorAccent) : getColor(R.color.textColorPrimary));
-                textView.setTypeface(null, android.graphics.Typeface.BOLD);
-                textView.setGravity(android.view.Gravity.CENTER);
-                textView.setPadding(16, 24, 16, 24);
-                
-                if (currentIndex == position) {
-                    textView.setBackgroundResource(R.drawable.ripple_card_effect);
+            public View getView(int position, android.view.View convertView, @NonNull android.view.ViewGroup parent) {
+                if (convertView == null) {
+                    convertView = getLayoutInflater().inflate(R.layout.item_letter_picker, parent, false);
                 }
                 
-                return textView;
+                TextView textView = convertView.findViewById(R.id.tvLetterItem);
+                MaterialCardView card = (MaterialCardView) convertView;
+                
+                textView.setText(getItem(position));
+                
+                if (currentIndex == position) {
+                    card.setStrokeWidth(4);
+                    card.setStrokeColor(getColor(R.color.colorAccent));
+                    textView.setTextColor(getColor(R.color.colorAccent));
+                    card.setCardBackgroundColor(ColorStateList.valueOf(getColor(R.color.white)));
+                } else {
+                    card.setStrokeWidth(0);
+                    textView.setTextColor(getColor(R.color.textColorPrimary));
+                    card.setCardBackgroundColor(ColorStateList.valueOf(getColor(R.color.white)));
+                }
+                
+                return convertView;
             }
         };
         
@@ -1292,8 +1340,56 @@ public class AlphabetActivity extends AppCompatActivity {
             dialog.dismiss();
         });
         
-        dialog.setContentView(gridView);
+        dialog.setContentView(bottomSheetView);
         dialog.show();
+    }
+
+    private void checkAndLogCompletion() {
+        if (!lessonCompletedLogSent && currentIndex >= letters.length - 1) {
+            lessonCompletedLogSent = true;
+            long duration = (System.currentTimeMillis() - startTime) / 1000;
+            
+            String userId = null;
+            if (FirebaseAuth.getInstance().getCurrentUser() != null) {
+                userId = FirebaseAuth.getInstance().getCurrentUser().getUid();
+            }
+            
+            progressTracker.logLessonCompletion(
+                this, 
+                userId, 
+                languageName + " Alphabet", 
+                "alphabet", 
+                duration, 
+                null
+            );
+            
+            Toast.makeText(this, getString(R.string.alphabet_lesson_complete, languageName), Toast.LENGTH_LONG).show();
+            celebrateAction();
+        }
+    }
+
+    private boolean requestAudioFocus() {
+        if (audioManager == null) return true;
+
+        int result;
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            if (focusRequest == null) {
+                AudioAttributes playbackAttributes = new AudioAttributes.Builder()
+                        .setUsage(AudioAttributes.USAGE_ASSISTANCE_SONIFICATION)
+                        .setContentType(AudioAttributes.CONTENT_TYPE_SPEECH)
+                        .build();
+                focusRequest = new AudioFocusRequest.Builder(AudioManager.AUDIOFOCUS_GAIN_TRANSIENT_MAY_DUCK)
+                        .setAudioAttributes(playbackAttributes)
+                        .setAcceptsDelayedFocusGain(true)
+                        .setOnAudioFocusChangeListener(focusChangeListener)
+                        .build();
+            }
+            result = audioManager.requestAudioFocus(focusRequest);
+        } else {
+            result = audioManager.requestAudioFocus(focusChangeListener,
+                    AudioManager.STREAM_MUSIC, AudioManager.AUDIOFOCUS_GAIN_TRANSIENT_MAY_DUCK);
+        }
+        return result == AudioManager.AUDIOFOCUS_REQUEST_GRANTED;
     }
 
     private void updateModeBadge() {
@@ -1301,16 +1397,16 @@ public class AlphabetActivity extends AppCompatActivity {
             if (modeBadgeText != null) {
                 if (isRecitalMode) {
                     modeBadgeIcon.setText("⭐");
-                    modeBadgeText.setText("RECITAL");
-                    modeBadgeDescription.setText("Listen & Learn");
+                    modeBadgeText.setText(R.string.alphabet_mode_recital);
+                    modeBadgeDescription.setText(R.string.alphabet_mode_recital_desc);
                     modeBadgeCard.setCardBackgroundColor(getColor(R.color.colorAccent));
                     modeBadgeText.setTextColor(getColor(android.R.color.white));
                     modeBadgeDescription.setTextColor(getColor(android.R.color.white));
                     modeBadgeDescription.setAlpha(0.8f);
                 } else {
                     modeBadgeIcon.setText("🎤");
-                    modeBadgeText.setText("PRACTICE");
-                    modeBadgeDescription.setText("Speak & Learn");
+                    modeBadgeText.setText(R.string.alphabet_mode_practice);
+                    modeBadgeDescription.setText(R.string.alphabet_mode_practice_desc);
                     modeBadgeCard.setCardBackgroundColor(getColor(R.color.colorPrimary));
                     modeBadgeText.setTextColor(getColor(android.R.color.white));
                     modeBadgeDescription.setTextColor(getColor(android.R.color.white));
