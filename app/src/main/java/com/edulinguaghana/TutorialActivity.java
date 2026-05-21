@@ -44,9 +44,6 @@ public class TutorialActivity extends AppCompatActivity {
     private ViewGroup animatedShapesContainer;
     private List<TutorialSlide> slides;
     
-    private static final String PREF_NAME = "EduLinguaPrefs";
-    private static final String KEY_SEEN_INTRO = "SEEN_INTRO";
-
     // Bright, kid-friendly colors for each slide background
     private final int[] colors = {
         Color.parseColor("#FFEBEE"), // Slide 1: Soft Pink
@@ -225,11 +222,11 @@ public class TutorialActivity extends AppCompatActivity {
     }
 
     private void finishTutorial() {
-        SharedPreferences prefs = getSharedPreferences(PREF_NAME, MODE_PRIVATE);
-        boolean isFirstTime = !prefs.getBoolean(KEY_SEEN_INTRO, false);
+        SharedPreferences prefs = getSharedPreferences(MainActivity.PREF_NAME, MODE_PRIVATE);
+        boolean isFirstTime = !prefs.getBoolean(MainActivity.KEY_SEEN_INTRO, false);
         
         if (isFirstTime) {
-            prefs.edit().putBoolean(KEY_SEEN_INTRO, true).apply();
+            prefs.edit().putBoolean(MainActivity.KEY_SEEN_INTRO, true).apply();
             Intent intent = new Intent(this, MainActivity.class);
             startActivity(intent);
         }

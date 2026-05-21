@@ -83,11 +83,11 @@ public class MainActivity extends AppCompatActivity {
     private static final String KEY_ANIMATIONS_ENABLED = "ANIMATIONS_ENABLED";
     private static final String KEY_LOW_POWER_ANIMATIONS = "LOW_POWER_ANIMATIONS";
 
-    private static final String PREF_NAME = "EduLinguaPrefs";
+    public static final String PREF_NAME = "EduLinguaPrefs";
 
     private static final String KEY_LAST_LANG_CODE = "LAST_LANG_CODE";
     private static final String KEY_LAST_LANG_NAME = "LAST_LANG_NAME";
-    private static final String KEY_SEEN_INTRO = "SEEN_INTRO";
+    public static final String KEY_SEEN_INTRO = "SEEN_INTRO";
 
     private String selectedLangCode = null;
     private String selectedLangName = null;

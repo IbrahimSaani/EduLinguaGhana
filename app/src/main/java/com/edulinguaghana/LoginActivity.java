@@ -221,6 +221,10 @@ public class LoginActivity extends AppCompatActivity {
         saveUserToDatabase(user);
         // Restore progress from database
         restoreUserProgress(user);
+        
+        // Mark intro as seen so returning users don't see the tutorial
+        markIntroAsSeen();
+        
         Toast.makeText(LoginActivity.this, R.string.login_welcome_back, Toast.LENGTH_SHORT).show();
         navigateToMain();
     }
@@ -398,6 +402,7 @@ public class LoginActivity extends AppCompatActivity {
         userRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot snapshot) {
+                markIntroAsSeen();
                 if (hasCompleteLearnerProfile(snapshot)) {
                     saveUserToDatabase(user);
                     restoreUserProgress(user);
@@ -418,6 +423,7 @@ public class LoginActivity extends AppCompatActivity {
 
             @Override
             public void onCancelled(DatabaseError error) {
+                markIntroAsSeen();
                 saveUserToDatabase(user);
                 restoreUserProgress(user);
                 navigateToMain();
@@ -567,7 +573,13 @@ public class LoginActivity extends AppCompatActivity {
         // Check if user is already signed in
         FirebaseUser currentUser = mAuth.getCurrentUser();
         if (currentUser != null) {
+            markIntroAsSeen();
             navigateToMain();
         }
+    }
+
+    private void markIntroAsSeen() {
+        android.content.SharedPreferences prefs = getSharedPreferences(MainActivity.PREF_NAME, MODE_PRIVATE);
+        prefs.edit().putBoolean(MainActivity.KEY_SEEN_INTRO, true).apply();
     }
 }
