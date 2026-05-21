@@ -129,6 +129,14 @@ public class AlphabetActivity extends AppCompatActivity {
         // Initialize text views
         tvLanguageTitle = findViewById(R.id.tvLanguageTitle);
         tvLetter = findViewById(R.id.tvLetter);
+
+        // Set up toolbar back button
+        com.google.android.material.appbar.MaterialToolbar toolbar = findViewById(R.id.toolbar);
+        if (toolbar != null) {
+            setSupportActionBar(toolbar);
+            toolbar.setNavigationOnClickListener(v -> finish());
+        }
+
         tvLetterWord = findViewById(R.id.tvLetterWord);
         tvProgressCounter = findViewById(R.id.tvProgressCounter);
         celebrationEmoji = findViewById(R.id.celebrationEmoji);

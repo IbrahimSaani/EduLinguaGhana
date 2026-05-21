@@ -31,7 +31,7 @@ public class QuestManager {
                     JSONObject o = arr.getJSONObject(i);
                     out.add(Quest.fromJson(o));
                 }
-                boolean changed = mergeMissingDefaultQuests(out);
+                boolean changed = syncWithDefaultQuests(out);
                 if (changed) {
                     saveQuests(ctx, out);
                 }
@@ -43,10 +43,12 @@ public class QuestManager {
         }
     }
 
-    private static boolean mergeMissingDefaultQuests(List<Quest> existing) {
+    private static boolean syncWithDefaultQuests(List<Quest> existing) {
         if (existing == null) return false;
         List<Quest> defaults = generateDefaultDailyQuests();
         boolean changed = false;
+
+        // Add missing default quests
         for (Quest def : defaults) {
             boolean found = false;
             for (Quest q : existing) {
@@ -60,6 +62,24 @@ public class QuestManager {
                 changed = true;
             }
         }
+
+        // Remove obsolete quests that are no longer in defaults
+        java.util.Iterator<Quest> iterator = existing.iterator();
+        while (iterator.hasNext()) {
+            Quest q = iterator.next();
+            boolean stillExists = false;
+            for (Quest def : defaults) {
+                if (def.id.equals(q.id)) {
+                    stillExists = true;
+                    break;
+                }
+            }
+            if (!stillExists) {
+                iterator.remove();
+                changed = true;
+            }
+        }
+
         return changed;
     }
 

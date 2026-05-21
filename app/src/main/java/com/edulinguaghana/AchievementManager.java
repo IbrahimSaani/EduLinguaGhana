@@ -61,6 +61,23 @@ public class AchievementManager {
                         changed = true;
                     }
                 }
+
+                // Remove obsolete achievements that are no longer in defaults
+                java.util.Iterator<Achievement> iterator = achievements.iterator();
+                while (iterator.hasNext()) {
+                    Achievement a = iterator.next();
+                    boolean stillExists = false;
+                    for (Achievement def : defaults) {
+                        if (def.getId().equals(a.getId())) {
+                            stillExists = true;
+                            break;
+                        }
+                    }
+                    if (!stillExists) {
+                        iterator.remove();
+                        changed = true;
+                    }
+                }
                 
                 if (changed) {
                     saveAchievements();

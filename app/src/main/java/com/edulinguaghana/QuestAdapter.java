@@ -160,8 +160,14 @@ public class QuestAdapter extends RecyclerView.Adapter<QuestAdapter.QuestViewHol
                     return "🔥";
                 case "quiz_multiple":
                     return "🧠";
-                case "speed_game":
-                    return "💨";
+                case "bubble_pop_quest":
+                    return "🎈";
+                case "rocket_sort_quest":
+                    return "🚀";
+                case "puzzle_solver":
+                    return "🧩";
+                case "fun_game_daily":
+                    return "🎮";
                 case "language_explorer":
                     return "🌍";
                 case "marathon_learner":

@@ -27,7 +27,7 @@ public class BadgeManager {
             try {
                 JSONArray arr = new JSONArray(j);
                 for (int i = 0; i < arr.length(); i++) out.add(Badge.fromJson(arr.getJSONObject(i)));
-                boolean changed = mergeMissingDefaultBadges(out);
+                boolean changed = syncWithDefaultBadges(out);
                 if (changed) {
                     saveBadges(ctx, out);
                 }
@@ -39,10 +39,12 @@ public class BadgeManager {
         }
     }
 
-    private static boolean mergeMissingDefaultBadges(List<Badge> existing) {
+    private static boolean syncWithDefaultBadges(List<Badge> existing) {
         if (existing == null) return false;
         List<Badge> defaults = generateDefaultBadges();
         boolean changed = false;
+
+        // Add missing default badges
         for (Badge def : defaults) {
             boolean found = false;
             for (Badge b : existing) {
@@ -56,6 +58,24 @@ public class BadgeManager {
                 changed = true;
             }
         }
+
+        // Remove obsolete badges that are no longer in defaults
+        java.util.Iterator<Badge> iterator = existing.iterator();
+        while (iterator.hasNext()) {
+            Badge b = iterator.next();
+            boolean stillExists = false;
+            for (Badge def : defaults) {
+                if (def.id.equals(b.id)) {
+                    stillExists = true;
+                    break;
+                }
+            }
+            if (!stillExists) {
+                iterator.remove();
+                changed = true;
+            }
+        }
+
         return changed;
     }
 
