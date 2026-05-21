@@ -18,6 +18,7 @@ import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.DragEvent;
+import android.view.HapticFeedbackConstants;
 import android.content.ClipData;
 import android.content.ClipDescription;
 import android.view.animation.Animation;
@@ -182,16 +183,16 @@ public class QuizActivity extends AppCompatActivity {
         btnStartQuiz.setOnClickListener(v -> showQuizContent());
 
         // Answer buttons
-        btnOption1.setOnClickListener(v -> checkAnswer(btnOption1));
-        btnOption2.setOnClickListener(v -> checkAnswer(btnOption2));
-        btnOption3.setOnClickListener(v -> checkAnswer(btnOption3));
-        btnOption4.setOnClickListener(v -> checkAnswer(btnOption4));
-        btnOption5.setOnClickListener(v -> checkAnswer(btnOption5));
-        btnOption6.setOnClickListener(v -> checkAnswer(btnOption6));
+        btnOption1.setOnClickListener(v -> { v.performHapticFeedback(HapticFeedbackConstants.KEYBOARD_TAP); checkAnswer(btnOption1); });
+        btnOption2.setOnClickListener(v -> { v.performHapticFeedback(HapticFeedbackConstants.KEYBOARD_TAP); checkAnswer(btnOption2); });
+        btnOption3.setOnClickListener(v -> { v.performHapticFeedback(HapticFeedbackConstants.KEYBOARD_TAP); checkAnswer(btnOption3); });
+        btnOption4.setOnClickListener(v -> { v.performHapticFeedback(HapticFeedbackConstants.KEYBOARD_TAP); checkAnswer(btnOption4); });
+        btnOption5.setOnClickListener(v -> { v.performHapticFeedback(HapticFeedbackConstants.KEYBOARD_TAP); checkAnswer(btnOption5); });
+        btnOption6.setOnClickListener(v -> { v.performHapticFeedback(HapticFeedbackConstants.KEYBOARD_TAP); checkAnswer(btnOption6); });
 
         // Replay audio
         if (btnPlayAudio != null) {
-            btnPlayAudio.setOnClickListener(v -> speakPrompt());
+            btnPlayAudio.setOnClickListener(v -> { v.performHapticFeedback(HapticFeedbackConstants.LONG_PRESS); speakPrompt(); });
         }
 
         // End screen buttons
@@ -289,44 +290,44 @@ public class QuizActivity extends AppCompatActivity {
 
         switch (quizType) {
             case "numbers":
-                modeLabel = "Numbers Quiz";
-                description = "Listen to the number and choose the correct option.";
+                modeLabel = getString(R.string.quiz_mode_numbers);
+                description = getString(R.string.quiz_desc_numbers);
                 iconRes = R.drawable.ic_quiz_numbers;
                 break;
             case "sequence":
-                modeLabel = "Number Sequence Quiz";
-                description = "Complete the sequence by finding the missing number.";
+                modeLabel = getString(R.string.quiz_mode_sequence);
+                description = getString(R.string.quiz_desc_sequence);
                 iconRes = R.drawable.ic_quiz_sequence;
                 break;
             case "matching":
-                modeLabel = "Matching Quiz";
-                description = "Match the letter to the word that starts with it.";
+                modeLabel = getString(R.string.quiz_mode_matching);
+                description = getString(R.string.quiz_desc_matching);
                 iconRes = R.drawable.ic_quiz_matching;
                 break;
             case "shadow_match":
-                modeLabel = "Shadow Match";
-                description = "Identify the character that fits the shadow outline.";
+                modeLabel = getString(R.string.quiz_mode_shadow);
+                description = getString(R.string.quiz_desc_shadow);
                 iconRes = R.drawable.ic_quiz_matching; 
                 break;
             case "hidden_shapes":
-                modeLabel = "Hidden Shapes";
-                description = "Rub the sand to reveal the hidden character.";
+                modeLabel = getString(R.string.quiz_mode_hidden);
+                description = getString(R.string.quiz_desc_hidden);
                 iconRes = R.drawable.mascot_owl; 
                 break;
             case "odd_one_out":
-                modeLabel = "Word Recognition";
-                description = "Identify the correct word starting with the letter.";
+                modeLabel = getString(R.string.quiz_mode_word_recog);
+                description = getString(R.string.quiz_desc_word_recog);
                 iconRes = R.drawable.ic_quiz_letters;
                 break;
             case "mixed":
-                modeLabel = "Mixed Quiz";
-                description = "A mix of letter and number questions.";
+                modeLabel = getString(R.string.quiz_mode_mixed);
+                description = getString(R.string.quiz_desc_mixed);
                 iconRes = R.drawable.ic_quiz_mixed;
                 break;
             case "letters":
             default:
-                modeLabel = "Letters Quiz";
-                description = "Listen to the letter and choose the correct option.";
+                modeLabel = getString(R.string.quiz_mode_letters);
+                description = getString(R.string.quiz_desc_letters);
                 iconRes = R.drawable.ic_quiz_letters;
                 break;
         }
@@ -731,7 +732,7 @@ public class QuizActivity extends AppCompatActivity {
         if (btnOption4 != null) btnOption4.setText(options.get(3));
         if (btnOption5 != null) btnOption5.setText(options.get(4));
         if (btnOption6 != null) btnOption6.setText(options.get(5));
-        currentPromptTtsText = "Find the missing number";
+        currentPromptTtsText = getString(R.string.quiz_prompt_sequence_find);
     }
 
     private void generateMatchingQuestion() {
@@ -781,7 +782,7 @@ public class QuizActivity extends AppCompatActivity {
         matchingPairsRemaining = pairsToCreate;
         firstSelectedButton = null;
         currentCorrectAnswer = "MATCHING_MODE";
-        currentPromptTtsText = "Match the letters to the words";
+        currentPromptTtsText = getString(R.string.quiz_prompt_match_letters_words);
     }
 
     private void generateShadowMatchQuestion() {
@@ -1015,7 +1016,7 @@ public class QuizActivity extends AppCompatActivity {
             playSfx(true);
             score++;
             tvGameScore.setText(String.format(Locale.getDefault(), getString(R.string.quiz_score), score));
-            tvGameFeedback.setText("Match found! ✨");
+            tvGameFeedback.setText(R.string.quiz_feedback_match_found);
             tvGameFeedback.setTextColor(ContextCompat.getColor(this, R.color.correctAnswer));
             
             if (score > bestScore) {
@@ -1039,7 +1040,7 @@ public class QuizActivity extends AppCompatActivity {
             firstSelectedButton = null;
             
             if (tvGamePrompt != null) {
-                tvGamePrompt.setText("Match found! (" + matchingPairsRemaining + " pairs left)");
+                tvGamePrompt.setText(getString(R.string.quiz_feedback_match_remaining, matchingPairsRemaining));
             }
 
             if (matchingPairsRemaining == 0) {
@@ -1059,7 +1060,7 @@ public class QuizActivity extends AppCompatActivity {
         } else {
             // Wrong Match
             playSfx(false);
-            tvGameFeedback.setText("Not a match! ❌");
+            tvGameFeedback.setText(R.string.quiz_feedback_not_match);
             tvGameFeedback.setTextColor(ContextCompat.getColor(this, R.color.wrongAnswer));
 
             firstSelectedButton.setStrokeColor(ColorStateList.valueOf(ContextCompat.getColor(this, R.color.wrongAnswer)));
@@ -1430,9 +1431,9 @@ public class QuizActivity extends AppCompatActivity {
             @Override
             public void onSuccess(com.edulinguaghana.social.Challenge challenge) {
                 runOnUiThread(() -> {
-                    String msg = "Challenge score saved: " + score + " points! ⚔️";
+                    String msg = getString(R.string.quiz_challenge_saved, score);
                     if (challenge.state == com.edulinguaghana.social.Challenge.State.COMPLETED) {
-                        msg = "Challenge COMPLETED! Final score: " + score;
+                        msg = getString(R.string.quiz_challenge_completed, score);
                     }
                     Toast.makeText(QuizActivity.this, msg, Toast.LENGTH_LONG).show();
                 });

@@ -13,6 +13,7 @@ import android.os.Bundle;
 import android.os.VibrationEffect;
 import android.os.Vibrator;
 import android.content.res.ColorStateList;
+import android.view.HapticFeedbackConstants;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -348,13 +349,15 @@ public class MainActivity extends AppCompatActivity {
 
         // Set up interactive click listener
         mascotView.setOnClickListener(v -> {
+            v.performHapticFeedback(HapticFeedbackConstants.CONTEXT_CLICK);
             onMascotClicked();
         });
 
         // Set up long click for special animation
         mascotView.setOnLongClickListener(v -> {
+            v.performHapticFeedback(HapticFeedbackConstants.LONG_PRESS);
             playMascotCelebration();
-            showMascotMessage("I love learning with you! ✨");
+            showMascotMessage(getString(R.string.mascot_special_love));
             return true;
         });
     }
@@ -389,7 +392,7 @@ public class MainActivity extends AppCompatActivity {
                 break;
             case 2:
                 playMascotCelebration();
-                showMascotMessage("Yay! 🎉");
+                showMascotMessage(getString(R.string.mascot_yay));
                 break;
         }
     }
@@ -648,11 +651,11 @@ public class MainActivity extends AppCompatActivity {
         int streak = streakManager.getCurrentStreak();
 
         if (streak == 0) {
-            tvStreakCount.setText("🔥 Start today!");
+            tvStreakCount.setText(R.string.main_streak_start);
         } else if (streak == 1) {
-            tvStreakCount.setText("🔥 1 day");
+            tvStreakCount.setText(R.string.main_streak_day);
         } else {
-            tvStreakCount.setText("🔥 " + streak + " days");
+            tvStreakCount.setText(getString(R.string.main_streak_days, streak));
         }
     }
 
@@ -924,8 +927,8 @@ public class MainActivity extends AppCompatActivity {
         StyledMenuHelper.showStyledConfirmationDialog(
             this,
             "🚪",
-            "Exit App",
-            "Exit EduLingua Ghana?",
+            getString(R.string.main_exit_title),
+            getString(R.string.main_exit_message),
             "Yes",
             "No",
             this::playAppExitSoundAndExit,
@@ -1005,7 +1008,7 @@ public class MainActivity extends AppCompatActivity {
 
     private boolean ensureLanguageSelected() {
         if (selectedLangCode == null || selectedLangName == null) {
-            Toast.makeText(this, "Please select a language first.", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, R.string.main_lang_select_prompt, Toast.LENGTH_SHORT).show();
             return false;
         }
         return true;
@@ -1014,60 +1017,50 @@ public class MainActivity extends AppCompatActivity {
     // ---------------- BUTTON ACTIONS ----------------
 
     private void setupButtons() {
-        AnimatorSet cardClickAnimation = (AnimatorSet) AnimatorInflater.loadAnimator(this, R.animator.card_click_animation);
-
         btnRecitalMode.setOnClickListener(v -> {
-            cardClickAnimation.setTarget(v);
-            cardClickAnimation.start();
-            vibrate();
+            v.performHapticFeedback(HapticFeedbackConstants.KEYBOARD_TAP);
             if (!ensureLanguageSelected()) return;
             showContentTypeDialog(selectedLangCode, selectedLangName, "recital");
         });
 
         btnPracticeMode.setOnClickListener(v -> {
-            cardClickAnimation.setTarget(v);
-            cardClickAnimation.start();
-            vibrate();
+            v.performHapticFeedback(HapticFeedbackConstants.KEYBOARD_TAP);
             if (!ensureLanguageSelected()) return;
             showContentTypeDialog(selectedLangCode, selectedLangName, "practice");
         });
 
         btnQuizMode.setOnClickListener(v -> {
-            cardClickAnimation.setTarget(v);
-            cardClickAnimation.start();
-            vibrate();
+            v.performHapticFeedback(HapticFeedbackConstants.KEYBOARD_TAP);
             if (!ensureLanguageSelected()) return;
             showQuizTypeDialog(selectedLangCode, selectedLangName);
         });
 
         btnProgressMode.setOnClickListener(v -> {
-            cardClickAnimation.setTarget(v);
-            cardClickAnimation.start();
-            vibrate();
+            v.performHapticFeedback(HapticFeedbackConstants.KEYBOARD_TAP);
             openProgressScreen();
         });
     }
 
     private void showContentTypeDialog(String langCode, String langName, String mode) {
-        String modeLabel = mode.equals("recital") ? "Recital" : "Practice";
+        String modeLabel = mode.equals("recital") ? getString(R.string.content_recital) : getString(R.string.content_practice);
 
         List<StyledMenuHelper.MenuItem> menuItems = new ArrayList<>();
         menuItems.add(new StyledMenuHelper.MenuItem(
                 "🔤",
-                "Alphabet",
-                "Learn and hear letters",
+                getString(R.string.content_alphabet),
+                getString(R.string.content_alphabet_desc),
                 () -> openAlphabetScreen(langCode, langName, mode)
         ));
         menuItems.add(new StyledMenuHelper.MenuItem(
                 "🔢",
-                "Numbers",
-                "Learn and hear numbers",
+                getString(R.string.content_numbers),
+                getString(R.string.content_numbers_desc),
                 () -> openNumbersScreen(langCode, langName, mode)
         ));
 
         StyledMenuHelper.showStyledMenu(
                 this,
-                modeLabel.equals("Recital") ? "🎤" : "📝",
+                modeLabel.equals(getString(R.string.content_recital)) ? "🎤" : "📝",
                 modeLabel + " Mode - " + langName,
                 "",
                 menuItems,
@@ -1082,51 +1075,51 @@ public class MainActivity extends AppCompatActivity {
         // --- CATEGORY: EDUCATIONAL QUIZZES ---
         menuItems.add(new StyledMenuHelper.MenuItem(
                 "📚",
-                "Educational Quizzes",
+                getString(R.string.main_section_quizzes),
                 "SECTION_HEADER",
                 null
         ));
         menuItems.add(new StyledMenuHelper.MenuItem(
                 "🔤",
-                "Letter Recognition",
-                "Identify letters you hear",
+                getString(R.string.quiz_mode_letters),
+                getString(R.string.quiz_desc_letters),
                 () -> openQuizScreen(langCode, langName, "basic", "beginner", "all")
         ));
         menuItems.add(new StyledMenuHelper.MenuItem(
                 "🔢",
-                "Number Quiz",
-                "Listen and identify numbers",
+                getString(R.string.quiz_mode_numbers),
+                getString(R.string.quiz_desc_numbers),
                 () -> openQuizScreen(langCode, langName, "numbers", "beginner", "all")
         ));
         menuItems.add(new StyledMenuHelper.MenuItem(
                 "📊",
-                "Sequencing",
-                "Find the missing number",
+                getString(R.string.quiz_mode_sequence),
+                getString(R.string.quiz_desc_sequence),
                 () -> openQuizScreen(langCode, langName, "sequence", "beginner", "all")
         ));
         menuItems.add(new StyledMenuHelper.MenuItem(
                 "🎯",
-                "Matching Pairs",
-                "Match letters to words",
+                getString(R.string.quiz_mode_matching),
+                getString(R.string.quiz_desc_matching),
                 () -> openQuizScreen(langCode, langName, "matching", "beginner", "all")
         ));
         menuItems.add(new StyledMenuHelper.MenuItem(
                 "🔡",
-                "Word Recognition",
-                "Identify the correct word",
+                getString(R.string.quiz_mode_word_recog),
+                getString(R.string.quiz_desc_word_recog),
                 () -> openQuizScreen(langCode, langName, "odd_one_out", "beginner", "all")
         ));
         menuItems.add(new StyledMenuHelper.MenuItem(
                 "🎲",
-                "Mixed Mode",
-                "All educational types mixed",
+                getString(R.string.quiz_mode_mixed),
+                getString(R.string.quiz_desc_mixed),
                 () -> openQuizScreen(langCode, langName, "mixed", "beginner", "all")
         ));
 
         // --- CATEGORY: FUN MINI-GAMES ---
         menuItems.add(new StyledMenuHelper.MenuItem(
                 "🎮",
-                "Fun Mini-Games",
+                getString(R.string.main_section_games),
                 "SECTION_HEADER",
                 null
         ));
@@ -1164,8 +1157,8 @@ public class MainActivity extends AppCompatActivity {
         StyledMenuHelper.showStyledMenu(
                 this,
                 "🎮",
-                "Pick an Activity",
-                "Choose between quizzes or games",
+                getString(R.string.main_activity_pick_title),
+                getString(R.string.main_activity_pick_desc),
                 menuItems,
                 null
         );
@@ -1420,8 +1413,8 @@ public class MainActivity extends AppCompatActivity {
             StyledMenuHelper.showStyledConfirmationDialog(
                 this,
                 "🔒",
-                "Login Required",
-                "Sign in to compete on the leaderboard and see global rankings!",
+                getString(R.string.profile_login_required_title),
+                getString(R.string.profile_login_required_desc),
                 "Sign In",
                 "Cancel",
                 () -> {
@@ -1445,8 +1438,8 @@ public class MainActivity extends AppCompatActivity {
             StyledMenuHelper.showStyledConfirmationDialog(
                 this,
                 "📶",
-                "Internet Required",
-                "Leaderboard requires an internet connection to show global rankings.",
+                getString(R.string.profile_internet_required_title),
+                getString(R.string.profile_internet_required_desc),
                 "OK",
                 null,
                 null,
@@ -1476,8 +1469,8 @@ public class MainActivity extends AppCompatActivity {
         StyledMenuHelper.showStyledConfirmationDialog(
             this,
             "📧",
-            "Email Verification Required",
-            "Please verify your email address to access social features and save your progress online.",
+            getString(R.string.profile_verify_email_title),
+            getString(R.string.profile_verify_email_desc),
             "Verify Now",
             "Later",
             () -> {

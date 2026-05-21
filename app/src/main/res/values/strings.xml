@@ -254,6 +254,91 @@
     <string name="alphabet_lesson_complete">🎉 Lesson Complete! You explored all letters in %1$s!</string>
     <string name="alphabet_grid_title">Pick a Letter</string>
 
+    <!-- Numbers Activity -->
+    <string name="numbers_progress_counter">Number %1$d of 100</string>
+    <string name="numbers_toast_success">🎉 Excellent! You said: %1$s\n✅ Correct pronunciation of %2$d!</string>
+    <string name="numbers_toast_not_heard">Didn\'t catch that — please try again.</string>
+    <string name="numbers_toast_mic_needed">Microphone permission is needed for pronunciation practice.</string>
+    <string name="numbers_toast_speech_not_supported">Speech recognition not supported on this device.</string>
+    <string name="numbers_pronunciation_prompt">Please repeat the number</string>
+    <string name="numbers_practice_instruction">🎤 Try to pronounce: %1$d\n\n📝 Listen carefully to the audio above and repeat it!\n\nTap the number again to hear it.</string>
+    <string name="numbers_tip_prefix">💡 Tip: </string>
+    <string name="numbers_lesson_complete">🎉 Lesson Complete! You explored all numbers in %1$s!</string>
+    <string name="numbers_grid_title">Pick a Number</string>
+    <string name="numbers_mode_recital">RECITAL</string>
+    <string name="numbers_mode_practice">PRACTICE</string>
+    <string name="numbers_mode_recital_desc">Listen &amp; Learn</string>
+    <string name="numbers_mode_practice_desc">Speak &amp; Learn</string>
+
+    <!-- Quiz Activity -->
+    <string name="quiz_feedback_match_found">Match found! ✨</string>
+    <string name="quiz_feedback_match_remaining">Match found! (%1$d pairs left)</string>
+    <string name="quiz_feedback_not_match">Not a match! ❌</string>
+    <string name="quiz_prompt_match_letters_words">Match the letters to the words</string>
+    <string name="quiz_challenge_saved">Challenge score saved: %1$d points! ⚔️</string>
+    <string name="quiz_challenge_completed">Challenge COMPLETED! Final score: %1$d</string>
+    <string name="quiz_high_score_toast">🎉 New High Score in %1$s!</string>
+    <string name="quiz_mode_numbers">Numbers Quiz</string>
+    <string name="quiz_mode_sequence">Number Sequence Quiz</string>
+    <string name="quiz_mode_matching">Matching Quiz</string>
+    <string name="quiz_mode_shadow">Shadow Match</string>
+    <string name="quiz_mode_hidden">Hidden Shapes</string>
+    <string name="quiz_mode_word_recog">Word Recognition</string>
+    <string name="quiz_mode_mixed">Mixed Quiz</string>
+    <string name="quiz_mode_letters">Letters Quiz</string>
+    <string name="quiz_desc_numbers">Listen to the number and choose the correct option.</string>
+    <string name="quiz_desc_sequence">Complete the sequence by finding the missing number.</string>
+    <string name="quiz_desc_matching">Match the letter to the word that starts with it.</string>
+    <string name="quiz_desc_shadow">Identify the character that fits the shadow outline.</string>
+    <string name="quiz_desc_hidden">Rub the sand to reveal the hidden character.</string>
+    <string name="quiz_desc_word_recog">Identify the correct word starting with the letter.</string>
+    <string name="quiz_desc_mixed">A mix of letter and number questions.</string>
+    <string name="quiz_desc_letters">Listen to the letter and choose the correct option.</string>
+
+    <!-- Role Selection -->
+    <string name="role_selection_first_time_toast">Please select your role to continue</string>
+    <string name="role_selection_confirm_prompt">Please select a role</string>
+    <string name="role_selection_success_toast">Role set to %1$s</string>
+    <string name="role_desc_student">📚 Learn languages with interactive lessons\n✨ Complete quizzes and track your progress\n🏆 Compete with friends on leaderboards\n🎮 Earn badges and achievements</string>
+    <string name="role_desc_teacher">👨‍🏫 Monitor your students\' learning progress\n📊 View detailed performance analytics\n📝 Track quiz scores and completion rates\n👥 Connect with students using invite codes</string>
+    <string name="role_desc_parent">👨‍👩‍👧‍👦 Track your children\'s learning journey\n📈 View progress reports and achievements\n🎯 Monitor quiz performance and activity\n🔗 Connect with children using invite codes</string>
+    <string name="role_desc_default">Select a role to see details</string>
+
+    <!-- Main Activity -->
+    <string name="main_exit_title">Exit App</string>
+    <string name="main_exit_message">Exit EduLingua Ghana?</string>
+    <string name="main_lang_select_prompt">Please select a language first.</string>
+    <string name="main_streak_start">🔥 Start today!</string>
+    <string name="main_streak_days">🔥 %1$d days</string>
+    <string name="main_streak_day">🔥 1 day</string>
+    <string name="main_activity_pick_title">Pick an Activity</string>
+    <string name="main_activity_pick_desc">Choose between quizzes or games</string>
+    <string name="main_section_quizzes">Educational Quizzes</string>
+    <string name="main_section_games">Fun Mini-Games</string>
+    <string name="main_section_quizzes_desc">Identify letters, numbers and words</string>
+    <string name="main_section_games_desc">Rocket Sort, Bubble Pop and more</string>
+
+    <!-- Content Types -->
+    <string name="content_alphabet">Alphabet</string>
+    <string name="content_alphabet_desc">Learn and hear letters</string>
+    <string name="content_numbers">Numbers</string>
+    <string name="content_numbers_desc">Learn and hear numbers</string>
+    <string name="content_recital">Recital</string>
+    <string name="content_practice">Practice</string>
+
+    <!-- Mascot Messages Extra -->
+    <string name="mascot_special_love">I love learning with you! ✨</string>
+    <string name="mascot_yay">Yay! 🎉</string>
+
+    <!-- Profile Extra -->
+    <string name="profile_login_required_title">Login Required</string>
+    <string name="profile_login_required_desc">Sign in to compete on the leaderboard and see global rankings!</string>
+    <string name="profile_verify_email_title">Email Verification Required</string>
+    <string name="profile_verify_email_desc">Please verify your email address to access social features and save your progress online.</string>
+    <string name="profile_internet_required_title">Internet Required</string>
+    <string name="profile_internet_required_desc">Leaderboard requires an internet connection to show global rankings.</string>
+    <string name="profile_achievements_internet_desc">Achievements require an internet connection. Please connect and try again.</string>
+
     <!-- Role Manager Errors -->
     <string name="role_manager_pending_exists">A pending request already exists for this student</string>
     <string name="role_manager_already_connected">This student is already connected to you</string>
@@ -264,6 +349,7 @@
     <string name="complete_profile_title">Complete Your Profile</string>
     <string name="complete_profile_subtitle">Tell us a little more so we can personalize your learning journey.</string>
     <string name="complete_profile_section">Learner Profile</string>
+    <string name="complete_profile_default_name">Learner</string>
     <string name="complete_profile_name_label">Name</string>
     <string name="complete_profile_email_label">Email</string>
     <string name="complete_profile_age_hint">Age</string>

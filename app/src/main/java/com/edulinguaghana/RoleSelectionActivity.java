@@ -2,6 +2,7 @@ package com.edulinguaghana;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.HapticFeedbackConstants;
 import android.view.View;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
@@ -62,7 +63,7 @@ public class RoleSelectionActivity extends AppCompatActivity {
                 boolean isFirstTime = getIntent().getBooleanExtra("first_time", false);
                 if (isFirstTime) {
                     // Don't allow back on first time setup
-                    Toast.makeText(RoleSelectionActivity.this, "Please select your role to continue", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(RoleSelectionActivity.this, R.string.role_selection_first_time_toast, Toast.LENGTH_SHORT).show();
                 } else {
                     // Allow back navigation
                     setEnabled(false);
@@ -85,13 +86,16 @@ public class RoleSelectionActivity extends AppCompatActivity {
     private void setupListeners() {
         // Ensure only one radio button can be selected at a time
         roleRadioGroup.setOnCheckedChangeListener((group, checkedId) -> {
-            // Clear all other selections
             if (checkedId != -1) {
+                group.performHapticFeedback(HapticFeedbackConstants.CLOCK_TICK);
                 updateRoleDescription(checkedId);
             }
         });
 
-        btnConfirmRole.setOnClickListener(v -> confirmRoleSelection());
+        btnConfirmRole.setOnClickListener(v -> {
+            v.performHapticFeedback(HapticFeedbackConstants.VIRTUAL_KEY);
+            confirmRoleSelection();
+        });
 
         // Set default selection to Student
         roleRadioGroup.check(R.id.rbStudent);
@@ -128,22 +132,13 @@ public class RoleSelectionActivity extends AppCompatActivity {
     private void updateRoleDescription(int checkedId) {
         String description;
         if (checkedId == R.id.rbStudent) {
-            description = "📚 Learn languages with interactive lessons\n" +
-                    "✨ Complete quizzes and track your progress\n" +
-                    "🏆 Compete with friends on leaderboards\n" +
-                    "🎮 Earn badges and achievements";
+            description = getString(R.string.role_desc_student);
         } else if (checkedId == R.id.rbTeacher) {
-            description = "👨‍🏫 Monitor your students' learning progress\n" +
-                    "📊 View detailed performance analytics\n" +
-                    "📝 Track quiz scores and completion rates\n" +
-                    "👥 Connect with students using invite codes";
+            description = getString(R.string.role_desc_teacher);
         } else if (checkedId == R.id.rbParent) {
-            description = "👨‍👩‍👧‍👦 Track your children's learning journey\n" +
-                    "📈 View progress reports and achievements\n" +
-                    "🎯 Monitor quiz performance and activity\n" +
-                    "🔗 Connect with children using invite codes";
+            description = getString(R.string.role_desc_parent);
         } else {
-            description = "Select a role to see details";
+            description = getString(R.string.role_desc_default);
         }
 
         tvRoleDescription.setText(description);
@@ -172,7 +167,7 @@ public class RoleSelectionActivity extends AppCompatActivity {
         } else if (selectedId == R.id.rbParent) {
             selectedRole = UserRole.PARENT;
         } else {
-            Toast.makeText(this, "Please select a role", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, R.string.role_selection_confirm_prompt, Toast.LENGTH_SHORT).show();
             return;
         }
 
@@ -181,7 +176,7 @@ public class RoleSelectionActivity extends AppCompatActivity {
         // Save role to Firebase
         roleManager.setUserRole(this, currentUser.getUid(), selectedRole);
 
-        Toast.makeText(this, "Role set to " + selectedRole.name(), Toast.LENGTH_SHORT).show();
+        Toast.makeText(this, getString(R.string.role_selection_success_toast, selectedRole.name()), Toast.LENGTH_SHORT).show();
 
         boolean isFirstTime = getIntent().getBooleanExtra("first_time", false);
         if (isFirstTime) {

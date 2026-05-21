@@ -44,7 +44,7 @@ public class ProgressManager {
         // Update stats
         if (score > prevHighScore) {
             editor.putInt(KEY_HIGH_SCORE, score);
-            Toast.makeText(context, "🎉 New High Score in " + mode + "!", Toast.LENGTH_SHORT).show();
+            Toast.makeText(context, context.getString(R.string.quiz_high_score_toast, mode), Toast.LENGTH_SHORT).show();
         }
 
         editor.putInt(KEY_TOTAL_QUIZZES, totalQuizzes + 1);

@@ -134,7 +134,7 @@ public class CompleteProfileActivity extends AppCompatActivity {
         String displayName = currentUser.getDisplayName();
         String email = currentUser.getEmail();
         if (tvDisplayName != null) {
-            tvDisplayName.setText(!TextUtils.isEmpty(displayName) ? displayName : "Learner");
+            tvDisplayName.setText(!TextUtils.isEmpty(displayName) ? displayName : getString(R.string.complete_profile_default_name));
         }
         if (tvEmail != null) {
             tvEmail.setText(!TextUtils.isEmpty(email) ? email : "");

@@ -6,25 +6,35 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
 import android.Manifest;
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.content.res.ColorStateList;
+import android.media.AudioAttributes;
+import android.media.AudioFocusRequest;
+import android.media.AudioManager;
 import android.media.MediaPlayer;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.VibrationEffect;
 import android.os.Vibrator;
 import android.speech.RecognizerIntent;
 import android.speech.tts.TextToSpeech;
+import android.view.HapticFeedbackConstants;
+import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.edulinguaghana.tracking.ProgressTracker;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.card.MaterialCardView;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.progressindicator.LinearProgressIndicator;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
+import com.google.firebase.auth.FirebaseAuth;
 import com.edulinguaghana.tts.OfflineGhanaLPTtsService;
 import com.edulinguaghana.utils.LanguageConversionUtils;
 
@@ -61,6 +71,19 @@ public class NumbersActivity extends AppCompatActivity {
     private int currentNumber = 1;  // 1..100
     private TextToSpeech tts;
     private MediaPlayer mediaPlayer;
+    private AudioManager audioManager;
+    private AudioFocusRequest focusRequest;
+    private final AudioManager.OnAudioFocusChangeListener focusChangeListener = focusChange -> {
+        if (focusChange == AudioManager.AUDIOFOCUS_LOSS) {
+            if (mediaPlayer != null && mediaPlayer.isPlaying()) mediaPlayer.pause();
+            if (tts != null) tts.stop();
+        }
+    };
+
+    // Progress tracking
+    private ProgressTracker progressTracker;
+    private long startTime;
+    private boolean lessonCompletedLogSent = false;
 
     // Offline TTS for native Ghanaian languages (loads from res/raw)
     private OfflineGhanaLPTtsService offlineTts;
@@ -71,6 +94,13 @@ public class NumbersActivity extends AppCompatActivity {
     // Speech recognition retry state
     private int speechRetryCount = 0;
     private static final int MAX_SPEECH_RETRIES = 2;
+
+    @Override
+    protected void onSaveInstanceState(@NonNull Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putInt("CURRENT_NUMBER", currentNumber);
+        outState.putBoolean("LESSON_LOGGED", lessonCompletedLogSent);
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -107,18 +137,26 @@ public class NumbersActivity extends AppCompatActivity {
 
         // Initialize vibrator for haptic feedback
         vibrator = (Vibrator) getSystemService(VIBRATOR_SERVICE);
+        audioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
+        progressTracker = new ProgressTracker();
+        startTime = System.currentTimeMillis();
 
         languageCode = getIntent().getStringExtra("LANG_CODE");
         languageName = getIntent().getStringExtra("LANG_NAME");
         mode = getIntent().getStringExtra("MODE");
+
+        if (savedInstanceState != null) {
+            currentNumber = savedInstanceState.getInt("CURRENT_NUMBER", 1);
+            lessonCompletedLogSent = savedInstanceState.getBoolean("LESSON_LOGGED", false);
+        }
 
         if (languageName == null) languageName = "Unknown";
         if (mode == null) mode = "practice";
 
         isRecitalMode = mode.equals("recital");
 
-        tvLanguageTitleNum.setText("Language: " + languageName);
-        btnSpeakNumber.setText(isRecitalMode ? "Repeat" : "Practice");
+        tvLanguageTitleNum.setText(getString(R.string.language_prefix) + " " + languageName);
+        btnSpeakNumber.setText(isRecitalMode ? getString(R.string.numbers_mode_recital) : getString(R.string.numbers_mode_practice));
         updateModeBadge();
 
         progressBar.setMax(100);
@@ -146,13 +184,16 @@ public class NumbersActivity extends AppCompatActivity {
 
         btnNextNumber.setOnClickListener(v -> {
             try {
-                triggerHapticFeedback(30);  // Light haptic
+                v.performHapticFeedback(HapticFeedbackConstants.KEYBOARD_TAP);
             } catch (Exception e) {
                 android.util.Log.w("NumbersActivity", "Haptic feedback failed", e);
             }
             try {
                 currentNumber++;
-                if (currentNumber > 100) currentNumber = 1;
+                if (currentNumber > 100) {
+                    currentNumber = 1;
+                    checkAndLogCompletion();
+                }
                 updateNumber();
                 if (isRecitalMode) speakCurrentNumber();
             } catch (Exception e) {
@@ -162,7 +203,7 @@ public class NumbersActivity extends AppCompatActivity {
 
         btnPrevNumber.setOnClickListener(v -> {
             try {
-                triggerHapticFeedback(30);  // Light haptic
+                v.performHapticFeedback(HapticFeedbackConstants.KEYBOARD_TAP);
             } catch (Exception e) {
                 android.util.Log.w("NumbersActivity", "Haptic feedback failed", e);
             }
@@ -178,7 +219,7 @@ public class NumbersActivity extends AppCompatActivity {
 
         btnBackNumber.setOnClickListener(v -> {
             try {
-                triggerHapticFeedback(50);  // Medium haptic
+                v.performHapticFeedback(HapticFeedbackConstants.VIRTUAL_KEY);
             } catch (Exception e) {
                 android.util.Log.w("NumbersActivity", "Haptic feedback failed", e);
             }
@@ -187,7 +228,7 @@ public class NumbersActivity extends AppCompatActivity {
 
         btnSpeakNumber.setOnClickListener(v -> {
             try {
-                triggerHapticFeedback(50);  // Medium haptic
+                v.performHapticFeedback(HapticFeedbackConstants.LONG_PRESS);
                 celebrateAction();  // Celebration animation
             } catch (Exception e) {
                 android.util.Log.w("NumbersActivity", "Haptic feedback or celebration failed", e);
@@ -206,7 +247,7 @@ public class NumbersActivity extends AppCompatActivity {
         // Make number card tappable to speak
         numberCard.setOnClickListener(v -> {
             try {
-                triggerHapticFeedback(40);  // Light-medium haptic
+                v.performHapticFeedback(HapticFeedbackConstants.VIRTUAL_KEY);
                 speakCurrentNumber();
                 celebrateAction();  // Show celebration
             } catch (Exception e) {
@@ -235,7 +276,7 @@ public class NumbersActivity extends AppCompatActivity {
         // Quick access number picker button
         btnShowPicker.setOnClickListener(v -> {
             try {
-                triggerHapticFeedback(30);
+                v.performHapticFeedback(HapticFeedbackConstants.VIRTUAL_KEY);
                 showNumberPickerDialog();
             } catch (Exception e) {
                 android.util.Log.e("NumbersActivity", "Error showing number picker", e);
@@ -245,7 +286,7 @@ public class NumbersActivity extends AppCompatActivity {
         // Quick speak button
         btnSpeakQuick.setOnClickListener(v -> {
             try {
-                triggerHapticFeedback(40);
+                v.performHapticFeedback(HapticFeedbackConstants.KEYBOARD_TAP);
                 animateButtonPress(btnSpeakQuick);
                 speakCurrentNumber();
                 celebrateAction();
@@ -276,7 +317,7 @@ public class NumbersActivity extends AppCompatActivity {
 
     private void updateProgressCounter() {
         if (tvProgressCounter != null) {
-            String progressText = "Number " + currentNumber + " of 100";
+            String progressText = getString(R.string.numbers_progress_counter, currentNumber);
             tvProgressCounter.setText(progressText);
 
             // Animate counter update
@@ -301,6 +342,7 @@ public class NumbersActivity extends AppCompatActivity {
     }
 
     private void speakCurrentNumber() {
+        if (!requestAudioFocus()) return;
         try {
             // Try to load audio from recorded files first
             int resId = getNumberAudioResId(languageCode, currentNumber);
@@ -434,6 +476,7 @@ public class NumbersActivity extends AppCompatActivity {
     }
 
     private void playAudioResource(int resId) {
+        if (!requestAudioFocus()) return;
         if (mediaPlayer != null) {
             mediaPlayer.release();
         }
@@ -457,9 +500,7 @@ public class NumbersActivity extends AppCompatActivity {
         } else {
             // For Ghanaian languages: Show friendly message and provide audio example
             Toast.makeText(this,
-                "🎤 Try to pronounce: " + currentNumber +
-                "\n\n📝 Listen carefully to the audio above and repeat it!\n\n" +
-                "Tap the number again to hear it.",
+                getString(R.string.numbers_practice_instruction, currentNumber),
                 Toast.LENGTH_LONG).show();
 
             // Show helpful tips for Ghanaian languages
@@ -473,18 +514,18 @@ public class NumbersActivity extends AppCompatActivity {
         switch (languageCode) {
             case "ak": // Twi (backward compatibility)
             case "twi":
-                tips = "🎤 Speak clearly and naturally in Twi";
+                tips = getString(R.string.mascot_encouragement_1); // Placeholder or generic tip
                 break;
             case "ee": // Ewe
-                tips = "🎤 Remember: Ewe numbers have specific tones";
+                tips = getString(R.string.mascot_encouragement_2);
                 break;
             case "gaa": // Ga
-                tips = "🎤 Ga numbers require clear pronunciation";
+                tips = getString(R.string.mascot_encouragement_3);
                 break;
         }
 
         if (!tips.isEmpty()) {
-            Toast.makeText(this, "💡 Tip: " + tips, Toast.LENGTH_LONG).show();
+            Toast.makeText(this, getString(R.string.numbers_tip_prefix) + tips, Toast.LENGTH_LONG).show();
         }
     }
 
@@ -504,15 +545,13 @@ public class NumbersActivity extends AppCompatActivity {
         intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE, getSpeechLocaleCode());
         intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL,
                 RecognizerIntent.LANGUAGE_MODEL_FREE_FORM);
-        intent.putExtra(RecognizerIntent.EXTRA_PROMPT, "Please repeat the number");
+        intent.putExtra(RecognizerIntent.EXTRA_PROMPT, getString(R.string.numbers_pronunciation_prompt));
 
         // Improve recognition behavior: allow multiple results, set brief silence timeouts
         intent.putExtra(RecognizerIntent.EXTRA_MAX_RESULTS, 3);
         intent.putExtra(RecognizerIntent.EXTRA_PREFER_OFFLINE, false);
         // Shorten the silence thresholds so recognition completes sooner when user pauses
-        intent.putExtra("android.speech.extra.GET_AUDIO_FORMAT", "PCM"); // best-effort hint
         try {
-            // Some providers accept these extra keys for silence length
             intent.putExtra(RecognizerIntent.EXTRA_SPEECH_INPUT_COMPLETE_SILENCE_LENGTH_MILLIS, 1200L);
             intent.putExtra(RecognizerIntent.EXTRA_SPEECH_INPUT_MINIMUM_LENGTH_MILLIS, 800L);
         } catch (Exception e) {
@@ -522,7 +561,7 @@ public class NumbersActivity extends AppCompatActivity {
         try {
             startActivityForResult(intent, REQ_CODE_SPEECH_INPUT);
         } catch (Exception e) {
-            Toast.makeText(this, "Speech recognition not supported on this device.", Toast.LENGTH_LONG).show();
+            Toast.makeText(this, getString(R.string.numbers_toast_speech_not_supported), Toast.LENGTH_LONG).show();
         }
     }
 
@@ -553,7 +592,7 @@ public class NumbersActivity extends AppCompatActivity {
                         // No candidate matched; retry automatically up to MAX_SPEECH_RETRIES
                         if (speechRetryCount < MAX_SPEECH_RETRIES) {
                             speechRetryCount++;
-                            Toast.makeText(this, "Didn't catch that — please try again.", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(this, getString(R.string.numbers_toast_not_heard), Toast.LENGTH_SHORT).show();
                             promptSpeechInput();
                         } else {
                             speechRetryCount = 0;
@@ -563,7 +602,7 @@ public class NumbersActivity extends AppCompatActivity {
                 } else {
                     if (speechRetryCount < MAX_SPEECH_RETRIES) {
                         speechRetryCount++;
-                        Toast.makeText(this, "Could not hear you. Try again.", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(this, getString(R.string.numbers_toast_not_heard), Toast.LENGTH_SHORT).show();
                         promptSpeechInput();
                     } else {
                         speechRetryCount = 0;
@@ -657,9 +696,13 @@ public class NumbersActivity extends AppCompatActivity {
                 speechRetryCount = 0; // Reset
                 celebrateAction();
                 Toast.makeText(this,
-                    "🎉 Excellent! You said: " + recognized +
-                    "\n✅ Correct pronunciation of " + expected + "!",
+                    getString(R.string.numbers_toast_success, recognized, expected),
                     Toast.LENGTH_LONG).show();
+                
+                // Track progress
+                if (currentNumber > 50) {
+                    checkAndLogCompletion();
+                }
             } else {
                 // Didn't match
                 speechRetryCount++;
@@ -706,7 +749,7 @@ public class NumbersActivity extends AppCompatActivity {
                     grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                 promptSpeechInput();
             } else {
-                Toast.makeText(this, "Microphone permission is needed for pronunciation practice.", Toast.LENGTH_LONG).show();
+                Toast.makeText(this, getString(R.string.numbers_toast_mic_needed), Toast.LENGTH_LONG).show();
             }
         }
     }
@@ -753,17 +796,16 @@ public class NumbersActivity extends AppCompatActivity {
     }
 
     /**
-     * Show number picker in a bottom sheet dialog
+     * Show number picker in a bottom sheet dialog with enhanced UI
      */
     private void showNumberPickerDialog() {
         BottomSheetDialog dialog = new BottomSheetDialog(this);
         
-        // Create a custom grid view for numbers
-        GridView gridView = new GridView(this);
-        gridView.setNumColumns(5);
-        gridView.setPadding(24, 24, 24, 24);
-        gridView.setVerticalSpacing(16);
-        gridView.setHorizontalSpacing(16);
+        View bottomSheetView = getLayoutInflater().inflate(R.layout.dialog_number_picker, null);
+        TextView tvTitle = bottomSheetView.findViewById(R.id.tvGridTitle);
+        GridView gridView = bottomSheetView.findViewById(R.id.numberGrid);
+        
+        if (tvTitle != null) tvTitle.setText(R.string.numbers_grid_title);
         
         // Create adapter for numbers 1-100
         java.util.ArrayList<String> numberList = new java.util.ArrayList<>();
@@ -773,25 +815,33 @@ public class NumbersActivity extends AppCompatActivity {
         
         ArrayAdapter<String> adapter = new ArrayAdapter<String>(
             this,
-            android.R.layout.simple_list_item_1,
+            R.layout.item_letter_picker, // Reuse the same card layout
             numberList
         ) {
+            @NonNull
             @Override
-            public android.view.View getView(int position, android.view.View convertView, android.view.ViewGroup parent) {
-                android.widget.TextView textView = new android.widget.TextView(NumbersActivity.this);
-                textView.setText(getItem(position));
-                textView.setTextSize(16);
-                textView.setTextColor(currentNumber == (position + 1) ? 
-                    getColor(R.color.colorAccent) : getColor(R.color.textColorPrimary));
-                textView.setTypeface(null, android.graphics.Typeface.BOLD);
-                textView.setGravity(android.view.Gravity.CENTER);
-                textView.setPadding(8, 16, 8, 16);
-                
-                if (currentNumber == (position + 1)) {
-                    textView.setBackgroundResource(R.drawable.ripple_card_effect);
+            public View getView(int position, android.view.View convertView, @NonNull android.view.ViewGroup parent) {
+                if (convertView == null) {
+                    convertView = getLayoutInflater().inflate(R.layout.item_letter_picker, parent, false);
                 }
                 
-                return textView;
+                TextView textView = convertView.findViewById(R.id.tvLetterItem);
+                MaterialCardView card = (MaterialCardView) convertView;
+                
+                textView.setText(getItem(position));
+                
+                if (currentNumber == (position + 1)) {
+                    card.setStrokeWidth(4);
+                    card.setStrokeColor(getColor(R.color.colorAccent));
+                    textView.setTextColor(getColor(R.color.colorAccent));
+                    card.setCardBackgroundColor(ColorStateList.valueOf(getColor(R.color.white)));
+                } else {
+                    card.setStrokeWidth(0);
+                    textView.setTextColor(getColor(R.color.textColorPrimary));
+                    card.setCardBackgroundColor(ColorStateList.valueOf(getColor(R.color.white)));
+                }
+                
+                return convertView;
             }
         };
         
@@ -804,7 +854,7 @@ public class NumbersActivity extends AppCompatActivity {
             dialog.dismiss();
         });
         
-        dialog.setContentView(gridView);
+        dialog.setContentView(bottomSheetView);
         dialog.show();
     }
 
@@ -819,21 +869,69 @@ public class NumbersActivity extends AppCompatActivity {
         }
     }
 
+    private void checkAndLogCompletion() {
+        if (!lessonCompletedLogSent && currentNumber >= 100) {
+            lessonCompletedLogSent = true;
+            long duration = (System.currentTimeMillis() - startTime) / 1000;
+            
+            String userId = null;
+            if (FirebaseAuth.getInstance().getCurrentUser() != null) {
+                userId = FirebaseAuth.getInstance().getCurrentUser().getUid();
+            }
+            
+            progressTracker.logLessonCompletion(
+                this, 
+                userId, 
+                languageName + " Numbers", 
+                "numbers", 
+                duration, 
+                null
+            );
+            
+            Toast.makeText(this, getString(R.string.numbers_lesson_complete, languageName), Toast.LENGTH_LONG).show();
+            celebrateAction();
+        }
+    }
+
+    private boolean requestAudioFocus() {
+        if (audioManager == null) return true;
+
+        int result;
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            if (focusRequest == null) {
+                AudioAttributes playbackAttributes = new AudioAttributes.Builder()
+                        .setUsage(AudioAttributes.USAGE_ASSISTANCE_SONIFICATION)
+                        .setContentType(AudioAttributes.CONTENT_TYPE_SPEECH)
+                        .build();
+                focusRequest = new AudioFocusRequest.Builder(AudioManager.AUDIOFOCUS_GAIN_TRANSIENT_MAY_DUCK)
+                        .setAudioAttributes(playbackAttributes)
+                        .setAcceptsDelayedFocusGain(true)
+                        .setOnAudioFocusChangeListener(focusChangeListener)
+                        .build();
+            }
+            result = audioManager.requestAudioFocus(focusRequest);
+        } else {
+            result = audioManager.requestAudioFocus(focusChangeListener,
+                    AudioManager.STREAM_MUSIC, AudioManager.AUDIOFOCUS_GAIN_TRANSIENT_MAY_DUCK);
+        }
+        return result == AudioManager.AUDIOFOCUS_REQUEST_GRANTED;
+    }
+
     private void updateModeBadge() {
         try {
             if (modeBadgeText != null) {
                 if (isRecitalMode) {
                     modeBadgeIcon.setText("⭐");
-                    modeBadgeText.setText("RECITAL");
-                    modeBadgeDescription.setText("Listen & Learn");
+                    modeBadgeText.setText(R.string.numbers_mode_recital);
+                    modeBadgeDescription.setText(R.string.numbers_mode_recital_desc);
                     modeBadgeCard.setCardBackgroundColor(getColor(R.color.colorAccent));
                     modeBadgeText.setTextColor(getColor(android.R.color.white));
                     modeBadgeDescription.setTextColor(getColor(android.R.color.white));
                     modeBadgeDescription.setAlpha(0.8f);
                 } else {
                     modeBadgeIcon.setText("🎤");
-                    modeBadgeText.setText("PRACTICE");
-                    modeBadgeDescription.setText("Speak & Learn");
+                    modeBadgeText.setText(R.string.numbers_mode_practice);
+                    modeBadgeDescription.setText(R.string.numbers_mode_practice_desc);
                     modeBadgeCard.setCardBackgroundColor(getColor(R.color.colorPrimary));
                     modeBadgeText.setTextColor(getColor(android.R.color.white));
                     modeBadgeDescription.setTextColor(getColor(android.R.color.white));
