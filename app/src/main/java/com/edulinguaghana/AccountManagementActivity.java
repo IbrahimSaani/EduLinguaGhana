@@ -54,7 +54,6 @@ public class AccountManagementActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
         if (getSupportActionBar() != null) {
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-            // Title is handled by the CollapsingToolbarLayout header
             getSupportActionBar().setTitle("");
         }
 
@@ -106,7 +105,6 @@ public class AccountManagementActivity extends AppCompatActivity {
             etDisplayName.setText(displayName != null ? displayName : "");
             tvEmail.setText(email != null ? email : "");
 
-            // Check if user signed in with email/password provider
             boolean hasPasswordProvider = false;
             if (currentUser.getProviderData() != null) {
                 for (com.google.firebase.auth.UserInfo profile : currentUser.getProviderData()) {
@@ -117,12 +115,10 @@ public class AccountManagementActivity extends AppCompatActivity {
                 }
             }
 
-            // Hide password change card if user signed in with Google/Facebook
             if (!hasPasswordProvider) {
                 changePasswordCard.setVisibility(View.GONE);
             }
 
-            // Show email verification card if email is not verified
             if (!isEmailVerified && hasPasswordProvider) {
                 emailVerificationCard.setVisibility(View.VISIBLE);
             }
@@ -210,14 +206,13 @@ public class AccountManagementActivity extends AppCompatActivity {
         String learnerClass = etLearnerClass != null ? etLearnerClass.getText().toString().trim() : "";
 
         if (TextUtils.isEmpty(newDisplayName)) {
-            etDisplayName.setError("Display name cannot be empty");
+            etDisplayName.setError(getString(R.string.account_mgmt_name_empty));
             etDisplayName.requestFocus();
             return;
         }
 
         boolean isStudent = currentUserRole == UserRole.STUDENT;
         if (isStudent) {
-            // For students, both age and class must be present
             if (TextUtils.isEmpty(learnerAge) && !TextUtils.isEmpty(learnerClass)) {
                 etLearnerAge.setError(getString(R.string.complete_profile_required_age));
                 etLearnerAge.requestFocus();
@@ -230,7 +225,6 @@ public class AccountManagementActivity extends AppCompatActivity {
                 return;
             }
 
-            // Validate age if provided
             if (!TextUtils.isEmpty(learnerAge)) {
                 try {
                     int parsedAge = Integer.parseInt(learnerAge);
@@ -266,7 +260,7 @@ public class AccountManagementActivity extends AppCompatActivity {
                     } else {
                         showProgress(false);
                         Toast.makeText(AccountManagementActivity.this,
-                                "Failed to update profile: " + task.getException().getMessage(),
+                                getString(R.string.complete_profile_save_failed, task.getException().getMessage()),
                                 Toast.LENGTH_LONG).show();
                     }
                 });
@@ -290,11 +284,11 @@ public class AccountManagementActivity extends AppCompatActivity {
                     showProgress(false);
                     if (task.isSuccessful()) {
                         Toast.makeText(AccountManagementActivity.this,
-                                "✓ Profile updated successfully!", Toast.LENGTH_SHORT).show();
+                                getString(R.string.account_mgmt_profile_updated), Toast.LENGTH_SHORT).show();
                     } else {
                         Toast.makeText(AccountManagementActivity.this,
-                                "Profile updated on device, but database sync failed: " +
-                                (task.getException() != null ? task.getException().getMessage() : "Unknown error"),
+                                getString(R.string.account_mgmt_db_sync_failed,
+                                (task.getException() != null ? task.getException().getMessage() : "Unknown error")),
                                 Toast.LENGTH_LONG).show();
                     }
                 });
@@ -305,57 +299,53 @@ public class AccountManagementActivity extends AppCompatActivity {
         String newPassword = etNewPassword.getText().toString().trim();
         String confirmPassword = etConfirmPassword.getText().toString().trim();
 
-        // Validate inputs
         if (TextUtils.isEmpty(currentPassword)) {
-            etCurrentPassword.setError("Enter your current password");
+            etCurrentPassword.setError(getString(R.string.account_mgmt_enter_current_password));
             etCurrentPassword.requestFocus();
             return;
         }
 
         if (TextUtils.isEmpty(newPassword)) {
-            etNewPassword.setError("Enter new password");
+            etNewPassword.setError(getString(R.string.account_mgmt_enter_new_password));
             etNewPassword.requestFocus();
             return;
         }
 
         if (newPassword.length() < 6) {
-            etNewPassword.setError("Password must be at least 6 characters");
+            etNewPassword.setError(getString(R.string.account_mgmt_password_too_short));
             etNewPassword.requestFocus();
             return;
         }
 
         if (!newPassword.equals(confirmPassword)) {
-            etConfirmPassword.setError("Passwords do not match");
+            etConfirmPassword.setError(getString(R.string.account_mgmt_passwords_mismatch));
             etConfirmPassword.requestFocus();
             return;
         }
 
         showProgress(true);
 
-        // Re-authenticate user before changing password
         String email = currentUser.getEmail();
         AuthCredential credential = EmailAuthProvider.getCredential(email, currentPassword);
 
         currentUser.reauthenticate(credential)
                 .addOnCompleteListener(task -> {
                     if (task.isSuccessful()) {
-                        // Now update the password
                         currentUser.updatePassword(newPassword)
                                 .addOnCompleteListener(updateTask -> {
                                     if (updateTask.isSuccessful()) {
-                                        // Log password change to database for security tracking
                                         updatePasswordChangeInDatabase();
                                     } else {
                                         showProgress(false);
                                         Toast.makeText(AccountManagementActivity.this,
-                                                "Failed to change password: " + updateTask.getException().getMessage(),
+                                                getString(R.string.account_mgmt_password_sync_failed, updateTask.getException().getMessage()),
                                                 Toast.LENGTH_LONG).show();
                                     }
                                 });
                     } else {
                         showProgress(false);
                         Toast.makeText(AccountManagementActivity.this,
-                                "Authentication failed. Please check your current password.",
+                                getString(R.string.account_mgmt_reauth_failed),
                                 Toast.LENGTH_LONG).show();
                     }
                 });
@@ -375,15 +365,14 @@ public class AccountManagementActivity extends AppCompatActivity {
                     showProgress(false);
                     if (task.isSuccessful()) {
                         Toast.makeText(AccountManagementActivity.this,
-                                "🔒 Password changed successfully!", Toast.LENGTH_SHORT).show();
-                        // Clear password fields
+                                getString(R.string.account_mgmt_password_changed), Toast.LENGTH_SHORT).show();
                         etCurrentPassword.setText("");
                         etNewPassword.setText("");
                         etConfirmPassword.setText("");
                     } else {
                         Toast.makeText(AccountManagementActivity.this,
-                                "Password changed on device, but database sync failed: " + 
-                                (task.getException() != null ? task.getException().getMessage() : "Unknown error"),
+                                getString(R.string.account_mgmt_password_sync_failed, 
+                                (task.getException() != null ? task.getException().getMessage() : "Unknown error")),
                                 Toast.LENGTH_LONG).show();
                     }
                 });
@@ -399,17 +388,16 @@ public class AccountManagementActivity extends AppCompatActivity {
                         StyledMenuHelper.showStyledConfirmationDialog(
                             this,
                             "📧",
-                            "Verification Email Sent",
-                            "A verification email has been sent to " + currentUser.getEmail() +
-                                ". Please check your inbox and verify your email address.",
-                            "Verified My Email",
+                            getString(R.string.account_mgmt_verification_sent_title),
+                            getString(R.string.account_mgmt_verification_sent_message, currentUser.getEmail()),
+                            getString(R.string.account_mgmt_verified_my_email),
                             "OK",
                             this::refreshEmailVerificationStatus,
                             null
                         );
                     } else {
                         Toast.makeText(AccountManagementActivity.this,
-                                "Failed to send verification email: " + task.getException().getMessage(),
+                                getString(R.string.complete_profile_save_failed, task.getException().getMessage()),
                                 Toast.LENGTH_LONG).show();
                     }
                 });
@@ -418,28 +406,25 @@ public class AccountManagementActivity extends AppCompatActivity {
     private void refreshEmailVerificationStatus() {
         showProgress(true);
 
-        // Reload the user to get the latest email verification status
         currentUser.reload()
                 .addOnCompleteListener(task -> {
                     showProgress(false);
                     if (task.isSuccessful()) {
-                        // Update the current user reference
                         currentUser = mAuth.getCurrentUser();
                         
                         if (currentUser != null && currentUser.isEmailVerified()) {
-                            // Email is now verified, hide the verification card
                             emailVerificationCard.setVisibility(View.GONE);
                             Toast.makeText(AccountManagementActivity.this,
-                                    "Email verified successfully! ✓", Toast.LENGTH_SHORT).show();
+                                    getString(R.string.account_mgmt_email_verified_success), Toast.LENGTH_SHORT).show();
                         } else {
                             Toast.makeText(AccountManagementActivity.this,
-                                    "Email not verified yet. Please check your email and verify.",
+                                    getString(R.string.account_mgmt_email_not_verified),
                                     Toast.LENGTH_LONG).show();
                         }
                     } else {
                         Toast.makeText(AccountManagementActivity.this,
-                                "Failed to check email verification status: " + 
-                                (task.getException() != null ? task.getException().getMessage() : "Unknown error"),
+                                getString(R.string.account_mgmt_db_status_failed, 
+                                (task.getException() != null ? task.getException().getMessage() : "Unknown error")),
                                 Toast.LENGTH_LONG).show();
                     }
                 });
@@ -449,54 +434,50 @@ public class AccountManagementActivity extends AppCompatActivity {
         StyledMenuHelper.showStyledConfirmationDialog(
             this,
             "⚠️",
-            "Delete Account",
-            "Are you absolutely sure you want to delete your account?\n\n" +
-                        "This action is permanent and cannot be undone. All your progress, " +
-                        "achievements, and data will be permanently deleted.",
-            "Delete",
-            "Cancel",
+            getString(R.string.account_mgmt_delete_confirm_title),
+            getString(R.string.account_mgmt_delete_confirm_message),
+            getString(R.string.teacher_dashboard_remove_confirm), // Using existing "Remove/Delete"
+            getString(R.string.teacher_dashboard_remove_cancel),
             this::confirmDeleteAccount,
             null
         );
     }
 
     private void confirmDeleteAccount() {
-        // Show a second confirmation dialog
         StyledMenuHelper.showStyledConfirmationDialog(
             this,
             "🛑",
-            "Final Confirmation",
-            "This is your last chance. Do you really want to delete your account?",
-            "Yes, Delete Forever",
-            "No, Keep My Account",
+            getString(R.string.account_mgmt_delete_final_title),
+            getString(R.string.account_mgmt_delete_final_message),
+            getString(R.string.account_mgmt_delete_forever),
+            getString(R.string.account_mgmt_keep_account),
             this::deleteAccount,
             null
         );
     }
 
     private void deleteAccount() {
-        // First, prompt for password to re-authenticate
         showReAuthenticationDialog();
     }
 
     private void showReAuthenticationDialog() {
         final TextInputEditText passwordInput = new TextInputEditText(this);
         passwordInput.setInputType(android.text.InputType.TYPE_CLASS_TEXT | android.text.InputType.TYPE_TEXT_VARIATION_PASSWORD);
-        passwordInput.setHint("Enter your password");
+        passwordInput.setHint(getString(R.string.account_mgmt_password_hint));
 
         StyledMenuHelper.showStyledCustomDialog(
             this,
             "🔑",
-            "Confirm Password",
-            "For security reasons, please enter your password to delete your account.",
+            getString(R.string.account_mgmt_reauth_title),
+            getString(R.string.account_mgmt_reauth_message),
             passwordInput,
-            "Delete Account",
+            getString(R.string.account_mgmt_delete_button),
             "Cancel",
             () -> {
                 String password = passwordInput.getText().toString().trim();
                 if (TextUtils.isEmpty(password)) {
                     Toast.makeText(AccountManagementActivity.this,
-                            "Password cannot be empty", Toast.LENGTH_SHORT).show();
+                            getString(R.string.account_mgmt_password_hint), Toast.LENGTH_SHORT).show();
                     return;
                 }
                 performReAuthenticationAndDelete(password);
@@ -511,16 +492,14 @@ public class AccountManagementActivity extends AppCompatActivity {
         String email = currentUser.getEmail();
         AuthCredential credential = EmailAuthProvider.getCredential(email, password);
 
-        // Re-authenticate first
         currentUser.reauthenticate(credential)
                 .addOnCompleteListener(reAuthTask -> {
                     if (reAuthTask.isSuccessful()) {
-                        // Now delete user data from database before deleting auth account
                         deleteUserDataFromDatabase(currentUser.getUid());
                     } else {
                         showProgress(false);
                         Toast.makeText(AccountManagementActivity.this,
-                                "Authentication failed. Please check your password.",
+                                getString(R.string.account_mgmt_reauth_failed_delete),
                                 Toast.LENGTH_LONG).show();
                     }
                 });
@@ -530,7 +509,6 @@ public class AccountManagementActivity extends AppCompatActivity {
         com.google.firebase.database.DatabaseReference dbRef =
                 com.google.firebase.database.FirebaseDatabase.getInstance().getReference();
 
-        // Delete from users node
         dbRef.child("users").child(userId).removeValue()
                 .addOnCompleteListener(usersTask -> {
                     if (usersTask.isSuccessful()) {
@@ -538,7 +516,6 @@ public class AccountManagementActivity extends AppCompatActivity {
                     } else {
                         android.util.Log.e("AccountManagement", "Failed to delete user data", usersTask.getException());
                     }
-                    // Continue with other deletions
                     deleteFromLeaderboard(userId);
                 });
     }
@@ -554,7 +531,6 @@ public class AccountManagementActivity extends AppCompatActivity {
                     } else {
                         android.util.Log.e("AccountManagement", "Failed to delete leaderboard entry", leaderboardTask.getException());
                     }
-                    // Continue with other deletions
                     deleteUserProgress(currentUser.getUid());
                 });
     }
@@ -570,7 +546,6 @@ public class AccountManagementActivity extends AppCompatActivity {
                     } else {
                         android.util.Log.e("AccountManagement", "Failed to delete progress", progressTask.getException());
                     }
-                    // Continue with other deletions
                     deleteUserStats(userId);
                 });
     }
@@ -586,7 +561,6 @@ public class AccountManagementActivity extends AppCompatActivity {
                     } else {
                         android.util.Log.e("AccountManagement", "Failed to delete user stats", statsTask.getException());
                     }
-                    // Continue with other deletions
                     deleteUserAggregates(userId);
                 });
     }
@@ -602,7 +576,6 @@ public class AccountManagementActivity extends AppCompatActivity {
                     } else {
                         android.util.Log.e("AccountManagement", "Failed to delete aggregates", aggregatesTask.getException());
                     }
-                    // Continue with other deletions
                     deleteMilestones(userId);
                 });
     }
@@ -618,13 +591,11 @@ public class AccountManagementActivity extends AppCompatActivity {
                     } else {
                         android.util.Log.e("AccountManagement", "Failed to delete milestones", milestonesTask.getException());
                     }
-                    // Continue with other deletions
                     deleteRelationships(userId);
                 });
     }
 
     private void deleteRelationships(String userId) {
-        // Delete all relationships involving this user
         com.google.firebase.database.DatabaseReference relationshipsRef =
                 com.google.firebase.database.FirebaseDatabase.getInstance().getReference("relationships");
 
@@ -650,7 +621,6 @@ public class AccountManagementActivity extends AppCompatActivity {
     }
 
     private void deleteUserChallenges(String userId) {
-        // Delete all challenges involving this user
         com.google.firebase.database.DatabaseReference challengesRef =
                 com.google.firebase.database.FirebaseDatabase.getInstance().getReference("challenges");
 
@@ -674,14 +644,12 @@ public class AccountManagementActivity extends AppCompatActivity {
                     }
                 }
                 android.util.Log.d("AccountManagement", "User challenges deleted");
-                // Finally delete the Firebase Auth account
                 deleteFirebaseAuthUser();
             }
 
             @Override
             public void onCancelled(com.google.firebase.database.DatabaseError error) {
                 android.util.Log.e("AccountManagement", "Failed to delete challenges", error.toException());
-                // Continue anyway
                 deleteFirebaseAuthUser();
             }
         });
@@ -693,9 +661,8 @@ public class AccountManagementActivity extends AppCompatActivity {
                     showProgress(false);
                     if (task.isSuccessful()) {
                         Toast.makeText(AccountManagementActivity.this,
-                                "Account deleted successfully", Toast.LENGTH_SHORT).show();
+                                getString(R.string.account_mgmt_delete_success), Toast.LENGTH_SHORT).show();
                         
-                        // Clear all local user statistics
                         ProgressManager.resetProgress(this);
                         com.edulinguaghana.gamification.FunGameProgressManager.resetProgress(this);
                         com.edulinguaghana.gamification.XPManager.resetXP(this);
@@ -705,7 +672,6 @@ public class AccountManagementActivity extends AppCompatActivity {
                         new com.edulinguaghana.AchievementManager(this).resetAchievements();
                         AvatarBuilder.clearCache(this);
 
-                        // Sign out and return to main activity
                         mAuth.signOut();
                         finishAffinity();
                         android.content.Intent intent = new android.content.Intent(AccountManagementActivity.this, MainActivity.class);
@@ -715,7 +681,7 @@ public class AccountManagementActivity extends AppCompatActivity {
                         String errorMessage = task.getException() != null ?
                                 task.getException().getMessage() : "Unknown error";
                         Toast.makeText(AccountManagementActivity.this,
-                                "Failed to delete account: " + errorMessage,
+                                getString(R.string.account_mgmt_delete_failed, errorMessage),
                                 Toast.LENGTH_LONG).show();
                     }
                 });
@@ -728,12 +694,10 @@ public class AccountManagementActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        // Reload avatar when returning from editor
         if (avatarView != null) {
             avatarView.updateAvatar();
         }
 
-        // Refresh email verification status and load latest avatar from database
         if (currentUser != null) {
             currentUser.reload()
                     .addOnCompleteListener(task -> {
@@ -752,7 +716,6 @@ public class AccountManagementActivity extends AppCompatActivity {
                                     }
                                 }
 
-                                // Update email verification card visibility
                                 if (!isEmailVerified && hasPasswordProvider) {
                                     emailVerificationCard.setVisibility(View.VISIBLE);
                                 } else {

@@ -2,6 +2,7 @@ package com.edulinguaghana.tracking;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.HapticFeedbackConstants;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.LinearLayout;
@@ -129,19 +130,31 @@ public class TeacherDashboardActivity extends AppCompatActivity {
 
 
         if (btnAddFirstStudent != null) {
-            btnAddFirstStudent.setOnClickListener(v -> openRelationshipManagement());
+            btnAddFirstStudent.setOnClickListener(v -> {
+                v.performHapticFeedback(HapticFeedbackConstants.VIRTUAL_KEY);
+                openRelationshipManagement();
+            });
         }
 
         if (btnAddStudentBottom != null) {
-            btnAddStudentBottom.setOnClickListener(v -> openRelationshipManagement());
+            btnAddStudentBottom.setOnClickListener(v -> {
+                v.performHapticFeedback(HapticFeedbackConstants.VIRTUAL_KEY);
+                openRelationshipManagement();
+            });
         }
 
         if (btnRemoveStudent != null) {
-            btnRemoveStudent.setOnClickListener(v -> showRemoveStudentDialog());
+            btnRemoveStudent.setOnClickListener(v -> {
+                v.performHapticFeedback(HapticFeedbackConstants.LONG_PRESS);
+                showRemoveStudentDialog();
+            });
         }
 
         if (btnSort != null) {
-            btnSort.setOnClickListener(v -> showSortDialog());
+            btnSort.setOnClickListener(v -> {
+                v.performHapticFeedback(HapticFeedbackConstants.KEYBOARD_TAP);
+                showSortDialog();
+            });
         }
 
         setupClassFilter();

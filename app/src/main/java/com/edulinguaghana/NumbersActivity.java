@@ -160,6 +160,10 @@ public class NumbersActivity extends AppCompatActivity {
         updateModeBadge();
 
         progressBar.setMax(100);
+        if (seekBarNavigation != null) {
+            seekBarNavigation.setMax(99);
+            seekBarNavigation.setProgress(currentNumber - 1);
+        }
 
         // Initialize Offline TTS for native languages (loads from res/raw)
         offlineTts = new OfflineGhanaLPTtsService(this);
@@ -195,6 +199,7 @@ public class NumbersActivity extends AppCompatActivity {
                     checkAndLogCompletion();
                 }
                 updateNumber();
+                if (seekBarNavigation != null) seekBarNavigation.setProgress(currentNumber - 1);
                 if (isRecitalMode) speakCurrentNumber();
             } catch (Exception e) {
                 android.util.Log.e("NumbersActivity", "Error advancing number", e);
@@ -211,6 +216,7 @@ public class NumbersActivity extends AppCompatActivity {
                 currentNumber--;
                 if (currentNumber < 1) currentNumber = 100;
                 updateNumber();
+                if (seekBarNavigation != null) seekBarNavigation.setProgress(currentNumber - 1);
                 if (isRecitalMode) speakCurrentNumber();
             } catch (Exception e) {
                 android.util.Log.e("NumbersActivity", "Error going back number", e);
@@ -840,7 +846,7 @@ public class NumbersActivity extends AppCompatActivity {
                     textView.setTextColor(getColor(R.color.textColorPrimary));
                     card.setCardBackgroundColor(ColorStateList.valueOf(getColor(R.color.white)));
                 }
-                
+
                 return convertView;
             }
         };
@@ -848,7 +854,7 @@ public class NumbersActivity extends AppCompatActivity {
         gridView.setAdapter(adapter);
         gridView.setOnItemClickListener((parent, view, position, id) -> {
             currentNumber = position + 1;
-            seekBarNavigation.setProgress(position);
+            if (seekBarNavigation != null) seekBarNavigation.setProgress(position);
             updateNumber();
             if (isRecitalMode) speakCurrentNumber();
             dialog.dismiss();

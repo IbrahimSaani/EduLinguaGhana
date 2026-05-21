@@ -206,7 +206,7 @@ public class AchievementManager {
                     com.google.firebase.auth.FirebaseUser user = com.google.firebase.auth.FirebaseAuth.getInstance().getCurrentUser();
                     if (user != null) {
                         com.edulinguaghana.tracking.ProgressTracker tracker = new com.edulinguaghana.tracking.ProgressTracker();
-                        tracker.logAchievement(user.getUid(), achievement.getId(), achievement.getTitle(), null);
+                        tracker.logAchievement(context, user.getUid(), achievement.getId(), achievement.getTitle(), null);
                     }
                 } catch (Exception e) {
                     android.util.Log.e("AchievementManager", "Failed to log achievement to Firebase", e);

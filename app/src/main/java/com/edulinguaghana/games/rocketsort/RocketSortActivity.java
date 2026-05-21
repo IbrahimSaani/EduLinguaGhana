@@ -10,6 +10,7 @@ import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
+import android.view.HapticFeedbackConstants;
 import android.view.Gravity;
 import android.view.MotionEvent;
 import android.view.View;
@@ -126,10 +127,22 @@ public class RocketSortActivity extends AppCompatActivity {
             }
         });
 
-        findViewById(R.id.btnPause).setOnClickListener(v -> togglePause());
-        findViewById(R.id.btnRestart).setOnClickListener(v -> startNewGame());
-        findViewById(R.id.btnResume).setOnClickListener(v -> togglePause());
-        findViewById(R.id.btnQuit).setOnClickListener(v -> finish());
+        findViewById(R.id.btnPause).setOnClickListener(v -> {
+            v.performHapticFeedback(HapticFeedbackConstants.LONG_PRESS);
+            togglePause();
+        });
+        findViewById(R.id.btnRestart).setOnClickListener(v -> {
+            v.performHapticFeedback(HapticFeedbackConstants.VIRTUAL_KEY);
+            startNewGame();
+        });
+        findViewById(R.id.btnResume).setOnClickListener(v -> {
+            v.performHapticFeedback(HapticFeedbackConstants.VIRTUAL_KEY);
+            togglePause();
+        });
+        findViewById(R.id.btnQuit).setOnClickListener(v -> {
+            v.performHapticFeedback(HapticFeedbackConstants.VIRTUAL_KEY);
+            finish();
+        });
     }
 
     private void initSounds() {
@@ -289,7 +302,7 @@ public class RocketSortActivity extends AppCompatActivity {
             for (ObjectAnimator animator : asteroidAnimators.values()) {
                 animator.pause();
             }
-            showOverlay("Paused");
+            showOverlay(getString(R.string.game_status_paused));
         } else {
             overlayLayout.setVisibility(View.GONE);
             if (backgroundMusic != null && !isGameOver) {
@@ -461,14 +474,17 @@ public class RocketSortActivity extends AppCompatActivity {
         if (isGameOver || isFinishing() || isDestroyed()) return;
         score++;
         if (correctPlayer != null) correctPlayer.start();
-        updateUI();
         
+        // Haptic feedback for correct sort
         ImageView rocket = leftRocket ? ivRocketLeft : ivRocketRight;
         if (rocket != null) {
+            rocket.performHapticFeedback(HapticFeedbackConstants.KEYBOARD_TAP);
             rocket.animate().scaleX(1.2f).scaleY(1.2f).setDuration(100).withEndAction(() -> 
                 rocket.animate().scaleX(1.0f).scaleY(1.0f).setDuration(100).start()
             ).start();
         }
+        
+        updateUI();
         
         if (score % 5 == 0) {
             if (levelUpPlayer != null) levelUpPlayer.start();
@@ -484,6 +500,10 @@ public class RocketSortActivity extends AppCompatActivity {
         if (isGameOver || isFinishing() || isDestroyed()) return;
         lives--;
         if (wrongPlayer != null) wrongPlayer.start();
+        
+        // Strong haptic feedback for errors
+        asteroidContainer.performHapticFeedback(HapticFeedbackConstants.LONG_PRESS);
+
         updateUI();
         
         asteroidContainer.animate().translationX(20).setDuration(50).withEndAction(() ->
@@ -545,7 +565,7 @@ public class RocketSortActivity extends AppCompatActivity {
             FunGameProgressManager.recordGameCompleted(this, "rocket_sort", score, languageCode, (System.currentTimeMillis() - gameStartTime) / 1000);
         } catch (Exception ignored) { }
 
-        showOverlay("Mission Complete!");
+        showOverlay(getString(R.string.game_over_mission_complete));
     }
 
     private void saveChallengeResult() {
@@ -580,11 +600,11 @@ public class RocketSortActivity extends AppCompatActivity {
         View restartBtn = findViewById(R.id.btnRestart);
         
         if (isPaused && !isGameOver) {
-            scoreText.setText("Mission Status: Paused");
+            scoreText.setText(R.string.game_status_mission_paused);
             resumeBtn.setVisibility(View.VISIBLE);
             restartBtn.setVisibility(View.GONE);
         } else {
-            scoreText.setText("Final Score: " + score);
+            scoreText.setText(getString(R.string.quiz_final_score, score));
             resumeBtn.setVisibility(View.GONE);
             restartBtn.setVisibility(View.VISIBLE);
         }

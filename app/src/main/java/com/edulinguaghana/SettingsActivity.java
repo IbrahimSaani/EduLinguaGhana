@@ -186,7 +186,7 @@ public class SettingsActivity extends AppCompatActivity {
                 public void onStopTrackingTouch(SeekBar seekBar) {
                     // Notify QuizActivity of volume change if needed
                     Toast.makeText(SettingsActivity.this, 
-                        "Quiz music volume updated to " + seekBar.getProgress() + "%", 
+                        getString(R.string.settings_quiz_music_volume_updated, seekBar.getProgress()), 
                         Toast.LENGTH_SHORT).show();
                 }
             });
@@ -349,7 +349,7 @@ public class SettingsActivity extends AppCompatActivity {
 
         CloudSyncManager syncManager = new CloudSyncManager(this);
         String lastSyncTime = syncManager.getLastSyncTimeString();
-        tvLastSync.setText("Last sync: " + lastSyncTime);
+        tvLastSync.setText(getString(R.string.settings_last_sync_label, lastSyncTime));
     }
 
     private void displayCurrentRole() {
@@ -357,7 +357,7 @@ public class SettingsActivity extends AppCompatActivity {
 
         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
         if (user == null) {
-            tvCurrentRole.setText("Current role: Not logged in");
+            tvCurrentRole.setText(getString(R.string.settings_role_prefix, getString(R.string.settings_role_not_logged_in)));
             if (btnChangeRole != null) {
                 btnChangeRole.setEnabled(false);
             }
@@ -368,24 +368,24 @@ public class SettingsActivity extends AppCompatActivity {
         roleManager.getUserRole(this, user.getUid(), new RoleManager.RoleCallback() {
             @Override
             public void onRoleRetrieved(UserRole role) {
-                String roleText = "Current role: ";
+                String roleValue = "";
                 switch (role) {
                     case STUDENT:
-                        roleText += "🎓 Student";
+                        roleValue = getString(R.string.settings_role_student);
                         break;
                     case TEACHER:
-                        roleText += "👨‍🏫 Teacher";
+                        roleValue = getString(R.string.settings_role_teacher);
                         break;
                     case PARENT:
-                        roleText += "👨‍👩‍👧‍👦 Parent";
+                        roleValue = getString(R.string.settings_role_parent);
                         break;
                 }
-                tvCurrentRole.setText(roleText);
+                tvCurrentRole.setText(getString(R.string.settings_role_prefix, roleValue));
             }
 
             @Override
             public void onError(String error) {
-                tvCurrentRole.setText("Current role: Not set");
+                tvCurrentRole.setText(getString(R.string.settings_role_prefix, getString(R.string.settings_role_not_set)));
             }
         });
     }

@@ -221,7 +221,7 @@ public class LoginActivity extends AppCompatActivity {
         saveUserToDatabase(user);
         // Restore progress from database
         restoreUserProgress(user);
-        Toast.makeText(LoginActivity.this, "Welcome back!", Toast.LENGTH_SHORT).show();
+        Toast.makeText(LoginActivity.this, R.string.login_welcome_back, Toast.LENGTH_SHORT).show();
         navigateToMain();
     }
 
@@ -371,7 +371,7 @@ public class LoginActivity extends AppCompatActivity {
 
     private void firebaseAuthWithGoogle(String idToken) {
         if (idToken == null) {
-            Toast.makeText(this, "Google sign in token missing", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, R.string.login_error_token_missing, Toast.LENGTH_SHORT).show();
             return;
         }
         AuthCredential credential = GoogleAuthProvider.getCredential(idToken, null);
@@ -390,7 +390,7 @@ public class LoginActivity extends AppCompatActivity {
 
     private void handleSocialLogin(FirebaseUser user) {
         if (user == null) {
-            Toast.makeText(this, "Could not load your account", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, R.string.login_error_account_load, Toast.LENGTH_SHORT).show();
             return;
         }
 
@@ -403,14 +403,14 @@ public class LoginActivity extends AppCompatActivity {
                     restoreUserProgress(user);
                     String name = (user.getDisplayName() != null) ? user.getDisplayName() : "Learner";
                     Toast.makeText(LoginActivity.this,
-                            "Welcome " + name + "!",
+                            getString(R.string.login_welcome_user, name),
                             Toast.LENGTH_SHORT).show();
                     navigateToMain();
                 } else {
                     saveUserToDatabase(user);
                     restoreUserProgress(user);
                     Toast.makeText(LoginActivity.this,
-                            "Welcome back! You can update age, school, and class in Manage Account.",
+                            R.string.login_welcome_incomplete,
                             Toast.LENGTH_LONG).show();
                     navigateToMain();
                 }

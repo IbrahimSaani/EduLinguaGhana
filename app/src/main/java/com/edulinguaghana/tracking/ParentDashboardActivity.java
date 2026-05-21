@@ -2,6 +2,7 @@ package com.edulinguaghana.tracking;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.HapticFeedbackConstants;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.LinearLayout;
@@ -122,19 +123,31 @@ public class ParentDashboardActivity extends AppCompatActivity {
 
 
         if (btnAddFirstChild != null) {
-            btnAddFirstChild.setOnClickListener(v -> openRelationshipManagement());
+            btnAddFirstChild.setOnClickListener(v -> {
+                v.performHapticFeedback(HapticFeedbackConstants.VIRTUAL_KEY);
+                openRelationshipManagement();
+            });
         }
 
         if (btnAddChildBottom != null) {
-            btnAddChildBottom.setOnClickListener(v -> openRelationshipManagement());
+            btnAddChildBottom.setOnClickListener(v -> {
+                v.performHapticFeedback(HapticFeedbackConstants.VIRTUAL_KEY);
+                openRelationshipManagement();
+            });
         }
 
         if (btnRemoveChild != null) {
-            btnRemoveChild.setOnClickListener(v -> showRemoveChildDialog());
+            btnRemoveChild.setOnClickListener(v -> {
+                v.performHapticFeedback(HapticFeedbackConstants.LONG_PRESS);
+                showRemoveChildDialog();
+            });
         }
 
         if (btnSort != null) {
-            btnSort.setOnClickListener(v -> showSortDialog());
+            btnSort.setOnClickListener(v -> {
+                v.performHapticFeedback(HapticFeedbackConstants.KEYBOARD_TAP);
+                showSortDialog();
+            });
         }
 
         setupClassFilter();

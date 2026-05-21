@@ -61,6 +61,8 @@ public final class TimeBasedBackgroundManager {
         if (activity instanceof SplashActivity) return false;
         if (activity instanceof LoginActivity) return false;
         if (activity instanceof SignUpActivity) return false;
+        if (activity instanceof MainActivity) return false; // MainActivity handles its own complex dynamic background
+
         // Keep this scoped to the app's own activities; skip third-party screens.
         String packageName = activity.getPackageName();
         String activityPackage = activity.getClass().getPackage() != null

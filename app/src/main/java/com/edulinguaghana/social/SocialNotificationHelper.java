@@ -24,8 +24,6 @@ import com.edulinguaghana.R;
 @SuppressWarnings("MissingPermission")
 public class SocialNotificationHelper {
     private static final String CHANNEL_ID = "social_notifications";
-    private static final String CHANNEL_NAME = "Social Notifications";
-    private static final String CHANNEL_DESC = "Notifications for friend requests and challenges";
 
     private final Context context;
     private final NotificationManagerCompat notificationManager;
@@ -40,10 +38,10 @@ public class SocialNotificationHelper {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             NotificationChannel channel = new NotificationChannel(
                 CHANNEL_ID,
-                CHANNEL_NAME,
+                context.getString(R.string.notification_channel_social_name),
                 NotificationManager.IMPORTANCE_DEFAULT
             );
-            channel.setDescription(CHANNEL_DESC);
+            channel.setDescription(context.getString(R.string.notification_channel_social_desc));
             NotificationManager manager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
             if (manager != null) {
                 manager.createNotificationChannel(channel);
@@ -53,12 +51,10 @@ public class SocialNotificationHelper {
 
     private boolean canShowNotification() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            boolean granted = ActivityCompat.checkSelfPermission(context, Manifest.permission.POST_NOTIFICATIONS)
+            return ActivityCompat.checkSelfPermission(context, Manifest.permission.POST_NOTIFICATIONS)
                 == PackageManager.PERMISSION_GRANTED;
-            android.util.Log.d("SocialNotification", "Notification permission granted: " + granted);
-            return granted;
         }
-        return true; // No permission needed for older versions
+        return true;
     }
 
     /**
@@ -69,12 +65,14 @@ public class SocialNotificationHelper {
         if (!canShowNotification()) return;
 
         String fromName = displayName != null ? displayName : fromUserId;
+        String title = context.getString(R.string.notification_friend_request_title);
+        String message = context.getString(R.string.notification_friend_request_message, fromName);
         
         // Add to in-app notification manager
         com.edulinguaghana.NotificationManager inAppManager = new com.edulinguaghana.NotificationManager(context);
         inAppManager.addNotification(
-            "New Friend Request",
-            fromName + " wants to be your friend!",
+            context.getString(R.string.notification_friend_request_title_no_emoji), // Helper needed? or just use same
+            message,
             "👥",
             com.edulinguaghana.Notification.NotificationType.MOTIVATIONAL
         );
@@ -91,17 +89,16 @@ public class SocialNotificationHelper {
 
         NotificationCompat.Builder builder = new NotificationCompat.Builder(context, CHANNEL_ID)
             .setSmallIcon(R.drawable.ic_notifications)
-            .setContentTitle("New Friend Request 👥")
-            .setContentText((displayName != null ? displayName : fromUserId) + " wants to be your friend!")
+            .setContentTitle(title)
+            .setContentText(message)
             .setPriority(NotificationCompat.PRIORITY_DEFAULT)
             .setContentIntent(pendingIntent)
             .setAutoCancel(true);
 
         try {
-            //noinspection MissingPermission
             notificationManager.notify(fromUserId.hashCode(), builder.build());
         } catch (SecurityException e) {
-            // Permission not granted, silently fail
+            // Silently fail
         }
     }
 
@@ -114,19 +111,21 @@ public class SocialNotificationHelper {
 
         String prefix = "";
         if ("Male".equalsIgnoreCase(gender)) {
-            prefix = "Mr. ";
+            prefix = context.getString(R.string.notification_prefix_mr);
         } else if ("Female".equalsIgnoreCase(gender)) {
-            prefix = "Mrs. ";
+            prefix = context.getString(R.string.notification_prefix_mrs);
         }
         
         String fromName = prefix + (displayName != null ? displayName : fromUserId);
-        String roleLabel = "Teacher".equalsIgnoreCase(type) ? "Teacher" : "Parent";
+        String roleLabel = "Teacher".equalsIgnoreCase(type) ? 
+                context.getString(R.string.notification_rel_teacher) : 
+                context.getString(R.string.notification_rel_parent);
 
         // Add to in-app notification manager
         com.edulinguaghana.NotificationManager inAppManager = new com.edulinguaghana.NotificationManager(context);
         inAppManager.addNotification(
-            "New Connection Request",
-            fromName + " (" + roleLabel + ") wants to track your progress!",
+            context.getString(R.string.notification_rel_request_inapp_title),
+            context.getString(R.string.notification_rel_request_inapp_message, fromName, roleLabel),
             "👨‍🏫",
             com.edulinguaghana.Notification.NotificationType.MOTIVATIONAL
         );
@@ -143,8 +142,8 @@ public class SocialNotificationHelper {
 
         NotificationCompat.Builder builder = new NotificationCompat.Builder(context, CHANNEL_ID)
             .setSmallIcon(R.drawable.ic_notifications)
-            .setContentTitle("New Connection Request 🤝")
-            .setContentText(fromName + " wants to track your progress!")
+            .setContentTitle(context.getString(R.string.notification_rel_request_title))
+            .setContentText(context.getString(R.string.notification_rel_request_message, fromName))
             .setPriority(NotificationCompat.PRIORITY_DEFAULT)
             .setContentIntent(pendingIntent)
             .setAutoCancel(true);
@@ -160,12 +159,14 @@ public class SocialNotificationHelper {
         if (!canShowNotification()) return;
 
         String fromName = displayName != null ? displayName : fromUserId;
+        String title = context.getString(R.string.notification_challenge_title);
+        String message = context.getString(R.string.notification_challenge_message, fromName, quizType);
 
         // Add to in-app notification manager
         com.edulinguaghana.NotificationManager inAppManager = new com.edulinguaghana.NotificationManager(context);
         inAppManager.addNotification(
-            "New Challenge ⚔️",
-            fromName + " challenged you to " + quizType + "!",
+            title,
+            message,
             "⚔️",
             com.edulinguaghana.Notification.NotificationType.MOTIVATIONAL
         );
@@ -182,8 +183,8 @@ public class SocialNotificationHelper {
 
         NotificationCompat.Builder builder = new NotificationCompat.Builder(context, CHANNEL_ID)
             .setSmallIcon(R.drawable.ic_notifications)
-            .setContentTitle("New Challenge ⚔️")
-            .setContentText((displayName != null ? displayName : fromUserId) + " challenged you to " + quizType + "!")
+            .setContentTitle(title)
+            .setContentText(message)
             .setPriority(NotificationCompat.PRIORITY_DEFAULT)
             .setContentIntent(pendingIntent)
             .setAutoCancel(true);
@@ -199,12 +200,14 @@ public class SocialNotificationHelper {
         if (!canShowNotification()) return;
 
         String friendName = displayName != null ? displayName : friendUserId;
+        String title = context.getString(R.string.notification_friend_accepted_title);
+        String message = context.getString(R.string.notification_friend_accepted_message, friendName);
 
         // Add to in-app notification manager
         com.edulinguaghana.NotificationManager inAppManager = new com.edulinguaghana.NotificationManager(context);
         inAppManager.addNotification(
-            "Friend Request Accepted ✅",
-            friendName + " is now your friend!",
+            title,
+            message,
             "✅",
             com.edulinguaghana.Notification.NotificationType.ACHIEVEMENT
         );
@@ -221,8 +224,8 @@ public class SocialNotificationHelper {
 
         NotificationCompat.Builder builder = new NotificationCompat.Builder(context, CHANNEL_ID)
             .setSmallIcon(R.drawable.ic_notifications)
-            .setContentTitle("Friend Request Accepted ✅")
-            .setContentText((displayName != null ? displayName : friendUserId) + " is now your friend!")
+            .setContentTitle(title)
+            .setContentText(message)
             .setPriority(NotificationCompat.PRIORITY_DEFAULT)
             .setContentIntent(pendingIntent)
             .setAutoCancel(true);
@@ -266,10 +269,11 @@ public class SocialNotificationHelper {
         if (!canShowNotification()) return;
 
         String opponentName = displayName != null ? displayName : opponentId;
-        String title = won ? "Challenge Won! 🏆" : "Challenge Completed";
+        String title = won ? context.getString(R.string.notification_challenge_won_title) : 
+                context.getString(R.string.notification_challenge_completed_title);
         String message = won ?
-            "You beat " + opponentName + "!" :
-            "Challenge with " + opponentName + " completed!";
+            context.getString(R.string.notification_challenge_won_message, opponentName) :
+            context.getString(R.string.notification_challenge_completed_message, opponentName);
 
         // Add to in-app notification manager
         com.edulinguaghana.NotificationManager inAppManager = new com.edulinguaghana.NotificationManager(context);
@@ -299,10 +303,9 @@ public class SocialNotificationHelper {
             .setAutoCancel(true);
 
         try {
-            //noinspection MissingPermission
             notificationManager.notify(("completed_" + opponentId).hashCode(), builder.build());
         } catch (SecurityException e) {
-            // Permission not granted, silently fail
+            // Silently fail
         }
     }
 }

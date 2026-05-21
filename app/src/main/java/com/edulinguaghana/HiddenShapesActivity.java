@@ -6,6 +6,7 @@ import android.os.Handler;
 import android.os.VibrationEffect;
 import android.os.Vibrator;
 import android.speech.tts.TextToSpeech;
+import android.view.HapticFeedbackConstants;
 import android.view.View;
 import android.view.animation.AnimationUtils;
 import android.widget.TextView;
@@ -98,11 +99,26 @@ public class HiddenShapesActivity extends AppCompatActivity {
             toolbar.setNavigationOnClickListener(v -> finish());
         }
 
-        btnNext.setOnClickListener(v -> generateNewCharacter());
-        btnRestart.setOnClickListener(v -> startNewGame());
-        btnResume.setOnClickListener(v -> togglePause());
-        findViewById(R.id.btnPause).setOnClickListener(v -> togglePause());
-        findViewById(R.id.btnQuit).setOnClickListener(v -> finish());
+        btnNext.setOnClickListener(v -> {
+            v.performHapticFeedback(HapticFeedbackConstants.KEYBOARD_TAP);
+            generateNewCharacter();
+        });
+        btnRestart.setOnClickListener(v -> {
+            v.performHapticFeedback(HapticFeedbackConstants.VIRTUAL_KEY);
+            startNewGame();
+        });
+        btnResume.setOnClickListener(v -> {
+            v.performHapticFeedback(HapticFeedbackConstants.VIRTUAL_KEY);
+            togglePause();
+        });
+        findViewById(R.id.btnPause).setOnClickListener(v -> {
+            v.performHapticFeedback(HapticFeedbackConstants.LONG_PRESS);
+            togglePause();
+        });
+        findViewById(R.id.btnQuit).setOnClickListener(v -> {
+            v.performHapticFeedback(HapticFeedbackConstants.VIRTUAL_KEY);
+            finish();
+        });
 
         initTts();
         initSounds();
@@ -171,7 +187,7 @@ public class HiddenShapesActivity extends AppCompatActivity {
         isPaused = !isPaused;
         if (isPaused) {
             if (gameTimer != null) gameTimer.cancel();
-            showPauseOverlay("Paused");
+            showPauseOverlay(getString(R.string.game_status_paused));
         } else {
             overlayLayout.setVisibility(View.GONE);
             startTimer(timeLeftMs);
@@ -229,7 +245,7 @@ public class HiddenShapesActivity extends AppCompatActivity {
             FunGameProgressManager.recordGameCompleted(this, "hidden_shapes", score, languageCode, (System.currentTimeMillis() - gameStartTime) / 1000);
         } catch (Exception ignored) { }
 
-        showPauseOverlay("Time Up!");
+        showPauseOverlay(getString(R.string.game_over_time_up));
     }
 
     private void saveChallengeResult() {
@@ -260,11 +276,11 @@ public class HiddenShapesActivity extends AppCompatActivity {
         TextView scoreText = findViewById(R.id.tvOverlayScore);
         
         if (isPaused && !isGameOver) {
-            scoreText.setText("Status: Paused");
+            scoreText.setText(R.string.game_status_mission_status_paused);
             btnResume.setVisibility(View.VISIBLE);
             btnRestart.setVisibility(View.GONE);
         } else {
-            scoreText.setText("Mission Score: " + score);
+            scoreText.setText(getString(R.string.game_mission_score, score));
             btnResume.setVisibility(View.GONE);
             btnRestart.setVisibility(View.VISIBLE);
         }

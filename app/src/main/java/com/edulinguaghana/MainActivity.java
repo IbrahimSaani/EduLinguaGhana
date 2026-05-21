@@ -1125,32 +1125,32 @@ public class MainActivity extends AppCompatActivity {
         ));
         menuItems.add(new StyledMenuHelper.MenuItem(
                 "🚀",
-                "Rocket Sort",
-                "Drag asteroids into rockets",
+                getString(R.string.game_rocket_sort_title),
+                getString(R.string.game_rocket_sort_desc),
                 () -> openRocketSortScreen(langCode, langName)
         ));
         menuItems.add(new StyledMenuHelper.MenuItem(
                 "🫧",
-                "Bubble Pop",
-                "Pop the target letters",
+                getString(R.string.game_bubble_pop_title),
+                getString(R.string.game_bubble_pop_desc),
                 () -> openBubblePopScreen(langCode, langName)
         ));
         menuItems.add(new StyledMenuHelper.MenuItem(
                 "🏃",
-                "Speed Challenge",
-                "Fast-paced quick reaction",
+                getString(R.string.game_speed_challenge_title),
+                getString(R.string.game_speed_challenge_desc),
                 () -> openSpeedGameScreen(langCode, langName)
         ));
         menuItems.add(new StyledMenuHelper.MenuItem(
                 "🏜️",
-                "Hidden Shapes",
-                "Rub the sand to reveal items",
+                getString(R.string.game_hidden_shapes_title),
+                getString(R.string.game_hidden_shapes_desc),
                 () -> openHiddenShapesScreen(langCode, langName)
         ));
         menuItems.add(new StyledMenuHelper.MenuItem(
                 "🧩",
-                "Shape Match Puzzle",
-                "Match the letters to the slots",
+                getString(R.string.game_puzzle_match_title),
+                getString(R.string.game_puzzle_match_desc),
                 () -> openPuzzleGameScreen(langCode, langName)
         ));
 
@@ -1594,14 +1594,14 @@ public class MainActivity extends AppCompatActivity {
         if (role == UserRole.TEACHER) {
             // Check if item already exists before adding
             if (menu.findItem(R.id.menu_my_students) == null) {
-                menu.add(0, R.id.menu_my_students, 100, "My Students")
+                menu.add(0, R.id.menu_my_students, 100, getString(R.string.main_menu_my_students))
                     .setIcon(android.R.drawable.ic_menu_agenda)
                     .setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM);
             }
         } else if (role == UserRole.PARENT) {
             // Check if item already exists before adding
             if (menu.findItem(R.id.menu_my_children) == null) {
-                menu.add(0, R.id.menu_my_children, 100, "My Children")
+                menu.add(0, R.id.menu_my_children, 100, getString(R.string.main_menu_my_children))
                     .setIcon(android.R.drawable.ic_menu_agenda)
                     .setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM);
             }
@@ -1609,7 +1609,7 @@ public class MainActivity extends AppCompatActivity {
             // Student - add connection management
             // Check if item already exists before adding
             if (menu.findItem(R.id.menu_connections) == null) {
-                menu.add(0, R.id.menu_connections, 100, "Connections")
+                menu.add(0, R.id.menu_connections, 100, getString(R.string.main_menu_connections))
                     .setIcon(android.R.drawable.ic_menu_add)
                     .setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM);
             }

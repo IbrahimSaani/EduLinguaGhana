@@ -215,6 +215,10 @@ public class AlphabetActivity extends AppCompatActivity {
         }
 
         progressBar.setMax(letters.length);
+        if (seekBarNavigation != null) {
+            seekBarNavigation.setMax(letters.length - 1);
+            seekBarNavigation.setProgress(currentIndex);
+        }
 
         // Initialize Offline TTS for native languages (loads from res/raw)
         offlineTts = new OfflineGhanaLPTtsService(this);
@@ -262,6 +266,7 @@ public class AlphabetActivity extends AppCompatActivity {
                     checkAndLogCompletion();
                 }
                 updateLetterWithAnimation();
+                if (seekBarNavigation != null) seekBarNavigation.setProgress(currentIndex);
                 if (isRecitalMode) speakCurrentLetter();
             } catch (Exception e) {
                 android.util.Log.e("AlphabetActivity", "Error advancing letter", e);
@@ -279,6 +284,7 @@ public class AlphabetActivity extends AppCompatActivity {
                 currentIndex--;
                 if (currentIndex < 0) currentIndex = letters.length - 1;
                 updateLetterWithAnimation();
+                if (seekBarNavigation != null) seekBarNavigation.setProgress(currentIndex);
                 if (isRecitalMode) speakCurrentLetter();
             } catch (Exception e) {
                 android.util.Log.e("AlphabetActivity", "Error going back letter", e);
@@ -816,7 +822,6 @@ public class AlphabetActivity extends AppCompatActivity {
 
         switch (letter.toUpperCase()) {
             // Vowels
-            case "A": return "ay";
             case "E": return "ee";
             case "I": return "eye";
             case "O": return "oh";
@@ -826,10 +831,9 @@ public class AlphabetActivity extends AppCompatActivity {
             // Consonants that need special pronunciation
             case "H": return "aitch";
             case "W": return "double you";
-            case "X": return "eks";
             case "Z": return "zee";
 
-            // For all other letters, just return as is
+            // For all other letters (including A and X), just return as is
             default:
                 return letter;
         }
@@ -1326,7 +1330,7 @@ public class AlphabetActivity extends AppCompatActivity {
                     textView.setTextColor(getColor(R.color.textColorPrimary));
                     card.setCardBackgroundColor(ColorStateList.valueOf(getColor(R.color.white)));
                 }
-                
+
                 return convertView;
             }
         };
@@ -1334,7 +1338,7 @@ public class AlphabetActivity extends AppCompatActivity {
         gridView.setAdapter(adapter);
         gridView.setOnItemClickListener((parent, view, position, id) -> {
             currentIndex = position;
-            seekBarNavigation.setProgress(position);
+            if (seekBarNavigation != null) seekBarNavigation.setProgress(position);
             updateLetterWithAnimation();
             if (isRecitalMode) speakCurrentLetter();
             dialog.dismiss();

@@ -3,6 +3,7 @@ package com.edulinguaghana.tracking;
 import android.content.Context;
 import android.util.Log;
 
+import com.edulinguaghana.R;
 import com.edulinguaghana.StreakManager;
 import com.edulinguaghana.gamification.XPState;
 import com.edulinguaghana.gamification.XPManager;
@@ -85,7 +86,7 @@ public class ProgressTracker {
                 updateAggregates(context, finalUserId);
 
                 // Check for milestones
-                checkMilestones(finalUserId, score, correctAnswers, totalQuestions);
+                checkMilestones(context, finalUserId, score, correctAnswers, totalQuestions);
 
                 if (callback != null) callback.onSuccess();
             })
@@ -224,7 +225,7 @@ public class ProgressTracker {
     /**
      * Log achievement unlocked
      */
-    public void logAchievement(String userId, String achievementId, String achievementName, ProgressCallback callback) {
+    public void logAchievement(Context context, String userId, String achievementId, String achievementName, ProgressCallback callback) {
         if (userId == null) return;
 
         String activityId = UUID.randomUUID().toString();
@@ -247,8 +248,10 @@ public class ProgressTracker {
                 Log.d(TAG, "Achievement logged: " + achievementId);
 
                 // This is a milestone - notify supervisors
-                createMilestone(userId, "Achievement Unlocked: " + achievementName,
-                              "achievement", achievementId);
+                if (context != null) {
+                    createMilestone(userId, context.getString(R.string.notification_milestone_achievement, achievementName),
+                                  "achievement", achievementId);
+                }
 
                 if (callback != null) callback.onSuccess();
             })
@@ -261,7 +264,7 @@ public class ProgressTracker {
     /**
      * Log streak milestone
      */
-    public void logStreakMilestone(String userId, int streakDays, ProgressCallback callback) {
+    public void logStreakMilestone(Context context, String userId, int streakDays, ProgressCallback callback) {
         if (userId == null) return;
 
         String activityId = UUID.randomUUID().toString();
@@ -282,8 +285,8 @@ public class ProgressTracker {
                 Log.d(TAG, "Streak milestone logged: " + streakDays);
 
                 // Create milestone for significant streaks
-                if (streakDays >= 7 && streakDays % 7 == 0) {
-                    createMilestone(userId, streakDays + "-Day Streak!",
+                if (streakDays >= 7 && streakDays % 7 == 0 && context != null) {
+                    createMilestone(userId, context.getString(R.string.notification_milestone_streak, streakDays),
                                   "streak", String.valueOf(streakDays));
                 }
 
@@ -429,17 +432,17 @@ public class ProgressTracker {
     /**
      * Check for milestone achievements
      */
-    private void checkMilestones(String userId, int score, int correctAnswers, int totalQuestions) {
+    private void checkMilestones(Context context, String userId, int score, int correctAnswers, int totalQuestions) {
         // Perfect score milestone
         if (correctAnswers == totalQuestions && totalQuestions > 0) {
-            createMilestone(userId, "Perfect Score!", "perfect_score", String.valueOf(score));
+            createMilestone(userId, context.getString(R.string.notification_milestone_perfect_score), "perfect_score", String.valueOf(score));
         }
 
         // High score milestone (>90%)
         if (totalQuestions > 0) {
             double percentage = (correctAnswers * 100.0) / totalQuestions;
             if (percentage >= 90) {
-                createMilestone(userId, "Excellent Performance - " + (int)percentage + "%!",
+                createMilestone(userId, context.getString(R.string.notification_milestone_excellent, (int)percentage),
                               "high_score", String.valueOf(score));
             }
         }

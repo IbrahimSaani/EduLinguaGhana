@@ -12,10 +12,45 @@
 #   public *;
 #}
 
-# Uncomment this to preserve the line number information for
-# debugging stack traces.
-#-keepattributes SourceFile,LineNumberTable
+# EduLingua Ghana ProGuard Rules
 
-# If you keep the line number information, uncomment this to
-# hide the original source file name.
-#-renamesourcefileattribute SourceFile
+# Preservation of line numbers for crash reporting
+-keepattributes SourceFile,LineNumberTable
+-renamesourcefileattribute SourceFile
+
+# --- Firebase rules ---
+-keep class com.google.firebase.** { *; }
+-dontwarn com.google.firebase.**
+
+# --- Firebase Realtime Database Models ---
+# Preserve the model classes used for Firebase serialization
+-keep class com.edulinguaghana.tracking.ProgressActivity { *; }
+-keep class com.edulinguaghana.tracking.ProgressAggregate { *; }
+-keep class com.edulinguaghana.tracking.StudentProgressItem { *; }
+-keep class com.edulinguaghana.roles.UserRole { *; }
+-keep class com.edulinguaghana.roles.UserRelationship { *; }
+-keep class com.edulinguaghana.social.Challenge { *; }
+-keep class com.edulinguaghana.gamification.Badge { *; }
+-keep class com.edulinguaghana.gamification.Quest { *; }
+-keep class com.edulinguaghana.Achievement { *; }
+
+# --- Lottie rules ---
+-keep class com.airbnb.lottie.** { *; }
+
+# --- Facebook SDK rules ---
+-keep class com.facebook.** { *; }
+-dontwarn com.facebook.**
+
+# --- Keep methods with specific annotations ---
+-keepattributes *Annotation*
+-keepclassmembers class * {
+    @com.google.firebase.database.PropertyName *;
+    @com.google.firebase.database.IgnoreExtraProperties *;
+    @com.google.firebase.database.Exclude *;
+}
+
+# --- Preserve names for JNI or Reflection if needed ---
+-keepclassmembers enum * {
+    public static **[] values();
+    public static ** valueOf(java.lang.String);
+}

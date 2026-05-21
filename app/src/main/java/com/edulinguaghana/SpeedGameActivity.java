@@ -11,6 +11,7 @@ import android.os.Handler;
 import android.os.Looper;
 import android.speech.tts.TextToSpeech;
 import android.util.Log;
+import android.view.HapticFeedbackConstants;
 import android.view.View;
 import android.view.DragEvent;
 import android.content.ClipData;
@@ -150,20 +151,24 @@ public class SpeedGameActivity extends AppCompatActivity {
         initTts();
 
         // --- Button listeners ---
-        btnOption1.setOnClickListener(v -> handleAnswerClick((MaterialButton) v));
-        btnOption2.setOnClickListener(v -> handleAnswerClick((MaterialButton) v));
-        btnOption3.setOnClickListener(v -> handleAnswerClick((MaterialButton) v));
-        btnOption4.setOnClickListener(v -> handleAnswerClick((MaterialButton) v));
-        btnOption5.setOnClickListener(v -> handleAnswerClick((MaterialButton) v));
-        btnOption6.setOnClickListener(v -> handleAnswerClick((MaterialButton) v));
+        btnOption1.setOnClickListener(v -> { v.performHapticFeedback(HapticFeedbackConstants.KEYBOARD_TAP); handleAnswerClick((MaterialButton) v); });
+        btnOption2.setOnClickListener(v -> { v.performHapticFeedback(HapticFeedbackConstants.KEYBOARD_TAP); handleAnswerClick((MaterialButton) v); });
+        btnOption3.setOnClickListener(v -> { v.performHapticFeedback(HapticFeedbackConstants.KEYBOARD_TAP); handleAnswerClick((MaterialButton) v); });
+        btnOption4.setOnClickListener(v -> { v.performHapticFeedback(HapticFeedbackConstants.KEYBOARD_TAP); handleAnswerClick((MaterialButton) v); });
+        btnOption5.setOnClickListener(v -> { v.performHapticFeedback(HapticFeedbackConstants.KEYBOARD_TAP); handleAnswerClick((MaterialButton) v); });
+        btnOption6.setOnClickListener(v -> { v.performHapticFeedback(HapticFeedbackConstants.KEYBOARD_TAP); handleAnswerClick((MaterialButton) v); });
 
         btnBack.setOnClickListener(v -> {
+            v.performHapticFeedback(HapticFeedbackConstants.VIRTUAL_KEY);
             cancelTimer();
             finish();
         });
 
         if (btnPlayAudio != null) {
-            btnPlayAudio.setOnClickListener(v -> playAudio());
+            btnPlayAudio.setOnClickListener(v -> {
+                v.performHapticFeedback(HapticFeedbackConstants.LONG_PRESS);
+                playAudio();
+            });
         }
 
         // --- Start game ---

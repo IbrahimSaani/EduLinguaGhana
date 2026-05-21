@@ -12,6 +12,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.speech.tts.TextToSpeech;
+import android.view.HapticFeedbackConstants;
 import android.view.Gravity;
 import android.view.View;
 import android.view.animation.AccelerateDecelerateInterpolator;
@@ -139,9 +140,18 @@ public class BubblePopActivity extends AppCompatActivity {
         dynamicBackground = findViewById(R.id.dynamicBackground);
         konfettiView = findViewById(R.id.konfettiView);
 
-        findViewById(R.id.btnResume).setOnClickListener(v -> togglePause());
-        findViewById(R.id.btnRestart).setOnClickListener(v -> startNewGame());
-        findViewById(R.id.btnQuit).setOnClickListener(v -> finish());
+        findViewById(R.id.btnResume).setOnClickListener(v -> {
+            v.performHapticFeedback(HapticFeedbackConstants.VIRTUAL_KEY);
+            togglePause();
+        });
+        findViewById(R.id.btnRestart).setOnClickListener(v -> {
+            v.performHapticFeedback(HapticFeedbackConstants.VIRTUAL_KEY);
+            startNewGame();
+        });
+        findViewById(R.id.btnQuit).setOnClickListener(v -> {
+            v.performHapticFeedback(HapticFeedbackConstants.VIRTUAL_KEY);
+            finish();
+        });
 
         // Pre-warm character arrays
         new Handler(Looper.getMainLooper()).post(() -> {
@@ -347,7 +357,7 @@ public class BubblePopActivity extends AppCompatActivity {
             FunGameProgressManager.recordGameCompleted(this, "bubble_pop", score, languageCode, (System.currentTimeMillis() - gameStartTime) / 1000);
         } catch (Exception ignored) { }
 
-        showPauseOverlay("Time Up!");
+        showPauseOverlay(getString(R.string.game_over_time_up));
     }
 
     private void saveChallengeResult() {
@@ -386,7 +396,7 @@ public class BubblePopActivity extends AppCompatActivity {
             for (android.animation.AnimatorSet anim : bubbleAnimators.values()) {
                 anim.pause();
             }
-            showPauseOverlay("Paused");
+            showPauseOverlay(getString(R.string.game_status_paused));
         } else {
             overlayLayout.setVisibility(View.GONE);
             if (backgroundMusic != null && !isGameOver) {
@@ -411,11 +421,11 @@ public class BubblePopActivity extends AppCompatActivity {
         tvTitle.setText(title);
         
         if (isPaused && !isGameOver) {
-            scoreText.setText("Game Status: Paused");
+            scoreText.setText(R.string.game_status_game_paused);
             resumeBtn.setVisibility(View.VISIBLE);
             restartBtn.setVisibility(View.GONE);
         } else {
-            scoreText.setText("Final Score: " + score);
+            scoreText.setText(getString(R.string.quiz_final_score, score));
             resumeBtn.setVisibility(View.GONE);
             restartBtn.setVisibility(View.VISIBLE);
         }
@@ -611,6 +621,7 @@ public class BubblePopActivity extends AppCompatActivity {
         if (isTarget) {
             // Mark as popped to prevent "escaped" message
             wrapper.setTag(R.id.bubbleContainer, true);
+            bubble.performHapticFeedback(HapticFeedbackConstants.KEYBOARD_TAP);
             
             popBubble(bubble, true);
             score++;
@@ -630,6 +641,7 @@ public class BubblePopActivity extends AppCompatActivity {
             } catch (Exception ignored) {}
         } else {
             // Wrong bubble: Shake and sound
+            bubble.performHapticFeedback(HapticFeedbackConstants.LONG_PRESS);
             if (soundPool != null) {
                 soundPool.play(soundWrongId, 0.8f, 0.8f, 0, 0, 1f);
             }

@@ -108,6 +108,15 @@ public class StreakManager {
         if (currentStreak % 7 == 0 && currentStreak > 0 && AppPreferences.isStreakAlertsEnabled(context)) {
             NotificationManager notificationManager = new NotificationManager(context);
             notificationManager.sendStreakNotification(currentStreak);
+
+            // Log to Firebase tracker
+            try {
+                com.google.firebase.auth.FirebaseUser user = com.google.firebase.auth.FirebaseAuth.getInstance().getCurrentUser();
+                if (user != null) {
+                    com.edulinguaghana.tracking.ProgressTracker tracker = new com.edulinguaghana.tracking.ProgressTracker();
+                    tracker.logStreakMilestone(context, user.getUid(), currentStreak, null);
+                }
+            } catch (Exception ignored) {}
         }
     }
 
