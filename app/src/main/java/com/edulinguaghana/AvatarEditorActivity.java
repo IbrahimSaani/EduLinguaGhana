@@ -283,24 +283,32 @@ public class AvatarEditorActivity extends AppCompatActivity {
         com.google.firebase.auth.FirebaseUser currentUser = com.google.firebase.auth.FirebaseAuth.getInstance().getCurrentUser();
         if (currentUser == null) return;
 
-        com.google.firebase.database.DatabaseReference usersRef =
-                com.google.firebase.database.FirebaseDatabase.getInstance()
-                        .getReference("users")
-                        .child(currentUser.getUid());
+        String uid = currentUser.getUid();
+        com.google.firebase.database.FirebaseDatabase db = com.google.firebase.database.FirebaseDatabase.getInstance();
+        
+        java.util.Map<String, Object> avatarMap = config.toMap();
+        long now = System.currentTimeMillis();
 
-        java.util.Map<String, Object> updates = new java.util.HashMap<>();
-        updates.put("avatar", config.toMap());
-        updates.put("avatarUpdatedAt", System.currentTimeMillis());
+        // 1. Update user profile
+        com.google.firebase.database.DatabaseReference usersRef = db.getReference("users").child(uid);
+        java.util.Map<String, Object> userUpdates = new java.util.HashMap<>();
+        userUpdates.put("avatar", avatarMap);
+        userUpdates.put("avatarUpdatedAt", now);
+        usersRef.updateChildren(userUpdates);
 
-        usersRef.updateChildren(updates)
-                .addOnCompleteListener(task -> {
-                    if (task.isSuccessful()) {
-                        android.util.Log.d("AvatarEditor", "Avatar saved to database successfully");
-                    } else {
-                        android.util.Log.e("AvatarEditor", "Failed to save avatar to database: " +
-                            (task.getException() != null ? task.getException().getMessage() : "Unknown error"));
-                    }
-                });
+        // 2. Update leaderboard entry if it exists
+        com.google.firebase.database.DatabaseReference leaderboardRef = db.getReference("leaderboard").child(uid);
+        leaderboardRef.addListenerForSingleValueEvent(new com.google.firebase.database.ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull com.google.firebase.database.DataSnapshot snapshot) {
+                if (snapshot.exists()) {
+                    leaderboardRef.child("avatar").setValue(avatarMap);
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull com.google.firebase.database.DatabaseError error) {}
+        });
     }
 
     @Override

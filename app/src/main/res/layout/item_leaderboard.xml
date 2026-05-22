@@ -25,14 +25,12 @@
 
         <!-- Rank Badge -->
         <com.google.android.material.card.MaterialCardView
-            android:layout_width="54dp"
-            android:layout_height="54dp"
-            android:layout_marginEnd="12dp"
-            app:cardCornerRadius="27dp"
-            app:cardElevation="4dp"
-            app:strokeWidth="2dp"
-            app:strokeColor="@color/colorPrimary"
-            app:cardBackgroundColor="@color/colorAccent">
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            app:cardCornerRadius="24dp"
+            app:cardElevation="2dp"
+            app:strokeWidth="0dp"
+            app:cardBackgroundColor="@color/cardBackground">
 
             <TextView
                 android:id="@+id/tvRank"
@@ -40,10 +38,28 @@
                 android:layout_height="match_parent"
                 android:gravity="center"
                 android:text="1"
-                android:textSize="24sp"
+                android:textSize="18sp"
                 android:textStyle="bold"
-                android:textColor="#FFFFFF"
+                android:textColor="@color/textColorPrimary"
                 android:fontFamily="@font/agbalumo" />
+
+        </com.google.android.material.card.MaterialCardView>
+
+        <!-- Avatar -->
+        <com.google.android.material.card.MaterialCardView
+            android:layout_width="52dp"
+            android:layout_height="52dp"
+            android:layout_marginStart="8dp"
+            app:cardCornerRadius="26dp"
+            app:cardElevation="2dp"
+            app:strokeWidth="2dp"
+            app:strokeColor="@color/white">
+
+            <com.edulinguaghana.AvatarView
+                android:id="@+id/ivUserAvatar"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:scaleType="centerInside" />
 
         </com.google.android.material.card.MaterialCardView>
 

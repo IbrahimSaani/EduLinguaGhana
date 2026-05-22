@@ -40,6 +40,15 @@ public class LeaderboardAdapter extends RecyclerView.Adapter<LeaderboardAdapter.
         holder.tvUserName.setText(entry.getUserName());
         holder.tvScore.setText(String.valueOf(entry.getScore()));
 
+        // Set user avatar if available
+        if (entry.getAvatarData() != null && holder.ivUserAvatar != null) {
+            AvatarBuilder.AvatarConfig config = AvatarBuilder.AvatarConfig.fromMap(entry.getAvatarData());
+            holder.ivUserAvatar.setAvatarConfig(config);
+        } else if (holder.ivUserAvatar != null) {
+            // Set a default config if none exists
+            holder.ivUserAvatar.setAvatarConfig(new AvatarBuilder.AvatarConfig());
+        }
+
         // Set rank badge - display rank number or medal emoji for top 3
         if (rank == 1) {
             holder.tvRank.setText("🥇");
@@ -51,28 +60,22 @@ public class LeaderboardAdapter extends RecyclerView.Adapter<LeaderboardAdapter.
             holder.tvRank.setText(String.valueOf(rank));
         }
 
-        // Style main card based on rank - Enhanced for top ranks
-        if (rank == 1) {
-            holder.cardView.setCardBackgroundColor(ContextCompat.getColor(context, R.color.notification_achievement_bg));
+        // Highlight current user
+        com.google.firebase.auth.FirebaseUser currentUser = com.google.firebase.auth.FirebaseAuth.getInstance().getCurrentUser();
+        boolean isCurrentUser = currentUser != null && currentUser.getUid().equals(entry.getUserId());
+
+        // Style main card
+        if (isCurrentUser) {
+            holder.cardView.setCardBackgroundColor(Color.parseColor("#E3F2FD")); // Light blue
             holder.cardView.setStrokeWidth(4);
-            holder.cardView.setStrokeColor(ContextCompat.getColor(context, R.color.colorAccent));
-            holder.cardView.setCardElevation(8);
-        } else if (rank == 2) {
-            holder.cardView.setCardBackgroundColor(ContextCompat.getColor(context, R.color.notification_milestone_bg));
-            holder.cardView.setStrokeWidth(3);
             holder.cardView.setStrokeColor(ContextCompat.getColor(context, R.color.colorPrimary));
-            holder.cardView.setCardElevation(6);
-        } else if (rank == 3) {
-            holder.cardView.setCardBackgroundColor(ContextCompat.getColor(context, R.color.notification_motivational_bg));
-            holder.cardView.setStrokeWidth(2);
-            holder.cardView.setStrokeColor(ContextCompat.getColor(context, R.color.colorPrimary));
-            holder.cardView.setCardElevation(5);
         } else {
-            holder.cardView.setCardBackgroundColor(ContextCompat.getColor(context, android.R.color.white));
-            holder.cardView.setStrokeWidth(2);
+            holder.cardView.setCardBackgroundColor(Color.WHITE);
+            holder.cardView.setStrokeWidth(1);
             holder.cardView.setStrokeColor(Color.parseColor("#EEEEEE"));
-            holder.cardView.setCardElevation(4);
         }
+        
+        holder.cardView.setCardElevation(isCurrentUser ? 6 : 2);
     }
 
     @Override
@@ -80,11 +83,17 @@ public class LeaderboardAdapter extends RecyclerView.Adapter<LeaderboardAdapter.
         return leaderboardList.size();
     }
 
+    public void updateList(List<LeaderboardEntry> newList) {
+        this.leaderboardList = newList;
+        notifyDataSetChanged();
+    }
+
     static class LeaderboardViewHolder extends RecyclerView.ViewHolder {
         MaterialCardView cardView;
         TextView tvRank;
         TextView tvUserName;
         TextView tvScore;
+        AvatarView ivUserAvatar;
 
         public LeaderboardViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -92,6 +101,7 @@ public class LeaderboardAdapter extends RecyclerView.Adapter<LeaderboardAdapter.
             tvRank = itemView.findViewById(R.id.tvRank);
             tvUserName = itemView.findViewById(R.id.tvUserName);
             tvScore = itemView.findViewById(R.id.tvScore);
+            ivUserAvatar = itemView.findViewById(R.id.ivUserAvatar);
         }
     }
 }

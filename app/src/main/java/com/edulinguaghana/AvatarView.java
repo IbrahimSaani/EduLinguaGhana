@@ -30,9 +30,8 @@ public class AvatarView extends androidx.appcompat.widget.AppCompatImageView {
     }
 
     private void init(Context context) {
-        config = AvatarBuilder.loadConfig(context);
-        builder = new AvatarBuilder(context, config);
-        updateAvatar();
+        // Don't auto-load config here to prevent all AvatarViews from defaulting to current user
+        // We will call updateAvatar() when config is set
     }
 
     public void setAvatarConfig(AvatarBuilder.AvatarConfig config) {

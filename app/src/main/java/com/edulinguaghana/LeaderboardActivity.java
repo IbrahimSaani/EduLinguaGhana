@@ -45,6 +45,17 @@ public class LeaderboardActivity extends AppCompatActivity {
     private TextView tvYourScore;
     private androidx.swiperefreshlayout.widget.SwipeRefreshLayout swipeRefreshLayout;
 
+    // Podium views
+    private View podiumSection;
+    private AvatarView avatar1st, avatar2nd, avatar3rd;
+    private TextView name1st, name2nd, name3rd;
+    private TextView score1st, score2nd, score3rd;
+
+    // Sticky footer views
+    private View userRankStickyFooter;
+    private TextView tvFooterRank, tvFooterName, tvFooterScore;
+    private AvatarView ivFooterAvatar;
+
     private OfflineManager offlineManager;
     private DatabaseReference leaderboardRef;
     private List<LeaderboardEntry> leaderboardList;
@@ -73,6 +84,25 @@ public class LeaderboardActivity extends AppCompatActivity {
         tvYourRank = findViewById(R.id.tvYourRank);
         tvYourScore = findViewById(R.id.tvYourScore);
         swipeRefreshLayout = findViewById(R.id.swipeRefreshLayout);
+
+        // Podium views
+        podiumSection = findViewById(R.id.podiumSection);
+        avatar1st = findViewById(R.id.avatar1st);
+        avatar2nd = findViewById(R.id.avatar2nd);
+        avatar3rd = findViewById(R.id.avatar3rd);
+        name1st = findViewById(R.id.name1st);
+        name2nd = findViewById(R.id.name2nd);
+        name3rd = findViewById(R.id.name3rd);
+        score1st = findViewById(R.id.score1st);
+        score2nd = findViewById(R.id.score2nd);
+        score3rd = findViewById(R.id.score3rd);
+
+        // Sticky footer
+        userRankStickyFooter = findViewById(R.id.userRankStickyFooter);
+        tvFooterRank = findViewById(R.id.tvFooterRank);
+        tvFooterName = findViewById(R.id.tvFooterName);
+        tvFooterScore = findViewById(R.id.tvFooterScore);
+        ivFooterAvatar = findViewById(R.id.ivFooterAvatar);
 
         // Initialize managers
         offlineManager = new OfflineManager(this);
@@ -245,7 +275,10 @@ public class LeaderboardActivity extends AppCompatActivity {
                                 }
 
                                 // 3. Fetch avatar data
-                                if (userSnapshot.child("avatarData").exists()) {
+                                if (userSnapshot.child("avatar").exists()) {
+                                    entry.setAvatarData((java.util.Map<String, Object>) userSnapshot.child("avatar").getValue());
+                                } else if (userSnapshot.child("avatarData").exists()) {
+                                    // Fallback for legacy key
                                     entry.setAvatarData((java.util.Map<String, Object>) userSnapshot.child("avatarData").getValue());
                                 }
 
@@ -316,9 +349,19 @@ public class LeaderboardActivity extends AppCompatActivity {
             emptyStateLayout.setVisibility(View.GONE);
             mainContentLayout.setVisibility(View.VISIBLE);
 
+            // Handle Podium
+            setupPodium();
+
+            // Create a sublist for the RecyclerView starting from index 3 (rank 4 onwards)
+            List<LeaderboardEntry> listForAdapter = new ArrayList<>();
+            if (leaderboardList.size() > 3) {
+                listForAdapter.addAll(leaderboardList.subList(3, leaderboardList.size()));
+            }
+            
+            adapter.updateList(listForAdapter);
+
             // Animate the leaderboard content entrance
             animateLeaderboardEntrance();
-            adapter.notifyDataSetChanged();
 
             // Update user's rank and score with celebration
             updateUserRank();
@@ -329,30 +372,87 @@ public class LeaderboardActivity extends AppCompatActivity {
         }
     }
 
+    private void setupPodium() {
+        if (!leaderboardList.isEmpty()) {
+            podiumSection.setVisibility(View.VISIBLE);
+            
+            // 1st Place
+            LeaderboardEntry first = leaderboardList.get(0);
+            name1st.setText(first.getUserName());
+            score1st.setText(first.getScore() + " pts");
+            if (first.getAvatarData() != null) {
+                avatar1st.setAvatarConfig(AvatarBuilder.AvatarConfig.fromMap(first.getAvatarData()));
+            } else {
+                avatar1st.setAvatarConfig(new AvatarBuilder.AvatarConfig());
+            }
+
+            // 2nd Place
+            if (leaderboardList.size() >= 2) {
+                LeaderboardEntry second = leaderboardList.get(1);
+                name2nd.setText(second.getUserName());
+                score2nd.setText(second.getScore() + " pts");
+                if (second.getAvatarData() != null) {
+                    avatar2nd.setAvatarConfig(AvatarBuilder.AvatarConfig.fromMap(second.getAvatarData()));
+                } else {
+                    avatar2nd.setAvatarConfig(new AvatarBuilder.AvatarConfig());
+                }
+            }
+
+            // 3rd Place
+            if (leaderboardList.size() >= 3) {
+                LeaderboardEntry third = leaderboardList.get(2);
+                name3rd.setText(third.getUserName());
+                score3rd.setText(third.getScore() + " pts");
+                if (third.getAvatarData() != null) {
+                    avatar3rd.setAvatarConfig(AvatarBuilder.AvatarConfig.fromMap(third.getAvatarData()));
+                } else {
+                    avatar3rd.setAvatarConfig(new AvatarBuilder.AvatarConfig());
+                }
+            }
+        } else {
+            podiumSection.setVisibility(View.GONE);
+        }
+    }
+
 
     private void updateUserRank() {
         if (currentUser == null) {
             tvYourRank.setText("#--");
             tvYourScore.setText("0");
+            userRankStickyFooter.setVisibility(View.GONE);
             return;
         }
 
         // Find user's rank and score from leaderboard
         int rank = -1;
-        int userScore = 0;
+        LeaderboardEntry userEntry = null;
 
         for (int i = 0; i < leaderboardList.size(); i++) {
             LeaderboardEntry entry = leaderboardList.get(i);
             if (entry.getUserId() != null && entry.getUserId().equals(currentUser.getUid())) {
                 rank = i + 1;
-                userScore = entry.getScore();
+                userEntry = entry;
                 break;
             }
         }
 
         if (rank > 0) {
             tvYourRank.setText("#" + rank);
-            tvYourScore.setText(String.valueOf(userScore));
+            tvYourScore.setText(String.valueOf(userEntry.getScore()));
+
+            // Handle Sticky Footer
+            // Show footer if user is not in top 3 (already shown in podium)
+            if (rank > 3) {
+                userRankStickyFooter.setVisibility(View.VISIBLE);
+                tvFooterRank.setText("#" + rank);
+                tvFooterName.setText(userEntry.getUserName());
+                tvFooterScore.setText(userEntry.getScore() + " pts");
+                if (userEntry.getAvatarData() != null) {
+                    ivFooterAvatar.setAvatarConfig(AvatarBuilder.AvatarConfig.fromMap(userEntry.getAvatarData()));
+                }
+            } else {
+                userRankStickyFooter.setVisibility(View.GONE);
+            }
 
             // Animate rank update with celebration
             animateRankUpdate(rank);
@@ -364,6 +464,7 @@ public class LeaderboardActivity extends AppCompatActivity {
         } else {
             tvYourRank.setText("#--");
             tvYourScore.setText("0");
+            userRankStickyFooter.setVisibility(View.GONE);
         }
     }
 
