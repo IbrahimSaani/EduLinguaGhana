@@ -197,84 +197,147 @@
             android:layout_height="match_parent"
             android:orientation="vertical">
 
-            <!-- Hero Section -->
+            <!-- Hero Section (Your Status) -->
             <com.google.android.material.card.MaterialCardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_margin="16dp"
-                app:cardCornerRadius="20dp"
-                app:cardElevation="6dp"
+                app:cardCornerRadius="28dp"
+                app:cardElevation="10dp"
                 app:strokeWidth="0dp">
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:background="@drawable/bg_leaderboard_rank_card"
-                    android:orientation="horizontal"
-                    android:padding="24dp"
-                    android:gravity="center_vertical">
+                    android:orientation="vertical"
+                    android:padding="20dp">
 
                     <LinearLayout
-                        android:layout_width="0dp"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:orientation="vertical">
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical"
+                        android:layout_marginBottom="16dp">
 
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="YOUR RANK"
-                            android:textSize="12sp"
-                            android:textColor="#BDBDBD"
-                            android:letterSpacing="0.1"
-                            android:textStyle="bold" />
+                        <com.google.android.material.card.MaterialCardView
+                            android:layout_width="64dp"
+                            android:layout_height="64dp"
+                            app:cardCornerRadius="32dp"
+                            app:cardElevation="4dp"
+                            app:strokeWidth="2dp"
+                            app:strokeColor="@color/white">
+                            <com.edulinguaghana.AvatarView
+                                android:id="@+id/ivYourAvatarHero"
+                                android:layout_width="match_parent"
+                                android:layout_height="match_parent"
+                                android:scaleType="centerInside" />
+                        </com.google.android.material.card.MaterialCardView>
 
-                        <TextView
-                            android:id="@+id/tvYourRank"
-                            android:layout_width="wrap_content"
+                        <LinearLayout
+                            android:layout_width="0dp"
                             android:layout_height="wrap_content"
-                            android:layout_marginTop="4dp"
-                            android:text="#--"
-                            android:textSize="36sp"
-                            android:textStyle="bold"
-                            android:textColor="@color/white"
-                            android:fontFamily="@font/agbalumo" />
+                            android:layout_weight="1"
+                            android:layout_marginStart="16dp"
+                            android:orientation="vertical">
+
+                            <TextView
+                                android:id="@+id/tvYourNameHero"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Your Performance"
+                                android:textSize="18sp"
+                                android:textStyle="bold"
+                                android:fontFamily="@font/agbalumo"
+                                android:textColor="@color/white" />
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Keep climbing the ranks! 🚀"
+                                android:textSize="12sp"
+                                android:textColor="#E0E0E0"
+                                android:alpha="0.9" />
+                        </LinearLayout>
 
                     </LinearLayout>
 
                     <View
-                        android:layout_width="1dp"
-                        android:layout_height="60dp"
+                        android:layout_width="match_parent"
+                        android:layout_height="1dp"
                         android:background="@color/white"
                         android:alpha="0.2"
-                        android:layout_marginStart="24dp"
-                        android:layout_marginEnd="24dp" />
+                        android:layout_marginBottom="16dp" />
 
                     <LinearLayout
-                        android:layout_width="0dp"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:orientation="vertical">
+                        android:orientation="horizontal"
+                        android:gravity="center">
 
-                        <TextView
-                            android:layout_width="wrap_content"
+                        <!-- Rank -->
+                        <LinearLayout
+                            android:layout_width="0dp"
                             android:layout_height="wrap_content"
-                            android:text="TOTAL SCORE"
-                            android:textSize="12sp"
-                            android:textColor="#BDBDBD"
-                            android:letterSpacing="0.1"
-                            android:textStyle="bold" />
+                            android:layout_weight="1"
+                            android:orientation="vertical"
+                            android:gravity="center">
 
-                        <TextView
-                            android:id="@+id/tvYourScore"
-                            android:layout_width="wrap_content"
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="🏆 RANK"
+                                android:textSize="11sp"
+                                android:textColor="#BDBDBD"
+                                android:letterSpacing="0.1"
+                                android:textStyle="bold" />
+
+                            <TextView
+                                android:id="@+id/tvYourRank"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="2dp"
+                                android:text="#--"
+                                android:textSize="28sp"
+                                android:textStyle="bold"
+                                android:textColor="@color/white"
+                                android:fontFamily="@font/agbalumo" />
+                        </LinearLayout>
+
+                        <View
+                            android:layout_width="1dp"
+                            android:layout_height="40dp"
+                            android:background="@color/white"
+                            android:alpha="0.2" />
+
+                        <!-- Score -->
+                        <LinearLayout
+                            android:layout_width="0dp"
                             android:layout_height="wrap_content"
-                            android:layout_marginTop="4dp"
-                            android:text="0"
-                            android:textSize="36sp"
-                            android:textStyle="bold"
-                            android:textColor="@color/colorAccent"
-                            android:fontFamily="@font/agbalumo" />
+                            android:layout_weight="1"
+                            android:orientation="vertical"
+                            android:gravity="center">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="⭐ SCORE"
+                                android:textSize="11sp"
+                                android:textColor="#BDBDBD"
+                                android:letterSpacing="0.1"
+                                android:textStyle="bold" />
+
+                            <TextView
+                                android:id="@+id/tvYourScore"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="2dp"
+                                android:text="0"
+                                android:textSize="28sp"
+                                android:textStyle="bold"
+                                android:textColor="@color/colorAccent"
+                                android:fontFamily="@font/agbalumo" />
+                        </LinearLayout>
 
                     </LinearLayout>
 

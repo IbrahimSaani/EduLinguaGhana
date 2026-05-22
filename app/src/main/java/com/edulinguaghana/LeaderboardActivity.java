@@ -43,6 +43,8 @@ public class LeaderboardActivity extends AppCompatActivity {
     private ProgressBar progressBar;
     private TextView tvYourRank;
     private TextView tvYourScore;
+    private TextView tvYourNameHero;
+    private AvatarView ivYourAvatarHero;
     private androidx.swiperefreshlayout.widget.SwipeRefreshLayout swipeRefreshLayout;
 
     // Podium views
@@ -83,6 +85,8 @@ public class LeaderboardActivity extends AppCompatActivity {
         progressBar = findViewById(R.id.progressBar);
         tvYourRank = findViewById(R.id.tvYourRank);
         tvYourScore = findViewById(R.id.tvYourScore);
+        tvYourNameHero = findViewById(R.id.tvYourNameHero);
+        ivYourAvatarHero = findViewById(R.id.ivYourAvatarHero);
         swipeRefreshLayout = findViewById(R.id.swipeRefreshLayout);
 
         // Podium views
@@ -439,6 +443,12 @@ public class LeaderboardActivity extends AppCompatActivity {
         if (rank > 0) {
             tvYourRank.setText("#" + rank);
             tvYourScore.setText(String.valueOf(userEntry.getScore()));
+            tvYourNameHero.setText(userEntry.getUserName());
+            if (userEntry.getAvatarData() != null) {
+                ivYourAvatarHero.setAvatarConfig(AvatarBuilder.AvatarConfig.fromMap(userEntry.getAvatarData()));
+            } else {
+                ivYourAvatarHero.setAvatarConfig(new AvatarBuilder.AvatarConfig());
+            }
 
             // Handle Sticky Footer
             // Show footer if user is not in top 3 (already shown in podium)
