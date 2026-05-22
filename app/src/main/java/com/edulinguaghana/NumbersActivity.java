@@ -496,21 +496,10 @@ public class NumbersActivity extends AppCompatActivity {
     private void startPracticePronunciation() {
         speakCurrentNumber();
 
-        // For English & French: Use speech recognition
-        if ("en".equals(languageCode) || "fr".equals(languageCode)) {
-            if (!isRecordAudioPermissionGranted()) {
-                requestRecordAudioPermission();
-            } else {
-                promptSpeechInput();
-            }
+        if (!isRecordAudioPermissionGranted()) {
+            requestRecordAudioPermission();
         } else {
-            // For Ghanaian languages: Show friendly message and provide audio example
-            Toast.makeText(this,
-                getString(R.string.numbers_practice_instruction, currentNumber),
-                Toast.LENGTH_LONG).show();
-
-            // Show helpful tips for Ghanaian languages
-            showPronunciationTips();
+            promptSpeechInput();
         }
     }
 
@@ -700,7 +689,45 @@ public class NumbersActivity extends AppCompatActivity {
             if (recognizedNumber == expected) {
                 // Perfect match!
                 speechRetryCount = 0; // Reset
-                celebrateAction();
+
+                // Visual indication on the card (Same as AlphabetActivity)
+                if (numberCard != null) {
+                    // Store original values
+                    ColorStateList originalStrokeColor = numberCard.getStrokeColorStateList();
+                    ColorStateList originalBgColor = numberCard.getCardBackgroundColor();
+                    float originalElevation = numberCard.getCardElevation();
+
+                    // Success state - change colors and pop out
+                    numberCard.setStrokeColor(ColorStateList.valueOf(getColor(R.color.correctAnswer)));
+                    numberCard.setCardBackgroundColor(ColorStateList.valueOf(getColor(R.color.modeProgressStart)));
+                    numberCard.setCardElevation(originalElevation * 1.5f);
+
+                    // Revert after a delay
+                    numberCard.postDelayed(() -> {
+                        if (numberCard != null) {
+                            numberCard.setStrokeColor(originalStrokeColor);
+                            numberCard.setCardBackgroundColor(originalBgColor);
+                            numberCard.setCardElevation(originalElevation);
+                        }
+                    }, 2500);
+                }
+
+                // Change emoji temporarily and trigger celebration
+                if (celebrationEmoji != null) {
+                    String originalEmoji = celebrationEmoji.getText().toString();
+                    celebrationEmoji.setText("✅");
+                    celebrateAction();
+
+                    celebrationEmoji.postDelayed(() -> {
+                        if (celebrationEmoji != null) {
+                            celebrationEmoji.setText(originalEmoji);
+                        }
+                    }, 2500);
+                }
+
+                // Play success sound
+                playAudioResource(R.raw.correct);
+
                 Toast.makeText(this,
                     getString(R.string.numbers_toast_success, recognized, expected),
                     Toast.LENGTH_LONG).show();

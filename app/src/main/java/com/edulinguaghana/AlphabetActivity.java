@@ -912,21 +912,10 @@ public class AlphabetActivity extends AppCompatActivity {
     private void startPracticePronunciation() {
         speakCurrentLetter();
 
-        // For English & French: Use speech recognition
-        if ("en".equals(languageCode) || "fr".equals(languageCode)) {
-            if (!isRecordAudioPermissionGranted()) {
-                requestRecordAudioPermission();
-            } else {
-                promptSpeechInput();
-            }
+        if (!isRecordAudioPermissionGranted()) {
+            requestRecordAudioPermission();
         } else {
-            // For Ghanaian languages: Show friendly message and provide audio example
-            Toast.makeText(this,
-                getString(R.string.alphabet_practice_instruction, letters[currentIndex]),
-                Toast.LENGTH_LONG).show();
-
-            // Show helpful tips for Ghanaian languages
-            showPronunciationTips();
+            promptSpeechInput();
         }
     }
 
@@ -1009,7 +998,10 @@ public class AlphabetActivity extends AppCompatActivity {
 
     private String getSpeechLocaleCode() {
         if ("fr".equals(languageCode)) return "fr-FR";
-        // Add other language speech codes here if supported
+        if ("ak".equals(languageCode) || "twi".equals(languageCode) || "ee".equals(languageCode) || "gaa".equals(languageCode)) {
+            // Standard recognizer doesn't support these well, but using English with custom mapping is better than nothing
+            return "en-US";
+        }
         return "en-US";
     }
 
@@ -1197,40 +1189,40 @@ public class AlphabetActivity extends AppCompatActivity {
         } else {
             // English or general phonetic
             switch (upper) {
-                case "A": spellings.add("ay"); spellings.add("ey"); break;
-                case "B": spellings.add("bee"); break;
-                case "C": spellings.add("see"); spellings.add("sea"); break;
-                case "D": spellings.add("dee"); break;
-                case "E": spellings.add("ee"); break;
-                case "F": spellings.add("ef"); break;
-                case "G": spellings.add("gee"); spellings.add("jee"); break;
-                case "H": spellings.add("aitch"); break;
-                case "I": spellings.add("eye"); break;
+                case "A": spellings.add("ay"); spellings.add("ey"); spellings.add("ei"); break;
+                case "B": spellings.add("bee"); spellings.add("be"); break;
+                case "C": spellings.add("see"); spellings.add("sea"); spellings.add("si"); break;
+                case "D": spellings.add("dee"); spellings.add("di"); break;
+                case "E": spellings.add("ee"); spellings.add("i"); break;
+                case "F": spellings.add("ef"); spellings.add("eff"); break;
+                case "G": spellings.add("gee"); spellings.add("jee"); spellings.add("gi"); break;
+                case "H": spellings.add("aitch"); spellings.add("edge"); spellings.add("each"); break;
+                case "I": spellings.add("eye"); spellings.add("ai"); break;
                 case "J": spellings.add("jay"); break;
                 case "K": spellings.add("kay"); break;
-                case "L": spellings.add("el"); break;
+                case "L": spellings.add("el"); spellings.add("ell"); break;
                 case "M": spellings.add("em"); break;
                 case "N": spellings.add("en"); break;
                 case "O": spellings.add("oh"); break;
-                case "P": spellings.add("pee"); break;
-                case "Q": spellings.add("cue"); break;
+                case "P": spellings.add("pee"); spellings.add("pi"); break;
+                case "Q": spellings.add("cue"); spellings.add("queue"); break;
                 case "R": spellings.add("are"); break;
-                case "S": spellings.add("es"); break;
-                case "T": spellings.add("tee"); break;
+                case "S": spellings.add("es"); spellings.add("ess"); break;
+                case "T": spellings.add("tee"); spellings.add("ti"); break;
                 case "U": spellings.add("you"); break;
-                case "V": spellings.add("vee"); break;
+                case "V": spellings.add("vee"); spellings.add("vi"); break;
                 case "W": spellings.add("double"); break;
                 case "X": spellings.add("ex"); break;
                 case "Y": spellings.add("why"); break;
                 case "Z": spellings.add("zee"); spellings.add("zed"); break;
                 
                 // Ghanaian special characters (how they might be recognized by English-trained model)
-                case "Ɛ": spellings.add("eh"); spellings.add("air"); break;
-                case "Ɔ": spellings.add("aw"); spellings.add("oh"); break;
+                case "Ɛ": spellings.add("eh"); spellings.add("air"); spellings.add("at"); break;
+                case "Ɔ": spellings.add("aw"); spellings.add("oh"); spellings.add("or"); spellings.add("o"); break;
                 case "Ɖ": spellings.add("de"); break;
                 case "Ƒ": spellings.add("ef"); break;
                 case "Ɣ": spellings.add("ga"); break;
-                case "Ŋ": spellings.add("ng"); break;
+                case "Ŋ": spellings.add("ng"); spellings.add("ink"); break;
                 case "Ʋ": spellings.add("vu"); break;
             }
         }
