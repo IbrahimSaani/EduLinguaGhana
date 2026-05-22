@@ -260,10 +260,10 @@ public class MainActivity extends AppCompatActivity {
             StyledMenuHelper.showStyledConfirmationDialog(
                 this,
                 "🔒",
-                "Login Required",
-                offlineManager.getLoginRequiredMessage("Achievements"),
+                "Achievements Locked",
+                "Sign in to unlock amazing badges, earn XP, and track your learning milestones!",
                 "Sign In",
-                "Cancel",
+                "Later",
                 () -> {
                     Intent intent = new Intent(this, LoginActivity.class);
                     startActivity(intent);
@@ -1398,8 +1398,7 @@ public class MainActivity extends AppCompatActivity {
                 openProfileScreen();
                 return true;
             } else if (itemId == R.id.nav_challenges) {
-                Intent intent = new Intent(MainActivity.this, ChallengesActivity.class);
-                startActivity(intent);
+                openChallengesScreen();
                 return true;
             } else if (itemId == R.id.nav_notifications) {
                 openNotificationsScreen();
@@ -1417,10 +1416,10 @@ public class MainActivity extends AppCompatActivity {
             StyledMenuHelper.showStyledConfirmationDialog(
                 this,
                 "🔒",
-                getString(R.string.profile_login_required_title),
-                getString(R.string.profile_login_required_desc),
+                "Leaderboard Locked",
+                "Sign in to compete on the global leaderboard, see your ranking, and earn top scores!",
                 "Sign In",
-                "Cancel",
+                "Later",
                 () -> {
                     Intent intent = new Intent(this, LoginActivity.class);
                     startActivity(intent);
@@ -1442,8 +1441,8 @@ public class MainActivity extends AppCompatActivity {
             StyledMenuHelper.showStyledConfirmationDialog(
                 this,
                 "📶",
-                getString(R.string.profile_internet_required_title),
-                getString(R.string.profile_internet_required_desc),
+                "Internet Required",
+                "Leaderboard requires an active internet connection to show global rankings.",
                 "OK",
                 null,
                 null,
@@ -1458,6 +1457,53 @@ public class MainActivity extends AppCompatActivity {
 
     private void openProfileScreen() {
         Intent intent = new Intent(MainActivity.this, ProfileActivity.class);
+        startActivity(intent);
+    }
+
+    private void openChallengesScreen() {
+        OfflineManager offlineManager = new OfflineManager(this);
+
+        // Check if user is logged in
+        if (!offlineManager.isLoggedIn()) {
+            StyledMenuHelper.showStyledConfirmationDialog(
+                this,
+                "🔒",
+                "Challenges Locked",
+                "Sign in to unlock daily quests, earn exclusive badges, and compete with friends!",
+                "Sign In",
+                "Later",
+                () -> {
+                    Intent intent = new Intent(this, LoginActivity.class);
+                    startActivity(intent);
+                },
+                null
+            );
+            return;
+        }
+
+        // Check email verification
+        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+        if (user != null && !user.isEmailVerified()) {
+            showVerificationRequiredDialog();
+            return;
+        }
+
+        // Check internet connection
+        if (!offlineManager.isOnline()) {
+            StyledMenuHelper.showStyledConfirmationDialog(
+                this,
+                "📶",
+                "Internet Required",
+                "Challenges require an active internet connection to sync quests and leaderboard data.",
+                "OK",
+                null,
+                null,
+                null
+            );
+            return;
+        }
+
+        Intent intent = new Intent(MainActivity.this, ChallengesActivity.class);
         startActivity(intent);
     }
 

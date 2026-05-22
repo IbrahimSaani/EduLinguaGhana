@@ -72,17 +72,11 @@ public class StyledMenuHelper {
                 tv.setTextSize(18f);
                 tv.setTypeface(null, android.graphics.Typeface.BOLD);
                 tv.setPadding(30, 40, 0, 10);
-                convertView.setClickable(false);
-                convertView.setFocusable(false);
             } else {
                 TextView tvIcon = convertView.findViewById(R.id.tvMenuIcon);
                 TextView tvTitle = convertView.findViewById(R.id.tvMenuTitle);
                 TextView tvSubtitle = convertView.findViewById(R.id.tvMenuSubtitle);
                 ImageView ivArrow = convertView.findViewById(R.id.ivMenuArrow);
-
-                // Ensure the view is clickable and focusable (it might have been recycled from a header)
-                convertView.setClickable(true);
-                convertView.setFocusable(true);
 
                 tvIcon.setText(item.icon);
                 tvTitle.setText(item.title);
@@ -98,6 +92,11 @@ public class StyledMenuHelper {
             }
 
             return convertView;
+        }
+
+        @Override
+        public boolean isEnabled(int position) {
+            return !"SECTION_HEADER".equals(items.get(position).subtitle);
         }
 
         @Override
