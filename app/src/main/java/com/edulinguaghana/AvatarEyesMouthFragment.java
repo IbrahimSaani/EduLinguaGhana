@@ -35,20 +35,32 @@ public class AvatarEyesMouthFragment extends Fragment {
     private void setupRecyclerViews() {
         // Eye Style
         String[] eyeStyles = {"Normal", "Happy", "Wink", "Glasses", "Sunglasses", "Starry", "Sleepy", "Heart"};
-        eyeStyleAdapter = new AvatarSelectionAdapter(Arrays.asList(eyeStyles),
+        String[] eyeIcons = {"👀", "😊", "😉", "👓", "😎", "🤩", "😴", "😍"};
+        
+        eyeStyleAdapter = new AvatarSelectionAdapter(
+            Arrays.asList(eyeStyles),
+            Arrays.asList(eyeIcons),
             activity.getAvatarConfig().eyeStyle.ordinal(),
             position -> {
                 activity.getAvatarConfig().eyeStyle = AvatarBuilder.EyeStyle.values()[position];
+                // Reset expression to neutral when manual change is made
+                activity.getAvatarConfig().facialExpression = AvatarBuilder.FacialExpression.NEUTRAL;
                 activity.updateAvatar();
             });
         rvEyeStyle.setAdapter(eyeStyleAdapter);
 
         // Mouth Style
         String[] mouthStyles = {"Smile", "Laugh", "Neutral", "Smirk", "Surprised", "Tongue Out", "Whistling"};
-        mouthStyleAdapter = new AvatarSelectionAdapter(Arrays.asList(mouthStyles),
+        String[] mouthIcons = {"😊", "😄", "😐", "😏", "😲", "😛", "😙"};
+        
+        mouthStyleAdapter = new AvatarSelectionAdapter(
+            Arrays.asList(mouthStyles),
+            Arrays.asList(mouthIcons),
             activity.getAvatarConfig().mouthStyle.ordinal(),
             position -> {
                 activity.getAvatarConfig().mouthStyle = AvatarBuilder.MouthStyle.values()[position];
+                // Reset expression to neutral when manual change is made
+                activity.getAvatarConfig().facialExpression = AvatarBuilder.FacialExpression.NEUTRAL;
                 activity.updateAvatar();
             });
         rvMouthStyle.setAdapter(mouthStyleAdapter);

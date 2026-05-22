@@ -35,7 +35,11 @@ public class AvatarClothingFragment extends Fragment {
     private void setupRecyclerViews() {
         // Clothing Style
         String[] clothingStyles = {"T-Shirt", "Hoodie", "Dress", "Suit", "Casual", "Traditional"};
-        styleAdapter = new AvatarSelectionAdapter(Arrays.asList(clothingStyles),
+        String[] styleIcons = {"👕", "🧥", "👗", "👔", "👕", "👘"};
+        
+        styleAdapter = new AvatarSelectionAdapter(
+            Arrays.asList(clothingStyles),
+            Arrays.asList(styleIcons),
             activity.getAvatarConfig().clothingStyle.ordinal(),
             position -> {
                 activity.getAvatarConfig().clothingStyle = AvatarBuilder.ClothingStyle.values()[position];
@@ -45,7 +49,11 @@ public class AvatarClothingFragment extends Fragment {
 
         // Clothing Color
         String[] clothingColors = {"Red", "Blue", "Green", "Yellow", "Purple", "Orange", "Pink", "Black", "White"};
-        colorAdapter = new AvatarSelectionAdapter(Arrays.asList(clothingColors),
+        String[] colorIcons = {"🟥", "🟦", "🟩", "🟨", "🟪", "🟧", "💗", "⬛", "⬜"};
+        
+        colorAdapter = new AvatarSelectionAdapter(
+            Arrays.asList(clothingColors),
+            Arrays.asList(colorIcons),
             activity.getAvatarConfig().clothingColor.ordinal(),
             position -> {
                 activity.getAvatarConfig().clothingColor = AvatarBuilder.ClothingColor.values()[position];

@@ -34,10 +34,44 @@ public class AvatarExpressionFragment extends Fragment {
     private void setupRecyclerView() {
         // Facial Expression
         String[] expressions = {"Neutral", "Happy", "Excited", "Cool", "Surprised", "Shy"};
-        adapter = new AvatarSelectionAdapter(Arrays.asList(expressions),
+        String[] icons = {"😐", "😊", "🤩", "😎", "😲", "😊"};
+        
+        adapter = new AvatarSelectionAdapter(
+            Arrays.asList(expressions),
+            Arrays.asList(icons),
             activity.getAvatarConfig().facialExpression.ordinal(),
             position -> {
-                activity.getAvatarConfig().facialExpression = AvatarBuilder.FacialExpression.values()[position];
+                AvatarBuilder.FacialExpression expression = AvatarBuilder.FacialExpression.values()[position];
+                activity.getAvatarConfig().facialExpression = expression;
+                
+                // When an expression is selected, it acts as a preset for eyes and mouth
+                switch (expression) {
+                    case HAPPY:
+                        activity.getAvatarConfig().eyeStyle = AvatarBuilder.EyeStyle.HAPPY;
+                        activity.getAvatarConfig().mouthStyle = AvatarBuilder.MouthStyle.SMILE;
+                        break;
+                    case EXCITED:
+                        activity.getAvatarConfig().eyeStyle = AvatarBuilder.EyeStyle.STARRY;
+                        activity.getAvatarConfig().mouthStyle = AvatarBuilder.MouthStyle.LAUGH;
+                        break;
+                    case COOL:
+                        activity.getAvatarConfig().eyeStyle = AvatarBuilder.EyeStyle.SUNGLASSES;
+                        activity.getAvatarConfig().mouthStyle = AvatarBuilder.MouthStyle.SMIRK;
+                        break;
+                    case SURPRISED:
+                        activity.getAvatarConfig().eyeStyle = AvatarBuilder.EyeStyle.NORMAL;
+                        activity.getAvatarConfig().mouthStyle = AvatarBuilder.MouthStyle.SURPRISED;
+                        break;
+                    case SHY:
+                        activity.getAvatarConfig().eyeStyle = AvatarBuilder.EyeStyle.NORMAL;
+                        activity.getAvatarConfig().mouthStyle = AvatarBuilder.MouthStyle.SMILE;
+                        break;
+                    case NEUTRAL:
+                        activity.getAvatarConfig().eyeStyle = AvatarBuilder.EyeStyle.NORMAL;
+                        activity.getAvatarConfig().mouthStyle = AvatarBuilder.MouthStyle.NEUTRAL;
+                        break;
+                }
+
                 activity.updateAvatar();
             });
         rvExpression.setAdapter(adapter);

@@ -34,7 +34,11 @@ public class AvatarAccessoryFragment extends Fragment {
     private void setupRecyclerView() {
         // Accessory
         String[] accessories = {"None", "Hat", "Crown", "Headband", "Earrings", "Necklace", "Bow Tie", "Scarf", "Flower", "Mask"};
-        adapter = new AvatarSelectionAdapter(Arrays.asList(accessories),
+        String[] icons = {"🚫", "🎩", "👑", "🎀", "💎", "📿", "👔", "🧣", "🌸", "🎭"};
+        
+        adapter = new AvatarSelectionAdapter(
+            Arrays.asList(accessories),
+            Arrays.asList(icons),
             activity.getAvatarConfig().accessory.ordinal(),
             position -> {
                 activity.getAvatarConfig().accessory = AvatarBuilder.Accessory.values()[position];

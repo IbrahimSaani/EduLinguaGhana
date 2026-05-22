@@ -36,7 +36,11 @@ public class AvatarHairFragment extends Fragment {
         // Hair Style
         String[] hairStyles = {"Short", "Long", "Curly", "Bald", "Afro", "Braids", "Ponytail",
             "Dreadlocks", "Mohawk", "Bun", "Side Part"};
-        hairStyleAdapter = new AvatarSelectionAdapter(Arrays.asList(hairStyles), 
+        String[] styleIcons = {"👦", "👧", "👩‍🦱", "👨‍🦲", "🧶", "👱‍♀️", "👱‍♀️", "🧔", "🐓", "👩‍🦳", "👨"};
+        
+        hairStyleAdapter = new AvatarSelectionAdapter(
+            Arrays.asList(hairStyles), 
+            Arrays.asList(styleIcons),
             activity.getAvatarConfig().hairStyle.ordinal(), 
             position -> {
                 activity.getAvatarConfig().hairStyle = AvatarBuilder.HairStyle.values()[position];
@@ -46,7 +50,11 @@ public class AvatarHairFragment extends Fragment {
 
         // Hair Color
         String[] hairColors = {"Black", "Brown", "Blonde", "Red", "Gray", "Purple", "Blue", "Pink"};
-        hairColorAdapter = new AvatarSelectionAdapter(Arrays.asList(hairColors), 
+        String[] colorIcons = {"⚫", "🟤", "🟡", "🔴", "⚪", "🟣", "🔵", "💗"};
+        
+        hairColorAdapter = new AvatarSelectionAdapter(
+            Arrays.asList(hairColors), 
+            Arrays.asList(colorIcons),
             activity.getAvatarConfig().hairColor.ordinal(), 
             position -> {
                 activity.getAvatarConfig().hairColor = AvatarBuilder.HairColor.values()[position];

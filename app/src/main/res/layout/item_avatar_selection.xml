@@ -29,6 +29,15 @@
             android:visibility="gone" />
 
         <TextView
+            android:id="@+id/tvEmoji"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="32sp"
+            android:layout_marginBottom="6dp"
+            android:visibility="gone"
+            android:text="😊" />
+
+        <TextView
             android:id="@+id/tvLabel"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
