@@ -2,8 +2,10 @@ package com.edulinguaghana;
 
 import android.os.Bundle;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.HorizontalScrollView;
 import android.widget.RadioGroup;
 
 import androidx.annotation.NonNull;
@@ -16,6 +18,7 @@ import com.google.android.material.card.MaterialCardView;
 public class AvatarSkinToneFragment extends Fragment {
 
     private RadioGroup rgSkinTone;
+    private HorizontalScrollView hsvSkinTone;
     private MaterialCardView cardSkinLight, cardSkinMedium, cardSkinTan, cardSkinBrown, cardSkinDark;
     private AvatarEditorActivity activity;
 
@@ -26,6 +29,7 @@ public class AvatarSkinToneFragment extends Fragment {
 
         activity = (AvatarEditorActivity) getActivity();
         rgSkinTone = view.findViewById(R.id.rgSkinTone);
+        hsvSkinTone = view.findViewById(R.id.hsvSkinTone);
         cardSkinLight = view.findViewById(R.id.cardSkinLight);
         cardSkinMedium = view.findViewById(R.id.cardSkinMedium);
         cardSkinTan = view.findViewById(R.id.cardSkinTan);
@@ -34,9 +38,21 @@ public class AvatarSkinToneFragment extends Fragment {
 
         setupSkinToneCardClicks();
         setupListeners();
+        setupHorizontalScroll();
         updateUIFromConfig();
 
         return view;
+    }
+
+    private void setupHorizontalScroll() {
+        if (hsvSkinTone != null) {
+            hsvSkinTone.setOnTouchListener((v, event) -> {
+                if (event.getAction() == MotionEvent.ACTION_DOWN || event.getAction() == MotionEvent.ACTION_MOVE) {
+                    v.getParent().requestDisallowInterceptTouchEvent(true);
+                }
+                return false;
+            });
+        }
     }
 
     private void setupSkinToneCardClicks() {
