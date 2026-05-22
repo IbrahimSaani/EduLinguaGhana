@@ -80,6 +80,11 @@ public class MainActivity extends AppCompatActivity {
     private com.edulinguaghana.social.NotificationPermissionHelper permissionHelper;
     private FloatingActionButton fabRoleDashboard;
 
+    private boolean recitalAnimated = false;
+    private boolean practiceAnimated = false;
+    private boolean quizAnimated = false;
+    private boolean progressAnimated = false;
+
     private static final String KEY_ANIMATIONS_ENABLED = "ANIMATIONS_ENABLED";
     private static final String KEY_LOW_POWER_ANIMATIONS = "LOW_POWER_ANIMATIONS";
 
@@ -1272,11 +1277,10 @@ public class MainActivity extends AppCompatActivity {
     private void setupScrollAnimations() {
         nestedScrollView.setOnScrollChangeListener((NestedScrollView.OnScrollChangeListener) (v, scrollX, scrollY, oldScrollX, oldScrollY) -> {
             if (scrollY > oldScrollY) {
-
-                animateCard(btnRecitalMode, true);
-                animateCard(btnPracticeMode, true);
-                animateCard(btnQuizMode, true);
-                animateCard(btnProgressMode, true);
+                if (!recitalAnimated) { animateCard(btnRecitalMode, true); recitalAnimated = true; }
+                if (!practiceAnimated) { animateCard(btnPracticeMode, true); practiceAnimated = true; }
+                if (!quizAnimated) { animateCard(btnQuizMode, true); quizAnimated = true; }
+                if (!progressAnimated) { animateCard(btnProgressMode, true); progressAnimated = true; }
             }
         });
     }

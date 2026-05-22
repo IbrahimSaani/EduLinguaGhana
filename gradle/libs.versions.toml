@@ -10,6 +10,8 @@ constraintlayout = "2.1.4"
 lottie = "6.7.1"
 glide = "4.16.0"
 gdx = "1.14.0"
+firebaseAppDistribution = "5.2.1"
+firebaseAppDistributionSdk = "16.0.0-beta19"
 
 [libraries]
 junit = { group = "junit", name = "junit", version.ref = "junit" }
@@ -24,7 +26,10 @@ glide = { group = "com.github.bumptech.glide", name = "glide", version.ref = "gl
 gdx = { group = "com.badlogicgames.gdx", name = "gdx", version.ref = "gdx" }
 gdx-backend-android = { group = "com.badlogicgames.gdx", name = "gdx-backend-android", version.ref = "gdx" }
 gdx-platform = { group = "com.badlogicgames.gdx", name = "gdx-platform", version.ref = "gdx" }
+firebase-appdistribution-sdk = { group = "com.google.firebase", name = "firebase-appdistribution", version.ref = "firebaseAppDistributionSdk" }
+firebase-appdistribution-api = { group = "com.google.firebase", name = "firebase-appdistribution-api", version.ref = "firebaseAppDistributionSdk" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
+firebase-appdistribution = { id = "com.google.firebase.appdistribution", version.ref = "firebaseAppDistribution" }
 

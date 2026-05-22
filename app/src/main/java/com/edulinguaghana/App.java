@@ -15,6 +15,8 @@ import com.edulinguaghana.social.impl.FirebaseSocialRepository;
 import com.edulinguaghana.social.SocialRepository;
 import com.edulinguaghana.social.SocialProvider;
 import com.edulinguaghana.social.FCMTokenManager;
+import com.google.firebase.appdistribution.FirebaseAppDistribution;
+import com.google.firebase.appdistribution.InterruptionLevel;
 
 import java.util.concurrent.TimeUnit;
 
@@ -69,6 +71,16 @@ public class App extends Application {
             com.edulinguaghana.social.SocialActivityListener.getInstance(this).startListening();
         } catch (Exception e) {
             Log.e(TAG, "Failed to initialize SocialActivityListener", e);
+        }
+
+        // Enable App Distribution Tester Feedback notification
+        try {
+            FirebaseAppDistribution.getInstance().showFeedbackNotification(
+                    "Submit feedback to the developers",
+                    InterruptionLevel.DEFAULT
+            );
+        } catch (Exception e) {
+            Log.e(TAG, "Failed to show feedback notification", e);
         }
     }
 

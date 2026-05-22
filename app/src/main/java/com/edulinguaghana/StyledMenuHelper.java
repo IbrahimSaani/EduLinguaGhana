@@ -57,7 +57,7 @@ public class StyledMenuHelper {
             MenuItem item = items.get(position);
             boolean isHeader = "SECTION_HEADER".equals(item.subtitle);
 
-            if (convertView == null || (isHeader && convertView.findViewById(R.id.tvMenuIcon) != null) || (!isHeader && convertView.findViewById(android.R.id.text1) != null)) {
+            if (convertView == null) {
                 if (isHeader) {
                     convertView = LayoutInflater.from(context).inflate(android.R.layout.simple_list_item_1, parent, false);
                 } else {
@@ -80,6 +80,10 @@ public class StyledMenuHelper {
                 TextView tvSubtitle = convertView.findViewById(R.id.tvMenuSubtitle);
                 ImageView ivArrow = convertView.findViewById(R.id.ivMenuArrow);
 
+                // Ensure the view is clickable and focusable (it might have been recycled from a header)
+                convertView.setClickable(true);
+                convertView.setFocusable(true);
+
                 tvIcon.setText(item.icon);
                 tvTitle.setText(item.title);
 
@@ -94,6 +98,16 @@ public class StyledMenuHelper {
             }
 
             return convertView;
+        }
+
+        @Override
+        public int getViewTypeCount() {
+            return 2;
+        }
+
+        @Override
+        public int getItemViewType(int position) {
+            return "SECTION_HEADER".equals(items.get(position).subtitle) ? 0 : 1;
         }
     }
 

@@ -1,7 +1,12 @@
+import com.google.firebase.appdistribution.gradle.firebaseAppDistribution
+import java.util.Properties
+import java.io.FileInputStream
+
 plugins {
     alias(libs.plugins.android.application)
     id("com.google.gms.google-services")
     id("com.google.firebase.crashlytics")
+    alias(libs.plugins.firebase.appdistribution)
 }
 
 android {
@@ -11,9 +16,9 @@ android {
     defaultConfig {
         applicationId = "com.edulinguaghana"
         minSdk = 23
-        targetSdk = 36
-        versionCode = 1
-        versionName = "1.0"
+        targetSdk = 35
+        versionCode = 2
+        versionName = "1.0.1"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
@@ -22,13 +27,40 @@ android {
         }
     }
 
+    signingConfigs {
+        create("release") {
+            val keystorePropertiesFile = rootProject.file("keystore.properties")
+            val keystoreProperties = Properties()
+            if (keystorePropertiesFile.exists()) {
+                keystoreProperties.load(FileInputStream(keystorePropertiesFile))
+            }
+
+            keystoreProperties.getProperty("RELEASE_STORE_FILE")?.let {
+                storeFile = file(it)
+            }
+            storePassword = keystoreProperties.getProperty("RELEASE_STORE_PASSWORD")
+            keyAlias = keystoreProperties.getProperty("RELEASE_KEY_ALIAS")
+            keyPassword = keystoreProperties.getProperty("RELEASE_KEY_PASSWORD")
+        }
+    }
+
     buildTypes {
         release {
+            signingConfig = signingConfigs.getByName("release")
             isMinifyEnabled = false
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
+            firebaseAppDistribution {
+                appId = "1:340016497126:android:36b6e04f90691927389627"
+                testers = "ibrahimsaani41@gmail.com, quistkelvin32@gmail.com, 41jamesanderson@gmail.com, lovejoycelyn32@gmail.com, rhozaselorm@gmail.com, selormeyphinegad@gmail.com, ucheemmauel539@gmail.com"
+                releaseNotes = "Initial pre-release version for testing."
+            }
+        }
+        create("beta") {
+            initWith(getByName("release"))
+            matchingFallbacks += listOf("release")
         }
     }
     compileOptions {
@@ -87,6 +119,11 @@ dependencies {
 
     // WorkManager for background tasks and notifications
     implementation("androidx.work:work-runtime:2.9.0")
+
+    // Firebase App Distribution Feedback
+    implementation(libs.firebase.appdistribution.api)
+    add("betaImplementation", libs.firebase.appdistribution.sdk)
+    debugImplementation(libs.firebase.appdistribution.sdk)
 
     testImplementation(libs.junit)
 
