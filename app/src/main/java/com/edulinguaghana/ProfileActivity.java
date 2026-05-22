@@ -52,7 +52,6 @@ public class ProfileActivity extends AppCompatActivity {
     private TextView tvUserName, tvUserEmail, tvUserId, tvProfileStreak, tvTotalLessons, tvBestScore, tvFavoriteLanguage;
     private View userIdSection;
     private View languageSection;
-    private MaterialButton btnCopyUserId;
     // Gamification views
     private TextView tvLevel, tvXpText;
     private ProgressBar pbXp;
@@ -158,7 +157,6 @@ public class ProfileActivity extends AppCompatActivity {
         tvUserEmail = findViewById(R.id.tvUserEmail);
         tvUserId = findViewById(R.id.tvUserId);
         userIdSection = findViewById(R.id.userIdSection);
-        btnCopyUserId = findViewById(R.id.btnCopyUserId);
         tvProfileStreak = findViewById(R.id.tvProfileStreak);
         tvTotalLessons = findViewById(R.id.tvTotalLessons);
         tvBestScore = findViewById(R.id.tvBestScore);
@@ -337,15 +335,15 @@ public class ProfileActivity extends AppCompatActivity {
         });
 
         // Copy User ID button
-        if (btnCopyUserId != null) {
-            btnCopyUserId.setOnClickListener(v -> {
+        if (userIdSection != null) {
+            userIdSection.setOnClickListener(v -> {
                 FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
                 if (currentUser != null) {
                     String userId = currentUser.getUid();
                     android.content.ClipboardManager clipboard = (android.content.ClipboardManager) getSystemService(CLIPBOARD_SERVICE);
                     android.content.ClipData clip = android.content.ClipData.newPlainText("User ID", userId);
                     clipboard.setPrimaryClip(clip);
-                    Toast.makeText(this, "User ID copied! Share it with friends.", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(this, "User ID copied to clipboard! 📋", Toast.LENGTH_SHORT).show();
                 }
             });
         }
