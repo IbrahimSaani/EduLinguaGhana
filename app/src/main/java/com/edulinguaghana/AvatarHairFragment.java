@@ -35,8 +35,8 @@ public class AvatarHairFragment extends Fragment {
     private void setupRecyclerViews() {
         // Hair Style
         String[] hairStyles = {"Short", "Long", "Curly", "Bald", "Afro", "Braids", "Ponytail",
-            "Dreadlocks", "Mohawk", "Bun", "Side Part"};
-        String[] styleIcons = {"👦", "👧", "👩‍🦱", "👨‍🦲", "🧶", "👱‍♀️", "👱‍♀️", "🧔", "🐓", "👩‍🦳", "👨"};
+            "Spiky", "Mohawk", "Bun", "Side Part"};
+        String[] styleIcons = {"👦", "👧", "👩‍🦱", "👨‍🦲", "🧑‍🦱", "👩‍🦰", "👱‍♀️", "🧒", "🧑‍🎤", "👵", "👨"};
         
         hairStyleAdapter = new AvatarSelectionAdapter(
             Arrays.asList(hairStyles), 

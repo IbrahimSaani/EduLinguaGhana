@@ -40,7 +40,7 @@ public class AvatarBuilder {
     }
 
     public enum HairStyle {
-        SHORT, LONG, CURLY, BALD, AFRO, BRAIDS, PONYTAIL, DREADLOCKS, MOHAWK, BUN, SIDEPART
+        SHORT, LONG, CURLY, BALD, AFRO, BRAIDS, PONYTAIL, SPIKY, MOHAWK, BUN, SIDEPART
     }
 
     public enum HairColor {
@@ -377,17 +377,20 @@ public class AvatarBuilder {
                 }
                 break;
             }
-            case DREADLOCKS: {
-                RectF dreadBase = new RectF(centerX - faceRadius * 1.02f, centerY - faceRadius * 1.05f, 
-                                           centerX + faceRadius * 1.02f, centerY - faceRadius * 0.4f);
-                canvas.drawArc(dreadBase, 180, 180, true, hairPaint);
-                // Draw strands only on the sides to keep face clear
-                for (int d = 0; d < 7; d++) {
-                    if (d >= 2 && d <= 4) continue; // Skip the 3 middle strands covering eyes/nose/mouth
-                    
-                    float x = centerX - faceRadius * 0.9f + d * faceRadius * 0.3f;
-                    canvas.drawRoundRect(x - faceRadius * 0.1f, centerY - faceRadius * 0.4f, 
-                                       x + faceRadius * 0.1f, centerY + faceRadius * 1.1f, 10, 10, hairPaint);
+            case SPIKY: {
+                // Spiky hair implementation
+                RectF base = new RectF(centerX - faceRadius * 1.02f, centerY - faceRadius * 1.05f, 
+                                      centerX + faceRadius * 1.02f, centerY - faceRadius * 0.1f);
+                canvas.drawArc(base, 180, 180, true, hairPaint);
+                
+                for (int i = 0; i < 7; i++) {
+                    float x = centerX - faceRadius * 0.9f + i * faceRadius * 0.3f;
+                    Path spike = new Path();
+                    spike.moveTo(x - faceRadius * 0.15f, centerY - faceRadius * 0.8f);
+                    spike.lineTo(x, centerY - faceRadius * 1.3f);
+                    spike.lineTo(x + faceRadius * 0.15f, centerY - faceRadius * 0.8f);
+                    spike.close();
+                    canvas.drawPath(spike, hairPaint);
                 }
                 break;
             }
