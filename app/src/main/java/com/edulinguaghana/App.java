@@ -26,7 +26,6 @@ public class App extends Application {
     @Override
     public void onCreate() {
         super.onCreate();
-        // Removed: TimeBasedBackgroundManager.register(this); - Disabled to prevent invisible screens in Dark Mode
 
         // Initialize Firebase (no-op if already initialized by google-services)
         try {

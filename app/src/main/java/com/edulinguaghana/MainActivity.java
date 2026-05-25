@@ -53,8 +53,6 @@ import java.util.List;
 public class MainActivity extends AppCompatActivity {
 
     private CoordinatorLayout rootCoordinator;
-    private ImageView dynamicBackgroundOverlay;
-    private DynamicBackgroundView dynamicBackground;
     private ChipGroup languageChipGroup;
     private MaterialCardView btnRecitalMode, btnPracticeMode, btnQuizMode, btnProgressMode;
     private MaterialCardView heroCard;
@@ -128,7 +126,6 @@ public class MainActivity extends AppCompatActivity {
         animateToolbar(toolbar);
 
         rootCoordinator = findViewById(R.id.rootCoordinator);
-        dynamicBackgroundOverlay = findViewById(R.id.dynamicBackgroundOverlay);
         heroCard = findViewById(R.id.heroCard);
         starTopLeft = findViewById(R.id.starTopLeft);
         starTopRight = findViewById(R.id.starTopRight);
@@ -152,9 +149,7 @@ public class MainActivity extends AppCompatActivity {
         mascotView = findViewById(R.id.mascotView);
         nestedScrollView = findViewById(R.id.nestedScrollView);
         bottomNavigation = findViewById(R.id.bottomNavigation);
-        dynamicBackground = findViewById(R.id.dynamicBackground);
 
-        setupDynamicBackground();
         setupMascot();
         setupHeroGlow();
         setupStarAnimations();
@@ -870,15 +865,12 @@ public class MainActivity extends AppCompatActivity {
         achievementManager.checkAndUnlockAchievements();
 
         // previously read high score to show in removed UI; keep prefs access in case other features rely on it
-        applyDynamicBackground();
 
         // Only start the dynamic overlay pulse when animations are enabled, dynamic
         // backgrounds are allowed by user preference and the system is not in dark mode.
-        boolean dynamicEnabled = AppPreferences.isDynamicBackgroundEnabled(this);
         boolean isDark = ThemeUtils.isDarkMode(this);
 
-        if (animationsEnabled() && dynamicEnabled && !isDark) {
-            startOverlayPulse();
+        if (animationsEnabled() && !isDark) {
             if (heroGlowAnimator != null && !heroGlowAnimator.isStarted()) {
                 heroGlowAnimator.start();
             }
@@ -887,15 +879,11 @@ public class MainActivity extends AppCompatActivity {
             if (bubbleTopAnimator != null && !bubbleTopAnimator.isStarted()) bubbleTopAnimator.start();
             if (bubbleMidAnimator != null && !bubbleMidAnimator.isStarted()) bubbleMidAnimator.start();
             if (bubbleBottomAnimator != null && !bubbleBottomAnimator.isStarted()) bubbleBottomAnimator.start();
-        } else {
-            // ensure overlay alpha is set to default when animations disabled or overlay hidden
-            if (dynamicBackgroundOverlay != null) dynamicBackgroundOverlay.setAlpha(0.45f);
         }
     }
 
     @Override
     protected void onPause() {
-        stopOverlayPulse();
         if (heroGlowAnimator != null && heroGlowAnimator.isRunning()) {
             heroGlowAnimator.end();
         }
@@ -1275,6 +1263,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void setupScrollAnimations() {
+        if (nestedScrollView == null) return;
         nestedScrollView.setOnScrollChangeListener((NestedScrollView.OnScrollChangeListener) (v, scrollX, scrollY, oldScrollX, oldScrollY) -> {
             if (scrollY > oldScrollY) {
                 if (!recitalAnimated) { animateCard(btnRecitalMode, true); recitalAnimated = true; }
@@ -1283,46 +1272,6 @@ public class MainActivity extends AppCompatActivity {
                 if (!progressAnimated) { animateCard(btnProgressMode, true); progressAnimated = true; }
             }
         });
-    }
-
-    private void setupDynamicBackground() {
-        // Dynamic backgrounds disabled to support Dark Mode properly across all devices
-        if (rootCoordinator != null) {
-            rootCoordinator.setBackgroundResource(R.color.appBackground);
-        }
-        if (dynamicBackground != null) dynamicBackground.setVisibility(View.GONE);
-        if (dynamicBackgroundOverlay != null) dynamicBackgroundOverlay.setVisibility(View.GONE);
-        stopOverlayPulse();
-    }
-
-    private void applyDynamicBackground() {
-        if (rootCoordinator == null) return;
-        
-        // Use standard app background that respects light/dark themes
-        rootCoordinator.setBackgroundResource(R.color.appBackground);
-        
-        if (dynamicBackground != null) dynamicBackground.setVisibility(View.GONE);
-        if (dynamicBackgroundOverlay != null) dynamicBackgroundOverlay.setVisibility(View.GONE);
-        stopOverlayPulse();
-    }
-
-    private void startOverlayPulse() {
-        if (dynamicBackgroundOverlay == null) return;
-        if (overlayPulseAnimator == null) {
-            overlayPulseAnimator = ObjectAnimator.ofFloat(dynamicBackgroundOverlay, View.ALPHA, 0.35f, 0.65f);
-            overlayPulseAnimator.setDuration(6000);
-            overlayPulseAnimator.setRepeatMode(ValueAnimator.REVERSE);
-            overlayPulseAnimator.setRepeatCount(ValueAnimator.INFINITE);
-        }
-        if (!overlayPulseAnimator.isStarted()) {
-            overlayPulseAnimator.start();
-        }
-    }
-
-    private void stopOverlayPulse() {
-        if (overlayPulseAnimator != null && overlayPulseAnimator.isStarted()) {
-            overlayPulseAnimator.cancel();
-        }
     }
 
     private void animateCard(View view, boolean scrollingDown) {

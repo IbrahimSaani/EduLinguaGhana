@@ -4,7 +4,7 @@
     <corners android:radius="36dp" />
     <gradient
         android:angle="45"
-        android:centerColor="#FFFFFF"
+        android:centerColor="@color/cardBackground"
         android:endColor="@color/playfulHeroEnd"
         android:startColor="@color/playfulHeroStart"
         android:type="linear" />

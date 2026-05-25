@@ -24,7 +24,6 @@ import java.util.List;
 
 public class NotificationsActivity extends AppCompatActivity implements NotificationsAdapter.OnNotificationClickListener {
 
-    private com.edulinguaghana.DynamicBackgroundView dynamicBackground;
     private ImageView emptyStateBellIcon;
     private View sparkleTopLeft;
     private View sparkleTopRight;
@@ -57,7 +56,6 @@ public class NotificationsActivity extends AppCompatActivity implements Notifica
         }
 
         // Initialize views
-        dynamicBackground = findViewById(R.id.dynamicBackground);
         emptyStateBellIcon = findViewById(R.id.emptyStateBellIcon);
         sparkleTopLeft = findViewById(R.id.sparkleTopLeft);
         sparkleTopRight = findViewById(R.id.sparkleTopRight);
@@ -69,9 +67,6 @@ public class NotificationsActivity extends AppCompatActivity implements Notifica
         btnStartLearning = findViewById(R.id.btnStartLearning);
         unreadBadge = findViewById(R.id.unreadBadge);
         tvUnreadCount = findViewById(R.id.tvUnreadCount);
-
-        // Setup background
-        setupBackground();
 
         // Setup empty-state interactions
         setupEmptyStateInteractions();
@@ -105,13 +100,6 @@ public class NotificationsActivity extends AppCompatActivity implements Notifica
         // Load notifications
         loadNotifications();
     }
-
-    private void setupBackground() {
-        if (dynamicBackground == null) return;
-        // Disabled to support Dark Mode properly
-        dynamicBackground.setVisibility(View.GONE);
-    }
-
 
     private void setupRecyclerView() {
         notificationsRecyclerView.setLayoutManager(new LinearLayoutManager(this));

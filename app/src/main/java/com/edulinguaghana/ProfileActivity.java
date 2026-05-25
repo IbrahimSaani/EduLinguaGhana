@@ -59,7 +59,6 @@ public class ProfileActivity extends AppCompatActivity {
     private View achievementsCard;
     private View lessonsSection;
     private AvatarView profileImage, avatarNotSignedIn;
-    private DynamicBackgroundView dynamicBackground;
     private MaterialButton btnAddFriend, btnChallengeFriend;
     private SearchHistory searchHistory;
 
@@ -105,17 +104,10 @@ public class ProfileActivity extends AppCompatActivity {
         }
 
         initViews();
-        setupDynamicBackground();
         setupProfile();
         setupListeners();
     }
 
-
-    private void setupDynamicBackground() {
-        if (dynamicBackground == null) return;
-        // Disabled to support Dark Mode properly
-        dynamicBackground.setVisibility(android.view.View.GONE);
-    }
 
     private void initViews() {
         notSignedInLayout = findViewById(R.id.notSignedInLayout);
@@ -137,7 +129,6 @@ public class ProfileActivity extends AppCompatActivity {
         languageSection = findViewById(R.id.languageSection);
         profileImage = findViewById(R.id.profileImage);
         avatarNotSignedIn = findViewById(R.id.avatarNotSignedIn);
-        dynamicBackground = findViewById(R.id.dynamicBackground);
         // Gamification views
         tvLevel = findViewById(R.id.tv_level);
         pbXp = findViewById(R.id.pb_xp);

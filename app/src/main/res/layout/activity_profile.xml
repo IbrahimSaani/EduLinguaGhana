@@ -5,7 +5,7 @@
     android:layout_height="match_parent"
     android:fitsSystemWindows="true">
 
-    <com.edulinguaghana.DynamicBackgroundView
+    <View
         android:id="@+id/dynamicBackground"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -87,7 +87,7 @@
                 app:cardCornerRadius="32dp"
                 app:cardElevation="8dp"
                 app:strokeWidth="0dp"
-                app:cardBackgroundColor="@color/white">
+                app:cardBackgroundColor="@color/cardBackground">
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -103,7 +103,7 @@
                         app:cardElevation="12dp"
                         app:strokeWidth="6dp"
                         app:strokeColor="@color/colorPrimary"
-                        app:cardBackgroundColor="@color/white">
+                        app:cardBackgroundColor="@color/cardBackground">
 
                         <com.edulinguaghana.AvatarView
                             android:id="@+id/avatarNotSignedIn"
@@ -159,7 +159,7 @@
                     app:cardCornerRadius="32dp"
                     app:cardElevation="8dp"
                     app:strokeWidth="0dp"
-                    app:cardBackgroundColor="@color/white">
+                    app:cardBackgroundColor="@color/cardBackground">
 
                     <LinearLayout
                         android:layout_width="match_parent"
@@ -176,7 +176,7 @@
                             app:cardElevation="8dp"
                             app:strokeWidth="4dp"
                             app:strokeColor="@color/colorPrimary"
-                            app:cardBackgroundColor="@color/white">
+                            app:cardBackgroundColor="@color/cardBackground">
 
                             <com.edulinguaghana.AvatarView
                                 android:id="@+id/profileImage"
@@ -308,7 +308,7 @@
                     android:layout_marginTop="16dp"
                     app:cardCornerRadius="24dp"
                     app:cardElevation="6dp"
-                    app:cardBackgroundColor="@color/white">
+                    app:cardBackgroundColor="@color/cardBackground">
 
                     <LinearLayout
                         android:layout_width="match_parent"
@@ -379,7 +379,7 @@
                         android:layout_marginEnd="8dp"
                         app:cardCornerRadius="20dp"
                         app:cardElevation="4dp"
-                        app:cardBackgroundColor="@color/white">
+                        app:cardBackgroundColor="@color/cardBackground">
 
                         <LinearLayout
                             android:layout_width="match_parent"
@@ -420,7 +420,7 @@
                         android:layout_marginStart="8dp"
                         app:cardCornerRadius="20dp"
                         app:cardElevation="4dp"
-                        app:cardBackgroundColor="@color/white">
+                        app:cardBackgroundColor="@color/cardBackground">
 
                         <LinearLayout
                             android:layout_width="match_parent"
@@ -463,7 +463,7 @@
                     android:layout_marginTop="16dp"
                     app:cardCornerRadius="24dp"
                     app:cardElevation="4dp"
-                    app:cardBackgroundColor="@color/white">
+                    app:cardBackgroundColor="@color/cardBackground">
 
                     <LinearLayout
                         android:layout_width="match_parent"

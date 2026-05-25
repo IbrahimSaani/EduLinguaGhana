@@ -9,21 +9,10 @@ import android.content.SharedPreferences;
 public final class AppPreferences {
 
     private static final String PREFS_NAME = "EduLinguaPrefs"; // keep consistent with app
-    private static final String KEY_DYNAMIC_BG = "dynamic_backgrounds_enabled";
     private static final String KEY_DAILY_REMINDERS = "DAILY_REMINDERS";
     private static final String KEY_STREAK_ALERTS = "STREAK_ALERTS";
 
     private AppPreferences() {}
-
-    public static boolean isDynamicBackgroundEnabled(Context context) {
-        return false; // Force disabled to ensure Dark Mode compatibility
-    }
-
-    public static void setDynamicBackgroundEnabled(Context context, boolean enabled) {
-        if (context == null) return;
-        SharedPreferences prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
-        prefs.edit().putBoolean(KEY_DYNAMIC_BG, enabled).apply();
-    }
 
     public static boolean isDailyRemindersEnabled(Context context) {
         if (context == null) return true;

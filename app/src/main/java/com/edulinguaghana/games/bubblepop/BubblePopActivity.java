@@ -25,7 +25,6 @@ import androidx.activity.OnBackPressedCallback;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 
-import com.edulinguaghana.DynamicBackgroundView;
 import com.edulinguaghana.R;
 import com.edulinguaghana.gamification.FunGameProgressManager;
 import com.edulinguaghana.StyledMenuHelper;
@@ -52,7 +51,6 @@ public class BubblePopActivity extends AppCompatActivity {
     private FrameLayout bubbleContainer, ambientParticles;
     private TextView tvScore, tvTarget, tvCountdown, tvTimer;
     private View overlayLayout;
-    private DynamicBackgroundView dynamicBackground;
     private KonfettiView konfettiView;
 
     private String languageCode;
@@ -137,7 +135,6 @@ public class BubblePopActivity extends AppCompatActivity {
         tvCountdown = findViewById(R.id.tvCountdown);
         tvTimer = findViewById(R.id.tvTimer);
         overlayLayout = findViewById(R.id.overlayLayout);
-        dynamicBackground = findViewById(R.id.dynamicBackground);
         konfettiView = findViewById(R.id.konfettiView);
 
         findViewById(R.id.btnResume).setOnClickListener(v -> {
@@ -162,10 +159,6 @@ public class BubblePopActivity extends AppCompatActivity {
 
         findViewById(R.id.btnRestart).setOnClickListener(v -> startNewGame());
         findViewById(R.id.btnQuit).setOnClickListener(v -> finish());
-
-        if (dynamicBackground != null) {
-            dynamicBackground.setVisibility(View.GONE);
-        }
 
         setupAmbientBackground();
     }

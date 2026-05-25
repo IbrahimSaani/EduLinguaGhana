@@ -53,13 +53,9 @@
                 android:textSize="34sp"
                 android:textStyle="bold"
                 android:fontFamily="@font/agbalumo"
-                android:textColor="@color/white"
+                android:textColor="@color/textColorPrimary"
                 android:gravity="center"
                 android:letterSpacing="0.02"
-                android:shadowColor="#40000000"
-                android:shadowDx="2"
-                android:shadowDy="2"
-                android:shadowRadius="4"
                 app:layout_constraintTop_toBottomOf="@id/logoCard"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent" />
@@ -72,7 +68,7 @@
                 android:layout_marginTop="8dp"
                 android:text="@string/signup_subtitle_adventure"
                 android:textSize="16sp"
-                android:textColor="@color/white"
+                android:textColor="@color/textColorSecondary"
                 android:gravity="center"
                 android:alpha="0.95"
                 android:textStyle="bold"
@@ -90,7 +86,7 @@
                 app:cardCornerRadius="32dp"
                 app:cardElevation="10dp"
                 app:strokeWidth="0dp"
-                app:cardBackgroundColor="@android:color/white"
+                app:cardBackgroundColor="@color/cardBackground"
                 app:layout_constraintTop_toBottomOf="@id/tvSubtitle"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent">
@@ -339,7 +335,7 @@
                     android:layout_width="0dp"
                     android:layout_height="1.5dp"
                     android:layout_weight="1"
-                    android:background="@color/white"
+                    android:background="@color/dividerColor"
                     android:alpha="0.6" />
 
                 <TextView
@@ -351,13 +347,13 @@
                     android:textSize="13sp"
                     android:textStyle="bold"
                     android:letterSpacing="0.1"
-                    android:textColor="@color/white" />
+                    android:textColor="@color/textColorSecondary" />
 
                 <View
                     android:layout_width="0dp"
                     android:layout_height="1.5dp"
                     android:layout_weight="1"
-                    android:background="@color/white"
+                    android:background="@color/dividerColor"
                     android:alpha="0.6" />
 
             </LinearLayout>
@@ -389,9 +385,9 @@
                     app:iconTint="@null"
                     style="@style/Widget.MaterialComponents.Button.OutlinedButton"
                     app:cornerRadius="29dp"
-                    app:strokeColor="@color/white"
-                    app:strokeWidth="0dp"
-                    app:backgroundTint="@color/white"
+                    app:strokeColor="@color/dividerColor"
+                    app:strokeWidth="1dp"
+                    app:backgroundTint="@color/cardBackground"
                     app:elevation="4dp" />
 
                 <com.google.android.material.button.MaterialButton
@@ -439,8 +435,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Explore First 🚀"
-                    android:textColor="@color/white"
-                    android:textSize="16sp"
+                    android:textColor="@color/textColorPrimary"
                     android:textStyle="bold"
                     android:clickable="true"
                     android:focusable="true" />

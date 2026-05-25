@@ -27,7 +27,6 @@ public class AvatarEditorActivity extends AppCompatActivity {
     private ViewPager2 viewPager;
     private TabLayout tabLayout;
     private MaterialButton btnSaveAvatar, btnRandomAvatar, btnChangeBackground;
-    private DynamicBackgroundView dynamicBackground;
 
     private AvatarBuilder.AvatarConfig config;
     private AvatarBuilder builder;
@@ -55,17 +54,11 @@ public class AvatarEditorActivity extends AppCompatActivity {
         }
 
         initViews();
-        setupDynamicBackground();
         loadCurrentAvatar();
         setupViewPager();
         setupListeners();
     }
 
-    private void setupDynamicBackground() {
-        if (dynamicBackground == null) return;
-        // Disabled to support Dark Mode properly
-        dynamicBackground.setVisibility(android.view.View.GONE);
-    }
 
     private void initViews() {
         avatarPreview = findViewById(R.id.avatarPreview);
@@ -74,7 +67,6 @@ public class AvatarEditorActivity extends AppCompatActivity {
         btnSaveAvatar = findViewById(R.id.btnSaveAvatar);
         btnRandomAvatar = findViewById(R.id.btnRandomAvatar);
         btnChangeBackground = findViewById(R.id.btnChangeBackground);
-        dynamicBackground = findViewById(R.id.dynamicBackground);
     }
 
     private void loadCurrentAvatar() {
