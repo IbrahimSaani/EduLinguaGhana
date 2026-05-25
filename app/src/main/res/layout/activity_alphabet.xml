@@ -448,17 +448,38 @@
             </LinearLayout>
 
             <!-- Main Content Area with Enhanced Visuals and Interactivity -->
-            <FrameLayout
+            <RelativeLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="28dp">
+
+                <!-- Navigation Buttons - Styled as bold arrows -->
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnPrev"
+                    style="@style/Widget.Material3.Button.ElevatedButton"
+                    android:layout_width="72dp"
+                    android:layout_height="72dp"
+                    android:layout_alignParentStart="true"
+                    android:layout_centerVertical="true"
+                    android:layout_marginStart="8dp"
+                    android:contentDescription="@string/content_description_previous"
+                    android:padding="0dp"
+                    app:cornerRadius="36dp"
+                    app:elevation="12dp"
+                    app:icon="@drawable/ic_nav_prev"
+                    app:iconGravity="textStart"
+                    app:iconSize="40dp"
+                    app:iconPadding="0dp"
+                    app:backgroundTint="@color/colorPrimary" />
 
                 <com.google.android.material.card.MaterialCardView
                     android:id="@+id/letterCard"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="32dp"
-                    android:layout_marginEnd="32dp"
+                    android:layout_toEndOf="@id/btnPrev"
+                    android:layout_toStartOf="@id/btnNext"
+                    android:layout_marginStart="8dp"
+                    android:layout_marginEnd="8dp"
                     android:foreground="?attr/selectableItemBackground"
                     android:clickable="true"
                     android:focusable="true"
@@ -507,12 +528,15 @@
                             android:fontFamily="@font/agbalumo"
                             android:text="A"
                             android:textColor="@color/colorAccent"
-                            android:textSize="160sp"
+                            android:textSize="140sp"
                             android:textStyle="bold"
                             android:shadowColor="#40000000"
                             android:shadowDx="4"
                             android:shadowDy="4"
-                            android:shadowRadius="8" />
+                            android:shadowRadius="8"
+                            app:autoSizeTextType="uniform"
+                            app:autoSizeMinTextSize="80sp"
+                            app:autoSizeMaxTextSize="140sp" />
 
                         <!-- Word display with enhanced styling -->
                         <LinearLayout
@@ -553,7 +577,7 @@
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
                                 android:textColor="@color/colorPrimary"
-                                android:textSize="28sp"
+                                android:textSize="24sp"
                                 android:textStyle="bold"
                                 android:fontFamily="@font/agbalumo"
                                 android:letterSpacing="0.01"
@@ -570,26 +594,26 @@
                             android:id="@+id/btnSpeak"
                             style="@style/Widget.Material3.Button"
                             android:layout_width="wrap_content"
-                            android:layout_height="68dp"
-                            android:minWidth="240dp"
-                            android:paddingStart="36dp"
-                            android:paddingEnd="36dp"
+                            android:layout_height="60dp"
+                            android:minWidth="200dp"
+                            android:paddingStart="24dp"
+                            android:paddingEnd="24dp"
                             android:text="@string/speak_button"
-                            android:textSize="18sp"
+                            android:textSize="16sp"
                             android:textStyle="bold"
-                            app:cornerRadius="34dp"
-                            app:elevation="10dp"
+                            app:cornerRadius="30dp"
+                            app:elevation="8dp"
                             app:icon="@drawable/ic_speak"
-                            app:iconSize="28dp"
+                            app:iconSize="24dp"
                             app:iconGravity="start"
-                            app:iconPadding="16dp" />
+                            app:iconPadding="12dp" />
 
                         <!-- Hint text -->
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_marginTop="18dp"
-                            android:text="✨ Tap to hear the pronunciation!"
+                            android:layout_marginTop="12dp"
+                            android:text="✨ Tap to hear pronunciation!"
                             android:textColor="@color/colorAccent"
                             android:textSize="11sp"
                             android:alpha="0.75"
@@ -597,39 +621,24 @@
                     </LinearLayout>
                 </com.google.android.material.card.MaterialCardView>
 
-                <!-- Navigation Buttons - Enhanced with gradient backgrounds -->
-                <com.google.android.material.button.MaterialButton
-                    android:id="@+id/btnPrev"
-                    style="@style/Widget.Material3.Button.ElevatedButton.Icon"
-                    android:layout_width="72dp"
-                    android:layout_height="72dp"
-                    android:layout_gravity="center_vertical|start"
-                    android:layout_marginStart="8dp"
-                    android:contentDescription="@string/content_description_previous"
-                    app:cornerRadius="36dp"
-                    app:elevation="14dp"
-                    app:icon="@drawable/ic_arrow_back"
-                    app:iconGravity="textStart"
-                    app:iconSize="36dp"
-                    app:iconPadding="0dp"
-                    app:backgroundTint="@color/colorPrimary" />
-
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/btnNext"
-                    style="@style/Widget.Material3.Button.ElevatedButton.Icon"
+                    style="@style/Widget.Material3.Button.ElevatedButton"
                     android:layout_width="72dp"
                     android:layout_height="72dp"
-                    android:layout_gravity="center_vertical|end"
+                    android:layout_alignParentEnd="true"
+                    android:layout_centerVertical="true"
                     android:layout_marginEnd="8dp"
                     android:contentDescription="@string/content_description_next"
+                    android:padding="0dp"
                     app:cornerRadius="36dp"
-                    app:elevation="14dp"
-                    app:icon="@drawable/ic_arrow_forward"
+                    app:elevation="12dp"
+                    app:icon="@drawable/ic_nav_next"
                     app:iconGravity="textStart"
-                    app:iconSize="36dp"
+                    app:iconSize="40dp"
                     app:iconPadding="0dp"
                     app:backgroundTint="@color/colorPrimary" />
-            </FrameLayout>
+            </RelativeLayout>
         </LinearLayout>
     </ScrollView>
 

@@ -170,14 +170,6 @@
                         android:text="@string/settings_low_power_animations"
                         android:padding="12dp" />
 
-                    <!-- Allow user to disable dynamic/background sparkle overlays -->
-                    <com.google.android.material.switchmaterial.SwitchMaterial
-                        android:id="@+id/switchDynamicBackground"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:text="Enable dynamic backgrounds"
-                        android:padding="12dp" />
-
                     <View
                         android:layout_width="match_parent"
                         android:layout_height="1dp"

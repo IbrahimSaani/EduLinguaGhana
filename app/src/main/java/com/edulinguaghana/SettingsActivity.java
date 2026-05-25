@@ -29,7 +29,6 @@ public class SettingsActivity extends AppCompatActivity {
     private SwitchMaterial switchMusic, switchSfx;
     private SwitchMaterial switchAnimations;
     private SwitchMaterial switchLowPowerAnimations;
-    private SwitchMaterial switchDynamicBackground;
     private SwitchMaterial switchDailyReminders, switchStreakAlerts;
     private SeekBar seekBarQuizMusicVolume;
     private TextView tvQuizMusicVolumeValue;
@@ -116,10 +115,6 @@ public class SettingsActivity extends AppCompatActivity {
         switchSfx.setChecked(sfxEnabled);
         switchAnimations.setChecked(animationsEnabled);
         switchLowPowerAnimations.setChecked(lowPowerEnabled);
-        // dynamic background switch
-        switchDynamicBackground = findViewById(R.id.switchDynamicBackground);
-        boolean dynamicEnabled = AppPreferences.isDynamicBackgroundEnabled(this);
-        if (switchDynamicBackground != null) switchDynamicBackground.setChecked(dynamicEnabled);
         switchDailyReminders.setChecked(dailyReminders);
         switchStreakAlerts.setChecked(streakAlerts);
 
@@ -145,12 +140,6 @@ public class SettingsActivity extends AppCompatActivity {
         switchLowPowerAnimations.setOnCheckedChangeListener((buttonView, isChecked) -> {
             prefs.edit().putBoolean(KEY_LOW_POWER_ANIMATIONS, isChecked).apply();
         });
-
-        if (switchDynamicBackground != null) {
-            switchDynamicBackground.setOnCheckedChangeListener((buttonView, isChecked) -> {
-                AppPreferences.setDynamicBackgroundEnabled(SettingsActivity.this, isChecked);
-            });
-        }
 
         switchDailyReminders.setOnCheckedChangeListener((buttonView, isChecked) -> {
             AppPreferences.setDailyRemindersEnabled(SettingsActivity.this, isChecked);

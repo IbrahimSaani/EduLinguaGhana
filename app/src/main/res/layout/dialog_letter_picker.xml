@@ -25,14 +25,13 @@
         android:gravity="center"
         android:layout_marginBottom="16dp"/>
 
-    <GridView
+    <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/letterGrid"
         android:layout_width="match_parent"
-        android:layout_height="300dp"
-        android:numColumns="5"
-        android:verticalSpacing="12dp"
-        android:horizontalSpacing="12dp"
-        android:scrollbars="none"
-        android:gravity="center" />
+        android:layout_height="320dp"
+        android:clipToPadding="false"
+        android:scrollbars="vertical"
+        app:layoutManager="androidx.recyclerview.widget.GridLayoutManager"
+        app:spanCount="5" />
 
 </LinearLayout>

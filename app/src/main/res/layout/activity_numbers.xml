@@ -406,20 +406,22 @@
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="36dp">
 
+                <!-- Navigation Buttons - Styled as bold arrows -->
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/btnPrevNumber"
-                    style="@style/Widget.Material3.Button.ElevatedButton.Icon"
+                    style="@style/Widget.Material3.Button.ElevatedButton"
                     android:layout_width="72dp"
                     android:layout_height="72dp"
                     android:layout_alignParentStart="true"
                     android:layout_centerVertical="true"
                     android:layout_marginStart="8dp"
                     android:contentDescription="@string/content_description_previous"
+                    android:padding="0dp"
                     app:cornerRadius="36dp"
-                    app:elevation="14dp"
-                    app:icon="@drawable/ic_arrow_back"
+                    app:elevation="12dp"
+                    app:icon="@drawable/ic_nav_prev"
                     app:iconGravity="textStart"
-                    app:iconSize="36dp"
+                    app:iconSize="40dp"
                     app:iconPadding="0dp"
                     app:backgroundTint="@color/colorPrimary" />
 
@@ -544,19 +546,19 @@
                                android:id="@+id/btnSpeakNumber"
                                style="@style/Widget.Material3.Button"
                                android:layout_width="match_parent"
-                               android:layout_height="68dp"
+                               android:layout_height="60dp"
                                android:minWidth="0dp"
                                android:paddingStart="16dp"
                                android:paddingEnd="16dp"
                                android:text="@string/speak_button"
-                               android:textSize="18sp"
+                               android:textSize="16sp"
                                android:textStyle="bold"
                                android:maxLines="1"
                                android:singleLine="true"
                                android:ellipsize="end"
                                android:hyphenationFrequency="none"
-                               app:cornerRadius="34dp"
-                               app:elevation="10dp"
+                               app:cornerRadius="30dp"
+                               app:elevation="8dp"
                                app:icon="@drawable/ic_speak"
                                app:iconSize="20dp"
                                app:iconGravity="start"
@@ -566,7 +568,7 @@
                         <TextView
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:layout_marginTop="18dp"
+                            android:layout_marginTop="12dp"
                             android:gravity="center"
                             android:text="✨ Tap to hear pronunciation!"
                             android:textColor="@color/colorAccent"
@@ -576,20 +578,22 @@
                     </LinearLayout>
                 </com.google.android.material.card.MaterialCardView>
 
+                <!-- Navigation Buttons - Styled as bold arrows -->
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/btnNextNumber"
-                    style="@style/Widget.Material3.Button.ElevatedButton.Icon"
+                    style="@style/Widget.Material3.Button.ElevatedButton"
                     android:layout_width="72dp"
                     android:layout_height="72dp"
                     android:layout_alignParentEnd="true"
                     android:layout_centerVertical="true"
                     android:layout_marginEnd="8dp"
                     android:contentDescription="@string/content_description_next"
+                    android:padding="0dp"
                     app:cornerRadius="36dp"
-                    app:elevation="14dp"
-                    app:icon="@drawable/ic_arrow_forward"
+                    app:elevation="12dp"
+                    app:icon="@drawable/ic_nav_next"
                     app:iconGravity="textStart"
-                    app:iconSize="36dp"
+                    app:iconSize="40dp"
                     app:iconPadding="0dp"
                     app:backgroundTint="@color/colorPrimary" />
 

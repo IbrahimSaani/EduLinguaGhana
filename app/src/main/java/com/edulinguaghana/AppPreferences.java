@@ -16,9 +16,7 @@ public final class AppPreferences {
     private AppPreferences() {}
 
     public static boolean isDynamicBackgroundEnabled(Context context) {
-        if (context == null) return true;
-        SharedPreferences prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
-        return prefs.getBoolean(KEY_DYNAMIC_BG, true);
+        return false; // Force disabled to ensure Dark Mode compatibility
     }
 
     public static void setDynamicBackgroundEnabled(Context context, boolean enabled) {

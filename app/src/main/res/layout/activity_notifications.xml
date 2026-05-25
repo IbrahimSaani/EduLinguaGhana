@@ -11,7 +11,8 @@
     <com.edulinguaghana.DynamicBackgroundView
         android:id="@+id/dynamicBackground"
         android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+        android:layout_height="match_parent"
+        android:visibility="gone" />
 
     <com.google.android.material.appbar.AppBarLayout
         android:id="@+id/appBarLayout"

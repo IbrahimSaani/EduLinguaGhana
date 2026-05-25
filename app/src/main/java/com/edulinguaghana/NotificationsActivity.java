@@ -108,25 +108,8 @@ public class NotificationsActivity extends AppCompatActivity implements Notifica
 
     private void setupBackground() {
         if (dynamicBackground == null) return;
-        
-        int hour = java.util.Calendar.getInstance().get(java.util.Calendar.HOUR_OF_DAY);
-        int colorStart, colorMid, colorEnd;
-
-        if (hour >= 5 && hour < 11) {
-            colorStart = androidx.core.content.ContextCompat.getColor(this, R.color.bgMorningStart);
-            colorMid = androidx.core.content.ContextCompat.getColor(this, R.color.bgMorningMid);
-            colorEnd = androidx.core.content.ContextCompat.getColor(this, R.color.bgMorningEnd);
-        } else if (hour >= 11 && hour < 17) {
-            colorStart = androidx.core.content.ContextCompat.getColor(this, R.color.bgDayStart);
-            colorMid = androidx.core.content.ContextCompat.getColor(this, R.color.bgDayMid);
-            colorEnd = androidx.core.content.ContextCompat.getColor(this, R.color.bgDayEnd);
-        } else {
-            colorStart = androidx.core.content.ContextCompat.getColor(this, R.color.bgNightStart);
-            colorMid = androidx.core.content.ContextCompat.getColor(this, R.color.bgNightMid);
-            colorEnd = androidx.core.content.ContextCompat.getColor(this, R.color.bgNightEnd);
-        }
-
-        dynamicBackground.setColors(colorStart, colorMid, colorEnd);
+        // Disabled to support Dark Mode properly
+        dynamicBackground.setVisibility(View.GONE);
     }
 
 

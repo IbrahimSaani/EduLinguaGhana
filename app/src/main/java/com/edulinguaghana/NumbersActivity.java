@@ -38,11 +38,13 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.edulinguaghana.tts.OfflineGhanaLPTtsService;
 import com.edulinguaghana.utils.LanguageConversionUtils;
 
-import android.widget.GridView;
 import android.widget.SeekBar;
-import android.widget.ArrayAdapter;
-
+import androidx.recyclerview.widget.RecyclerView;
+import android.view.ViewGroup;
+import android.view.LayoutInflater;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Locale;
 
 public class NumbersActivity extends AppCompatActivity {
@@ -836,55 +838,53 @@ public class NumbersActivity extends AppCompatActivity {
         
         View bottomSheetView = getLayoutInflater().inflate(R.layout.dialog_number_picker, null);
         TextView tvTitle = bottomSheetView.findViewById(R.id.tvGridTitle);
-        GridView gridView = bottomSheetView.findViewById(R.id.numberGrid);
+        RecyclerView recyclerView = bottomSheetView.findViewById(R.id.numberGrid);
         
         if (tvTitle != null) tvTitle.setText(R.string.numbers_grid_title);
         
-        // Create adapter for numbers 1-100
-        java.util.ArrayList<String> numberList = new java.util.ArrayList<>();
+        // Create list for numbers 1-100
+        List<String> numberList = new ArrayList<>();
         for (int i = 1; i <= 100; i++) {
             numberList.add(String.valueOf(i));
         }
         
-        ArrayAdapter<String> adapter = new ArrayAdapter<String>(
-            this,
-            R.layout.item_letter_picker, // Reuse the same card layout
-            numberList
-        ) {
+        recyclerView.setAdapter(new RecyclerView.Adapter<RecyclerView.ViewHolder>() {
             @NonNull
             @Override
-            public View getView(int position, android.view.View convertView, @NonNull android.view.ViewGroup parent) {
-                if (convertView == null) {
-                    convertView = getLayoutInflater().inflate(R.layout.item_letter_picker, parent, false);
-                }
+            public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+                View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_letter_picker, parent, false);
+                return new RecyclerView.ViewHolder(view) {};
+            }
+
+            @Override
+            public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
+                TextView textView = holder.itemView.findViewById(R.id.tvLetterItem);
+                MaterialCardView card = (MaterialCardView) holder.itemView;
                 
-                TextView textView = convertView.findViewById(R.id.tvLetterItem);
-                MaterialCardView card = (MaterialCardView) convertView;
-                
-                textView.setText(getItem(position));
+                textView.setText(numberList.get(position));
                 
                 if (currentNumber == (position + 1)) {
                     card.setStrokeWidth(4);
-                    card.setStrokeColor(getColor(R.color.colorAccent));
+                    card.setStrokeColor(ColorStateList.valueOf(getColor(R.color.colorAccent)));
                     textView.setTextColor(getColor(R.color.colorAccent));
-                    card.setCardBackgroundColor(ColorStateList.valueOf(getColor(R.color.white)));
                 } else {
                     card.setStrokeWidth(0);
                     textView.setTextColor(getColor(R.color.textColorPrimary));
-                    card.setCardBackgroundColor(ColorStateList.valueOf(getColor(R.color.white)));
                 }
-
-                return convertView;
+                
+                card.setOnClickListener(v -> {
+                    currentNumber = holder.getAdapterPosition() + 1;
+                    if (seekBarNavigation != null) seekBarNavigation.setProgress(currentNumber - 1);
+                    updateNumber();
+                    if (isRecitalMode) speakCurrentNumber();
+                    dialog.dismiss();
+                });
             }
-        };
-        
-        gridView.setAdapter(adapter);
-        gridView.setOnItemClickListener((parent, view, position, id) -> {
-            currentNumber = position + 1;
-            if (seekBarNavigation != null) seekBarNavigation.setProgress(position);
-            updateNumber();
-            if (isRecitalMode) speakCurrentNumber();
-            dialog.dismiss();
+
+            @Override
+            public int getItemCount() {
+                return numberList.size();
+            }
         });
         
         dialog.setContentView(bottomSheetView);

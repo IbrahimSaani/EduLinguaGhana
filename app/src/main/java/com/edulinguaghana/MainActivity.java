@@ -1286,65 +1286,24 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void setupDynamicBackground() {
-        applyDynamicBackground();
-        // overlay pulse is started from onResume() when animations are enabled
+        // Dynamic backgrounds disabled to support Dark Mode properly across all devices
+        if (rootCoordinator != null) {
+            rootCoordinator.setBackgroundResource(R.color.appBackground);
+        }
+        if (dynamicBackground != null) dynamicBackground.setVisibility(View.GONE);
+        if (dynamicBackgroundOverlay != null) dynamicBackgroundOverlay.setVisibility(View.GONE);
+        stopOverlayPulse();
     }
 
     private void applyDynamicBackground() {
-        if (rootCoordinator == null || dynamicBackgroundOverlay == null) return;
-
-        boolean dynamicEnabled = AppPreferences.isDynamicBackgroundEnabled(this);
-        boolean isDark = ThemeUtils.isDarkMode(this);
-
-        int hour = Calendar.getInstance().get(Calendar.HOUR_OF_DAY);
-        int backgroundRes;
-        int overlayTintRes;
-        float targetAlpha;
-        int colorStart, colorMid, colorEnd;
-
-        if (hour >= 5 && hour < 11) {
-            backgroundRes = R.drawable.bg_main_morning;
-            overlayTintRes = R.color.sparkleHalo;
-            targetAlpha = 0.45f;
-            colorStart = ContextCompat.getColor(this, R.color.bgMorningStart);
-            colorMid = ContextCompat.getColor(this, R.color.bgMorningMid);
-            colorEnd = ContextCompat.getColor(this, R.color.bgMorningEnd);
-        } else if (hour >= 11 && hour < 17) {
-            backgroundRes = R.drawable.bg_main_day;
-            overlayTintRes = R.color.sparkleHaloSecondary;
-            targetAlpha = 0.4f;
-            colorStart = ContextCompat.getColor(this, R.color.bgDayStart);
-            colorMid = ContextCompat.getColor(this, R.color.bgDayMid);
-            colorEnd = ContextCompat.getColor(this, R.color.bgDayEnd);
-        } else {
-            backgroundRes = R.drawable.bg_main_night;
-            overlayTintRes = R.color.sparkleCore;
-            targetAlpha = 0.6f;
-            colorStart = ContextCompat.getColor(this, R.color.bgNightStart);
-            colorMid = ContextCompat.getColor(this, R.color.bgNightMid);
-            colorEnd = ContextCompat.getColor(this, R.color.bgNightEnd);
-        }
-
-        // If dynamic backgrounds are disabled or device is in dark mode we keep the
-        // background static and hide overlays to preserve contrast.
-        if (!dynamicEnabled || isDark) {
-            rootCoordinator.setBackgroundResource(backgroundRes);
-            if (dynamicBackground != null) dynamicBackground.setVisibility(View.GONE);
-            dynamicBackgroundOverlay.setVisibility(View.GONE);
-            stopOverlayPulse();
-            return;
-        }
-
-        rootCoordinator.setBackgroundResource(backgroundRes);
-        if (dynamicBackground != null) {
-            dynamicBackground.setVisibility(View.VISIBLE);
-            dynamicBackground.setColors(colorStart, colorMid, colorEnd);
-        }
-        dynamicBackgroundOverlay.setVisibility(View.VISIBLE);
-        dynamicBackgroundOverlay.setImageResource(R.drawable.bg_dynamic_sparkle);
-        ImageViewCompat.setImageTintList(dynamicBackgroundOverlay,
-                ColorStateList.valueOf(ContextCompat.getColor(this, overlayTintRes)));
-        dynamicBackgroundOverlay.setAlpha(targetAlpha);
+        if (rootCoordinator == null) return;
+        
+        // Use standard app background that respects light/dark themes
+        rootCoordinator.setBackgroundResource(R.color.appBackground);
+        
+        if (dynamicBackground != null) dynamicBackground.setVisibility(View.GONE);
+        if (dynamicBackgroundOverlay != null) dynamicBackgroundOverlay.setVisibility(View.GONE);
+        stopOverlayPulse();
     }
 
     private void startOverlayPulse() {

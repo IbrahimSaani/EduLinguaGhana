@@ -63,34 +63,8 @@ public class AvatarEditorActivity extends AppCompatActivity {
 
     private void setupDynamicBackground() {
         if (dynamicBackground == null) return;
-
-        boolean dynamicEnabled = AppPreferences.isDynamicBackgroundEnabled(this);
-        boolean isDark = ThemeUtils.isDarkMode(this);
-
-        if (!dynamicEnabled || isDark) {
-            dynamicBackground.setVisibility(android.view.View.GONE);
-            return;
-        }
-
-        int hour = Calendar.getInstance().get(Calendar.HOUR_OF_DAY);
-        int colorStart, colorMid, colorEnd;
-
-        if (hour >= 5 && hour < 11) {
-            colorStart = ContextCompat.getColor(this, R.color.bgMorningStart);
-            colorMid = ContextCompat.getColor(this, R.color.bgMorningMid);
-            colorEnd = ContextCompat.getColor(this, R.color.bgMorningEnd);
-        } else if (hour >= 11 && hour < 17) {
-            colorStart = ContextCompat.getColor(this, R.color.bgDayStart);
-            colorMid = ContextCompat.getColor(this, R.color.bgDayMid);
-            colorEnd = ContextCompat.getColor(this, R.color.bgDayEnd);
-        } else {
-            colorStart = ContextCompat.getColor(this, R.color.bgNightStart);
-            colorMid = ContextCompat.getColor(this, R.color.bgNightMid);
-            colorEnd = ContextCompat.getColor(this, R.color.bgNightEnd);
-        }
-
-        dynamicBackground.setVisibility(android.view.View.VISIBLE);
-        dynamicBackground.setColors(colorStart, colorMid, colorEnd);
+        // Disabled to support Dark Mode properly
+        dynamicBackground.setVisibility(android.view.View.GONE);
     }
 
     private void initViews() {

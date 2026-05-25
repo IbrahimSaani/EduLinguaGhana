@@ -12,7 +12,8 @@
     <com.edulinguaghana.DynamicBackgroundView
         android:id="@+id/dynamicBackground"
         android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+        android:layout_height="match_parent"
+        android:visibility="gone" />
 
     <ImageView
         android:id="@+id/dynamicBackgroundOverlay"
@@ -25,6 +26,7 @@
         android:clickable="false"
         android:focusable="false"
         android:importantForAccessibility="no"
+        android:visibility="gone"
         tools:src="@drawable/bg_dynamic_sparkle" />
 
     <!-- Floating Alphabets and Numbers Container -->
