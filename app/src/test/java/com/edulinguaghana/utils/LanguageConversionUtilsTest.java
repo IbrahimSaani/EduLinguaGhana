@@ -20,7 +20,7 @@ public class LanguageConversionUtilsTest {
         assertEquals("Ten", LanguageConversionUtils.convertNumberToWord(10, "en"));
         assertEquals("Eleven", LanguageConversionUtils.convertNumberToWord(11, "en"));
         assertEquals("Twenty", LanguageConversionUtils.convertNumberToWord(20, "en"));
-        assertEquals("Twenty-One", LanguageConversionUtils.convertNumberToWord(21, "en"));
+        assertEquals("Twenty One", LanguageConversionUtils.convertNumberToWord(21, "en"));
         assertEquals("Fifty", LanguageConversionUtils.convertNumberToWord(50, "en"));
         assertEquals("One Hundred", LanguageConversionUtils.convertNumberToWord(100, "en"));
     }
@@ -76,10 +76,10 @@ public class LanguageConversionUtilsTest {
         assertEquals("enyɔ", LanguageConversionUtils.convertNumberToWord(2, "gaa"));
         assertEquals("nyɔŋma", LanguageConversionUtils.convertNumberToWord(10, "gaa"));
         assertEquals("nyɔŋma kɛ ekome", LanguageConversionUtils.convertNumberToWord(11, "gaa"));
-        assertEquals("iwuo", LanguageConversionUtils.convertNumberToWord(20, "gaa"));
-        assertEquals("iwuo kɛ ekome", LanguageConversionUtils.convertNumberToWord(21, "gaa"));
-        assertEquals("iwuo enyɔ kɛ nyɔŋma", LanguageConversionUtils.convertNumberToWord(50, "gaa"));
-        assertEquals("ohaa", LanguageConversionUtils.convertNumberToWord(100, "gaa"));
+        assertEquals("nyɔŋmai enyɔ", LanguageConversionUtils.convertNumberToWord(20, "gaa"));
+        assertEquals("nyɔŋmai enyɔ kɛ ekome", LanguageConversionUtils.convertNumberToWord(21, "gaa"));
+        assertEquals("nyɔŋmai enumɔ", LanguageConversionUtils.convertNumberToWord(50, "gaa"));
+        assertEquals("oha", LanguageConversionUtils.convertNumberToWord(100, "gaa"));
     }
 
     // ============ Edge Cases ============

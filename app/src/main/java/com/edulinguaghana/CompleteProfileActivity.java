@@ -217,7 +217,6 @@ public class CompleteProfileActivity extends AppCompatActivity {
         updates.put("displayName", currentUser.getDisplayName());
         updates.put("username", currentUser.getDisplayName() != null ? currentUser.getDisplayName() : currentUser.getEmail());
         updates.put("age", age);
-        updates.put("school", "");
         updates.put("studentClass", studentClass);
         updates.put("lastLogin", System.currentTimeMillis());
 

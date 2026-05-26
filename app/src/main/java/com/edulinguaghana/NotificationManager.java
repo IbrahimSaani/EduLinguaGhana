@@ -76,6 +76,12 @@ public class NotificationManager {
         }
 
         saveNotifications(notifications);
+
+        // Also trigger system notification
+        try {
+            AppNotificationHelper helper = new AppNotificationHelper(context);
+            helper.showNotification(title, message, id.hashCode());
+        } catch (Exception ignored) {}
     }
 
     // Mark notification as read

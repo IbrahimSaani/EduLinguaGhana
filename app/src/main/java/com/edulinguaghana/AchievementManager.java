@@ -15,9 +15,9 @@ public class AchievementManager {
     private static final String PREF_NAME = "AchievementsPrefs";
     private static final String KEY_ACHIEVEMENTS = "ACHIEVEMENTS_LIST";
 
-    private Context context;
-    private SharedPreferences prefs;
-    private Gson gson;
+    private final Context context;
+    private final SharedPreferences prefs;
+    private final Gson gson;
     private List<Achievement> achievements;
 
     public AchievementManager(Context context) {
@@ -172,14 +172,12 @@ public class AchievementManager {
 
     // Check and unlock achievements based on progress
     public void checkAndUnlockAchievements() {
-        ProgressManager progressManager = new ProgressManager();
         StreakManager streakManager = new StreakManager(context);
 
-        int totalQuizzes = progressManager.getTotalQuizzes(context);
-        int highScore = progressManager.getHighScore(context);
-        int accuracy = progressManager.getAccuracy(context);
+        int totalQuizzes = ProgressManager.getTotalQuizzes(context);
+        int highScore = ProgressManager.getHighScore(context);
+        int accuracy = ProgressManager.getAccuracy(context);
         int currentStreak = streakManager.getCurrentStreak();
-        int totalCorrect = progressManager.getTotalCorrect(context);
         int totalFunGames = FunGameProgressManager.getTotalFunGamesPlayed(context);
 
         boolean newUnlock = false;

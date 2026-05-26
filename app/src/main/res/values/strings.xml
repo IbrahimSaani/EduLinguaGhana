@@ -73,6 +73,8 @@
     <string name="game_status_mission_status_paused">Status: Paused</string>
     <string name="game_over_time_up">Time Up!</string>
     <string name="game_over_mission_complete">Mission Complete!</string>
+    <string name="game_start_go">GO!</string>
+    <string name="game_timer_pattern">⏱️ %1$ds</string>
     <string name="settings_role_prefix">Current role: %s</string>
     <string name="settings_role_not_logged_in">Not logged in</string>
     <string name="settings_role_not_set">Not set</string>
@@ -499,6 +501,7 @@
     <string name="profile_challenge">Challenge</string>
     <string name="profile_streak_emoji">🔥</string>
     <string name="profile_streak_default">0 days</string>
+    <string name="profile_streak_count">%1$d days</string>
     <string name="profile_streak_label">Streak</string>
     <string name="profile_best_score_emoji">🏆</string>
     <string name="profile_best_score_default">0 / 10</string>

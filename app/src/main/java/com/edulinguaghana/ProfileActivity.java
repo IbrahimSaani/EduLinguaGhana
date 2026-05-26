@@ -50,6 +50,9 @@ public class ProfileActivity extends AppCompatActivity {
     private SwitchMaterial switchMusic, switchSfx;
     private MaterialButton btnGoToLogin, btnManageAccount, btnSignOut, btnEditAvatar;
     private TextView tvUserName, tvUserEmail, tvUserId, tvProfileStreak, tvTotalLessons, tvBestScore, tvFavoriteLanguage;
+    private TextView tvAge, tvClass;
+    private TextView tvLastSync;
+    private MaterialButton btnSyncNow;
     private View userIdSection;
     private View languageSection;
     // Gamification views
@@ -125,7 +128,11 @@ public class ProfileActivity extends AppCompatActivity {
         tvProfileStreak = findViewById(R.id.tvProfileStreak);
         tvTotalLessons = findViewById(R.id.tvTotalLessons);
         tvBestScore = findViewById(R.id.tvBestScore);
+        tvAge = findViewById(R.id.tvAge);
+        tvClass = findViewById(R.id.tvClass);
         tvFavoriteLanguage = findViewById(R.id.tvFavoriteLanguage);
+        tvLastSync = findViewById(R.id.tvLastSync);
+        btnSyncNow = findViewById(R.id.btnSyncNow);
         languageSection = findViewById(R.id.languageSection);
         profileImage = findViewById(R.id.profileImage);
         avatarNotSignedIn = findViewById(R.id.avatarNotSignedIn);
@@ -239,9 +246,14 @@ public class ProfileActivity extends AppCompatActivity {
                 userIdSection.setVisibility(View.VISIBLE);
             }
 
-            // Load user statistics from ProgressManager
-            // Display streak (TODO: implement streak tracking)
-            tvProfileStreak.setText(R.string.profile_streak_default);
+            // Load user statistics from StreakManager
+            StreakManager streakManager = new StreakManager(this);
+            int currentStreak = streakManager.getCurrentStreak();
+            if (currentStreak > 0) {
+                tvProfileStreak.setText(getString(R.string.profile_streak_count, currentStreak));
+            } else {
+                tvProfileStreak.setText(R.string.profile_streak_default);
+            }
 
             // Display total lessons (using total quizzes as proxy)
             int totalLessons = ProgressManager.getTotalQuizzes(this);
@@ -260,6 +272,11 @@ public class ProfileActivity extends AppCompatActivity {
             XPState s = XPManager.getState(this);
             updateXpUi(s);
 
+            // Load learner profile details
+            loadLearnerProfileDetails(currentUserId);
+
+            // Update sync status
+            updateSyncStatus();
         } else {
             // User is not signed in
             notSignedInLayout.setVisibility(View.VISIBLE);
@@ -318,6 +335,10 @@ public class ProfileActivity extends AppCompatActivity {
         });
 
         btnSignOut.setOnClickListener(v -> showSignOutDialog());
+
+        if (btnSyncNow != null) {
+            btnSyncNow.setOnClickListener(v -> performSync());
+        }
 
         if (btnEditAvatar != null) {
             btnEditAvatar.setOnClickListener(v -> {
@@ -385,6 +406,57 @@ public class ProfileActivity extends AppCompatActivity {
             });
         }
 
+    }
+
+    private void updateSyncStatus() {
+        if (tvLastSync == null) return;
+        CloudSyncManager syncManager = new CloudSyncManager(this);
+        tvLastSync.setText(getString(R.string.settings_last_sync_label, syncManager.getLastSyncTimeString()));
+    }
+
+    private void performSync() {
+        CloudSyncManager syncManager = new CloudSyncManager(this);
+        if (!syncManager.canSync()) {
+            Toast.makeText(this, "Internet connection required for sync", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        btnSyncNow.setEnabled(false);
+        btnSyncNow.setText("Syncing...");
+
+        syncManager.syncToCloud((success, message) -> {
+            runOnUiThread(() -> {
+                btnSyncNow.setEnabled(true);
+                btnSyncNow.setText("Sync");
+                updateSyncStatus();
+                Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
+                // Refresh profile details after sync
+                FirebaseUser user = mAuth.getCurrentUser();
+                if (user != null) loadLearnerProfileDetails(user.getUid());
+            });
+        });
+    }
+
+    private void loadLearnerProfileDetails(String userId) {
+        if (userId == null) return;
+        com.google.firebase.database.DatabaseReference userRef =
+                com.google.firebase.database.FirebaseDatabase.getInstance().getReference("users").child(userId);
+
+        userRef.addListenerForSingleValueEvent(new com.google.firebase.database.ValueEventListener() {
+            @Override
+            public void onDataChange(@androidx.annotation.NonNull com.google.firebase.database.DataSnapshot snapshot) {
+                if (snapshot.exists()) {
+                    String age = snapshot.child("age").getValue(String.class);
+                    String studentClass = snapshot.child("studentClass").getValue(String.class);
+
+                    if (tvAge != null) tvAge.setText(age != null && !age.isEmpty() ? age : "Not set");
+                    if (tvClass != null) tvClass.setText(studentClass != null && !studentClass.isEmpty() ? studentClass : "Not set");
+                }
+            }
+
+            @Override
+            public void onCancelled(@androidx.annotation.NonNull com.google.firebase.database.DatabaseError error) {}
+        });
     }
 
     private void showLanguageSelectionDialog() {

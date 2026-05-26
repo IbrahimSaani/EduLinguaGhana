@@ -5,7 +5,6 @@ import android.animation.AnimatorListenerAdapter;
 import android.animation.ObjectAnimator;
 import android.annotation.SuppressLint;
 import android.graphics.Color;
-import android.graphics.drawable.GradientDrawable;
 import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.os.Handler;
@@ -42,7 +41,6 @@ public class RocketSortActivity extends AppCompatActivity {
     private View overlayLayout;
     private ImageView ivRocketLeft, ivRocketRight;
     private KonfettiView konfettiView;
-    private View rocketDock;
 
     private int score = 0;
     private int lives = 5;
@@ -51,13 +49,13 @@ public class RocketSortActivity extends AppCompatActivity {
 
     private String languageCode;
     private String[] alphabet;
-    private String[] numbers = {"0", "1", "2", "3", "4", "5", "6", "7", "8", "9"};
+    private final String[] numbers = {"0", "1", "2", "3", "4", "5", "6", "7", "8", "9"};
 
-    private Random random = new Random();
-    private Handler spawnHandler = new Handler(Looper.getMainLooper());
+    private final Random random = new Random();
+    private final Handler spawnHandler = new Handler(Looper.getMainLooper());
     private Runnable spawnRunnable;
-    private List<View> activeAsteroids = new ArrayList<>();
-    private java.util.Map<View, ObjectAnimator> asteroidAnimators = new java.util.HashMap<>();
+    private final List<View> activeAsteroids = new ArrayList<>();
+    private final java.util.Map<View, ObjectAnimator> asteroidAnimators = new java.util.HashMap<>();
 
     private MediaPlayer correctPlayer;
     private MediaPlayer wrongPlayer;
@@ -116,7 +114,6 @@ public class RocketSortActivity extends AppCompatActivity {
         ivRocketLeft = findViewById(R.id.ivRocketLeft);
         ivRocketRight = findViewById(R.id.ivRocketRight);
         konfettiView = findViewById(R.id.konfettiView);
-        rocketDock = findViewById(R.id.rocketDock);
 
         // Pre-warm character arrays for local languages
         new Handler(Looper.getMainLooper()).post(() -> {
@@ -251,7 +248,7 @@ public class RocketSortActivity extends AppCompatActivity {
                     count[0]--;
                     spawnHandler.postDelayed(this, 1000);
                 } else if (count[0] == 0) {
-                    tvCountdown.setText("GO!");
+                    tvCountdown.setText(R.string.game_start_go);
                     count[0]--;
                     spawnHandler.postDelayed(this, 800);
                 } else {
@@ -286,7 +283,7 @@ public class RocketSortActivity extends AppCompatActivity {
 
     private void updateTimerDisplay() {
         if (tvTimer != null) {
-            tvTimer.setText("⏱️ " + (timeLeftMs / 1000) + "s");
+            tvTimer.setText(getString(R.string.game_timer_pattern, timeLeftMs / 1000));
         }
     }
 
@@ -463,7 +460,7 @@ public class RocketSortActivity extends AppCompatActivity {
                         if (correct) {
                             handleCorrectSort(leftRocket);
                         } else {
-                            handleWrongSort(asteroid);
+                            handleWrongSort();
                         }
                         removeAsteroid(asteroid);
                     }
@@ -479,8 +476,8 @@ public class RocketSortActivity extends AppCompatActivity {
         ImageView rocket = leftRocket ? ivRocketLeft : ivRocketRight;
         if (rocket != null) {
             rocket.performHapticFeedback(HapticFeedbackConstants.KEYBOARD_TAP);
-            rocket.animate().scaleX(1.2f).scaleY(1.2f).setDuration(100).withEndAction(() -> 
-                rocket.animate().scaleX(1.0f).scaleY(1.0f).setDuration(100).start()
+            rocket.animate().scaleX(1.2f).scaleY(1.2f).setDuration(100).withEndAction(
+                () -> rocket.animate().scaleX(1.0f).scaleY(1.0f).setDuration(100).start()
             ).start();
         }
         
@@ -496,7 +493,7 @@ public class RocketSortActivity extends AppCompatActivity {
         if (score % 10 == 0) celebrate();
     }
 
-    private void handleWrongSort(View asteroid) {
+    private void handleWrongSort() {
         if (isGameOver || isFinishing() || isDestroyed()) return;
         lives--;
         if (wrongPlayer != null) wrongPlayer.start();

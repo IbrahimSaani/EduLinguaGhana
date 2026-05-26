@@ -443,7 +443,6 @@ public class LoginActivity extends AppCompatActivity {
     private boolean hasCompleteLearnerProfile(DataSnapshot snapshot) {
         return snapshot != null
                 && !TextUtils.isEmpty(snapshot.child("age").getValue(String.class))
-                && !TextUtils.isEmpty(snapshot.child("school").getValue(String.class))
                 && !TextUtils.isEmpty(snapshot.child("studentClass").getValue(String.class));
     }
 
