@@ -186,7 +186,7 @@ public class LoginActivity extends AppCompatActivity {
             LoginActivity.this,
             "📧",
             "Email Verification Required",
-            "Your email is not verified yet. Please check your inbox for the verification link.",
+            "Your email is not verified yet. Please check your inbox for the verification link.\n\n💡 Tip: Check your Spam or Junk folder if it's missing.",
             "I've Verified",
             "Resend Email",
             () -> {
@@ -305,9 +305,18 @@ public class LoginActivity extends AppCompatActivity {
         mAuth.sendPasswordResetEmail(email)
                 .addOnCompleteListener(task -> {
                     if (task.isSuccessful()) {
-                        Toast.makeText(LoginActivity.this,
-                                "Password reset email sent to " + email,
-                                Toast.LENGTH_LONG).show();
+                        StyledMenuHelper.showStyledConfirmationDialog(
+                            LoginActivity.this,
+                            "🔑",
+                            "Reset Email Sent",
+                            "A password reset link has been sent to " + email + 
+                            ". Please follow the instructions in the email to set a new password.\n\n" +
+                            "💡 Tip: If you don't see it, check your Spam or Junk folder.",
+                            "Okay",
+                            null,
+                            null,
+                            null
+                        );
                     } else {
                         String message = (task.getException() != null) ? task.getException().getMessage() : "Unknown error";
                         Toast.makeText(LoginActivity.this,

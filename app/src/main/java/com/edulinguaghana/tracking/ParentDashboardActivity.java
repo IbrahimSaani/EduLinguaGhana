@@ -4,7 +4,6 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.HapticFeedbackConstants;
 import android.view.View;
-import android.widget.ArrayAdapter;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -43,7 +42,6 @@ public class ParentDashboardActivity extends AppCompatActivity {
     private TextView emptyTextView;
     private SwipeRefreshLayout swipeRefresh;
     private LinearLayout emptyStateLayout;
-    private MaterialAutoCompleteTextView classFilterDropdown;
 
     // Statistics views
     private TextView tvTotalChildren;
@@ -57,11 +55,6 @@ public class ParentDashboardActivity extends AppCompatActivity {
     private int currentSortOption = 0; // 0=Name, 1=Level, 2=Activity
     private int activeLoadToken = 0;
 
-    private String ALL_CLASSES_FILTER;
-    private String UNASSIGNED_CLASSES_FILTER;
-    private String[] classFilterOptions;
-    private String selectedClassFilter;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -73,20 +66,6 @@ public class ParentDashboardActivity extends AppCompatActivity {
             return;
         }
         currentUserId = user.getUid();
-
-        ALL_CLASSES_FILTER = getString(R.string.teacher_dashboard_all_classes);
-        UNASSIGNED_CLASSES_FILTER = getString(R.string.teacher_dashboard_unassigned);
-        classFilterOptions = new String[]{
-                ALL_CLASSES_FILTER,
-                "Class 1",
-                "Class 2",
-                "Class 3",
-                "Class 4",
-                "Class 5",
-                "Class 6",
-                UNASSIGNED_CLASSES_FILTER
-        };
-        selectedClassFilter = ALL_CLASSES_FILTER;
 
         roleManager = new RoleManager();
         progressTracker = new ProgressTracker();
@@ -111,7 +90,6 @@ public class ParentDashboardActivity extends AppCompatActivity {
         emptyStateLayout = findViewById(R.id.emptyStateLayout);
         swipeRefresh = findViewById(R.id.swipeRefresh);
         MaterialButton btnSort = findViewById(R.id.btnSort);
-        classFilterDropdown = findViewById(R.id.classFilterDropdown);
         MaterialButton btnAddFirstChild = findViewById(R.id.btnAddFirstChild);
         MaterialButton btnAddChildBottom = findViewById(R.id.btnAddChildBottom);
         MaterialButton btnRemoveChild = findViewById(R.id.btnRemoveChild);
@@ -149,25 +127,6 @@ public class ParentDashboardActivity extends AppCompatActivity {
                 showSortDialog();
             });
         }
-
-        setupClassFilter();
-    }
-
-    private void setupClassFilter() {
-        if (classFilterDropdown == null) return;
-
-        ArrayAdapter<String> adapter = new ArrayAdapter<>(
-                this,
-                android.R.layout.simple_dropdown_item_1line,
-                classFilterOptions
-        );
-        classFilterDropdown.setAdapter(adapter);
-        classFilterDropdown.setText(selectedClassFilter, false);
-        classFilterDropdown.setOnClickListener(v -> classFilterDropdown.showDropDown());
-        classFilterDropdown.setOnItemClickListener((parent, view, position, id) -> {
-            selectedClassFilter = classFilterOptions[position];
-            renderChildren();
-        });
     }
 
     private void openRelationshipManagement() {
@@ -361,12 +320,7 @@ public class ParentDashboardActivity extends AppCompatActivity {
     }
 
     private void renderChildren() {
-        List<StudentProgressItem> visibleChildren = new ArrayList<>();
-        for (StudentProgressItem child : allChildren) {
-            if (matchesSelectedClass(child.getStudentClass())) {
-                visibleChildren.add(child);
-            }
-        }
+        List<StudentProgressItem> visibleChildren = new ArrayList<>(allChildren);
 
         sortVisibleChildren(visibleChildren);
         adapter.updateStudents(visibleChildren);
@@ -376,7 +330,7 @@ public class ParentDashboardActivity extends AppCompatActivity {
             emptyStateLayout.setVisibility(View.VISIBLE);
             childrenRecyclerView.setVisibility(View.GONE);
             if (emptyTextView != null) {
-                emptyTextView.setText(getEmptyStateMessage());
+                emptyTextView.setText(R.string.parent_dashboard_empty_message);
             }
         } else {
             emptyStateLayout.setVisibility(View.GONE);
@@ -384,34 +338,10 @@ public class ParentDashboardActivity extends AppCompatActivity {
         }
     }
 
-    private boolean matchesSelectedClass(String studentClass) {
-        String normalizedClass = normalizeClassLabel(studentClass);
-
-        if (Objects.equals(ALL_CLASSES_FILTER, selectedClassFilter)) {
-            return true;
-        }
-
-        if (Objects.equals(UNASSIGNED_CLASSES_FILTER, selectedClassFilter)) {
-            return normalizedClass.isEmpty();
-        }
-
-        return selectedClassFilter.equalsIgnoreCase(normalizedClass);
-    }
-
     private void sortVisibleChildren(List<StudentProgressItem> children) {
         if (children.isEmpty()) return;
 
         Collections.sort(children, (a, b) -> {
-            if (Objects.equals(ALL_CLASSES_FILTER, selectedClassFilter)) {
-                int classCompare = Integer.compare(
-                        getClassSortOrder(a.getStudentClass()),
-                        getClassSortOrder(b.getStudentClass())
-                );
-                if (classCompare != 0) {
-                    return classCompare;
-                }
-            }
-
             switch (currentSortOption) {
                 case 0:
                     String aName = a.getStudentName() != null ? a.getStudentName() : "";
@@ -429,36 +359,6 @@ public class ParentDashboardActivity extends AppCompatActivity {
                     return 0;
             }
         });
-    }
-
-    private int getClassSortOrder(String studentClass) {
-        String normalizedClass = normalizeClassLabel(studentClass);
-        switch (normalizedClass) {
-            case "Class 1": return 1;
-            case "Class 2": return 2;
-            case "Class 3": return 3;
-            case "Class 4": return 4;
-            case "Class 5": return 5;
-            case "Class 6": return 6;
-            case "": return 999;
-            default: return 998;
-        }
-    }
-
-    private String normalizeClassLabel(String studentClass) {
-        return studentClass == null ? "" : studentClass.trim();
-    }
-
-    private String getEmptyStateMessage() {
-        if (Objects.equals(ALL_CLASSES_FILTER, selectedClassFilter)) {
-            return getString(R.string.parent_dashboard_empty_message);
-        }
-
-        if (Objects.equals(UNASSIGNED_CLASSES_FILTER, selectedClassFilter)) {
-            return getString(R.string.teacher_dashboard_empty_unassigned);
-        }
-
-        return getString(R.string.parent_dashboard_empty_filter, selectedClassFilter);
     }
 
     private void updateStatistics(List<StudentProgressItem> children) {

@@ -210,7 +210,8 @@ public class SignUpActivity extends AppCompatActivity {
                  "📧",
                  "Verify Your Email",
                  "A verification link has been sent to " + user.getEmail() +
-                         ".\n\nPlease check your inbox and verify your account to continue. This ensures your account is secure.",
+                         ".\n\nPlease check your inbox and verify your account to continue. This ensures your account is secure.\n\n" +
+                         "💡 Tip: If you don't see the email, please check your Spam or Junk folder.",
                  "I've Verified",
                  "Resend Email",
                  () -> {
