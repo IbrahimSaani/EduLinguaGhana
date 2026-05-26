@@ -1,7 +1,11 @@
 package com.edulinguaghana;
 
 import android.app.Application;
+import android.app.Activity;
+import android.os.Bundle;
+import android.net.Uri;
 import android.util.Log;
+import java.lang.reflect.Field;
 
 import androidx.work.ExistingPeriodicWorkPolicy;
 import androidx.work.PeriodicWorkRequest;
@@ -81,6 +85,50 @@ public class App extends Application {
         } catch (Exception e) {
             Log.e(TAG, "Failed to show feedback notification", e);
         }
+
+        // Apply global hotfix for Firebase App Distribution FeedbackActivity crash
+        // Fixes NullPointerException in onSaveInstanceState when screenshotUri is null
+        applyFeedbackActivityCrashFix();
+    }
+
+    /**
+     * Hotfix for a known crash in Firebase App Distribution SDK (16.0.0-beta19)
+     * The FeedbackActivity crashes in onSaveInstanceState when screenshotUri is null.
+     */
+    private void applyFeedbackActivityCrashFix() {
+        registerActivityLifecycleCallbacks(new ActivityLifecycleCallbacks() {
+            @Override
+            public void onActivityCreated(@androidx.annotation.NonNull Activity activity, @androidx.annotation.Nullable Bundle savedInstanceState) {
+                if (activity.getClass().getName().endsWith(".FeedbackActivity")) {
+                    try {
+                        // Use reflection to ensure screenshotUri is never null before onSaveInstanceState is called
+                        Field field = activity.getClass().getDeclaredField("screenshotUri");
+                        field.setAccessible(true);
+                        if (field.get(activity) == null) {
+                            field.set(activity, Uri.EMPTY);
+                            Log.d(TAG, "FeedbackActivity patched: screenshotUri was null, set to Uri.EMPTY");
+                        }
+                    } catch (Exception e) {
+                        Log.w(TAG, "Could not patch FeedbackActivity screenshotUri", e);
+                    }
+                }
+            }
+
+            @Override public void onActivityStarted(@androidx.annotation.NonNull Activity activity) {}
+            @Override public void onActivityResumed(@androidx.annotation.NonNull Activity activity) {}
+            @Override public void onActivityPaused(@androidx.annotation.NonNull Activity activity) {}
+            @Override public void onActivityStopped(@androidx.annotation.NonNull Activity activity) {}
+            @Override public void onActivitySaveInstanceState(@androidx.annotation.NonNull Activity activity, @androidx.annotation.NonNull Bundle outState) {
+                // Double protection: Ensure the bundle key doesn't have a null value that causes issues later
+                if (activity.getClass().getName().endsWith(".FeedbackActivity")) {
+                    String screenshotKey = "com.google.firebase.appdistribution.FeedbackActivity.SCREENSHOT_URI";
+                    if (outState.containsKey(screenshotKey) && outState.getString(screenshotKey) == null) {
+                        outState.putString(screenshotKey, "");
+                    }
+                }
+            }
+            @Override public void onActivityDestroyed(@androidx.annotation.NonNull Activity activity) {}
+        });
     }
 
     /**
