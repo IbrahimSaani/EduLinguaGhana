@@ -410,20 +410,21 @@
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/btnPrevNumber"
                     style="@style/Widget.Material3.Button.ElevatedButton"
-                    android:layout_width="72dp"
-                    android:layout_height="72dp"
+                    android:layout_width="56dp"
+                    android:layout_height="56dp"
                     android:layout_alignParentStart="true"
                     android:layout_centerVertical="true"
-                    android:layout_marginStart="8dp"
+                    android:layout_marginStart="2dp"
                     android:contentDescription="@string/content_description_previous"
                     android:padding="0dp"
-                    app:cornerRadius="36dp"
-                    app:elevation="12dp"
-                    app:icon="@drawable/ic_nav_prev"
+                    app:cornerRadius="28dp"
+                    app:elevation="8dp"
+                    app:icon="@drawable/ic_back"
                     app:iconGravity="textStart"
-                    app:iconSize="40dp"
+                    app:iconSize="32dp"
                     app:iconPadding="0dp"
-                    app:backgroundTint="@color/colorPrimary" />
+                    app:backgroundTint="@color/colorAccent"
+                    app:iconTint="@color/white" />
 
                 <com.google.android.material.card.MaterialCardView
                     android:layout_width="match_parent"
@@ -431,8 +432,8 @@
                     android:layout_toStartOf="@id/btnNextNumber"
                     android:layout_toEndOf="@id/btnPrevNumber"
                     android:layout_centerVertical="true"
-                    android:layout_marginStart="8dp"
-                    android:layout_marginEnd="8dp"
+                    android:layout_marginStart="2dp"
+                    android:layout_marginEnd="2dp"
                     app:cardCornerRadius="32dp"
                     app:cardElevation="16dp"
                     app:strokeColor="@color/colorPrimary"
@@ -582,20 +583,21 @@
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/btnNextNumber"
                     style="@style/Widget.Material3.Button.ElevatedButton"
-                    android:layout_width="72dp"
-                    android:layout_height="72dp"
+                    android:layout_width="56dp"
+                    android:layout_height="56dp"
                     android:layout_alignParentEnd="true"
                     android:layout_centerVertical="true"
-                    android:layout_marginEnd="8dp"
+                    android:layout_marginEnd="2dp"
                     android:contentDescription="@string/content_description_next"
                     android:padding="0dp"
-                    app:cornerRadius="36dp"
-                    app:elevation="12dp"
-                    app:icon="@drawable/ic_nav_next"
+                    app:cornerRadius="28dp"
+                    app:elevation="8dp"
+                    app:icon="@drawable/ic_arrow_forward"
                     app:iconGravity="textStart"
-                    app:iconSize="40dp"
+                    app:iconSize="32dp"
                     app:iconPadding="0dp"
-                    app:backgroundTint="@color/colorPrimary" />
+                    app:backgroundTint="@color/colorAccent"
+                    app:iconTint="@color/white" />
 
             </RelativeLayout>
         </LinearLayout>

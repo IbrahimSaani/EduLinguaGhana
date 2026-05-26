@@ -105,6 +105,12 @@ public class AccountManagementActivity extends AppCompatActivity {
             etDisplayName.setText(displayName != null ? displayName : "");
             tvEmail.setText(email != null ? email : "");
 
+            // Load saved avatar config
+            if (avatarView != null) {
+                AvatarBuilder.AvatarConfig config = AvatarBuilder.loadConfig(this);
+                avatarView.setAvatarConfig(config);
+            }
+
             boolean hasPasswordProvider = false;
             if (currentUser.getProviderData() != null) {
                 for (com.google.firebase.auth.UserInfo profile : currentUser.getProviderData()) {
@@ -695,7 +701,8 @@ public class AccountManagementActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
         if (avatarView != null) {
-            avatarView.updateAvatar();
+            AvatarBuilder.AvatarConfig config = AvatarBuilder.loadConfig(this);
+            avatarView.setAvatarConfig(config);
         }
 
         if (currentUser != null) {
