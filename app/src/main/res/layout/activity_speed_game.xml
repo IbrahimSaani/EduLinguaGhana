@@ -222,9 +222,10 @@
                     android:textSize="32sp"
                     android:textStyle="bold"
                     android:fontFamily="@font/agbalumo"
-                    android:backgroundTint="#1A237E"
-                    app:strokeWidth="2dp"
-                    app:strokeColor="#4FC3F7"
+                    android:backgroundTint="@null"
+                    android:background="@drawable/bg_quiz_option"
+                    android:textColor="@color/colorPrimary"
+                    app:elevation="4dp"
                     app:cornerRadius="20dp"
                     tools:text="A" />
 
@@ -237,9 +238,10 @@
                     android:textSize="32sp"
                     android:textStyle="bold"
                     android:fontFamily="@font/agbalumo"
-                    android:backgroundTint="#1A237E"
-                    app:strokeWidth="2dp"
-                    app:strokeColor="#4FC3F7"
+                    android:backgroundTint="@null"
+                    android:background="@drawable/bg_quiz_option"
+                    android:textColor="@color/colorPrimary"
+                    app:elevation="4dp"
                     app:cornerRadius="20dp"
                     tools:text="B" />
 
@@ -252,9 +254,10 @@
                     android:textSize="32sp"
                     android:textStyle="bold"
                     android:fontFamily="@font/agbalumo"
-                    android:backgroundTint="#1A237E"
-                    app:strokeWidth="2dp"
-                    app:strokeColor="#4FC3F7"
+                    android:backgroundTint="@null"
+                    android:background="@drawable/bg_quiz_option"
+                    android:textColor="@color/colorPrimary"
+                    app:elevation="4dp"
                     app:cornerRadius="20dp"
                     tools:text="C" />
 
@@ -267,9 +270,10 @@
                     android:textSize="32sp"
                     android:textStyle="bold"
                     android:fontFamily="@font/agbalumo"
-                    android:backgroundTint="#1A237E"
-                    app:strokeWidth="2dp"
-                    app:strokeColor="#4FC3F7"
+                    android:backgroundTint="@null"
+                    android:background="@drawable/bg_quiz_option"
+                    android:textColor="@color/colorPrimary"
+                    app:elevation="4dp"
                     app:cornerRadius="20dp"
                     tools:text="D" />
 
@@ -282,9 +286,10 @@
                     android:textSize="32sp"
                     android:textStyle="bold"
                     android:fontFamily="@font/agbalumo"
-                    android:backgroundTint="#1A237E"
-                    app:strokeWidth="2dp"
-                    app:strokeColor="#4FC3F7"
+                    android:backgroundTint="@null"
+                    android:background="@drawable/bg_quiz_option"
+                    android:textColor="@color/colorPrimary"
+                    app:elevation="4dp"
                     app:cornerRadius="20dp"
                     tools:text="E" />
 
@@ -297,9 +302,10 @@
                     android:textSize="32sp"
                     android:textStyle="bold"
                     android:fontFamily="@font/agbalumo"
-                    android:backgroundTint="#1A237E"
-                    app:strokeWidth="2dp"
-                    app:strokeColor="#4FC3F7"
+                    android:backgroundTint="@null"
+                    android:background="@drawable/bg_quiz_option"
+                    android:textColor="@color/colorPrimary"
+                    app:elevation="4dp"
                     app:cornerRadius="20dp"
                     tools:text="F" />
             </GridLayout>

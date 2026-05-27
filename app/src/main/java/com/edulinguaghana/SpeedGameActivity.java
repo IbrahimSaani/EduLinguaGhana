@@ -271,6 +271,16 @@ public class SpeedGameActivity extends AppCompatActivity {
     }
 
     private void generateNewQuestion() {
+        // Reset button backgrounds for gaming UI
+        MaterialButton[] buttons = {btnOption1, btnOption2, btnOption3, btnOption4, btnOption5, btnOption6};
+        for (MaterialButton button : buttons) {
+            if (button != null) {
+                button.setBackgroundResource(R.drawable.bg_quiz_option);
+                button.setScaleX(1.0f);
+                button.setScaleY(1.0f);
+            }
+        }
+
         // Reset shadow match feedback styling
         if (tvGameFeedback != null) {
             tvGameFeedback.setText("");
@@ -594,7 +604,15 @@ public class SpeedGameActivity extends AppCompatActivity {
             tvGameScore.setText(getString(R.string.quiz_score, score));
 
             playSfx(true);
-            playCorrectAnimation(clickedButton);
+            
+            // Gaming UI: Background change and scale animation
+            clickedButton.setBackgroundResource(R.drawable.bg_quiz_option_correct);
+            clickedButton.animate()
+                .scaleX(1.15f)
+                .scaleY(1.15f)
+                .setDuration(150)
+                .withEndAction(() -> clickedButton.animate().scaleX(1.0f).scaleY(1.0f).setDuration(100).start())
+                .start();
 
             if (score > bestScore) {
                 bestScore = score;
@@ -606,7 +624,13 @@ public class SpeedGameActivity extends AppCompatActivity {
             tvGameFeedback.setText(getString(R.string.quiz_feedback_wrong, currentCorrectAnswer));
             tvGameFeedback.setTextColor(ContextCompat.getColor(this, R.color.wrongAnswer));
             playSfx(false);
+            
+            // Gaming UI: Background change and shake
+            clickedButton.setBackgroundResource(R.drawable.bg_quiz_option_wrong);
             playWrongAnimation(clickedButton);
+            
+            // Find and highlight correct answer
+            highlightCorrectButton();
             
             // Decrease time by 1 second on wrong answer
             timeLeftMs -= PENALTY_TIME_MS;
@@ -710,20 +734,26 @@ public class SpeedGameActivity extends AppCompatActivity {
         } catch (Exception ignored) {}
     }
 
+    private void highlightCorrectButton() {
+        MaterialButton[] buttons = {btnOption1, btnOption2, btnOption3, btnOption4, btnOption5, btnOption6};
+        for (MaterialButton button : buttons) {
+            if (button != null && button.getText().toString().equals(currentCorrectAnswer)) {
+                button.setBackgroundResource(R.drawable.bg_quiz_option_correct);
+                button.animate()
+                    .scaleX(1.1f)
+                    .scaleY(1.1f)
+                    .setDuration(200)
+                    .withEndAction(() -> button.animate().scaleX(1.0f).scaleY(1.0f).setDuration(200).start())
+                    .start();
+                break;
+            }
+        }
+    }
+
     private void saveHighScore(int value) {
         SharedPreferences.Editor ed = prefs.edit();
         ed.putInt(KEY_HIGH_SCORE, value);
         ed.apply();
-    }
-
-    private void playCorrectAnimation(View button) {
-        try {
-            Animation bounce = AnimationUtils.loadAnimation(this, R.anim.bounce_pop);
-            button.startAnimation(bounce);
-
-            Animation glow = AnimationUtils.loadAnimation(this, R.anim.glow_pulse);
-            tvGameFeedback.startAnimation(glow);
-        } catch (Exception ignored) {}
     }
 
     private void playWrongAnimation(View button) {

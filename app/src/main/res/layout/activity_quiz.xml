@@ -5,15 +5,15 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:fitsSystemWindows="true"
-    android:background="@drawable/gradient_background"
+    android:background="@drawable/bg_quiz_gaming"
     tools:context=".QuizActivity">
 
     <com.google.android.material.appbar.AppBarLayout
         android:id="@+id/appBarLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@drawable/gradient_background"
-        android:elevation="8dp"
+        android:background="@android:color/transparent"
+        android:elevation="0dp"
         tools:visibility="visible"
         android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar">
 
@@ -49,16 +49,16 @@
                 android:padding="20dp"
                 android:paddingTop="40dp">
 
-                <!-- Welcome Icon with Animation -->
-                <ImageView
+                <!-- Welcome Icon with Lottie Animation -->
+                <com.airbnb.lottie.LottieAnimationView
                     android:id="@+id/ivWelcomeIcon"
-                    android:layout_width="100dp"
-                    android:layout_height="100dp"
+                    android:layout_width="180dp"
+                    android:layout_height="180dp"
                     android:layout_gravity="center_horizontal"
-                    android:layout_marginBottom="24dp"
-                    android:scaleType="centerInside"
-                    android:contentDescription="@string/quiz_welcome"
-                    tools:src="@drawable/ic_quiz_letters" />
+                    android:layout_marginBottom="16dp"
+                    app:lottie_autoPlay="true"
+                    app:lottie_loop="true"
+                    app:lottie_rawRes="@raw/kids_animation" />
 
                 <com.google.android.material.card.MaterialCardView
                     android:layout_width="match_parent"
@@ -194,13 +194,15 @@
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/btnStartQuiz"
                     android:layout_width="match_parent"
-                    android:layout_height="56dp"
+                    android:layout_height="70dp"
                     android:text="@string/quiz_start_button"
-                    android:textSize="18sp"
+                    android:textSize="20sp"
                     android:textStyle="bold"
+                    android:fontFamily="@font/agbalumo"
                     android:letterSpacing="0.05"
-                    app:cornerRadius="12dp"
-                    android:backgroundTint="@color/colorAccent"
+                    app:cornerRadius="16dp"
+                    android:backgroundTint="@null"
+                    android:background="@drawable/bg_game_button"
                     android:textColor="@color/white"
                     app:elevation="8dp"
                     android:contentDescription="@string/quiz_start_button" />
@@ -244,10 +246,10 @@
                             android:id="@+id/progressBar"
                             style="?android:attr/progressBarStyleHorizontal"
                             android:layout_width="match_parent"
-                            android:layout_height="8dp"
+                            android:layout_height="14dp"
                             android:progress="50"
-                            android:layout_marginBottom="16dp"
-                            android:clipToOutline="true" />
+                            android:progressDrawable="@drawable/custom_game_progress_bar"
+                            android:layout_marginBottom="16dp" />
 
                         <!-- Stats Row -->
                         <LinearLayout
@@ -420,10 +422,15 @@
                         android:layout_width="0dp"
                         android:layout_columnWeight="1"
                         android:layout_margin="8dp"
-                        android:minHeight="64dp"
-                        android:textSize="24sp"
+                        android:minHeight="80dp"
+                        android:textSize="28sp"
                         android:textStyle="bold"
-                        app:cornerRadius="12dp"
+                        android:fontFamily="@font/agbalumo"
+                        app:cornerRadius="16dp"
+                        android:backgroundTint="@null"
+                        android:background="@drawable/bg_quiz_option"
+                        android:textColor="@color/colorPrimary"
+                        app:elevation="4dp"
                         android:letterSpacing="0.1"
                         tools:text="A" />
 
@@ -432,10 +439,15 @@
                         android:layout_width="0dp"
                         android:layout_columnWeight="1"
                         android:layout_margin="8dp"
-                        android:minHeight="64dp"
-                        android:textSize="24sp"
+                        android:minHeight="80dp"
+                        android:textSize="28sp"
                         android:textStyle="bold"
-                        app:cornerRadius="12dp"
+                        android:fontFamily="@font/agbalumo"
+                        app:cornerRadius="16dp"
+                        android:backgroundTint="@null"
+                        android:background="@drawable/bg_quiz_option"
+                        android:textColor="@color/colorPrimary"
+                        app:elevation="4dp"
                         android:letterSpacing="0.1"
                         tools:text="B" />
 
@@ -444,10 +456,15 @@
                         android:layout_width="0dp"
                         android:layout_columnWeight="1"
                         android:layout_margin="8dp"
-                        android:minHeight="64dp"
-                        android:textSize="24sp"
+                        android:minHeight="80dp"
+                        android:textSize="28sp"
                         android:textStyle="bold"
-                        app:cornerRadius="12dp"
+                        android:fontFamily="@font/agbalumo"
+                        app:cornerRadius="16dp"
+                        android:backgroundTint="@null"
+                        android:background="@drawable/bg_quiz_option"
+                        android:textColor="@color/colorPrimary"
+                        app:elevation="4dp"
                         android:letterSpacing="0.1"
                         tools:text="C" />
 
@@ -456,10 +473,15 @@
                         android:layout_width="0dp"
                         android:layout_columnWeight="1"
                         android:layout_margin="8dp"
-                        android:minHeight="64dp"
-                        android:textSize="24sp"
+                        android:minHeight="80dp"
+                        android:textSize="28sp"
                         android:textStyle="bold"
-                        app:cornerRadius="12dp"
+                        android:fontFamily="@font/agbalumo"
+                        app:cornerRadius="16dp"
+                        android:backgroundTint="@null"
+                        android:background="@drawable/bg_quiz_option"
+                        android:textColor="@color/colorPrimary"
+                        app:elevation="4dp"
                         android:letterSpacing="0.1"
                         tools:text="D" />
 
@@ -468,10 +490,15 @@
                         android:layout_width="0dp"
                         android:layout_columnWeight="1"
                         android:layout_margin="8dp"
-                        android:minHeight="64dp"
-                        android:textSize="24sp"
+                        android:minHeight="80dp"
+                        android:textSize="28sp"
                         android:textStyle="bold"
-                        app:cornerRadius="12dp"
+                        android:fontFamily="@font/agbalumo"
+                        app:cornerRadius="16dp"
+                        android:backgroundTint="@null"
+                        android:background="@drawable/bg_quiz_option"
+                        android:textColor="@color/colorPrimary"
+                        app:elevation="4dp"
                         android:letterSpacing="0.1"
                         tools:text="E" />
 
@@ -480,10 +507,15 @@
                         android:layout_width="0dp"
                         android:layout_columnWeight="1"
                         android:layout_margin="8dp"
-                        android:minHeight="64dp"
-                        android:textSize="24sp"
+                        android:minHeight="80dp"
+                        android:textSize="28sp"
                         android:textStyle="bold"
-                        app:cornerRadius="12dp"
+                        android:fontFamily="@font/agbalumo"
+                        app:cornerRadius="16dp"
+                        android:backgroundTint="@null"
+                        android:background="@drawable/bg_quiz_option"
+                        android:textColor="@color/colorPrimary"
+                        app:elevation="4dp"
                         android:letterSpacing="0.1"
                         tools:text="F" />
 
@@ -531,11 +563,21 @@
             android:visibility="gone"
             tools:visibility="visible">
 
-            <!-- Celebration emoji (replaces Lottie animation for lighter-weight end screen) -->
-            <TextView
-                android:id="@+id/tvEndCelebrationEmoji"
+            <!-- Lottie Celebration -->
+            <com.airbnb.lottie.LottieAnimationView
+                android:id="@+id/lavEndCelebration"
                 android:layout_width="220dp"
                 android:layout_height="220dp"
+                android:layout_marginBottom="16dp"
+                app:lottie_autoPlay="true"
+                app:lottie_loop="true"
+                app:lottie_rawRes="@raw/kids_animation" />
+
+            <!-- Celebration emoji (fallback) -->
+            <TextView
+                android:id="@+id/tvEndCelebrationEmoji"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
                 android:layout_marginBottom="16dp"
                 android:gravity="center"
                 android:text="🎉"
@@ -670,28 +712,31 @@
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/btnPlayAgain"
                     android:layout_width="match_parent"
-                    android:layout_height="56dp"
+                    android:layout_height="70dp"
                     android:layout_marginBottom="12dp"
                     android:text="@string/quiz_play_again_button"
-                    android:textSize="16sp"
+                    android:textSize="18sp"
                     android:textStyle="bold"
-                    app:cornerRadius="12dp"
-                    android:backgroundTint="@color/colorAccent"
+                    android:fontFamily="@font/agbalumo"
+                    app:cornerRadius="16dp"
+                    android:backgroundTint="@null"
+                    android:background="@drawable/bg_quiz_success_button"
                     android:textColor="@color/white"
-                    app:elevation="6dp" />
+                    app:elevation="8dp" />
 
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/btnEndQuit"
-                    style="@style/Widget.Material3.Button.OutlinedButton"
                     android:layout_width="match_parent"
-                    android:layout_height="56dp"
+                    android:layout_height="70dp"
                     android:text="@string/quiz_quit_button"
-                    android:textSize="16sp"
+                    android:textSize="18sp"
                     android:textStyle="bold"
-                    app:cornerRadius="12dp"
-                    app:strokeColor="@color/colorPrimary"
-                    app:strokeWidth="2dp"
-                    android:textColor="@color/colorPrimary" />
+                    android:fontFamily="@font/agbalumo"
+                    app:cornerRadius="16dp"
+                    android:backgroundTint="@null"
+                    android:background="@drawable/bg_quiz_error_button"
+                    android:textColor="@color/white"
+                    app:elevation="8dp" />
             </LinearLayout>
 
         </LinearLayout>

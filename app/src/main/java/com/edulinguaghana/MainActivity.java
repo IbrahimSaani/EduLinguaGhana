@@ -1008,28 +1008,50 @@ public class MainActivity extends AppCompatActivity {
 
     // ---------------- BUTTON ACTIONS ----------------
 
+    private void applyGamingClickEffect(View v, Runnable action) {
+        v.animate()
+            .scaleX(0.92f)
+            .scaleY(0.92f)
+            .setDuration(100)
+            .withEndAction(() -> {
+                v.animate()
+                    .scaleX(1.0f)
+                    .scaleY(1.0f)
+                    .setDuration(100)
+                    .withEndAction(action)
+                    .start();
+            })
+            .start();
+    }
+
     private void setupButtons() {
         btnRecitalMode.setOnClickListener(v -> {
             v.performHapticFeedback(HapticFeedbackConstants.KEYBOARD_TAP);
-            if (!ensureLanguageSelected()) return;
-            showContentTypeDialog(selectedLangCode, selectedLangName, "recital");
+            applyGamingClickEffect(v, () -> {
+                if (!ensureLanguageSelected()) return;
+                showContentTypeDialog(selectedLangCode, selectedLangName, "recital");
+            });
         });
 
         btnPracticeMode.setOnClickListener(v -> {
             v.performHapticFeedback(HapticFeedbackConstants.KEYBOARD_TAP);
-            if (!ensureLanguageSelected()) return;
-            showContentTypeDialog(selectedLangCode, selectedLangName, "practice");
+            applyGamingClickEffect(v, () -> {
+                if (!ensureLanguageSelected()) return;
+                showContentTypeDialog(selectedLangCode, selectedLangName, "practice");
+            });
         });
 
         btnQuizMode.setOnClickListener(v -> {
             v.performHapticFeedback(HapticFeedbackConstants.KEYBOARD_TAP);
-            if (!ensureLanguageSelected()) return;
-            showQuizTypeDialog(selectedLangCode, selectedLangName);
+            applyGamingClickEffect(v, () -> {
+                if (!ensureLanguageSelected()) return;
+                showQuizTypeDialog(selectedLangCode, selectedLangName);
+            });
         });
 
         btnProgressMode.setOnClickListener(v -> {
             v.performHapticFeedback(HapticFeedbackConstants.KEYBOARD_TAP);
-            openProgressScreen();
+            applyGamingClickEffect(v, this::openProgressScreen);
         });
     }
 

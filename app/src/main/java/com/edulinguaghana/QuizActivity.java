@@ -1,6 +1,5 @@
 package com.edulinguaghana;
 
-import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.ColorStateList;
 import android.graphics.Color;
@@ -13,6 +12,7 @@ import android.os.Bundle;
 import android.os.Build;
 import android.os.CountDownTimer;
 import android.os.Handler;
+import android.os.Looper;
 import android.speech.tts.TextToSpeech;
 import android.util.Log;
 import android.view.MenuItem;
@@ -66,7 +66,6 @@ public class QuizActivity extends AppCompatActivity {
 
     // Start screen
     private TextView tvStartTitle, tvStartDescription;
-    private ImageView ivWelcomeIcon;
     private MaterialButton btnStartQuiz;
 
     // Game screen
@@ -78,10 +77,13 @@ public class QuizActivity extends AppCompatActivity {
     private ScratchRevealView scratchRevealView;
     private nl.dionsegijn.konfetti.xml.KonfettiView konfettiView;
 
+    // UI Animations
+    private com.airbnb.lottie.LottieAnimationView ivWelcomeIcon, lavEndCelebration;
+
     // End screen
     private TextView tvFinalScore, tvEndBestScore, tvNewHighScore;
     private MaterialButton btnPlayAgain, btnEndQuit;
-    private TextView tvEndCelebrationEmoji; // lightweight replacement for Lottie
+    private TextView tvEndCelebrationEmoji;
 
     private String quizType, languageCode, languageName;
     private String currentSubMode; // Track sub-mode for Mixed Quiz
@@ -257,6 +259,7 @@ public class QuizActivity extends AppCompatActivity {
         btnPlayAgain = findViewById(R.id.btnPlayAgain);
         btnEndQuit = findViewById(R.id.btnEndQuit);
         tvNewHighScore = findViewById(R.id.tvNewHighScore);
+        lavEndCelebration = findViewById(R.id.lavEndCelebration);
         tvEndCelebrationEmoji = findViewById(R.id.tvEndCelebrationEmoji);
         konfettiView = findViewById(R.id.konfettiView);
     }
@@ -365,7 +368,7 @@ public class QuizActivity extends AppCompatActivity {
      * Capitalize first letter of a word
      */
     private String capitalizeWord(String word) {
-        if (word == null || word.length() == 0) return "";
+        if (word == null || word.isEmpty()) return "";
         return word.substring(0, 1).toUpperCase() + word.substring(1);
     }
 
@@ -480,7 +483,7 @@ public class QuizActivity extends AppCompatActivity {
             MediaPlayer mediaPlayer = new MediaPlayer();
             mediaPlayer.setDataSource(this, audioUri);
             mediaPlayer.prepareAsync();
-            mediaPlayer.setOnPreparedListener(mp -> mp.start());
+            mediaPlayer.setOnPreparedListener(MediaPlayer::start);
             mediaPlayer.setOnCompletionListener(MediaPlayer::release);
         } catch (Exception ignored) {
         }
@@ -525,10 +528,6 @@ public class QuizActivity extends AppCompatActivity {
         );
     }
 
-    private String normalizeLanguageCode(String code) {
-        return LanguageConversionUtils.normalizeLanguageCode(code);
-    }
-
     private void startGame() {
         score = 0;
         quizStartTime = System.currentTimeMillis();
@@ -557,6 +556,18 @@ public class QuizActivity extends AppCompatActivity {
 
     private void generateNewQuestion() {
         resetButtons();
+        
+        // Animate prompt in
+        if (tvGamePrompt != null) {
+            tvGamePrompt.setAlpha(0f);
+            tvGamePrompt.setTranslationY(-20f);
+            tvGamePrompt.animate()
+                .alpha(1f)
+                .translationY(0f)
+                .setDuration(400)
+                .start();
+        }
+
         switch (quizType) {
             case "numbers":
                 generateNumberQuestion();
@@ -816,40 +827,6 @@ public class QuizActivity extends AppCompatActivity {
                         v.animate().scaleX(1.2f).scaleY(1.2f).setDuration(200).start();
                         return true;
                     case DragEvent.ACTION_DRAG_EXITED:
-                        v.animate().scaleX(1.0f).scaleY(1.0f).setDuration(200).start();
-                        return true;
-                    case DragEvent.ACTION_DROP:
-                        ClipData.Item item = event.getClipData().getItemAt(0);
-                        String dragData = item.getText().toString();
-                        if (dragData.equals(currentCorrectAnswer)) {
-                            MaterialButton[] buttons = {btnOption1, btnOption2, btnOption3, btnOption4, btnOption5, btnOption6};
-                            for (MaterialButton btn : buttons) {
-                                if (btn != null && btn.getText().equals(dragData)) {
-                                    // Set the tag or some flag to allow checkAnswer to proceed
-                                    btn.setTag(R.id.scratchCard, "drag_success");
-                                    shadowView.reveal(ContextCompat.getColor(this, R.color.correctAnswer));
-                                    celebrate();
-                                    checkAnswer(btn);
-                                    btn.setTag(R.id.scratchCard, null);
-                                    break;
-                                }
-                            }
-                        } else {
-                            // Shake effect for wrong drop
-                            ObjectAnimator shake = ObjectAnimator.ofFloat(v, View.TRANSLATION_X, 0, 25);
-                            shake.setDuration(50);
-                            shake.setRepeatCount(5);
-                            shake.setRepeatMode(ValueAnimator.REVERSE);
-                            shake.addListener(new android.animation.AnimatorListenerAdapter() {
-                                @Override
-                                public void onAnimationEnd(android.animation.Animator animation) {
-                                    v.setTranslationX(0);
-                                }
-                            });
-                            shake.start();
-                            playSfx(false);
-                        }
-                        return true;
                     case DragEvent.ACTION_DRAG_ENDED:
                         v.animate().scaleX(1.0f).scaleY(1.0f).setDuration(200).start();
                         return true;
@@ -1025,6 +1002,29 @@ public class QuizActivity extends AppCompatActivity {
             tvGameFeedback.setText(R.string.quiz_feedback_match_found);
             tvGameFeedback.setTextColor(ContextCompat.getColor(this, R.color.correctAnswer));
             
+            // Gaming UI: Success feedback and hide
+            final MaterialButton first = firstSelectedButton;
+            final MaterialButton second = clickedButton;
+            
+            first.setBackgroundResource(R.drawable.bg_quiz_option_correct);
+            second.setBackgroundResource(R.drawable.bg_quiz_option_correct);
+
+            first.animate()
+                .scaleX(0f)
+                .scaleY(0f)
+                .alpha(0f)
+                .setDuration(400)
+                .withEndAction(() -> first.setVisibility(View.INVISIBLE))
+                .start();
+                
+            second.animate()
+                .scaleX(0f)
+                .scaleY(0f)
+                .alpha(0f)
+                .setDuration(400)
+                .withEndAction(() -> second.setVisibility(View.INVISIBLE))
+                .start();
+            
             if (score > bestScore) {
                 bestScore = score;
                 saveHighScore();
@@ -1035,12 +1035,6 @@ public class QuizActivity extends AppCompatActivity {
                 }
                 celebrate();
             }
-
-            // Animate and hide matched buttons
-            final MaterialButton first = firstSelectedButton;
-            final MaterialButton second = clickedButton;
-            first.animate().alpha(0).scaleX(0.5f).scaleY(0.5f).setDuration(300).withEndAction(() -> first.setVisibility(View.INVISIBLE));
-            second.animate().alpha(0).scaleX(0.5f).scaleY(0.5f).setDuration(300).withEndAction(() -> second.setVisibility(View.INVISIBLE));
 
             matchingPairsRemaining--;
             firstSelectedButton = null;
@@ -1054,7 +1048,7 @@ public class QuizActivity extends AppCompatActivity {
                 tvGameFeedback.setText(R.string.quiz_feedback_correct);
                 tvGameFeedback.setTextColor(ContextCompat.getColor(this, R.color.correctAnswer));
 
-                new Handler().postDelayed(() -> {
+                new Handler(Looper.getMainLooper()).postDelayed(() -> {
                     if (remainingTime <= 0) {
                         endQuiz();
                     } else {
@@ -1085,7 +1079,7 @@ public class QuizActivity extends AppCompatActivity {
             final MaterialButton second = clickedButton;
             firstSelectedButton = null;
 
-            new Handler().postDelayed(() -> {
+            new Handler(Looper.getMainLooper()).postDelayed(() -> {
                 first.setStrokeColor(ColorStateList.valueOf(ContextCompat.getColor(this, R.color.buttonSecondary)));
                 first.setStrokeWidth(2);
                 second.setStrokeColor(ColorStateList.valueOf(ContextCompat.getColor(this, R.color.buttonSecondary)));
@@ -1128,7 +1122,20 @@ public class QuizActivity extends AppCompatActivity {
             tvGameFeedback.setText(R.string.quiz_feedback_correct);
             tvGameFeedback.setTextColor(ContextCompat.getColor(this, R.color.correctAnswer));
             tvGameFeedback.announceForAccessibility(getString(R.string.accessibility_correct_answer, score));
-            clickedButton.setStrokeColor(ColorStateList.valueOf(ContextCompat.getColor(this, R.color.correctAnswer)));
+            
+            // Gaming UI: Change background and scale up
+            clickedButton.setBackgroundResource(R.drawable.bg_quiz_option_correct);
+            clickedButton.animate()
+                .scaleX(1.15f)
+                .scaleY(1.15f)
+                .setDuration(200)
+                .withEndAction(() -> clickedButton.animate()
+                        .scaleX(1.0f)
+                        .scaleY(1.0f)
+                        .setDuration(150)
+                        .start())
+                .start();
+
             clickedButton.startAnimation(correctAnim);
             playSfx(true);
             if (score > bestScore) {
@@ -1146,8 +1153,14 @@ public class QuizActivity extends AppCompatActivity {
             tvGameFeedback.setText(getString(R.string.quiz_feedback_wrong, currentCorrectAnswer));
             tvGameFeedback.setTextColor(ContextCompat.getColor(this, R.color.wrongAnswer));
             tvGameFeedback.announceForAccessibility(getString(R.string.accessibility_wrong_answer, currentCorrectAnswer));
-            clickedButton.setStrokeColor(ColorStateList.valueOf(ContextCompat.getColor(this, R.color.wrongAnswer)));
+            
+            // Gaming UI: Change background and shake
+            clickedButton.setBackgroundResource(R.drawable.bg_quiz_option_wrong);
             clickedButton.startAnimation(wrongAnim);
+            
+            // Find correct button and highlight it subtly
+            highlightCorrectButton();
+
             playSfx(false);
             remainingTime -= PENALTY_TIME;
             if (remainingTime < 0) remainingTime = 0;
@@ -1160,7 +1173,7 @@ public class QuizActivity extends AppCompatActivity {
         tvGameScore.setText(String.format(Locale.getDefault(), getString(R.string.quiz_score), score));
         setButtonsEnabled(false);
 
-        new Handler().postDelayed(() -> {
+        new Handler(Looper.getMainLooper()).postDelayed(() -> {
             if (remainingTime <= 0) {
                 endQuiz();
             } else {
@@ -1269,7 +1282,7 @@ public class QuizActivity extends AppCompatActivity {
                 com.google.firebase.database.DatabaseReference challengesRef = com.google.firebase.database.FirebaseDatabase.getInstance().getReference("challenges");
                 challengesRef.addListenerForSingleValueEvent(new com.google.firebase.database.ValueEventListener() {
                     @Override
-                    public void onDataChange(com.google.firebase.database.DataSnapshot snapshot) {
+                    public void onDataChange(@androidx.annotation.NonNull com.google.firebase.database.DataSnapshot snapshot) {
                         for (com.google.firebase.database.DataSnapshot child : snapshot.getChildren()) {
                             com.edulinguaghana.social.Challenge c = child.getValue(com.edulinguaghana.social.Challenge.class);
                             if (c != null && c.challengedId != null && c.challengedId.equals(uid) && (c.state == com.edulinguaghana.social.Challenge.State.PENDING || c.state == com.edulinguaghana.social.Challenge.State.ONGOING)) {
@@ -1322,29 +1335,26 @@ public class QuizActivity extends AppCompatActivity {
                     Animation bouncePop = AnimationUtils.loadAnimation(this, R.anim.bounce_pop);
                     tvNewHighScore.startAnimation(bouncePop);
                 }
+                if (lavEndCelebration != null) {
+                    lavEndCelebration.setVisibility(View.VISIBLE);
+                    lavEndCelebration.playAnimation();
+                }
                 if (tvEndCelebrationEmoji != null) {
                     tvEndCelebrationEmoji.setVisibility(View.VISIBLE);
-                    tvEndCelebrationEmoji.setScaleX(0.8f);
-                    tvEndCelebrationEmoji.setScaleY(0.8f);
-                    tvEndCelebrationEmoji.animate()
-                        .scaleX(1.3f)
-                        .scaleY(1.3f)
-                        .rotationBy(360f)
-                        .setDuration(700)
-                        .withEndAction(() -> {
-                            // Reset rotation to keep view stable
-                            tvEndCelebrationEmoji.setRotation(0f);
-                        })
-                        .start();
+                    tvEndCelebrationEmoji.setText("🏆"); // Trophy for new high score
+                    tvEndCelebrationEmoji.setScaleX(1.3f);
+                    tvEndCelebrationEmoji.setScaleY(1.3f);
                 }
             } else {
                 if (tvNewHighScore != null) {
                     tvNewHighScore.setVisibility(View.GONE);
                 }
+                if (lavEndCelebration != null) {
+                    lavEndCelebration.setVisibility(View.GONE);
+                }
                 if (tvEndCelebrationEmoji != null) {
-                    tvEndCelebrationEmoji.animate().cancel();
-                    tvEndCelebrationEmoji.setVisibility(View.GONE);
-                    tvEndCelebrationEmoji.setRotation(0f);
+                    tvEndCelebrationEmoji.setVisibility(View.VISIBLE);
+                    tvEndCelebrationEmoji.setText("🎮"); // Game icon for normal finish
                 }
             }
         } catch (Exception ignored) {
@@ -1355,6 +1365,23 @@ public class QuizActivity extends AppCompatActivity {
         if (countDownTimer != null) {
             countDownTimer.cancel();
             countDownTimer = null;
+        }
+    }
+
+    private void highlightCorrectButton() {
+        MaterialButton[] buttons = {btnOption1, btnOption2, btnOption3, btnOption4, btnOption5, btnOption6};
+        for (MaterialButton button : buttons) {
+            if (button != null && button.getText().toString().equals(currentCorrectAnswer)) {
+                button.setBackgroundResource(R.drawable.bg_quiz_option_correct);
+                // Subtle pulse to show correct answer
+                button.animate()
+                    .scaleX(1.1f)
+                    .scaleY(1.1f)
+                    .setDuration(250)
+                    .withEndAction(() -> button.animate().scaleX(1.0f).scaleY(1.0f).setDuration(250).start())
+                    .start();
+                break;
+            }
         }
     }
 
@@ -1372,8 +1399,13 @@ public class QuizActivity extends AppCompatActivity {
 
         setButtonsEnabled(true);
         MaterialButton[] buttons = {btnOption1, btnOption2, btnOption3, btnOption4, btnOption5, btnOption6};
-        for (MaterialButton button : buttons) {
+        for (int i = 0; i < buttons.length; i++) {
+            MaterialButton button = buttons[i];
             if (button != null) {
+                // Restore gaming UI default background
+                button.setBackgroundResource(R.drawable.bg_quiz_option);
+                button.setBackgroundTintList(null); // Ensure background resource shows
+
                 // Cancel ObjectAnimator if exists from Shadow Match
                 Object animator = button.getTag(R.id.mascotView);
                 if (animator instanceof ObjectAnimator) {
@@ -1381,13 +1413,21 @@ public class QuizActivity extends AppCompatActivity {
                 }
                 button.setRotation(0f);
 
-                button.setStrokeColor(ColorStateList.valueOf(ContextCompat.getColor(this, R.color.buttonSecondary)));
-                button.setStrokeWidth(2);
                 button.clearAnimation();
                 button.setVisibility(View.VISIBLE);
-                button.setAlpha(1.0f);
-                button.setScaleX(1.0f);
-                button.setScaleY(1.0f);
+                button.setAlpha(0f);
+                button.setScaleX(0.5f);
+                button.setScaleY(0.5f);
+                
+                // Pop-in animation with delay
+                button.animate()
+                    .alpha(1f)
+                    .scaleX(1f)
+                    .scaleY(1f)
+                    .setDuration(300)
+                    .setStartDelay(i * 50)
+                    .setInterpolator(new android.view.animation.OvershootInterpolator())
+                    .start();
             }
         }
     }

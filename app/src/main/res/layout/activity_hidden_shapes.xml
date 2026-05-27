@@ -130,20 +130,20 @@
         <com.google.android.material.button.MaterialButton
             android:id="@+id/btnNext"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_height="64dp"
             android:layout_marginTop="32dp"
             android:paddingStart="40dp"
             android:paddingEnd="40dp"
             android:text="@string/hidden_shapes_next"
             android:visibility="gone"
-            android:backgroundTint="#FFAB40"
+            android:backgroundTint="@null"
+            android:background="@drawable/bg_game_button"
             android:textColor="@color/white"
             android:textSize="18sp"
             android:textStyle="bold"
             android:fontFamily="@font/agbalumo"
-            app:cornerRadius="24dp"
-            app:strokeColor="@color/white"
-            app:strokeWidth="1.5dp" />
+            app:cornerRadius="20dp"
+            app:elevation="8dp" />
 
     </LinearLayout>
 
@@ -197,34 +197,48 @@
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/btnResume"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
+                    android:layout_height="64dp"
                     android:layout_marginTop="32dp"
-                    android:backgroundTint="#FFAB40"
-                    android:padding="16dp"
+                    android:backgroundTint="@null"
+                    android:background="@drawable/bg_quiz_primary_button"
                     android:text="Resume Search"
-                    android:textColor="#0D1117"
+                    android:textColor="@color/white"
+                    android:textSize="18sp"
+                    android:textStyle="bold"
+                    android:fontFamily="@font/agbalumo"
                     android:visibility="gone"
-                    app:cornerRadius="24dp" />
+                    app:cornerRadius="16dp"
+                    app:elevation="8dp" />
 
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/btnRestart"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
+                    android:layout_height="64dp"
                     android:layout_marginTop="16dp"
-                    android:backgroundTint="#2E7D32"
-                    android:padding="16dp"
+                    android:backgroundTint="@null"
+                    android:background="@drawable/bg_quiz_success_button"
                     android:text="Start Over"
                     android:textColor="@color/white"
-                    app:cornerRadius="24dp" />
+                    android:textSize="18sp"
+                    android:textStyle="bold"
+                    android:fontFamily="@font/agbalumo"
+                    app:cornerRadius="16dp"
+                    app:elevation="8dp" />
 
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/btnQuit"
-                    style="@style/Widget.MaterialComponents.Button.TextButton"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="8dp"
+                    android:layout_height="64dp"
+                    android:layout_marginTop="16dp"
+                    android:backgroundTint="@null"
+                    android:background="@drawable/bg_quiz_error_button"
                     android:text="Quit Game"
-                    android:textColor="@color/textColorSecondary" />
+                    android:textColor="@color/white"
+                    android:textSize="18sp"
+                    android:textStyle="bold"
+                    android:fontFamily="@font/agbalumo"
+                    app:cornerRadius="16dp"
+                    app:elevation="8dp" />
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>
     </LinearLayout>

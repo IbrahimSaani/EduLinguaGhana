@@ -11,6 +11,7 @@ import android.os.Handler;
 import android.os.Looper;
 import android.view.DragEvent;
 import android.view.Gravity;
+import android.view.HapticFeedbackConstants;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
@@ -86,6 +87,20 @@ public class PuzzleGameActivity extends AppCompatActivity {
         startNewGame();
     }
 
+    private void applyGamingClickEffect(View v, Runnable action) {
+        v.animate()
+            .scaleX(0.92f)
+            .scaleY(0.92f)
+            .setDuration(100)
+            .withEndAction(() -> v.animate()
+                    .scaleX(1.0f)
+                    .scaleY(1.0f)
+                    .setDuration(100)
+                    .withEndAction(action)
+                    .start())
+            .start();
+    }
+
     private void initViews() {
         slotContainer = findViewById(R.id.slotContainer);
         pieceContainer = findViewById(R.id.pieceContainer);
@@ -96,10 +111,10 @@ public class PuzzleGameActivity extends AppCompatActivity {
         overlayLayout = findViewById(R.id.overlayLayout);
         konfettiView = findViewById(R.id.konfettiView);
 
-        findViewById(R.id.btnPause).setOnClickListener(v -> togglePause());
-        findViewById(R.id.btnResume).setOnClickListener(v -> togglePause());
-        findViewById(R.id.btnRestart).setOnClickListener(v -> startNewGame());
-        findViewById(R.id.btnQuit).setOnClickListener(v -> finish());
+        findViewById(R.id.btnPause).setOnClickListener(v -> applyGamingClickEffect(v, this::togglePause));
+        findViewById(R.id.btnResume).setOnClickListener(v -> applyGamingClickEffect(v, this::togglePause));
+        findViewById(R.id.btnRestart).setOnClickListener(v -> applyGamingClickEffect(v, this::startNewGame));
+        findViewById(R.id.btnQuit).setOnClickListener(v -> applyGamingClickEffect(v, this::finish));
     }
 
     private void initSounds() {
@@ -219,7 +234,11 @@ public class PuzzleGameActivity extends AppCompatActivity {
             piece.setOnLongClickListener(v -> {
                 ClipData data = ClipData.newPlainText("", "");
                 View.DragShadowBuilder shadow = new View.DragShadowBuilder(v);
-                v.startDrag(data, shadow, v, 0);
+                if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
+                    v.startDragAndDrop(data, shadow, v, 0);
+                } else {
+                    v.startDrag(data, shadow, v, 0);
+                }
                 v.setVisibility(View.INVISIBLE);
                 return true;
             });
@@ -248,30 +267,49 @@ public class PuzzleGameActivity extends AppCompatActivity {
                         score += 1;
                         piecesMatched++;
                         updateUI();
-                        if (correctPlayer != null) correctPlayer.start();
+                        if (correctPlayer != null) {
+                            correctPlayer.seekTo(0);
+                            correctPlayer.start();
+                        }
+                        
+                        v.performHapticFeedback(HapticFeedbackConstants.KEYBOARD_TAP);
                         
                         ((ViewGroup) draggedView.getParent()).removeView(draggedView);
                         ((FrameLayout) v).removeAllViews();
                         ((FrameLayout) v).addView(draggedView);
                         draggedView.setVisibility(View.VISIBLE);
                         draggedView.setOnLongClickListener(null); // Lock it
-                        draggedView.setBackgroundResource(R.drawable.puzzle_piece_glossy); // Ensure style
+                        draggedView.setBackgroundResource(R.drawable.puzzle_piece_glossy);
                         
-                        // Success Animation
-                        draggedView.setScaleX(1.2f);
-                        draggedView.setScaleY(1.2f);
-                        draggedView.animate().scaleX(1.0f).scaleY(1.0f).setDuration(300).setInterpolator(new android.view.animation.OvershootInterpolator()).start();
+                        // Success Animation: Pop and Glow
+                        draggedView.setScaleX(1.3f);
+                        draggedView.setScaleY(1.3f);
+                        draggedView.animate()
+                            .scaleX(1.0f)
+                            .scaleY(1.0f)
+                            .setDuration(400)
+                            .setInterpolator(new android.view.animation.OvershootInterpolator())
+                            .start();
 
                         v.setBackgroundResource(0); // Remove slot border
                         
                         if (piecesMatched >= PUZZLE_SIZE) {
                             celebrate();
-                            handler.postDelayed(() -> generateNewPuzzle(), 1000);
+                            handler.postDelayed(PuzzleGameActivity.this::generateNewPuzzle, 1000);
                         }
                     } else {
                         // Wrong Match
-                        if (wrongPlayer != null) wrongPlayer.start();
+                        if (wrongPlayer != null) {
+                            wrongPlayer.seekTo(0);
+                            wrongPlayer.start();
+                        }
+                        v.performHapticFeedback(HapticFeedbackConstants.LONG_PRESS);
                         draggedView.setVisibility(View.VISIBLE);
+                        
+                        // Shake animation for the target slot to show error
+                        ObjectAnimator shake = ObjectAnimator.ofFloat(v, "translationX", 0, 15, -15, 15, -15, 0);
+                        shake.setDuration(300);
+                        shake.start();
                     }
                     break;
                 case DragEvent.ACTION_DRAG_ENDED:

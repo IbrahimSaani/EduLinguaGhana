@@ -167,33 +167,48 @@
                     <com.google.android.material.button.MaterialButton
                         android:id="@+id/btnResume"
                         android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
+                        android:layout_height="64dp"
                         android:layout_marginTop="32dp"
-                        android:backgroundTint="#4FC3F7"
-                        android:padding="16dp"
+                        android:backgroundTint="@null"
+                        android:background="@drawable/bg_quiz_primary_button"
                         android:text="Resume Mission"
-                        android:textColor="#0D1117"
+                        android:textColor="@color/white"
+                        android:textSize="18sp"
+                        android:textStyle="bold"
+                        android:fontFamily="@font/agbalumo"
                         android:visibility="gone"
-                        app:cornerRadius="24dp" />
+                        app:cornerRadius="16dp"
+                        app:elevation="8dp" />
 
                     <com.google.android.material.button.MaterialButton
                         android:id="@+id/btnRestart"
                         android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
+                        android:layout_height="64dp"
                         android:layout_marginTop="16dp"
-                        android:backgroundTint="#FFAB40"
-                        android:padding="16dp"
+                        android:backgroundTint="@null"
+                        android:background="@drawable/bg_quiz_success_button"
                         android:text="Play Again"
-                        android:textColor="#0D1117"
-                        app:cornerRadius="24dp" />
+                        android:textColor="@color/white"
+                        android:textSize="18sp"
+                        android:textStyle="bold"
+                        android:fontFamily="@font/agbalumo"
+                        app:cornerRadius="16dp"
+                        app:elevation="8dp" />
 
                     <com.google.android.material.button.MaterialButton
                         android:id="@+id/btnQuit"
-                        style="@style/Widget.MaterialComponents.Button.TextButton"
                         android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
+                        android:layout_height="64dp"
+                        android:layout_marginTop="16dp"
+                        android:backgroundTint="@null"
+                        android:background="@drawable/bg_quiz_error_button"
                         android:text="Quit Mission"
-                        android:textColor="#4FC3F7" />
+                        android:textColor="@color/white"
+                        android:textSize="18sp"
+                        android:textStyle="bold"
+                        android:fontFamily="@font/agbalumo"
+                        app:cornerRadius="16dp"
+                        app:elevation="8dp" />
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
         </LinearLayout>

@@ -3,6 +3,7 @@ package com.edulinguaghana.games.rocketsort;
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.animation.ObjectAnimator;
+import android.animation.ValueAnimator;
 import android.annotation.SuppressLint;
 import android.graphics.Color;
 import android.media.MediaPlayer;
@@ -220,6 +221,7 @@ public class RocketSortActivity extends AppCompatActivity {
         
         updateUI();
         overlayLayout.setVisibility(View.GONE);
+        startLivingUI();
         
         if (backgroundMusic != null && !backgroundMusic.isPlaying()) {
             backgroundMusic.start();
@@ -230,7 +232,21 @@ public class RocketSortActivity extends AppCompatActivity {
         }
         activeAsteroids.clear();
 
+        // Pulse rockets to make them feel "alive"
+        animateRocketEngine(ivRocketLeft);
+        animateRocketEngine(ivRocketRight);
+
         showCountdown();
+    }
+
+    private void animateRocketEngine(View rocket) {
+        if (rocket == null) return;
+        ObjectAnimator pulse = ObjectAnimator.ofFloat(rocket, "scaleY", 1.0f, 1.05f);
+        pulse.setDuration(150);
+        pulse.setRepeatMode(ValueAnimator.REVERSE);
+        pulse.setRepeatCount(ValueAnimator.INFINITE);
+        pulse.start();
+        rocket.setTag(R.id.mascotView, pulse); // Reuse tag to store animator
     }
 
     private void showCountdown() {
@@ -470,21 +486,30 @@ public class RocketSortActivity extends AppCompatActivity {
     private void handleCorrectSort(boolean leftRocket) {
         if (isGameOver || isFinishing() || isDestroyed()) return;
         score++;
-        if (correctPlayer != null) correctPlayer.start();
+        if (correctPlayer != null) {
+            correctPlayer.seekTo(0);
+            correctPlayer.start();
+        }
         
-        // Haptic feedback for correct sort
+        // Gaming UI: Rocket "catch" animation
         ImageView rocket = leftRocket ? ivRocketLeft : ivRocketRight;
         if (rocket != null) {
             rocket.performHapticFeedback(HapticFeedbackConstants.KEYBOARD_TAP);
-            rocket.animate().scaleX(1.2f).scaleY(1.2f).setDuration(100).withEndAction(
-                () -> rocket.animate().scaleX(1.0f).scaleY(1.0f).setDuration(100).start()
-            ).start();
+            rocket.animate()
+                .scaleX(1.25f)
+                .scaleY(1.25f)
+                .setDuration(150)
+                .withEndAction(() -> rocket.animate().scaleX(1.0f).scaleY(1.0f).setDuration(150).start())
+                .start();
         }
         
         updateUI();
         
         if (score % 5 == 0) {
-            if (levelUpPlayer != null) levelUpPlayer.start();
+            if (levelUpPlayer != null) {
+                levelUpPlayer.seekTo(0);
+                levelUpPlayer.start();
+            }
             currentSpeed = Math.max(MIN_SPEED, currentSpeed - 400); // More aggressive speed up
             spawnInterval = Math.max(MIN_SPAWN_INTERVAL, spawnInterval - 300); // Faster spawning
             android.widget.Toast.makeText(this, "Mission Speed Up! 🚀", android.widget.Toast.LENGTH_SHORT).show();
@@ -527,6 +552,23 @@ public class RocketSortActivity extends AppCompatActivity {
         if (animator != null) {
             animator.cancel();
         }
+    }
+
+    private void startLivingUI() {
+        if (ivRocketLeft == null || ivRocketRight == null) return;
+        
+        // Rocket engine pulse effect for "Living UI"
+        ObjectAnimator pulseLeft = ObjectAnimator.ofFloat(ivRocketLeft, View.SCALE_Y, 1.0f, 1.05f);
+        pulseLeft.setDuration(400);
+        pulseLeft.setRepeatMode(ValueAnimator.REVERSE);
+        pulseLeft.setRepeatCount(ValueAnimator.INFINITE);
+        pulseLeft.start();
+
+        ObjectAnimator pulseRight = ObjectAnimator.ofFloat(ivRocketRight, View.SCALE_Y, 1.0f, 1.05f);
+        pulseRight.setDuration(450); 
+        pulseRight.setRepeatMode(ValueAnimator.REVERSE);
+        pulseRight.setRepeatCount(ValueAnimator.INFINITE);
+        pulseRight.start();
     }
 
     private void updateUI() {

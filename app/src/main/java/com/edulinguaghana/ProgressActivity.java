@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.Looper;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
@@ -96,7 +97,7 @@ public class ProgressActivity extends AppCompatActivity {
 
     private void animateProgress(int targetProgress) {
         Log.d(TAG, "animateProgress: Animating to " + targetProgress);
-        new Handler().postDelayed(() -> {
+        new Handler(Looper.getMainLooper()).postDelayed(() -> {
             Log.d(TAG, "animateProgress: Handler running for progress bar.");
             // Animate the progress bar with a smooth progression
             animateProgressValue(targetProgress);
@@ -112,7 +113,7 @@ public class ProgressActivity extends AppCompatActivity {
     private void animateProgressValue(int targetProgress) {
         final int animationDuration = 1000; // 1 second animation
         final long startTime = System.currentTimeMillis();
-        final Handler handler = new Handler();
+        final Handler handler = new Handler(Looper.getMainLooper());
         
         handler.post(new Runnable() {
             @Override
@@ -138,7 +139,7 @@ public class ProgressActivity extends AppCompatActivity {
         Animation levelUp = AnimationUtils.loadAnimation(this, R.anim.level_up_pulse);
         Animation sparkle = AnimationUtils.loadAnimation(this, R.anim.sparkle_bounce);
 
-        Handler handler = new Handler();
+        Handler handler = new Handler(Looper.getMainLooper());
 
         // Stats card - slide in and glow
         startAnimation(handler, cardStats, slideIn, 0);

@@ -648,7 +648,7 @@ public class BubblePopActivity extends AppCompatActivity {
 
     private void popBubble(TextView bubble, boolean isCorrect) {
         if (isCorrect) {
-            // Revert to MediaPlayer for the main pop sound to ensure it triggers correctly
+            // Gaming UI: Play pop sound
             try {
                 MediaPlayer mp = MediaPlayer.create(this, R.raw.squash);
                 if (mp != null) {
@@ -656,29 +656,51 @@ public class BubblePopActivity extends AppCompatActivity {
                     mp.setOnCompletionListener(MediaPlayer::release);
                     mp.start();
                 }
-            } catch (Exception e) {
-                android.util.Log.e("BubblePop", "Error playing squash sound", e);
-            }
+            } catch (Exception ignored) {}
+        } else {
+            // Play wrong sound
+            if (soundPool != null) soundPool.play(soundWrongId, 0.7f, 0.7f, 1, 0, 1.0f);
         }
         
         final View parentWrapper = (View) bubble.getParent();
         
-        // Animation: Scale up and fade out
-        bubble.animate()
-            .scaleX(1.5f)
-            .scaleY(1.5f)
-            .alpha(0f)
-            .setDuration(200)
-            .setListener(new AnimatorListenerAdapter() {
+        // Gaming UI: Smooth pop animation
+        if (isCorrect) {
+            bubble.animate()
+                .scaleX(1.6f)
+                .scaleY(1.6f)
+                .alpha(0f)
+                .setDuration(250)
+                .setListener(new AnimatorListenerAdapter() {
+                    @Override
+                    public void onAnimationEnd(Animator animation) {
+                        removeBubble(parentWrapper != null ? parentWrapper : bubble);
+                    }
+                })
+                .start();
+        } else {
+            // Shake and shrink for wrong bubble
+            ObjectAnimator shake = ObjectAnimator.ofFloat(bubble, "translationX", 0, 15, -15, 15, -15, 0);
+            shake.setDuration(250);
+            shake.addListener(new AnimatorListenerAdapter() {
                 @Override
                 public void onAnimationEnd(Animator animation) {
-                    if (parentWrapper != null) {
-                        removeBubble(parentWrapper);
-                    } else {
-                        removeBubble(bubble);
-                    }
+                    bubble.animate()
+                        .scaleX(0f)
+                        .scaleY(0f)
+                        .alpha(0f)
+                        .setDuration(200)
+                        .setListener(new AnimatorListenerAdapter() {
+                            @Override
+                            public void onAnimationEnd(Animator animation) {
+                                removeBubble(parentWrapper != null ? parentWrapper : bubble);
+                            }
+                        })
+                        .start();
                 }
             });
+            shake.start();
+        }
     }
 
     private void removeBubble(View wrapper) {
