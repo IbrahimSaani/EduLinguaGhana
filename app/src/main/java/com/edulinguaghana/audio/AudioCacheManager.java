@@ -3,7 +3,6 @@ package com.edulinguaghana.audio;
 import android.content.Context;
 import android.media.MediaPlayer;
 import android.net.Uri;
-import android.util.Log;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -32,7 +31,6 @@ import java.util.Map;
  */
 public class AudioCacheManager {
 
-    private static final String TAG = "AudioCacheManager";
     private static final String CACHE_DIR = "audio_cache";
     private static final long MAX_CACHE_SIZE = 100 * 1024 * 1024; // 100MB
     private static final long INDIVIDUAL_FILE_MAX = 5 * 1024 * 1024; // 5MB per file
@@ -96,9 +94,7 @@ public class AudioCacheManager {
         this.cacheDirectory = new File(filesDir, CACHE_DIR);
 
         if (!cacheDirectory.exists()) {
-            if (!cacheDirectory.mkdirs()) {
-                Log.e(TAG, "Failed to create cache directory");
-            }
+            cacheDirectory.mkdirs();
         }
 
         // Load existing cache from disk
@@ -116,7 +112,6 @@ public class AudioCacheManager {
             // Check file size
             long fileSize = inputStream.available();
             if (fileSize > INDIVIDUAL_FILE_MAX) {
-                Log.w(TAG, "Audio file too large: " + audioId);
                 return false;
             }
 
@@ -140,11 +135,9 @@ public class AudioCacheManager {
             audioCache.put(audioId, cached);
             currentCacheSize += fileSize;
 
-            Log.d(TAG, "Cached audio: " + audioId + " (" + fileSize + " bytes)");
             return true;
 
         } catch (IOException e) {
-            Log.e(TAG, "Error caching audio: " + audioId, e);
             return false;
         }
     }
@@ -154,12 +147,10 @@ public class AudioCacheManager {
      */
     public boolean cacheTtsAudio(String text, String languageCode, byte[] audioData) {
         if (text == null || text.isEmpty() || audioData == null) {
-            Log.w(TAG, "Invalid parameters for TTS caching");
             return false;
         }
 
         if (audioData.length > INDIVIDUAL_FILE_MAX) {
-            Log.w(TAG, "TTS audio file too large: " + text);
             return false;
         }
 
@@ -183,11 +174,9 @@ public class AudioCacheManager {
             }
             currentCacheSize += audioData.length;
 
-            Log.d(TAG, "TTS audio cached: " + text + " (" + audioData.length + " bytes)");
             return true;
 
         } catch (IOException e) {
-            Log.e(TAG, "Failed to cache TTS audio: " + text, e);
             return false;
         }
     }
@@ -203,7 +192,6 @@ public class AudioCacheManager {
             CachedAudio entry = memoryCache.get(cacheKey);
             if (!entry.isExpired() && entry.cacheFile.exists()) {
                 entry.updateAccessTime();
-                Log.d(TAG, "TTS cache hit (memory): " + text);
                 return Uri.fromFile(entry.cacheFile);
             } else {
                 memoryCache.remove(cacheKey);
@@ -219,7 +207,6 @@ public class AudioCacheManager {
                 if (memoryCache.size() < MAX_MEMORY_ENTRIES) {
                     memoryCache.put(cacheKey, cached);
                 }
-                Log.d(TAG, "TTS cache hit (disk): " + text);
                 return Uri.fromFile(cached.cacheFile);
             } else {
                 // Remove expired entry
@@ -230,7 +217,6 @@ public class AudioCacheManager {
             }
         }
 
-        Log.d(TAG, "TTS cache miss: " + text);
         return null;
     }
 
@@ -282,7 +268,6 @@ public class AudioCacheManager {
             mediaPlayer.prepareAsync();
 
         } catch (IOException e) {
-            Log.e(TAG, "Error playing cached audio: " + audioId, e);
             if (callback != null) {
                 callback.onPlaybackError(audioId, e.getMessage());
             }
@@ -306,7 +291,6 @@ public class AudioCacheManager {
         if (cached != null) {
             if (cached.cacheFile.delete()) {
                 currentCacheSize -= cached.fileSize;
-                Log.d(TAG, "Cleared cached audio: " + audioId);
             }
         }
     }
@@ -321,7 +305,6 @@ public class AudioCacheManager {
         audioCache.clear();
         memoryCache.clear();
         currentCacheSize = 0;
-        Log.d(TAG, "Cleared all cache");
     }
 
     /**
@@ -343,7 +326,6 @@ public class AudioCacheManager {
      * Cleanup expired cache entries
      */
     private void cleanupExpiredCache() {
-        int removed = 0;
         java.util.Iterator<Map.Entry<String, CachedAudio>> iterator = audioCache.entrySet().iterator();
 
         while (iterator.hasNext()) {
@@ -355,13 +337,8 @@ public class AudioCacheManager {
                     currentCacheSize -= cached.fileSize;
                     memoryCache.remove(entry.getKey());
                     iterator.remove();
-                    removed++;
                 }
             }
-        }
-
-        if (removed > 0) {
-            Log.d(TAG, "Cleaned up " + removed + " expired cache entries");
         }
     }
 
@@ -418,8 +395,6 @@ public class AudioCacheManager {
                 }
             }
         }
-
-        Log.d(TAG, "Loaded cache index: " + audioCache.size() + " files, " + currentCacheSize + " bytes");
     }
 
     /**
@@ -427,7 +402,6 @@ public class AudioCacheManager {
      */
     public void release() {
         // Cleanup if needed
-        Log.d(TAG, "AudioCacheManager released");
     }
 }
 

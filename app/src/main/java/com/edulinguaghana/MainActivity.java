@@ -776,8 +776,7 @@ public class MainActivity extends AppCompatActivity {
                     }
                 }
             }
-        } catch (Exception e) {
-            e.printStackTrace();
+        } catch (Exception ignored) {
         }
     }
 
@@ -1460,7 +1459,6 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onError(String error) {
                 // Default to student - no special navigation needed
-                android.util.Log.d("MainActivity", "Could not get user role: " + error);
             }
         });
     }

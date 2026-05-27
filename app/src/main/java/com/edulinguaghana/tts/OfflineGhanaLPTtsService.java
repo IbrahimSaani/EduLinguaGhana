@@ -36,7 +36,6 @@ public class OfflineGhanaLPTtsService {
         String sanitized = sanitizeForFilename(letter);
         String audioLangCode = normalizeLanguageForAudio(language);
         String resourceName = audioLangCode + "_letter_" + sanitized;
-        Log.d(TAG, "Speaking letter: " + letter + " in language: " + language + " (audio: " + audioLangCode + ") -> resource: " + resourceName);
         playAudioResource(resourceName, callback);
     }
 
@@ -49,7 +48,6 @@ public class OfflineGhanaLPTtsService {
         String sanitized = sanitizeForFilename(word);
         String audioLangCode = normalizeLanguageForAudio(language);
         String resourceName = audioLangCode + "_word_" + sanitized;
-        Log.d(TAG, "Speaking word: " + word + " in language: " + language + " (audio: " + audioLangCode + ") -> resource: " + resourceName);
         playAudioResource(resourceName, callback);
     }
 
@@ -61,7 +59,6 @@ public class OfflineGhanaLPTtsService {
     public void speakNumber(int number, String language, PlaybackCallback callback) {
         String audioLangCode = normalizeLanguageForAudio(language);
         String resourceName = String.format(Locale.US, "%s_number_%03d", audioLangCode, number);
-        Log.d(TAG, "Speaking number: " + number + " in language: " + language + " (audio: " + audioLangCode + ") -> resource: " + resourceName);
         playAudioResource(resourceName, callback);
     }
 
@@ -70,7 +67,6 @@ public class OfflineGhanaLPTtsService {
      */
     public void speak(String text, String language, PlaybackCallback callback) {
         if (text == null || text.trim().isEmpty()) {
-            Log.w(TAG, "Empty text passed to speak()");
             if (callback != null) callback.onError("Empty text");
             return;
         }
@@ -85,7 +81,6 @@ public class OfflineGhanaLPTtsService {
             int num = Integer.parseInt(text.trim());
             if (num >= 1 && num <= 100) {
                 numberPadded = String.format(Locale.US, "%03d", num);
-                Log.d(TAG, "Detected number: " + text + " -> formatted as: " + numberPadded);
             }
         } catch (NumberFormatException ignored) {
             // Not a number, continue with text patterns
@@ -110,22 +105,15 @@ public class OfflineGhanaLPTtsService {
             };
         }
 
-        Log.d(TAG, "Attempting to speak '" + text + "' in language '" + language + "' (audio lang: '" + audioLangCode + "')");
-
         for (String resourceName : patterns) {
-            Log.d(TAG, "Trying resource pattern: " + resourceName);
             int resId = getResourceId(resourceName);
             if (resId != 0) {
-                Log.d(TAG, "Found resource: " + resourceName + " (ID: " + resId + ")");
                 playAudioResource(resourceName, callback);
                 return;
-            } else {
-                Log.w(TAG, "Resource not found: " + resourceName);
             }
         }
 
         // No audio file found
-        Log.e(TAG, "No audio file found for: " + text + " in language: " + language);
         if (callback != null) {
             callback.onError("No audio file found for: " + text);
         }

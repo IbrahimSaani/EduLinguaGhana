@@ -269,8 +269,7 @@ public class SettingsActivity extends AppCompatActivity {
                     }
                 }
             }
-        } catch (Exception e) {
-            e.printStackTrace();
+        } catch (Exception ignored) {
         }
     }
 
@@ -294,8 +293,7 @@ public class SettingsActivity extends AppCompatActivity {
             if (tvAccountHeader != null) tvAccountHeader.setTypeface(typeface, android.graphics.Typeface.BOLD);
             if (tvCloudHeader != null) tvCloudHeader.setTypeface(typeface, android.graphics.Typeface.BOLD);
             if (tvAboutHeader != null) tvAboutHeader.setTypeface(typeface, android.graphics.Typeface.BOLD);
-        } catch (Exception e) {
-            e.printStackTrace();
+        } catch (Exception ignored) {
         }
     }
 

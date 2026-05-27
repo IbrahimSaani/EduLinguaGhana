@@ -2,7 +2,6 @@ package com.edulinguaghana;
 
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.util.Log;
 
 import androidx.annotation.NonNull;
 
@@ -19,7 +18,6 @@ import java.util.Map;
 import java.util.Set;
 
 public class CloudSyncManager {
-    private static final String TAG = "CloudSyncManager";
     private static final String PREF_NAME = "CloudSyncPrefs";
     private static final String KEY_LAST_SYNC = "LAST_SYNC_TIME";
     private static final String EDU_PREFS = "EduLinguaPrefs";
@@ -125,16 +123,13 @@ public class CloudSyncManager {
                 .setValue(userData)
                 .addOnSuccessListener(aVoid -> {
                     saveLastSyncTime();
-                    Log.d(TAG, "Data synced to cloud successfully");
                     callback.onSyncComplete(true, "Data synced successfully!");
                 })
                 .addOnFailureListener(e -> {
-                    Log.e(TAG, "Failed to sync data", e);
                     callback.onSyncComplete(false, "Sync failed: " + e.getMessage());
                 });
 
         } catch (Exception e) {
-            Log.e(TAG, "Error syncing data", e);
             callback.onSyncComplete(false, "Error: " + e.getMessage());
         }
     }
@@ -240,11 +235,9 @@ public class CloudSyncManager {
                             }
 
                             saveLastSyncTime();
-                            Log.d(TAG, "Data synced from cloud successfully");
                             callback.onSyncComplete(true, "Data restored from cloud!");
 
                         } catch (Exception e) {
-                            Log.e(TAG, "Error processing cloud data", e);
                             callback.onSyncComplete(false, "Error processing data");
                         }
                     } else {
@@ -254,7 +247,6 @@ public class CloudSyncManager {
 
                 @Override
                 public void onCancelled(@NonNull DatabaseError error) {
-                    Log.e(TAG, "Failed to read cloud data", error.toException());
                     callback.onSyncComplete(false, "Failed to read cloud data");
                 }
             });
@@ -282,7 +274,6 @@ public class CloudSyncManager {
             @Override
             public void onRoleRetrieved(com.edulinguaghana.roles.UserRole role) {
                 if (role != com.edulinguaghana.roles.UserRole.STUDENT) {
-                    Log.d(TAG, "Non-student user (" + role + ") tried to upload to leaderboard. Skipping.");
                     // Return success but with a message indicating it's for students
                     callback.onSyncComplete(true, "Great job! (Leaderboard is for students)");
                     return;
@@ -307,24 +298,20 @@ public class CloudSyncManager {
                 leaderboardEntry.put("score", score);
                 leaderboardEntry.put("timestamp", System.currentTimeMillis());
 
-                Log.d(TAG, "Uploading score to leaderboard - User: " + finalUserName + ", Score: " + score);
 
                 // Upload to leaderboard
                 databaseRef.child("leaderboard").child(userId)
                     .setValue(leaderboardEntry)
                     .addOnSuccessListener(aVoid -> {
-                        Log.d(TAG, "Score uploaded to leaderboard successfully");
                         callback.onSyncComplete(true, "Score submitted!");
                     })
                     .addOnFailureListener(e -> {
-                        Log.e(TAG, "Failed to upload score: " + e.getMessage(), e);
                         callback.onSyncComplete(false, "Upload failed: " + e.getMessage());
                     });
             }
 
             @Override
             public void onError(String error) {
-                Log.e(TAG, "Failed to verify user role for leaderboard: " + error);
                 callback.onSyncComplete(false, "Verification failed: " + error);
             }
         });

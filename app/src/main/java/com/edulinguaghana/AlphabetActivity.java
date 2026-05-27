@@ -78,19 +78,6 @@ public class AlphabetActivity extends AppCompatActivity {
     private int practiceRetryCount = 0;
     private static final int MAX_RETRIES_BEFORE_TIP = 2;
 
-    // --- ALPHABET & WORD DATA ---
-    private final String[] lettersEnFr = {"A","B","C","D","E","F","G","H","I","J","K","L","M","N","O","P","Q","R","S","T","U","V","W","X","Y","Z"};
-    private final String[] wordsEn = {"Apple", "Ball", "Cat", "Dog", "Elephant", "Fish", "Goat", "Hat", "Ice Cream", "Jug", "Kite", "Lion", "Monkey", "Nose", "Orange", "Pen", "Queen", "Rainbow", "Sun", "Tiger", "Umbrella", "Violin", "Watch", "Xylophone", "Yoyo", "Zebra"};
-    private final String[] wordsFr = {"Avion", "Bateau", "Chien", "Dauphin", "Éléphant", "Fleur", "Girafe", "Hibou", "Île", "Jardin", "Kangourou", "Lune", "Maison", "Nuage", "Oiseau", "Poisson", "Quatre", "Robot", "Soleil", "Train", "Uniforme", "Vache", "Wagon", "Xylophone", "Yaourt", "Zèbre"};
-    private final String[] lettersAk = {"A", "B", "D", "E", "Ɛ", "F", "G", "H", "I", "K", "L", "M", "N", "O", "Ɔ", "P", "R", "S", "T", "U", "W", "Y"};
-    private final String[] wordsAk = {"Akokɔ", "Borɔdeɛ", "Duku", "Etuo", "Ɛmo", "Forosie", "Gari", "Hweaa", "Isu", "Kube", "Lɔre", "Maame", "Nsuo", "Odwan", "Ɔkraman", "Pono", "Prako", "Sika", "Tɛkyerɛma", "Uniwesiti", "Wura", "Yareɛ"};
-    private final String[] lettersEe = {"A", "B", "D", "Ɖ", "E", "Ɛ", "F", "Ƒ", "G", "Ɣ", "H", "X", "I", "K", "L", "M", "N", "Ŋ", "O", "Ɔ", "P", "R", "S", "T", "U", "V", "Ʋ", "W", "Y", "Z"};
-    private final String[] wordsEe = {"Ati", "Baka", "Dadi", "Ɖevi", "Eku", "Ɛfu", "Fia", "Ƒo", "Gbe", "Ɣe", "Ha", "Xɔ", "Iŋk", "Kafu", "Lá", "Me", "Nɔ", "Ŋkɔ", "Oyi", "Ɔli", "Papa", "Rɛdio", "Sɔ", "Tɔ", "Unilɔ", "Vɔ", "Ʋu", "Wó", "Yevú", "Zã"};
-    private final String[] lettersGaa = {"A", "B", "D", "E", "Ɛ", "F", "G", "H", "I", "J", "K", "L", "M", "N", "Ŋ", "O", "Ɔ", "P", "R", "S", "T", "V", "W", "Y", "Z"};
-    private final String[] wordsGaa = {"Akekā", "Blɔfo", "Dade", "Enɔ", "Ɛlɛ", "Fio", "Gbekɛ", "Hejɔ", "Iŋk", "Jɔ", "Klala", "Lala", "Maŋ", "Nuu", "Ŋmã", "Okpɔtɔ", "Ɔɔso", "Papa", "Rugu", "Sohaa", "Tee", "Vinɔ", "Wɔ", "Yoomo", "Zigidi"};
-    private final String[] lettersTwi = {"A", "B", "D", "E", "Ɛ", "F", "G", "H", "I", "K", "L", "M", "N", "O", "Ɔ", "P", "R", "S", "T", "U", "W", "Y"};
-    private final String[] wordsTwi = {"Ade", "Borɔ", "Dade", "Etuo", "Ɛmo", "Fufuu", "Gari", "Hena", "Isuaa", "Kɔkɔɔ", "Lopa", "Moa", "Nom", "Okra", "Ɔkyire", "Papa", "Rikisi", "Sɛn", "Toa", "Upire", "Wɔ", "Yam"};
-
 
     private TextToSpeech tts;
     private MediaPlayer mediaPlayer;
@@ -195,31 +182,31 @@ public class AlphabetActivity extends AppCompatActivity {
         btnSpeak.setText(isRecitalMode ? getString(R.string.alphabet_mode_recital) : getString(R.string.alphabet_mode_practice));
         updateModeBadge();
 
-        // --- DYNAMICALLY SET ALPHABET & WORDS ---
+        // --- LOAD ALPHABET & WORDS FROM RESOURCES ---
         switch (languageCode) {
             case "ak":
-                letters = lettersAk;
-                words = wordsAk;
-                break;
-            case "ee":
-                letters = lettersEe;
-                words = wordsEe;
+                letters = getResources().getStringArray(R.array.letters_ak);
+                words = getResources().getStringArray(R.array.words_ak);
                 break;
             case "gaa":
-                letters = lettersGaa;
-                words = wordsGaa;
+                letters = getResources().getStringArray(R.array.letters_gaa);
+                words = getResources().getStringArray(R.array.words_gaa);
                 break;
             case "twi":
-                letters = lettersTwi;
-                words = wordsTwi;
+                letters = getResources().getStringArray(R.array.letters_ak); // Twi and Akan share alphabet
+                words = getResources().getStringArray(R.array.words_twi);
+                break;
+            case "ee":
+                letters = getResources().getStringArray(R.array.letters_ee);
+                words = getResources().getStringArray(R.array.words_ee);
                 break;
             case "fr":
-                letters = lettersEnFr;
-                words = wordsFr;
+                letters = getResources().getStringArray(R.array.letters_en_fr);
+                words = getResources().getStringArray(R.array.words_fr);
                 break;
-            default: // "en" and any other case
-                letters = lettersEnFr;
-                words = wordsEn;
+            default: // "en"
+                letters = getResources().getStringArray(R.array.letters_en_fr);
+                words = getResources().getStringArray(R.array.words_en);
                 break;
         }
 
@@ -235,25 +222,22 @@ public class AlphabetActivity extends AppCompatActivity {
         // Start background animations after views are ready
         try {
             startBackgroundAnimations();
-        } catch (Exception e) {
+        } catch (Exception ignored) {
             // Animations failed, but continue without them
-            e.printStackTrace();
         }
 
         tts = new TextToSpeech(this, status -> {
             try {
                 if (status == TextToSpeech.SUCCESS) {
-                    tts.setLanguage(getLocaleForLanguage(languageCode));
+                    tts.setLanguage(com.edulinguaghana.utils.LanguageConversionUtils.getLocaleForLanguage(languageCode));
                     updateLetter();
                     if (isRecitalMode) {
                         speakCurrentLetter();
                     }
                 } else {
-                    Toast.makeText(this, "TTS initialization failed", Toast.LENGTH_SHORT).show();
                     updateLetter();
                 }
             } catch (Exception e) {
-                android.util.Log.e("AlphabetActivity", "Error during TTS initialization or recital playback", e);
                 try {
                     updateLetter();
                 } catch (Exception ignored) {
@@ -277,8 +261,7 @@ public class AlphabetActivity extends AppCompatActivity {
                 updateLetterWithAnimation();
                 if (seekBarNavigation != null) seekBarNavigation.setProgress(currentIndex);
                 if (isRecitalMode) speakCurrentLetter();
-            } catch (Exception e) {
-                android.util.Log.e("AlphabetActivity", "Error advancing letter", e);
+            } catch (Exception ignored) {
             }
         });
 
@@ -295,8 +278,7 @@ public class AlphabetActivity extends AppCompatActivity {
                 updateLetterWithAnimation();
                 if (seekBarNavigation != null) seekBarNavigation.setProgress(currentIndex);
                 if (isRecitalMode) speakCurrentLetter();
-            } catch (Exception e) {
-                android.util.Log.e("AlphabetActivity", "Error going back letter", e);
+            } catch (Exception ignored) {
             }
         });
 
@@ -324,8 +306,7 @@ public class AlphabetActivity extends AppCompatActivity {
                 } else {
                     startPracticePronunciation();
                 }
-            } catch (Exception e) {
-                android.util.Log.e("AlphabetActivity", "Error speaking letter", e);
+            } catch (Exception ignored) {
             }
         });
 
@@ -335,8 +316,7 @@ public class AlphabetActivity extends AppCompatActivity {
                 v.performHapticFeedback(HapticFeedbackConstants.VIRTUAL_KEY);
                 speakCurrentLetter();
                 celebrateAction();  // Show celebration
-            } catch (Exception e) {
-                android.util.Log.e("AlphabetActivity", "Error in letter card click", e);
+            } catch (Exception ignored) {
             }
         });
 
@@ -370,8 +350,7 @@ public class AlphabetActivity extends AppCompatActivity {
             try {
                 v.performHapticFeedback(HapticFeedbackConstants.VIRTUAL_KEY);
                 showLetterPickerDialog();
-            } catch (Exception e) {
-                android.util.Log.e("AlphabetActivity", "Error showing letter picker", e);
+            } catch (Exception ignored) {
             }
         });
 
@@ -382,8 +361,7 @@ public class AlphabetActivity extends AppCompatActivity {
                 animateButtonPress(btnSpeakQuick);
                 speakCurrentLetter();
                 celebrateAction();
-            } catch (Exception e) {
-                android.util.Log.e("AlphabetActivity", "Error in quick speak button", e);
+            } catch (Exception ignored) {
             }
         });
     }
@@ -399,15 +377,7 @@ public class AlphabetActivity extends AppCompatActivity {
             // Update progress bar and counter
             progressBar.setProgress(currentIndex + 1);
             updateProgressCounter();
-        } catch (Exception e) {
-            android.util.Log.e("AlphabetActivity", "Error updating letter display", e);
-            // Ensure display is at least partially updated
-            try {
-                if (currentIndex < letters.length) {
-                    tvLetter.setText(letters[currentIndex]);
-                }
-            } catch (Exception ignored) {
-            }
+        } catch (Exception ignored) {
         }
     }
 
@@ -415,8 +385,7 @@ public class AlphabetActivity extends AppCompatActivity {
         // Animate letter change with smooth fade and scale
         try {
             animateLetterChange();
-        } catch (Exception e) {
-            e.printStackTrace();
+        } catch (Exception ignored) {
         }
 
         // Update text with letter
@@ -430,8 +399,7 @@ public class AlphabetActivity extends AppCompatActivity {
 
         try {
             animateProgressIcon();
-        } catch (Exception e) {
-            e.printStackTrace();
+        } catch (Exception ignored) {
         }
     }
 
@@ -464,8 +432,7 @@ public class AlphabetActivity extends AppCompatActivity {
             // Animate word text
             Animation wordAnim = AnimationUtils.loadAnimation(this, R.anim.fade_in);
             tvLetterWord.startAnimation(wordAnim);
-        } catch (Exception e) {
-            e.printStackTrace();
+        } catch (Exception ignored) {
         }
     }
 
@@ -512,8 +479,7 @@ public class AlphabetActivity extends AppCompatActivity {
                 Animation bounce = AnimationUtils.loadAnimation(this, R.anim.bounce_pop);
                 button.startAnimation(bounce);
             }
-        } catch (Exception e) {
-            e.printStackTrace();
+        } catch (Exception ignored) {
         }
     }
 
@@ -548,8 +514,7 @@ public class AlphabetActivity extends AppCompatActivity {
                     })
                     .start();
             }
-        } catch (Exception e) {
-            e.printStackTrace();
+        } catch (Exception ignored) {
         }
     }
 
@@ -559,8 +524,7 @@ public class AlphabetActivity extends AppCompatActivity {
                 Animation bounce = AnimationUtils.loadAnimation(this, R.anim.bounce_pop);
                 progressIcon.startAnimation(bounce);
             }
-        } catch (Exception e) {
-            e.printStackTrace();
+        } catch (Exception ignored) {
         }
     }
 
@@ -573,7 +537,7 @@ public class AlphabetActivity extends AppCompatActivity {
             int resId = getLetterAudioResId(languageCode, letter);
             if (resId != 0) {
                 playAudioResource(resId);
-            } else if (isGhanaianLanguage(languageCode)) {
+            } else if (com.edulinguaghana.utils.LanguageConversionUtils.isGhanaianLanguage(languageCode)) {
                 // Fallback to GhanaLP TTS if no recorded audio exists
                 speakWithGhanaLP(letter);
             } else if (tts != null) {
@@ -583,9 +547,7 @@ public class AlphabetActivity extends AppCompatActivity {
             }
 
             animateLetter();
-        } catch (Exception e) {
-            android.util.Log.e("AlphabetActivity", "Error in speakCurrentLetter", e);
-            // Silently fail - don't crash the app
+        } catch (Exception ignored) {
         }
     }
 
@@ -604,7 +566,7 @@ public class AlphabetActivity extends AppCompatActivity {
             }
 
             // Normalize language code for audio file lookup
-            String apiLangCode = normalizeLanguageCode(languageCode);
+            final String apiLangCode = com.edulinguaghana.utils.LanguageConversionUtils.normalizeLanguageCode(languageCode);
 
             // Disable speak button during playback
             if (btnSpeak != null) {
@@ -715,7 +677,7 @@ public class AlphabetActivity extends AppCompatActivity {
         }
     }
 
-    private String normalizeLanguageCode(String code) {
+    private String normalizeLanguageCodeLegacy(String code) {
         if (code == null) return "twi";
         switch (code.toLowerCase()) {
             case "ak":
@@ -924,15 +886,15 @@ public class AlphabetActivity extends AppCompatActivity {
         String tips = "";
         String letter = letters[currentIndex];
 
-        switch (languageCode) {
-            case "ak": // Twi (backward compatibility)
-            case "twi":
+        String normalizedCode = com.edulinguaghana.utils.LanguageConversionUtils.normalizeLanguageCode(languageCode);
+        switch (normalizedCode) {
+            case com.edulinguaghana.utils.LanguageConversionUtils.LANG_TWI:
                 tips = getTwiPronunciationTip(letter);
                 break;
-            case "ee": // Ewe
+            case com.edulinguaghana.utils.LanguageConversionUtils.LANG_EWE:
                 tips = getEwePronunciationTip(letter);
                 break;
-            case "gaa": // Ga
+            case com.edulinguaghana.utils.LanguageConversionUtils.LANG_GA:
                 tips = getGaPronunciationTip(letter);
                 break;
         }
@@ -998,12 +960,7 @@ public class AlphabetActivity extends AppCompatActivity {
     }
 
     private String getSpeechLocaleCode() {
-        if ("fr".equals(languageCode)) return "fr-FR";
-        if ("ak".equals(languageCode) || "twi".equals(languageCode) || "ee".equals(languageCode) || "gaa".equals(languageCode)) {
-            // Standard recognizer doesn't support these well, but using English with custom mapping is better than nothing
-            return "en-US";
-        }
-        return "en-US";
+        return com.edulinguaghana.utils.LanguageConversionUtils.getSpeechLocaleCode(languageCode);
     }
 
     private Locale getLocaleForLanguage(String code) {
@@ -1218,13 +1175,19 @@ public class AlphabetActivity extends AppCompatActivity {
                 case "Z": spellings.add("zee"); spellings.add("zed"); break;
                 
                 // Ghanaian special characters (how they might be recognized by English-trained model)
-                case "Ɛ": spellings.add("eh"); spellings.add("air"); spellings.add("at"); break;
-                case "Ɔ": spellings.add("aw"); spellings.add("oh"); spellings.add("or"); spellings.add("o"); break;
-                case "Ɖ": spellings.add("de"); break;
-                case "Ƒ": spellings.add("ef"); break;
-                case "Ɣ": spellings.add("ga"); break;
-                case "Ŋ": spellings.add("ng"); spellings.add("ink"); break;
-                case "Ʋ": spellings.add("vu"); break;
+                case "Ɛ": 
+                    spellings.add("eh"); spellings.add("air"); spellings.add("at"); 
+                    spellings.add("end"); spellings.add("egg"); spellings.add("et");
+                    break;
+                case "Ɔ": 
+                    spellings.add("aw"); spellings.add("oh"); spellings.add("or"); 
+                    spellings.add("on"); spellings.add("awe"); spellings.add("o");
+                    break;
+                case "Ɖ": spellings.add("de"); spellings.add("the"); break;
+                case "Ƒ": spellings.add("ef"); spellings.add("if"); break;
+                case "Ɣ": spellings.add("ga"); spellings.add("her"); break;
+                case "Ŋ": spellings.add("ng"); spellings.add("ink"); spellings.add("ing"); spellings.add("thing"); break;
+                case "Ʋ": spellings.add("vu"); spellings.add("view"); break;
             }
         }
         return spellings;

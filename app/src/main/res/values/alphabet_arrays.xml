@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="letters_en_fr">
+        <item>A</item><item>B</item><item>C</item><item>D</item><item>E</item><item>F</item><item>G</item><item>H</item><item>I</item><item>J</item><item>K</item><item>L</item><item>M</item><item>N</item><item>O</item><item>P</item><item>Q</item><item>R</item><item>S</item><item>T</item><item>U</item><item>V</item><item>W</item><item>X</item><item>Y</item><item>Z</item>
+    </string-array>
+
+    <string-array name="words_en">
+        <item>Apple</item><item>Ball</item><item>Cat</item><item>Dog</item><item>Elephant</item><item>Fish</item><item>Goat</item><item>Hat</item><item>Ice Cream</item><item>Jug</item><item>Kite</item><item>Lion</item><item>Monkey</item><item>Nose</item><item>Orange</item><item>Pen</item><item>Queen</item><item>Rainbow</item><item>Sun</item><item>Tiger</item><item>Umbrella</item><item>Violin</item><item>Watch</item><item>Xylophone</item><item>Yoyo</item><item>Zebra</item>
+    </string-array>
+
+    <string-array name="letters_ak">
+        <item>A</item><item>B</item><item>D</item><item>E</item><item>Ɛ</item><item>F</item><item>G</item><item>H</item><item>I</item><item>K</item><item>L</item><item>M</item><item>N</item><item>O</item><item>Ɔ</item><item>P</item><item>R</item><item>S</item><item>T</item><item>U</item><item>W</item><item>Y</item>
+    </string-array>
+
+    <string-array name="words_ak">
+        <item>Akokɔ</item><item>Borɔdeɛ</item><item>Duku</item><item>Etuo</item><item>Ɛmo</item><item>Forosie</item><item>Gari</item><item>Hweaa</item><item>Isu</item><item>Kube</item><item>Lɔre</item><item>Maame</item><item>Nsuo</item><item>Odwan</item><item>Ɔkraman</item><item>Pono</item><item>Prako</item><item>Sika</item><item>Tɛkyerɛma</item><item>Uniwesiti</item><item>Wura</item><item>Yareɛ</item>
+    </string-array>
+
+    <string-array name="letters_gaa">
+        <item>A</item><item>B</item><item>D</item><item>E</item><item>Ɛ</item><item>F</item><item>G</item><item>H</item><item>I</item><item>J</item><item>K</item><item>L</item><item>M</item><item>N</item><item>Ŋ</item><item>O</item><item>Ɔ</item><item>P</item><item>R</item><item>S</item><item>T</item><item>V</item><item>W</item><item>Y</item><item>Z</item>
+    </string-array>
+
+    <string-array name="words_gaa">
+        <item>Akekā</item><item>Blɔfo</item><item>Dade</item><item>Enɔ</item><item>Ɛlɛ</item><item>Fio</item><item>Gbekɛ</item><item>Hejɔ</item><item>Iŋk</item><item>Jɔ</item><item>Klala</item><item>Lala</item><item>Maŋ</item><item>Nuu</item><item>Ŋmã</item><item>Okpɔtɔ</item><item>Ɔɔso</item><item>Papa</item><item>Rugu</item><item>Sohaa</item><item>Tee</item><item>Vinɔ</item><item>Wɔ</item><item>Yoomo</item><item>Zigidi</item>
+    </string-array>
+
+    <string-array name="letters_ee">
+        <item>A</item><item>B</item><item>D</item><item>Ɖ</item><item>E</item><item>Ɛ</item><item>F</item><item>Ƒ</item><item>G</item><item>Ɣ</item><item>H</item><item>X</item><item>I</item><item>K</item><item>L</item><item>M</item><item>N</item><item>Ŋ</item><item>O</item><item>Ɔ</item><item>P</item><item>R</item><item>S</item><item>T</item><item>U</item><item>V</item><item>Ʋ</item><item>W</item><item>Y</item><item>Z</item>
+    </string-array>
+
+    <string-array name="words_ee">
+        <item>Ati</item><item>Baka</item><item>Dadi</item><item>Ɖevi</item><item>Eku</item><item>Ɛfu</item><item>Fia</item><item>Ƒo</item><item>Gbe</item><item>Ɣe</item><item>Ha</item><item>Xɔ</item><item>Iŋk</item><item>Kafu</item><item>Lá</item><item>Me</item><item>Nɔ</item><item>Ŋkɔ</item><item>Oyi</item><item>Ɔli</item><item>Papa</item><item>Rɛdio</item><item>Sɔ</item><item>Tɔ</item><item>Unilɔ</item><item>Vɔ</item><item>Ʋu</item><item>Wó</item><item>Yevú</item><item>Zã</item>
+    </string-array>
+
+    <string-array name="words_fr">
+        <item>Avion</item><item>Bateau</item><item>Chien</item><item>Dauphin</item><item>Éléphant</item><item>Fleur</item><item>Girafe</item><item>Hibou</item><item>Île</item><item>Jardin</item><item>Kangourou</item><item>Lune</item><item>Maison</item><item>Nuage</item><item>Oiseau</item><item>Poisson</item><item>Quatre</item><item>Robot</item><item>Soleil</item><item>Train</item><item>Uniforme</item><item>Vache</item><item>Wagon</item><item>Xylophone</item><item>Yaourt</item><item>Zèbre</item>
+    </string-array>
+
+    <string-array name="words_twi">
+        <item>Ade</item><item>Borɔ</item><item>Dade</item><item>Etuo</item><item>Ɛmo</item><item>Fufuu</item><item>Gari</item><item>Hena</item><item>Isuaa</item><item>Kɔkɔɔ</item><item>Lopa</item><item>Moa</item><item>Nom</item><item>Okra</item><item>Ɔkyire</item><item>Papa</item><item>Rikisi</item><item>Sɛn</item><item>Toa</item><item>Upire</item><item>Wɔ</item><item>Yam</item>
+    </string-array>
+</resources>

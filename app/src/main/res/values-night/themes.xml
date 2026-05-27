@@ -31,6 +31,12 @@
 
     <style name="Theme.EduLinguaGhana" parent="Base.Theme.EduLinguaGhana" />
 
+    <style name="Theme.App.Starting" parent="Theme.SplashScreen">
+        <item name="windowSplashScreenBackground">@color/appBackground</item>
+        <item name="windowSplashScreenAnimatedIcon">@drawable/ic_logo</item>
+        <item name="postSplashScreenTheme">@style/Theme.EduLinguaGhana</item>
+    </style>
+
     <!-- Toolbar Title Style for Dark Mode -->
     <style name="ToolbarTitleStyle" parent="TextAppearance.Widget.AppCompat.Toolbar.Title">
         <item name="android:textSize">20sp</item>

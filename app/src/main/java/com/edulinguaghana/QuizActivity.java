@@ -84,6 +84,7 @@ public class QuizActivity extends AppCompatActivity {
     private TextView tvEndCelebrationEmoji; // lightweight replacement for Lottie
 
     private String quizType, languageCode, languageName;
+    private String currentSubMode; // Track sub-mode for Mixed Quiz
     private String difficulty = "beginner";  // Default difficulty level
     private String category = "all";  // Default category
     private int score = 0;
@@ -384,8 +385,7 @@ public class QuizActivity extends AppCompatActivity {
             }
             startBackgroundMusic();
             startGame();
-        } catch (Exception e) {
-            Log.e("QuizActivity", "Error showing quiz content", e);
+        } catch (Exception ignored) {
         }
     }
 
@@ -458,12 +458,10 @@ public class QuizActivity extends AppCompatActivity {
                 cachedAudio = audioCacheManager.getCachedTtsAudio(currentPromptTtsText, languageCode);
             }
             if (cachedAudio != null) {
-                Log.d("QuizActivity", "Playing cached audio: " + currentPromptTtsText);
                 playAudioFile(cachedAudio);
                 return;
             }
 
-            Log.d("QuizActivity", "Speaking text (not cached): '" + currentPromptTtsText + "' in language: " + languageCode);
             if (tts != null) {
                 tts.stop();
                 tts.setSpeechRate(0.9f); // Slightly slower for clarity
@@ -484,8 +482,7 @@ public class QuizActivity extends AppCompatActivity {
             mediaPlayer.prepareAsync();
             mediaPlayer.setOnPreparedListener(mp -> mp.start());
             mediaPlayer.setOnCompletionListener(MediaPlayer::release);
-        } catch (Exception e) {
-            Log.e("QuizActivity", "Error playing audio file", e);
+        } catch (Exception ignored) {
         }
     }
 
@@ -519,7 +516,6 @@ public class QuizActivity extends AppCompatActivity {
                     isOfflineTtsPlaying = false;
                     runOnUiThread(() -> {
                         // Fallback to Android TTS on error
-                        Log.w("QuizActivity", "Offline TTS error: " + error + ", falling back to Android TTS");
                         if (tts != null && ttsReady) {
                             tts.speak(text, TextToSpeech.QUEUE_FLUSH, null, "quiz_tts");
                         }
@@ -591,8 +587,8 @@ public class QuizActivity extends AppCompatActivity {
     }
 
     private void generateLetterQuestion() {
+        currentSubMode = "letters";
         if (alphabet == null || alphabet.length == 0) {
-            Log.e("QuizActivity", "Alphabet is null or empty for language: " + languageCode);
             // Fallback to English alphabet
             alphabet = new String[]{"A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z"};
         }
@@ -636,6 +632,7 @@ public class QuizActivity extends AppCompatActivity {
     }
 
     private void generateNumberQuestion() {
+        currentSubMode = "numbers";
         int correctNumber = random.nextInt(MAX_NUMBER) + 1;
         currentCorrectAnswer = String.valueOf(correctNumber);
         List<String> options = new ArrayList<>();
@@ -686,6 +683,7 @@ public class QuizActivity extends AppCompatActivity {
     }
 
     private void generateSequenceQuestion() {
+        currentSubMode = "sequence";
         int start = random.nextInt(Math.max(1, MAX_NUMBER - 5)) + 1;
         int step = 1;
         int[] seq = new int[4];
@@ -736,6 +734,7 @@ public class QuizActivity extends AppCompatActivity {
     }
 
     private void generateMatchingQuestion() {
+        currentSubMode = "matching";
         if (tvGamePrompt != null) {
             tvGamePrompt.setText(R.string.quiz_prompt_matching_pairs);
         }
@@ -786,6 +785,7 @@ public class QuizActivity extends AppCompatActivity {
     }
 
     private void generateShadowMatchQuestion() {
+        currentSubMode = "shadow_match";
         if (tvGamePrompt != null) {
             tvGamePrompt.setText(R.string.quiz_prompt_shadow_match);
         }
@@ -902,6 +902,7 @@ public class QuizActivity extends AppCompatActivity {
     }
 
     private void generateHiddenShapesQuestion() {
+        currentSubMode = "hidden_shapes";
         if (tvGamePrompt != null) {
             tvGamePrompt.setText(R.string.hidden_shapes_prompt);
         }
@@ -924,6 +925,7 @@ public class QuizActivity extends AppCompatActivity {
 
         if (scratchCard != null && scratchRevealView != null) {
             scratchCard.setVisibility(View.VISIBLE);
+            scratchRevealView.setScratchEnabled(true);
             scratchRevealView.setHiddenText(target, text -> {
                 // Character revealed!
                 runOnUiThread(() -> {
@@ -931,6 +933,9 @@ public class QuizActivity extends AppCompatActivity {
                     speakPrompt();
                     playSfx(true);
                     
+                    if (tvGamePrompt != null) {
+                        tvGamePrompt.setText(getString(R.string.hidden_shapes_found, text));
+                    }
                     setOptionsVisibility(View.VISIBLE);
                 });
             });
@@ -956,6 +961,7 @@ public class QuizActivity extends AppCompatActivity {
     }
 
     private void generateOddOneOutQuestion() {
+        currentSubMode = "odd_one_out";
         String[] currentAlphabet = LanguageConversionUtils.getAlphabetForLanguage(languageCode);
         
         List<String> letters = new ArrayList<>();
@@ -1100,12 +1106,14 @@ public class QuizActivity extends AppCompatActivity {
     }
 
     private void checkAnswer(MaterialButton clickedButton) {
-        if ("shadow_match".equals(quizType) && !"drag_success".equals(clickedButton.getTag(R.id.scratchCard))) {
+        String effectiveMode = "mixed".equals(quizType) ? currentSubMode : quizType;
+        
+        if ("shadow_match".equals(effectiveMode) && !"drag_success".equals(clickedButton.getTag(R.id.scratchCard))) {
             // In shadow match, we only want drag and drop to work.
             tvGameFeedback.setText(R.string.quiz_hint_drag_to_match);
             return;
         }
-        if ("matching".equals(quizType)) {
+        if ("matching".equals(effectiveMode)) {
             handleMatchingClick(clickedButton);
             return;
         }
@@ -1339,8 +1347,7 @@ public class QuizActivity extends AppCompatActivity {
                     tvEndCelebrationEmoji.setRotation(0f);
                 }
             }
-        } catch (Exception e) {
-            Log.e("QuizActivity", "Error showing end screen", e);
+        } catch (Exception ignored) {
         }
     }
 
@@ -1506,8 +1513,7 @@ public class QuizActivity extends AppCompatActivity {
                     backgroundMusicPlayer.setVolume(prefVolume, prefVolume);
                 }
             }
-        } catch (Exception e) {
-            Log.e("QuizActivity", "Error initializing background music: " + e.getMessage());
+        } catch (Exception ignored) {
         }
     }
 
@@ -1523,7 +1529,6 @@ public class QuizActivity extends AppCompatActivity {
             if (audioManager != null) {
                 int vol = audioManager.getStreamVolume(AudioManager.STREAM_MUSIC);
                 if (vol == 0) {
-                    Log.d("QuizActivity", "Not starting background music because STREAM_MUSIC volume is 0");
                     return;
                 }
             }
@@ -1548,7 +1553,6 @@ public class QuizActivity extends AppCompatActivity {
                 prefVolume = 0.3f;
             }
             if (!backgroundMusicEnabled || prefVolume <= 0f) {
-                Log.d("QuizActivity", "Background music disabled or volume set to 0 in preferences");
                 return;
             }
 
@@ -1568,14 +1572,10 @@ public class QuizActivity extends AppCompatActivity {
                 try {
                     backgroundMusicPlayer.setVolume(prefVolume, prefVolume);
                     if (!backgroundMusicPlayer.isPlaying()) backgroundMusicPlayer.start();
-                } catch (Exception e) {
-                    Log.e("QuizActivity", "Error starting background music: " + e.getMessage());
+                } catch (Exception ignored) {
                 }
-            } else {
-                Log.d("QuizActivity", "Audio focus not granted, not starting background music");
             }
-        } catch (Exception e) {
-            Log.e("QuizActivity", "Error starting background music: " + e.getMessage());
+        } catch (Exception ignored) {
         }
     }
 
@@ -1587,8 +1587,7 @@ public class QuizActivity extends AppCompatActivity {
             if (backgroundMusicPlayer != null && backgroundMusicPlayer.isPlaying()) {
                 backgroundMusicPlayer.pause();
             }
-        } catch (Exception e) {
-            Log.e("QuizActivity", "Error pausing background music: " + e.getMessage());
+        } catch (Exception ignored) {
         }
     }
 
@@ -1607,12 +1606,10 @@ public class QuizActivity extends AppCompatActivity {
             if (audioManager != null && afChangeListener != null) {
                 try {
                     audioManager.abandonAudioFocus(afChangeListener);
-                } catch (Exception e) {
-                    Log.w("QuizActivity", "Failed to abandon audio focus", e);
+                } catch (Exception ignored) {
                 }
             }
-        } catch (Exception e) {
-            Log.e("QuizActivity", "Error stopping background music: " + e.getMessage());
+        } catch (Exception ignored) {
         }
     }
 

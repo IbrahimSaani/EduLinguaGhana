@@ -179,6 +179,10 @@ public class HiddenShapesActivity extends AppCompatActivity {
         overlayLayout.setVisibility(View.GONE);
         updateTimerDisplay();
         updateScoreDisplay();
+        
+        // Prepare the character immediately so the sand is over a real shape
+        generateNewCharacter();
+        
         showInitialCountdown();
     }
 
@@ -343,9 +347,11 @@ public class HiddenShapesActivity extends AppCompatActivity {
     private void showInitialCountdown() {
         if (tvCountdown == null) {
             startTimer(timeLeftMs);
-            generateNewCharacter();
             return;
         }
+
+        // Disable scratching during countdown
+        if (scratchView != null) scratchView.setScratchEnabled(false);
 
         tvCountdown.setVisibility(View.VISIBLE);
         final int[] count = {3};
@@ -366,8 +372,11 @@ public class HiddenShapesActivity extends AppCompatActivity {
                     handler.postDelayed(this, 800);
                 } else {
                     tvCountdown.setVisibility(View.GONE);
+                    
+                    // Enable scratching now
+                    if (scratchView != null) scratchView.setScratchEnabled(true);
+                    
                     startTimer(timeLeftMs);
-                    generateNewCharacter();
                 }
             }
         };

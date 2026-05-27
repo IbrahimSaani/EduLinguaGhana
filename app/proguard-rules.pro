@@ -54,3 +54,17 @@
     public static **[] values();
     public static ** valueOf(java.lang.String);
 }
+
+# --- Gson rules ---
+-keepattributes Signature
+-keepattributes *Annotation*
+-dontwarn sun.misc.**
+-keep class com.google.gson.** { *; }
+-keep class com.edulinguaghana.** { *; }
+
+# --- Glide rules ---
+-keep public class * extends com.bumptech.glide.module.AppGlideModule
+-keep public class * extends com.bumptech.glide.module.LibraryGlideModule
+-keep class com.bumptech.glide.** { *; }
+-keep interface com.bumptech.glide.** { *; }
+-dontwarn com.bumptech.glide.**

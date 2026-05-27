@@ -1,7 +1,6 @@
 package com.edulinguaghana.tracking;
 
 import android.content.Context;
-import android.util.Log;
 
 import com.edulinguaghana.R;
 import com.edulinguaghana.StreakManager;
@@ -23,7 +22,6 @@ import java.util.UUID;
  * Central service for tracking and syncing student progress to Firebase
  */
 public class ProgressTracker {
-    private static final String TAG = "ProgressTracker";
 
     private final DatabaseReference progressRef;
     private final DatabaseReference aggregatesRef;
@@ -80,8 +78,6 @@ public class ProgressTracker {
         // Save to Firebase
         progressRef.child(finalUserId).child("activities").child(activityId).setValue(activity)
             .addOnSuccessListener(aVoid -> {
-                Log.d(TAG, "Quiz activity logged: " + activityId);
-
                 // Update aggregates
                 updateAggregates(context, finalUserId);
 
@@ -91,7 +87,6 @@ public class ProgressTracker {
                 if (callback != null) callback.onSuccess();
             })
             .addOnFailureListener(e -> {
-                Log.e(TAG, "Failed to log quiz activity", e);
                 if (callback != null) callback.onError(e.getMessage());
             });
     }
@@ -131,13 +126,11 @@ public class ProgressTracker {
 
         progressRef.child(finalUserId).child("activities").child(activityId).setValue(activity)
             .addOnSuccessListener(aVoid -> {
-                Log.d(TAG, "Fun game activity logged: " + activityId);
                 // Update aggregates to push achievements/quests/badges to Firebase
                 updateAggregates(context, finalUserId);
                 if (callback != null) callback.onSuccess();
             })
             .addOnFailureListener(e -> {
-                Log.e(TAG, "Failed to log fun game activity", e);
                 if (callback != null) callback.onError(e.getMessage());
             });
     }
@@ -181,12 +174,10 @@ public class ProgressTracker {
 
         progressRef.child(finalUserId).child("activities").child(activityId).setValue(activity)
             .addOnSuccessListener(aVoid -> {
-                Log.d(TAG, "Lesson activity logged: " + activityId);
                 updateAggregates(context, finalUserId);
                 if (callback != null) callback.onSuccess();
             })
             .addOnFailureListener(e -> {
-                Log.e(TAG, "Failed to log lesson activity", e);
                 if (callback != null) callback.onError(e.getMessage());
             });
     }
@@ -213,11 +204,9 @@ public class ProgressTracker {
 
         progressRef.child(userId).child("activities").child(activityId).setValue(activity)
             .addOnSuccessListener(aVoid -> {
-                Log.d(TAG, "XP activity logged: " + activityId);
                 if (callback != null) callback.onSuccess();
             })
             .addOnFailureListener(e -> {
-                Log.e(TAG, "Failed to log XP activity", e);
                 if (callback != null) callback.onError(e.getMessage());
             });
     }
@@ -245,8 +234,6 @@ public class ProgressTracker {
 
         progressRef.child(userId).child("activities").child(activityId).setValue(activity)
             .addOnSuccessListener(aVoid -> {
-                Log.d(TAG, "Achievement logged: " + achievementId);
-
                 // This is a milestone - notify supervisors
                 if (context != null) {
                     createMilestone(userId, context.getString(R.string.notification_milestone_achievement, achievementName),
@@ -256,7 +243,6 @@ public class ProgressTracker {
                 if (callback != null) callback.onSuccess();
             })
             .addOnFailureListener(e -> {
-                Log.e(TAG, "Failed to log achievement", e);
                 if (callback != null) callback.onError(e.getMessage());
             });
     }
@@ -282,8 +268,6 @@ public class ProgressTracker {
 
         progressRef.child(userId).child("activities").child(activityId).setValue(activity)
             .addOnSuccessListener(aVoid -> {
-                Log.d(TAG, "Streak milestone logged: " + streakDays);
-
                 // Create milestone for significant streaks
                 if (streakDays >= 7 && streakDays % 7 == 0 && context != null) {
                     createMilestone(userId, context.getString(R.string.notification_milestone_streak, streakDays),
@@ -293,7 +277,6 @@ public class ProgressTracker {
                 if (callback != null) callback.onSuccess();
             })
             .addOnFailureListener(e -> {
-                Log.e(TAG, "Failed to log streak", e);
                 if (callback != null) callback.onError(e.getMessage());
             });
     }
@@ -409,21 +392,18 @@ public class ProgressTracker {
                             userRef.child("quests").setValue(quests);
                             userRef.child("achievements").setValue(achievementManager.getAllAchievements());
 
-                        } catch (Exception e) {
-                            Log.e(TAG, "Error updating aggregates", e);
+                        } catch (Exception ignored) {
                         }
                     }
 
                     @Override
                     public void onCancelled(DatabaseError error) {
-                        Log.e(TAG, "Failed to read aggregates", error.toException());
                     }
                 });
             }
 
             @Override
             public void onCancelled(DatabaseError error) {
-                Log.e(TAG, "Failed to read activities", error.toException());
             }
         });
     }
@@ -464,10 +444,8 @@ public class ProgressTracker {
 
         milestonesRef.child(userId).child(milestoneId).setValue(milestone)
             .addOnSuccessListener(aVoid -> {
-                Log.d(TAG, "Milestone created: " + title);
             })
             .addOnFailureListener(e -> {
-                Log.e(TAG, "Failed to create milestone", e);
             });
     }
 
@@ -475,23 +453,19 @@ public class ProgressTracker {
      * Get progress aggregate for a student
      */
     public void getProgressAggregate(String userId, ProgressAggregateCallback callback) {
-        Log.d(TAG, "Fetching progress aggregate for userId: " + userId);
         aggregatesRef.child(userId).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot snapshot) {
                 ProgressAggregate aggregate = snapshot.getValue(ProgressAggregate.class);
                 if (aggregate == null) {
-                    Log.d(TAG, "No aggregate found for user, creating default");
                     aggregate = new ProgressAggregate();
                     aggregate.setUserId(userId);
                 }
-                Log.d(TAG, "Progress aggregate retrieved successfully for " + userId);
                 callback.onAggregateRetrieved(aggregate);
             }
 
             @Override
             public void onCancelled(DatabaseError error) {
-                Log.e(TAG, "Failed to fetch progress aggregate: " + error.getMessage() + " (Code: " + error.getCode() + ")");
                 callback.onError(error.getMessage());
             }
         });

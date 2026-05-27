@@ -179,12 +179,9 @@ public class NumbersActivity extends AppCompatActivity {
                         speakCurrentNumber();
                     }
                 } else {
-                    Toast.makeText(this, "TTS init failed", Toast.LENGTH_SHORT).show();
                     updateNumber();
                 }
-            } catch (Exception e) {
-                android.util.Log.e("NumbersActivity", "Error during TTS initialization or recital playback", e);
-                updateNumber();
+            } catch (Exception ignored) {
             }
         });
 
@@ -203,8 +200,7 @@ public class NumbersActivity extends AppCompatActivity {
                 updateNumber();
                 if (seekBarNavigation != null) seekBarNavigation.setProgress(currentNumber - 1);
                 if (isRecitalMode) speakCurrentNumber();
-            } catch (Exception e) {
-                android.util.Log.e("NumbersActivity", "Error advancing number", e);
+            } catch (Exception ignored) {
             }
         });
 
@@ -220,8 +216,7 @@ public class NumbersActivity extends AppCompatActivity {
                 updateNumber();
                 if (seekBarNavigation != null) seekBarNavigation.setProgress(currentNumber - 1);
                 if (isRecitalMode) speakCurrentNumber();
-            } catch (Exception e) {
-                android.util.Log.e("NumbersActivity", "Error going back number", e);
+            } catch (Exception ignored) {
             }
         });
 
@@ -247,8 +242,7 @@ public class NumbersActivity extends AppCompatActivity {
                 } else {
                     startPracticePronunciation();
                 }
-            } catch (Exception e) {
-                android.util.Log.e("NumbersActivity", "Error speaking number", e);
+            } catch (Exception ignored) {
             }
         });
 
@@ -258,8 +252,7 @@ public class NumbersActivity extends AppCompatActivity {
                 v.performHapticFeedback(HapticFeedbackConstants.VIRTUAL_KEY);
                 speakCurrentNumber();
                 celebrateAction();  // Show celebration
-            } catch (Exception e) {
-                android.util.Log.e("NumbersActivity", "Error in number card click", e);
+            } catch (Exception ignored) {
             }
         });
 
@@ -286,8 +279,7 @@ public class NumbersActivity extends AppCompatActivity {
             try {
                 v.performHapticFeedback(HapticFeedbackConstants.VIRTUAL_KEY);
                 showNumberPickerDialog();
-            } catch (Exception e) {
-                android.util.Log.e("NumbersActivity", "Error showing number picker", e);
+            } catch (Exception ignored) {
             }
         });
 
@@ -298,8 +290,7 @@ public class NumbersActivity extends AppCompatActivity {
                 animateButtonPress(btnSpeakQuick);
                 speakCurrentNumber();
                 celebrateAction();
-            } catch (Exception e) {
-                android.util.Log.e("NumbersActivity", "Error in quick speak button", e);
+            } catch (Exception ignored) {
             }
         });
     }
@@ -313,13 +304,7 @@ public class NumbersActivity extends AppCompatActivity {
             tvNumberSpelling.setText(numberWord != null ? numberWord : "");
             progressBar.setProgress(currentNumber);
             updateProgressCounter();
-        } catch (Exception e) {
-            android.util.Log.e("NumbersActivity", "Error updating number display", e);
-            // Ensure display is at least partially updated
-            try {
-                tvNumber.setText(String.valueOf(currentNumber));
-            } catch (Exception ignored) {
-            }
+        } catch (Exception ignored) {
         }
     }
 
@@ -356,7 +341,7 @@ public class NumbersActivity extends AppCompatActivity {
             int resId = getNumberAudioResId(languageCode, currentNumber);
             if (resId != 0) {
                 playAudioResource(resId);  // This only plays if resId is found
-            } else if (isGhanaianLanguage(languageCode)) {
+            } else if (LanguageConversionUtils.isGhanaianLanguage(languageCode)) {
                 // Fallback to GhanaLP TTS if no recorded audio exists
                 speakWithGhanaLP(currentNumber);
             } else if (tts != null) {
@@ -364,18 +349,8 @@ public class NumbersActivity extends AppCompatActivity {
                 tts.speak(String.valueOf(currentNumber), TextToSpeech.QUEUE_FLUSH, null, "NUMBER_ID");
             }
             animateNumber();
-        } catch (Exception e) {
-            android.util.Log.e("NumbersActivity", "Error in speakCurrentNumber", e);
-            // Silently fail - don't crash the app
+        } catch (Exception ignored) {
         }
-    }
-
-    private boolean isGhanaianLanguage(String code) {
-        if (code == null) return false;
-        String lower = code.toLowerCase();
-        return lower.equals("ak") || lower.equals("twi") ||
-               lower.equals("ee") || lower.equals("ewe") ||
-               lower.equals("gaa") || lower.equals("ga");
     }
 
     private void speakWithGhanaLP(int number) {
@@ -385,7 +360,7 @@ public class NumbersActivity extends AppCompatActivity {
             }
 
             // Normalize language code for audio file lookup
-            String apiLangCode = normalizeLanguageCode(languageCode);
+            final String apiLangCode = LanguageConversionUtils.normalizeLanguageCode(languageCode);
 
             // Disable speak button during playback
             if (btnSpeakNumber != null) {
@@ -420,20 +395,17 @@ public class NumbersActivity extends AppCompatActivity {
                             if (btnSpeakNumber != null) {
                                 btnSpeakNumber.setEnabled(true);
                             }
-                            android.util.Log.w("NumbersActivity", "No offline audio found for number: " + number);
                             try {
                                 if (tts != null) {
                                     tts.speak(String.valueOf(number), TextToSpeech.QUEUE_FLUSH, null, "NUMBER_ID");
                                 }
-                            } catch (Exception e) {
-                                android.util.Log.e("NumbersActivity", "Error during TTS fallback speak", e);
+                            } catch (Exception ignored) {
                             }
                         });
                     }
                 }
             );
         } catch (Exception e) {
-            android.util.Log.e("NumbersActivity", "Error in speakWithGhanaLP", e);
             // Try TTS as ultimate fallback
             try {
                 if (tts != null && tts.isSpeaking()) {
@@ -445,29 +417,11 @@ public class NumbersActivity extends AppCompatActivity {
                 if (btnSpeakNumber != null) {
                     btnSpeakNumber.setEnabled(true);
                 }
-            } catch (Exception ttsError) {
-                android.util.Log.e("NumbersActivity", "TTS fallback also failed", ttsError);
+            } catch (Exception ignored) {
                 if (btnSpeakNumber != null) {
                     btnSpeakNumber.setEnabled(true);
                 }
             }
-        }
-    }
-
-    private String normalizeLanguageCode(String code) {
-        if (code == null) return "twi";
-        switch (code.toLowerCase()) {
-            case "ak":
-            case "twi":
-                return "twi";
-            case "ee":
-            case "ewe":
-                return "ewe";
-            case "gaa":
-            case "ga":
-                return "ga";
-            default:
-                return code.toLowerCase();
         }
     }
 
@@ -508,15 +462,15 @@ public class NumbersActivity extends AppCompatActivity {
     private void showPronunciationTips() {
         String tips = "";
 
-        switch (languageCode) {
-            case "ak": // Twi (backward compatibility)
-            case "twi":
+        String normalizedCode = LanguageConversionUtils.normalizeLanguageCode(languageCode);
+        switch (normalizedCode) {
+            case LanguageConversionUtils.LANG_TWI:
                 tips = getString(R.string.mascot_encouragement_1); // Placeholder or generic tip
                 break;
-            case "ee": // Ewe
+            case LanguageConversionUtils.LANG_EWE:
                 tips = getString(R.string.mascot_encouragement_2);
                 break;
-            case "gaa": // Ga
+            case LanguageConversionUtils.LANG_GA:
                 tips = getString(R.string.mascot_encouragement_3);
                 break;
         }

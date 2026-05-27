@@ -4,7 +4,6 @@ import android.app.Application;
 import android.app.Activity;
 import android.os.Bundle;
 import android.net.Uri;
-import android.util.Log;
 import java.lang.reflect.Field;
 
 import androidx.work.ExistingPeriodicWorkPolicy;
@@ -25,7 +24,6 @@ import com.google.firebase.appdistribution.InterruptionLevel;
 import java.util.concurrent.TimeUnit;
 
 public class App extends Application {
-    private static final String TAG = "App";
 
     @Override
     public void onCreate() {
@@ -51,29 +49,25 @@ public class App extends Application {
             SocialProvider.init(repo);
         } catch (Exception e) {
             // Fall back to null provider; existing code should handle null
-            Log.e(TAG, "Failed to initialize SocialProvider", e);
         }
 
         // Initialize FCM token
         try {
             FCMTokenManager fcmTokenManager = new FCMTokenManager(this);
             fcmTokenManager.initializeFCMToken();
-        } catch (Exception e) {
-            Log.e(TAG, "Failed to initialize FCM token", e);
+        } catch (Exception ignored) {
         }
 
         // Initialize background notification worker
         try {
             scheduleLearningNotificationWorker();
-        } catch (Exception e) {
-            Log.e(TAG, "Failed to schedule learning notification worker", e);
+        } catch (Exception ignored) {
         }
 
         // Initialize social activity listener for real-time notifications
         try {
             com.edulinguaghana.social.SocialActivityListener.getInstance(this).startListening();
-        } catch (Exception e) {
-            Log.e(TAG, "Failed to initialize SocialActivityListener", e);
+        } catch (Exception ignored) {
         }
 
         // Enable App Distribution Tester Feedback notification
@@ -82,8 +76,7 @@ public class App extends Application {
                     "Submit feedback to the developers",
                     InterruptionLevel.DEFAULT
             );
-        } catch (Exception e) {
-            Log.e(TAG, "Failed to show feedback notification", e);
+        } catch (Exception ignored) {
         }
 
         // Apply global hotfix for Firebase App Distribution FeedbackActivity crash
@@ -106,10 +99,8 @@ public class App extends Application {
                         field.setAccessible(true);
                         if (field.get(activity) == null) {
                             field.set(activity, Uri.EMPTY);
-                            Log.d(TAG, "FeedbackActivity patched: screenshotUri was null, set to Uri.EMPTY");
                         }
-                    } catch (Exception e) {
-                        Log.w(TAG, "Could not patch FeedbackActivity screenshotUri", e);
+                    } catch (Exception ignored) {
                     }
                 }
             }
@@ -150,8 +141,6 @@ public class App extends Application {
                 ExistingPeriodicWorkPolicy.KEEP,  // Keep existing if already scheduled
                 notificationWorkRequest
         );
-
-        Log.d(TAG, "Learning notification worker scheduled");
     }
 }
 

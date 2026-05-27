@@ -91,7 +91,6 @@ public class ProgressManager {
             }
         } catch (Exception e) {
             // Silently fail if Firebase is not available
-            android.util.Log.e("ProgressManager", "Failed to log to Firebase", e);
         }
     }
 
@@ -118,8 +117,12 @@ public class ProgressManager {
             boolean isNewLanguage = languagesUsed.add(languageCode);
 
             // Save updated languages
-            String updatedLanguages = String.join(",", languagesUsed);
-            prefs.edit().putString(KEY_LANGUAGES_USED, updatedLanguages).apply();
+            StringBuilder sb = new StringBuilder();
+            for (String lang : languagesUsed) {
+                if (sb.length() > 0) sb.append(",");
+                sb.append(lang);
+            }
+            prefs.edit().putString(KEY_LANGUAGES_USED, sb.toString()).apply();
 
             // If new language is added, progress the quest
             if (isNewLanguage && languagesUsed.size() <= 2) {
@@ -144,8 +147,12 @@ public class ProgressManager {
             boolean isNewLanguage = languagesUsed.add(languageCode);
             
             // Save updated languages
-            String updatedLanguages = String.join(",", languagesUsed);
-            prefs.edit().putString(KEY_LANGUAGES_USED, updatedLanguages).apply();
+            StringBuilder sb = new StringBuilder();
+            for (String lang : languagesUsed) {
+                if (sb.length() > 0) sb.append(",");
+                sb.append(lang);
+            }
+            prefs.edit().putString(KEY_LANGUAGES_USED, sb.toString()).apply();
             
             // If new language is added, progress the quest
             if (isNewLanguage && languagesUsed.size() <= 2) {

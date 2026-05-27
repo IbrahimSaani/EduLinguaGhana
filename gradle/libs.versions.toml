@@ -3,15 +3,18 @@ agp = "9.2.1"
 junit = "4.13.2"
 junitVersion = "1.1.5"
 espressoCore = "3.5.1"
-appcompat = "1.6.1"
-material = "1.10.0"
-activity = "1.8.0"
-constraintlayout = "2.1.4"
+appcompat = "1.7.0"
+material = "1.12.0"
+activity = "1.9.3"
+constraintlayout = "2.2.0"
 lottie = "6.7.1"
 glide = "4.16.0"
 gdx = "1.14.0"
 firebaseAppDistribution = "5.2.1"
 firebaseAppDistributionSdk = "16.0.0-beta19"
+core-splashscreen = "1.2.0"
+googleServices = "4.4.4"
+crashlytics = "3.0.7"
 
 [libraries]
 junit = { group = "junit", name = "junit", version.ref = "junit" }
@@ -28,8 +31,11 @@ gdx-backend-android = { group = "com.badlogicgames.gdx", name = "gdx-backend-and
 gdx-platform = { group = "com.badlogicgames.gdx", name = "gdx-platform", version.ref = "gdx" }
 firebase-appdistribution-sdk = { group = "com.google.firebase", name = "firebase-appdistribution", version.ref = "firebaseAppDistributionSdk" }
 firebase-appdistribution-api = { group = "com.google.firebase", name = "firebase-appdistribution-api", version.ref = "firebaseAppDistributionSdk" }
+core-splashscreen = { group = "androidx.core", name = "core-splashscreen", version.ref = "core-splashscreen" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
 firebase-appdistribution = { id = "com.google.firebase.appdistribution", version.ref = "firebaseAppDistribution" }
+google-services = { id = "com.google.gms.google-services", version.ref = "googleServices" }
+firebase-crashlytics = { id = "com.google.firebase.crashlytics", version.ref = "crashlytics" }
 

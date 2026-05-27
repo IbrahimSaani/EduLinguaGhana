@@ -55,7 +55,6 @@ public class LearningNotificationWorker extends Worker {
 
             return Result.success();
         } catch (Exception e) {
-            e.printStackTrace();
             // Retry if there's an error
             return Result.retry();
         }
@@ -77,8 +76,7 @@ public class LearningNotificationWorker extends Worker {
                         1001
                 );
             }
-        } catch (Exception e) {
-            e.printStackTrace();
+        } catch (Exception ignored) {
         }
     }
 
@@ -111,8 +109,7 @@ public class LearningNotificationWorker extends Worker {
                     );
                 }
             }
-        } catch (Exception e) {
-            e.printStackTrace();
+        } catch (Exception ignored) {
         }
     }
 

@@ -37,6 +37,7 @@ public class ScratchRevealView extends View {
     private RevealListener revealListener;
     private OnScratchListener scratchListener;
     private boolean isRevealed = false;
+    private boolean isScratchEnabled = true;
     private final Random random = new Random();
     private int overlayAlpha = 255;
     private int moveCount = 0;
@@ -149,9 +150,19 @@ public class ScratchRevealView extends View {
 
     @Override
     protected void onDraw(@androidx.annotation.NonNull Canvas canvas) {
+        if (getWidth() <= 0 || getHeight() <= 0) return;
+
+        // Ensure text size is set if not already done
+        if (textPaint.getTextSize() <= 12f) { // Default is 12
+            textPaint.setTextSize(getHeight() * 0.6f);
+        }
+
         float x = getWidth() / 2f;
         float y = getHeight() / 2f - ((textPaint.descent() + textPaint.ascent()) / 2f);
-        canvas.drawText(hiddenText, x, y, textPaint);
+        
+        if (hiddenText != null) {
+            canvas.drawText(hiddenText, x, y, textPaint);
+        }
 
         if (overlayBitmap != null) {
             overlayPaint.setAlpha(overlayAlpha);
@@ -196,9 +207,13 @@ public class ScratchRevealView extends View {
         invalidate();
     }
 
+    public void setScratchEnabled(boolean enabled) {
+        this.isScratchEnabled = enabled;
+    }
+
     @Override
     public boolean onTouchEvent(MotionEvent event) {
-        if (isRevealed) return false;
+        if (isRevealed || !isScratchEnabled) return false;
 
         float x = event.getX();
         float y = event.getY();

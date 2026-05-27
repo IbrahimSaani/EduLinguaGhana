@@ -4,14 +4,14 @@ import java.io.FileInputStream
 
 plugins {
     alias(libs.plugins.android.application)
-    id("com.google.gms.google-services")
-    id("com.google.firebase.crashlytics")
+    alias(libs.plugins.google.services)
+    alias(libs.plugins.firebase.crashlytics)
     alias(libs.plugins.firebase.appdistribution)
 }
 
 android {
     namespace = "com.edulinguaghana"
-    compileSdk = 36
+    compileSdk = 35
 
     defaultConfig {
         applicationId = "com.edulinguaghana"
@@ -47,7 +47,7 @@ android {
     buildTypes {
         release {
             signingConfig = signingConfigs.getByName("release")
-            isMinifyEnabled = false
+            isMinifyEnabled = true
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
@@ -84,6 +84,7 @@ android {
 }
 
 dependencies {
+    implementation(libs.core.splashscreen)
     implementation(libs.appcompat)
     implementation(libs.material)
     implementation(libs.activity)
