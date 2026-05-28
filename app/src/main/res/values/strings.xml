@@ -273,6 +273,28 @@
     <string name="teacher_dashboard_needs_support">⚠️ Needs Support</string>
     <string name="teacher_dashboard_none_yet">None yet</string>
     <string name="teacher_dashboard_all_good">All good!</string>
+    <string name="teacher_dashboard_top_performers">🏆 Class Top Performers</string>
+    <string name="teacher_dashboard_rank_first">🥇</string>
+    <string name="teacher_dashboard_rank_second">🥈</string>
+    <string name="teacher_dashboard_rank_third">🥉</string>
+    <string name="teacher_dashboard_empty_rank">-</string>
+    <string name="teacher_dashboard_engagement_very_high">Very High</string>
+    <string name="teacher_dashboard_engagement_high">High</string>
+    <string name="teacher_dashboard_engagement_moderate">Moderate</string>
+    <string name="teacher_dashboard_engagement_low">Low</string>
+    <string name="teacher_dashboard_popular_lang_label">🌍 Popular Lang</string>
+    <string name="teacher_dashboard_engagement_label">📅 Engagement</string>
+    <string name="teacher_dashboard_popular_lang_default">Twi</string>
+    <string name="teacher_dashboard_engagement_default">High</string>
+    <string name="main_greeting_morning">Good Morning! ☀️</string>
+    <string name="main_greeting_afternoon">Good Afternoon! 🌤️</string>
+    <string name="main_greeting_evening">Good Evening! 🌙</string>
+    <string name="main_greeting_generic">Hello! 👋</string>
+    <string name="main_word_of_day_title">🆕 Word of the Day</string>
+    <string name="main_word_of_day_default">Akwaaba</string>
+    <string name="main_word_of_day_meaning_default">Welcome (Twi)</string>
+    <string name="common_pronounce">Pronounce</string>
+    <string name="main_fun_fact_default">Ghana has over 80 languages! 🇬🇭</string>
 
     <!-- Parent Dashboard -->
     <string name="parent_dashboard_title">My Children</string>

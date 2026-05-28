@@ -499,6 +499,7 @@
                     android:padding="24dp">
 
                     <TextView
+                        android:id="@+id/tvGreeting"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:fontFamily="@font/agbalumo"
@@ -541,19 +542,6 @@
                         android:textColor="@color/textColorPrimary"
                         android:textSize="20sp" />
 
-                    <TextView
-                        android:id="@+id/tapToPlayHint"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="12dp"
-                        android:background="@drawable/bg_score_chip"
-                        android:paddingStart="16dp"
-                        android:paddingEnd="16dp"
-                        android:paddingTop="6dp"
-                        android:paddingBottom="6dp"
-                        android:text="@string/main_tap_hint"
-                        android:textColor="@color/textColorSecondary"
-                        android:textSize="12sp" />
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
 
@@ -684,16 +672,78 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="8dp"
-                        android:text="Ghana has over 80 languages! 🇬🇭"
+                        android:text="@string/main_fun_fact_default"
                         android:textSize="14sp"
                         android:textColor="@color/textColorPrimary"
                         android:lineSpacingExtra="2dp" />
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
 
+            <!-- Word of the Day Card -->
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/wordOfDayCard"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                app:cardCornerRadius="20dp"
+                app:cardElevation="4dp"
+                app:layout_constraintTop_toBottomOf="@id/funFactCard"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent">
 
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/bg_language_card"
+                    android:orientation="vertical"
+                    android:padding="16dp">
 
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/main_word_of_day_title"
+                        android:textSize="14sp"
+                        android:textColor="@color/textColorSecondary"
+                        android:textStyle="bold" />
 
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical"
+                        android:layout_marginTop="8dp">
+
+                        <TextView
+                            android:id="@+id/tvWordOfDay"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="@string/main_word_of_day_default"
+                            android:textSize="22sp"
+                            android:fontFamily="@font/agbalumo"
+                            android:textColor="@color/colorPrimary" />
+
+                        <ImageView
+                            android:id="@+id/btnPronounceWord"
+                            android:layout_width="32dp"
+                            android:layout_height="32dp"
+                            android:src="@android:drawable/ic_btn_speak_now"
+                            android:contentDescription="@string/common_pronounce"
+                            app:tint="@color/colorAccent"
+                            android:clickable="true"
+                            android:focusable="true" />
+                    </LinearLayout>
+
+                    <TextView
+                        android:id="@+id/tvWordMeaning"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="4dp"
+                        android:text="@string/main_word_of_day_meaning_default"
+                        android:textSize="14sp"
+                        android:textColor="@color/textColorSecondary" />
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
 
             <!-- Quick Stats Dashboard Card -->
             <com.google.android.material.card.MaterialCardView
@@ -703,7 +753,7 @@
                 android:layout_marginTop="16dp"
                 app:cardCornerRadius="20dp"
                 app:cardElevation="4dp"
-                app:layout_constraintTop_toBottomOf="@id/funFactCard"
+                app:layout_constraintTop_toBottomOf="@id/wordOfDayCard"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent">
 

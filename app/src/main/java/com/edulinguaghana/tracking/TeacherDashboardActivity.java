@@ -14,6 +14,7 @@ import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
@@ -28,6 +29,11 @@ import com.google.android.material.textfield.MaterialAutoCompleteTextView;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -59,6 +65,8 @@ public class TeacherDashboardActivity extends AppCompatActivity {
     private TextView tvTotalWeeklyQuizzes;
     private TextView tvTopPerformer;
     private TextView tvNeedsAttention;
+    private TextView tvFirstPlace, tvSecondPlace, tvThirdPlace;
+    private TextView tvPopularLanguage, tvEngagementRate;
 
     private RoleManager roleManager;
     private ProgressTracker progressTracker;
@@ -138,6 +146,11 @@ public class TeacherDashboardActivity extends AppCompatActivity {
         tvTotalWeeklyQuizzes = findViewById(R.id.tvTotalWeeklyQuizzes);
         tvTopPerformer = findViewById(R.id.tvTopPerformer);
         tvNeedsAttention = findViewById(R.id.tvNeedsAttention);
+        tvFirstPlace = findViewById(R.id.tvFirstPlace);
+        tvSecondPlace = findViewById(R.id.tvSecondPlace);
+        tvThirdPlace = findViewById(R.id.tvThirdPlace);
+        tvPopularLanguage = findViewById(R.id.tvPopularLanguage);
+        tvEngagementRate = findViewById(R.id.tvEngagementRate);
 
 
         if (btnAddFirstStudent != null) {
@@ -438,24 +451,71 @@ public class TeacherDashboardActivity extends AppCompatActivity {
     }
 
     private void generateClassReport() {
-        // In a real app, this would generate a PDF or CSV
-        // For now, we show a success message as a placeholder
-        Toast.makeText(this, R.string.teacher_dashboard_report_generated, Toast.LENGTH_LONG).show();
+        if (allStudents.isEmpty()) {
+            Toast.makeText(this, "No student data to export", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        StringBuilder csv = new StringBuilder();
+        csv.append("Student Name,Level,Total XP,Weekly Quizzes,Accuracy\n");
+        for (StudentProgressItem student : allStudents) {
+            ProgressAggregate p = student.getProgress();
+            csv.append(student.getStudentName()).append(",")
+               .append(p.getCurrentLevel()).append(",")
+               .append(p.getTotalXP()).append(",")
+               .append(p.getQuizzesThisWeek()).append(",")
+               .append(String.format(Locale.getDefault(), "%.1f%%", p.getAccuracy()))
+               .append("\n");
+        }
+
+        Intent intent = new Intent(Intent.ACTION_SEND);
+        intent.setType("text/plain");
+        intent.putExtra(Intent.EXTRA_SUBJECT, "Class Progress Report");
+        intent.putExtra(Intent.EXTRA_TEXT, csv.toString());
+        startActivity(Intent.createChooser(intent, "Share Report via"));
     }
 
     private void showBroadcastDialog() {
-        // In a real app, this would open a dialog to enter a message
-        // and then send a push notification to all students via Firebase
-        StyledMenuHelper.showStyledConfirmationDialog(
-            this,
-            "📢",
-            "Send Announcement",
-            "Would you like to send a reminder to all students to complete their daily lessons?",
-            "Send Now",
-            "Cancel",
-            () -> Toast.makeText(this, R.string.teacher_dashboard_broadcast_sent, Toast.LENGTH_SHORT).show(),
-            null
-        );
+        android.widget.EditText etMessage = new android.widget.EditText(this);
+        etMessage.setHint("Type your announcement here...");
+        int padding = (int) (16 * getResources().getDisplayMetrics().density);
+        android.widget.FrameLayout container = new android.widget.FrameLayout(this);
+        container.setPadding(padding, padding / 2, padding, 0);
+        container.addView(etMessage);
+
+        new androidx.appcompat.app.AlertDialog.Builder(this)
+            .setTitle("📢 Broadcast Announcement")
+            .setMessage("Send a message to all your students.")
+            .setView(container)
+            .setPositiveButton("Send", (dialog, which) -> {
+                String message = etMessage.getText().toString();
+                if (!message.isEmpty()) {
+                    sendBroadcast(message);
+                }
+            })
+            .setNegativeButton("Cancel", null)
+            .show();
+    }
+
+    private void sendBroadcast(String message) {
+        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+        if (user == null) return;
+
+        DatabaseReference announceRef = FirebaseDatabase.getInstance().getReference("announcements");
+        String announcementId = announceRef.push().getKey();
+        
+        java.util.Map<String, Object> announcement = new java.util.HashMap<>();
+        announcement.put("id", announcementId);
+        announcement.put("teacherId", user.getUid());
+        announcement.put("teacherName", user.getDisplayName() != null ? user.getDisplayName() : "Teacher");
+        announcement.put("message", message);
+        announcement.put("timestamp", System.currentTimeMillis());
+
+        if (announcementId != null) {
+            announceRef.child(announcementId).setValue(announcement)
+                .addOnSuccessListener(aVoid -> Toast.makeText(this, "Broadcast sent successfully!", Toast.LENGTH_SHORT).show())
+                .addOnFailureListener(e -> Toast.makeText(this, "Failed to send: " + e.getMessage(), Toast.LENGTH_SHORT).show());
+        }
     }
 
 
@@ -607,6 +667,75 @@ public class TeacherDashboardActivity extends AppCompatActivity {
                 tvNeedsAttention.setText(R.string.teacher_dashboard_all_good);
             }
         }
+
+        updateEngagementInsights(students);
+        updateLeaderboard(students);
+    }
+
+    private void updateEngagementInsights(List<StudentProgressItem> students) {
+        if (students.isEmpty()) return;
+
+        // Engagement Rate calculation
+        if (tvEngagementRate != null) {
+            int activeToday = 0;
+            long oneDayAgo = System.currentTimeMillis() - (24 * 60 * 60 * 1000);
+            for (StudentProgressItem s : students) {
+                if (s.getProgress().getLastUpdated() > oneDayAgo) activeToday++;
+            }
+
+            double ratio = (double) activeToday / students.size();
+            if (ratio > 0.7) {
+                tvEngagementRate.setText(R.string.teacher_dashboard_engagement_very_high);
+                tvEngagementRate.setTextColor(ContextCompat.getColor(this, R.color.correctAnswer));
+            } else if (ratio > 0.4) {
+                tvEngagementRate.setText(R.string.teacher_dashboard_engagement_high);
+                tvEngagementRate.setTextColor(ContextCompat.getColor(this, R.color.correctAnswer));
+            } else if (ratio > 0.1) {
+                tvEngagementRate.setText(R.string.teacher_dashboard_engagement_moderate);
+                tvEngagementRate.setTextColor(ContextCompat.getColor(this, R.color.colorAccent));
+            } else {
+                tvEngagementRate.setText(R.string.teacher_dashboard_engagement_low);
+                tvEngagementRate.setTextColor(ContextCompat.getColor(this, R.color.wrongAnswer));
+            }
+        }
+
+        // Popular Language (Mock or logic if available)
+        if (tvPopularLanguage != null) {
+            // Since we don't have language data yet, let's pick a default or common one
+            // In a real app, we'd aggregate metadata from ProgressActivity
+            tvPopularLanguage.setText("Twi");
+        }
+    }
+
+    private void updateLeaderboard(List<StudentProgressItem> students) {
+        if (students.isEmpty()) {
+            resetLeaderboard();
+            return;
+        }
+
+        // Sort by XP or Level
+        List<StudentProgressItem> sorted = new ArrayList<>(students);
+        Collections.sort(sorted, (a, b) -> {
+            int xpCompare = Integer.compare(b.getProgress().getTotalXP(), a.getProgress().getTotalXP());
+            if (xpCompare != 0) return xpCompare;
+            return Integer.compare(b.getProgress().getCurrentLevel(), a.getProgress().getCurrentLevel());
+        });
+
+        if (tvFirstPlace != null) {
+            tvFirstPlace.setText(!sorted.isEmpty() ? sorted.get(0).getStudentName() : "-");
+        }
+        if (tvSecondPlace != null) {
+            tvSecondPlace.setText(sorted.size() > 1 ? sorted.get(1).getStudentName() : "-");
+        }
+        if (tvThirdPlace != null) {
+            tvThirdPlace.setText(sorted.size() > 2 ? sorted.get(2).getStudentName() : "-");
+        }
+    }
+
+    private void resetLeaderboard() {
+        if (tvFirstPlace != null) tvFirstPlace.setText("-");
+        if (tvSecondPlace != null) tvSecondPlace.setText("-");
+        if (tvThirdPlace != null) tvThirdPlace.setText("-");
     }
 
     private int comparePerformance(StudentProgressItem a, StudentProgressItem b) {

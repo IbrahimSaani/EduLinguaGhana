@@ -176,6 +176,19 @@
         ".read": "auth != null && ($userId === auth.uid || root.child('relationships').child(auth.uid + '_' + $userId).child('status').val() === 'ACCEPTED')",
         ".write": "$userId === auth.uid && auth.token.email_verified === true"
       }
+    },
+    "app_config": {
+      ".read": "auth != null",
+      "word_of_the_day": {
+        ".write": "auth != null && root.child('users').child(auth.uid).child('role').val() === 'TEACHER'"
+      }
+    },
+    "announcements": {
+      ".read": "auth != null",
+      ".indexOn": ["teacherId", "timestamp"],
+      "$announcementId": {
+        ".write": "auth != null && root.child('users').child(auth.uid).child('role').val() === 'TEACHER' && newData.child('teacherId').val() === auth.uid"
+      }
     }
   }
 }
