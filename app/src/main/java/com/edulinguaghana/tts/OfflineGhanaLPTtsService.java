@@ -217,14 +217,23 @@ public class OfflineGhanaLPTtsService {
 
         // Replace special Ghanaian characters with descriptive names
         // These match the actual filenames in res/raw
-        result = result.replace("ɛ", "e_open")      // Open e (Ewe, Twi)
-                      .replace("ɔ", "o_open")       // Open o (Ewe, Twi)
-                      .replace("ɖ", "d_caron")      // D with hook (Ewe)
-                      .replace("ƒ", "f_hook")       // F with hook (Ewe)
-                      .replace("ɣ", "g_hook")       // G with hook (Ewe)
-                      .replace("ŋ", "ng")           // Engma/Ng (Ga, Ewe)
-                      .replace("ʋ", "v_hook")       // V with hook (Ewe)
-                      .replace("ɲ", "ny");          // Ny digraph
+        // Handling both upper and lower case just in case toLowerCase has issues
+        result = result.replace("ɛ", "e_open")
+                      .replace("Ɛ", "e_open")
+                      .replace("ɔ", "o_open")
+                      .replace("Ɔ", "o_open")
+                      .replace("ɖ", "d_caron")
+                      .replace("Ɖ", "d_caron")
+                      .replace("ƒ", "f_hook")
+                      .replace("Ƒ", "f_hook")
+                      .replace("ɣ", "g_hook")
+                      .replace("Ɣ", "g_hook")
+                      .replace("ŋ", "ng")
+                      .replace("Ŋ", "ng")
+                      .replace("ʋ", "v_hook")
+                      .replace("Ʋ", "v_hook")
+                      .replace("ɲ", "ny")
+                      .replace("Ɲ", "ny");
 
         // Replace diacritics
         result = result.replace("ã", "a")

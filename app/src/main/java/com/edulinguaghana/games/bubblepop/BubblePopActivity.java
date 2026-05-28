@@ -208,8 +208,8 @@ public class BubblePopActivity extends AppCompatActivity {
             if (status == TextToSpeech.SUCCESS) {
                 tts.setLanguage(LanguageConversionUtils.getLocaleForLanguage(languageCode));
                 isTtsReady = true;
-                // Speak first target once ready, only if it has been generated
-                if (targetLetter != null) {
+                // Only fallback speak here if NOT using offline TTS
+                if (targetLetter != null && !LanguageConversionUtils.isGhanaianLanguage(languageCode)) {
                     speakTarget(targetLetter);
                 }
             }
@@ -440,13 +440,30 @@ public class BubblePopActivity extends AppCompatActivity {
     private void speakTarget(String text) {
         if (text == null || text.trim().isEmpty()) return;
         
-        if (LanguageConversionUtils.isGhanaianLanguage(languageCode) && offlineTts != null) {
-            try {
-                offlineTts.speak(text, languageCode, null);
-            } catch (Exception e) {
-                android.util.Log.e("BubblePop", "Error with offline TTS", e);
+        // Add a slight delay to ensure it doesn't overlap too harshly with the pop sound
+        spawnHandler.postDelayed(() -> {
+            if (LanguageConversionUtils.isGhanaianLanguage(languageCode) && offlineTts != null) {
+                offlineTts.speak(text, languageCode, new OfflineGhanaLPTtsService.PlaybackCallback() {
+                    @Override
+                    public void onStart() {}
+
+                    @Override
+                    public void onComplete() {}
+
+                    @Override
+                    public void onError(String error) {
+                        android.util.Log.w("BubblePop", "Offline TTS failed, falling back: " + error);
+                        speakWithSystemTts(text);
+                    }
+                });
+            } else {
+                speakWithSystemTts(text);
             }
-        } else if (isTtsReady && tts != null) {
+        }, 150);
+    }
+
+    private void speakWithSystemTts(String text) {
+        if (isTtsReady && tts != null) {
             try {
                 tts.speak(text, TextToSpeech.QUEUE_FLUSH, null, "bubble_pop");
             } catch (Exception e) {
@@ -660,15 +677,10 @@ public class BubblePopActivity extends AppCompatActivity {
 
     private void popBubble(TextView bubble, boolean isCorrect) {
         if (isCorrect) {
-            // Gaming UI: Play pop sound
-            try {
-                MediaPlayer mp = MediaPlayer.create(this, R.raw.squash);
-                if (mp != null) {
-                    mp.setVolume(1.0f, 1.0f);
-                    mp.setOnCompletionListener(MediaPlayer::release);
-                    mp.start();
-                }
-            } catch (Exception ignored) {}
+            // Gaming UI: Play pop sound using SoundPool for better performance
+            if (soundPool != null) {
+                soundPool.play(soundPopId, 1.0f, 1.0f, 1, 0, 1.0f);
+            }
         } else {
             // Play wrong sound
             if (soundPool != null) soundPool.play(soundWrongId, 0.7f, 0.7f, 1, 0, 1.0f);
