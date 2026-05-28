@@ -25,6 +25,7 @@ public class SplashActivity extends AppCompatActivity {
     private ImageView ivLogo;
     private TextView tvAppNameSplash;
     private TextView tvTaglineSplash;
+    private TextView tvProgressPercentage;
     private ProgressBar progressBar;
     private LinearLayout progressContainer;
     private ValueAnimator progressAnimator;
@@ -59,6 +60,7 @@ public class SplashActivity extends AppCompatActivity {
         ivLogo = findViewById(R.id.ivLogo);
         tvAppNameSplash = findViewById(R.id.tvAppNameSplash);
         tvTaglineSplash = findViewById(R.id.tvTaglineSplash);
+        tvProgressPercentage = findViewById(R.id.tvProgressPercentage);
         progressBar = findViewById(R.id.progressBar);
         progressContainer = findViewById(R.id.progressContainer);
         progressSparkle = findViewById(R.id.progressSparkle);
@@ -334,6 +336,9 @@ public class SplashActivity extends AppCompatActivity {
         progressAnimator.addUpdateListener(animation -> {
             int progress = (int) animation.getAnimatedValue();
             progressBar.setProgress(progress);
+            if (tvProgressPercentage != null) {
+                tvProgressPercentage.setText(progress + "%");
+            }
             animateSparkle(progress);
         });
         progressAnimator.start();

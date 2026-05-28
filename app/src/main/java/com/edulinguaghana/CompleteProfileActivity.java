@@ -66,6 +66,29 @@ public class CompleteProfileActivity extends AppCompatActivity {
         loadCurrentRole();
         loadExistingProfileValues();
         setupListeners();
+        animateViews();
+    }
+
+    private void animateViews() {
+        android.view.View title = findViewById(R.id.tvTitle);
+        android.view.View subtitle = findViewById(R.id.tvSubtitle);
+        android.view.View form = findViewById(R.id.userInfoCard);
+        
+        if (title != null) {
+            title.setAlpha(0f);
+            title.setTranslationY(20f);
+            title.animate().alpha(1f).translationY(0f).setDuration(500).start();
+        }
+        if (subtitle != null) {
+            subtitle.setAlpha(0f);
+            subtitle.setTranslationY(20f);
+            subtitle.animate().alpha(1f).translationY(0f).setDuration(500).setStartDelay(100).start();
+        }
+        if (form != null) {
+            form.setAlpha(0f);
+            form.setTranslationY(40f);
+            form.animate().alpha(1f).translationY(0f).setDuration(600).setStartDelay(200).start();
+        }
     }
 
     private void initViews() {

@@ -92,12 +92,41 @@ public class LoginActivity extends AppCompatActivity {
             logo.startAnimation(logoAnim);
         }
 
+        // Animate decorative elements
+        android.view.View star = findViewById(R.id.decorStar1);
+        android.view.View circle = findViewById(R.id.decorCircle1);
+        android.view.View diamond = findViewById(R.id.decorDiamond1);
+
+        if (star != null) {
+            star.startAnimation(android.view.animation.AnimationUtils.loadAnimation(this, R.anim.star_twinkle));
+        }
+        if (circle != null) {
+            circle.startAnimation(android.view.animation.AnimationUtils.loadAnimation(this, R.anim.floating_element));
+        }
+        if (diamond != null) {
+            diamond.startAnimation(android.view.animation.AnimationUtils.loadAnimation(this, R.anim.floating_element));
+        }
+
         // Animate form card
         android.view.View formCard = findViewById(R.id.loginFormCard);
         if (formCard != null) {
             android.view.animation.Animation cardAnim = android.view.animation.AnimationUtils.loadAnimation(this, R.anim.slide_up_fade_in);
             cardAnim.setStartOffset(300);
             formCard.startAnimation(cardAnim);
+        }
+
+        // Animate Title and Subtitle
+        android.view.View title = findViewById(R.id.tvWelcomeTitle);
+        android.view.View subtitle = findViewById(R.id.tvSubtitle);
+        if (title != null) {
+            title.setAlpha(0f);
+            title.setTranslationY(30f);
+            title.animate().alpha(1f).translationY(0f).setDuration(500).setStartDelay(100).start();
+        }
+        if (subtitle != null) {
+            subtitle.setAlpha(0f);
+            subtitle.setTranslationY(30f);
+            subtitle.animate().alpha(1f).translationY(0f).setDuration(500).setStartDelay(200).start();
         }
     }
 
