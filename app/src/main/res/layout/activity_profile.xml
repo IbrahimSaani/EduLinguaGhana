@@ -701,7 +701,7 @@
                     android:layout_marginTop="16dp"
                     app:cardCornerRadius="24dp"
                     app:cardElevation="2dp"
-                    app:cardBackgroundColor="#F0F4C3">
+                    app:cardBackgroundColor="@color/syncCardBackground">
 
                     <LinearLayout
                         android:layout_width="match_parent"

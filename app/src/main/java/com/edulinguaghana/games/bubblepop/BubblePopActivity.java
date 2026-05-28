@@ -491,14 +491,26 @@ public class BubblePopActivity extends AppCompatActivity {
             // Ensure decoy is NOT the target letter
             int attempts = 0;
             do {
-                letter = alphabet[random.nextInt(alphabet.length)];
+                // Modified picking logic to increase special characters frequency for Ghanaian languages
+                if (LanguageConversionUtils.isGhanaianLanguage(languageCode) && random.nextFloat() < 0.45f) {
+                    String[] specials = LanguageConversionUtils.getSpecialCharactersForLanguage(languageCode);
+                    if (specials.length > 0) {
+                        letter = specials[random.nextInt(specials.length)];
+                    } else {
+                        letter = alphabet[random.nextInt(alphabet.length)];
+                    }
+                } else {
+                    letter = alphabet[random.nextInt(alphabet.length)];
+                }
                 attempts++;
             } while (letter.equals(targetLetter) && attempts < 10);
         }
         
         // Random bubble size
         int size = (int) (getResources().getDisplayMetrics().density * (75 + random.nextInt(25)));
+
         if (isTarget) size = (int) (size * 1.15f); // Make target bubbles 15% larger to help visibility
+
         
         final TextView bubble = new TextView(this);
         bubble.setText(letter);

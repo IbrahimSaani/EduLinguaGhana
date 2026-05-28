@@ -5,7 +5,7 @@
             <item android:top="4dp">
                 <shape android:shape="rectangle">
                     <corners android:radius="28dp" />
-                    <solid android:color="#D1C4E9" />
+                    <solid android:color="@color/modePracticeEnd" />
                 </shape>
             </item>
         </layer-list>
@@ -15,17 +15,17 @@
             <item android:top="8dp">
                 <shape android:shape="rectangle">
                     <corners android:radius="28dp" />
-                    <solid android:color="#9575CD" />
+                    <solid android:color="@color/modePracticeEnd" />
                 </shape>
             </item>
             <item android:bottom="8dp">
                 <shape android:shape="rectangle">
                     <corners android:radius="28dp" />
                     <gradient
-                        android:startColor="#EDE7F6"
-                        android:endColor="#D1C4E9"
+                        android:startColor="@color/modePracticeStart"
+                        android:endColor="@color/modePracticeEnd"
                         android:angle="0" />
-                    <stroke android:width="2dp" android:color="#FFFFFF" />
+                    <stroke android:width="2dp" android:color="@color/white" />
                 </shape>
             </item>
         </layer-list>

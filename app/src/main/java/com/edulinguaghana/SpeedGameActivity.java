@@ -315,7 +315,16 @@ public class SpeedGameActivity extends AppCompatActivity {
     // NEW: Generate letter question
     private void generateLetterQuestion() {
         Random rnd = new Random();
-        currentCorrectAnswer = alphabet[rnd.nextInt(alphabet.length)];
+        if (LanguageConversionUtils.isGhanaianLanguage(languageCode) && rnd.nextFloat() < 0.45f) {
+            String[] specials = LanguageConversionUtils.getSpecialCharactersForLanguage(languageCode);
+            if (specials.length > 0) {
+                currentCorrectAnswer = specials[rnd.nextInt(specials.length)];
+            } else {
+                currentCorrectAnswer = alphabet[rnd.nextInt(alphabet.length)];
+            }
+        } else {
+            currentCorrectAnswer = alphabet[rnd.nextInt(alphabet.length)];
+        }
 
         // Build 6 unique options
         List<String> options = new ArrayList<>();

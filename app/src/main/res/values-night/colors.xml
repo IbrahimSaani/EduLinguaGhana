@@ -46,14 +46,15 @@
     <color name="playfulHeroEnd">#4A148C</color>
     <color name="languageCardStart">#004D40</color>
     <color name="languageCardEnd">#1B5E20</color>
-    <color name="modeRecitalStart">#5D4037</color>
-    <color name="modeRecitalEnd">#6D4C41</color>
-    <color name="modePracticeStart">#4527A0</color>
-    <color name="modePracticeEnd">#6A1B9A</color>
-    <color name="modeQuizStart">#006064</color>
+    <color name="modeRecitalStart">#FF9800</color>
+    <color name="modeRecitalEnd">#E65100</color>
+    <color name="modePracticeStart">#7E57C2</color>
+    <color name="modePracticeEnd">#5E35B1</color>
+    <color name="modeQuizStart">#00ACC1</color>
     <color name="modeQuizEnd">#00838F</color>
-    <color name="modeProgressStart">#1B5E20</color>
+    <color name="modeProgressStart">#43A047</color>
     <color name="modeProgressEnd">#2E7D32</color>
+    <color name="syncCardBackground">#1B300F</color> <!-- Darker green for dark mode -->
     <color name="chipSurface">#2C2C2C</color>
     <color name="chipStroke">#424242</color>
 

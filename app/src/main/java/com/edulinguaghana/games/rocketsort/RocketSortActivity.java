@@ -352,7 +352,21 @@ public class RocketSortActivity extends AppCompatActivity {
         if (isGameOver || isPaused) return;
 
         boolean isLetter = random.nextBoolean();
-        String content = isLetter ? alphabet[random.nextInt(alphabet.length)] : numbers[random.nextInt(numbers.length)];
+        String content;
+        if (isLetter) {
+            if (LanguageConversionUtils.isGhanaianLanguage(languageCode) && random.nextFloat() < 0.45f) {
+                String[] specials = LanguageConversionUtils.getSpecialCharactersForLanguage(languageCode);
+                if (specials.length > 0) {
+                    content = specials[random.nextInt(specials.length)];
+                } else {
+                    content = alphabet[random.nextInt(alphabet.length)];
+                }
+            } else {
+                content = alphabet[random.nextInt(alphabet.length)];
+            }
+        } else {
+            content = numbers[random.nextInt(numbers.length)];
+        }
         
         int size = (int) (getResources().getDisplayMetrics().density * 80);
         final FrameLayout wrapper = new FrameLayout(this);

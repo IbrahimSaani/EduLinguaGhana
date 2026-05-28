@@ -5,7 +5,7 @@
             <item android:top="4dp">
                 <shape android:shape="rectangle">
                     <corners android:radius="28dp" />
-                    <solid android:color="#A5D6A7" />
+                    <solid android:color="@color/modeProgressEnd" />
                 </shape>
             </item>
         </layer-list>
@@ -15,17 +15,17 @@
             <item android:top="8dp">
                 <shape android:shape="rectangle">
                     <corners android:radius="28dp" />
-                    <solid android:color="#81C784" />
+                    <solid android:color="@color/modeProgressEnd" />
                 </shape>
             </item>
             <item android:bottom="8dp">
                 <shape android:shape="rectangle">
                     <corners android:radius="28dp" />
                     <gradient
-                        android:startColor="#C8E6C9"
-                        android:endColor="#A5D6A7"
+                        android:startColor="@color/modeProgressStart"
+                        android:endColor="@color/modeProgressEnd"
                         android:angle="0" />
-                    <stroke android:width="2dp" android:color="#FFFFFF" />
+                    <stroke android:width="2dp" android:color="@color/white" />
                 </shape>
             </item>
         </layer-list>

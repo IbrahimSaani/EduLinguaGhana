@@ -292,6 +292,23 @@ public class LanguageConversionUtils {
     }
 
     /**
+     * Gets special characters (diacritics) for a Ghanaian language
+     */
+    public static String[] getSpecialCharactersForLanguage(String langCode) {
+        String normalized = normalizeLanguageCode(langCode);
+        switch (normalized) {
+            case LANG_TWI:
+                return new String[]{"Ɛ", "Ɔ"};
+            case LANG_EWE:
+                return new String[]{"Ɖ", "Ɛ", "Ƒ", "Ɣ", "Ŋ", "Ɔ", "Ʋ"};
+            case LANG_GA:
+                return new String[]{"Ɛ", "Ŋ", "Ɔ"};
+            default:
+                return new String[]{};
+        }
+    }
+
+    /**
      * English alphabet (A-Z)
      */
     public static String[] getEnglishAlphabet() {

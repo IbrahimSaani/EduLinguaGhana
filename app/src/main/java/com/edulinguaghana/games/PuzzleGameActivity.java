@@ -181,7 +181,17 @@ public class PuzzleGameActivity extends AppCompatActivity {
         tvPrompt.setText(useNumbers ? "Match the numbers!" : "Match the letters!");
 
         while (selected.size() < PUZZLE_SIZE) {
-            String item = pool[r.nextInt(pool.length)];
+            String item;
+            if (!useNumbers && LanguageConversionUtils.isGhanaianLanguage(languageCode) && r.nextFloat() < 0.45f) {
+                String[] specials = LanguageConversionUtils.getSpecialCharactersForLanguage(languageCode);
+                if (specials.length > 0) {
+                    item = specials[r.nextInt(specials.length)];
+                } else {
+                    item = pool[r.nextInt(pool.length)];
+                }
+            } else {
+                item = pool[r.nextInt(pool.length)];
+            }
             if (!selected.contains(item)) selected.add(item);
         }
 

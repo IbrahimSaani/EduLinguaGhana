@@ -53,6 +53,7 @@
     <color name="modeQuizEnd">#80DEEA</color>
     <color name="modeProgressStart">#C8E6C9</color>
     <color name="modeProgressEnd">#A5D6A7</color>
+    <color name="syncCardBackground">#F0F4C3</color>
     <color name="chipSurface">#FFFFFFFF</color>
     <color name="chipStroke">#E0E0E0</color>
 
