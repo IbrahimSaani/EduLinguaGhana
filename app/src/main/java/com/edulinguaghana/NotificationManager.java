@@ -275,11 +275,17 @@ public class NotificationManager {
 
         // Check if user practiced today using PracticeTracker
         if (!PracticeTracker.hasPracticedToday(context)) {
-            // User hasn't practiced today
-            sendReminderNotification(
-                "Time to Practice! 📚",
-                "Don't break your streak! Complete a lesson today."
-            );
+            // Check if we already showed a reminder today
+            String todayStr = new java.text.SimpleDateFormat("yyyy-MM-dd", java.util.Locale.US).format(new java.util.Date());
+            String lastReminderDate = prefs.getString("LAST_REMINDER_DATE", "");
+            
+            if (!todayStr.equals(lastReminderDate)) {
+                sendReminderNotification(
+                    "Time to Practice! 📚",
+                    "Don't break your streak! Complete a lesson today."
+                );
+                prefs.edit().putString("LAST_REMINDER_DATE", todayStr).apply();
+            }
         }
     }
 

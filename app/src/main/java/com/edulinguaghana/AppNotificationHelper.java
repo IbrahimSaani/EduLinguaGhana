@@ -18,7 +18,7 @@ import androidx.core.app.NotificationManagerCompat;
  * Helper class for sending system-level local notifications (Reminders, Streaks, Achievements)
  */
 public class AppNotificationHelper {
-    private static final String CHANNEL_ID = "app_reminders";
+    public static final String CHANNEL_ID = "learning_notifications";
     private static final String CHANNEL_NAME = "Learning Reminders";
     private static final String CHANNEL_DESC = "Notifications for practice reminders, streaks, and achievements";
 

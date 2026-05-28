@@ -123,22 +123,31 @@ public class App extends Application {
     }
 
     /**
-     * Schedule the background notification worker to run once per day
+     * Schedule the background notification worker to run periodically
      */
     private void scheduleLearningNotificationWorker() {
+        // Create constraints: we want it to run when device is idle if possible, but not strictly required
+        androidx.work.Constraints constraints = new androidx.work.Constraints.Builder()
+                .setRequiredNetworkType(androidx.work.NetworkType.NOT_REQUIRED)
+                .setRequiresBatteryNotLow(false)
+                .build();
+
         // Create a periodic work request that runs daily
+        // We use a flex interval to allow the system to batch it
         PeriodicWorkRequest notificationWorkRequest =
                 new PeriodicWorkRequest.Builder(
                         LearningNotificationWorker.class,
-                        1,  // Interval value
-                        TimeUnit.DAYS  // Interval unit
+                        24, TimeUnit.HOURS,
+                        6, TimeUnit.HOURS // Flex interval
                 )
+                .setConstraints(constraints)
+                .addTag("learning_notifications_task")
                 .build();
 
-        // Schedule the work, replacing any existing work with the same tag
+        // Schedule the work, replacing any existing work to ensure new logic is applied
         WorkManager.getInstance(this).enqueueUniquePeriodicWork(
                 "learning_notifications",
-                ExistingPeriodicWorkPolicy.KEEP,  // Keep existing if already scheduled
+                ExistingPeriodicWorkPolicy.REPLACE,
                 notificationWorkRequest
         );
     }
