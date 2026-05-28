@@ -37,20 +37,20 @@
           ".write": "$userId === auth.uid && auth.token.email_verified === true"
         },
         "progress": {
-          ".read": "auth != null",
+          ".read": "auth != null && ($userId === auth.uid || root.child('relationships').child(auth.uid + '_' + $userId).child('status').val() === 'ACCEPTED')",
           ".write": "$userId === auth.uid"
         },
         "funGames": {
-          ".read": "auth != null",
+          ".read": "auth != null && ($userId === auth.uid || root.child('relationships').child(auth.uid + '_' + $userId).child('status').val() === 'ACCEPTED')",
           ".write": "$userId === auth.uid"
         }
       }
     },
     "friends": {
-      ".read": "auth != null && (query.orderByChild == 'userId' && query.equalTo == auth.uid || query.orderByChild == 'friendUserId' && query.equalTo == auth.uid || root.child('users').child(auth.uid).child('role').val() === 'TEACHER' || root.child('users').child(auth.uid).child('role').val() === 'PARENT')",
+      ".read": "auth != null && (query.orderByChild == 'userId' && query.equalTo == auth.uid || query.orderByChild == 'friendUserId' && query.equalTo == auth.uid)",
       ".indexOn": ["userId", "friendUserId", "status"],
       "$friendshipId": {
-        ".read": "auth != null && (data.child('userId').val() === auth.uid || data.child('friendUserId').val() === auth.uid || root.child('users').child(auth.uid).child('role').val() === 'TEACHER' || root.child('users').child(auth.uid).child('role').val() === 'PARENT')",
+        ".read": "auth != null && (data.child('userId').val() === auth.uid || data.child('friendUserId').val() === auth.uid)",
         ".write": "auth != null && auth.token.email_verified === true && ((!newData.exists() && (data.child('userId').val() === auth.uid || data.child('friendUserId').val() === auth.uid)) || (newData.exists() && (!data.exists() || data.child('userId').val() === auth.uid || data.child('friendUserId').val() === auth.uid) && (newData.child('userId').val() === auth.uid || newData.child('friendUserId').val() === auth.uid)))",
         ".validate": "newData.hasChildren(['userId', 'friendUserId', 'status'])"
       }
@@ -122,14 +122,14 @@
       ".read": "auth != null",
       ".indexOn": ["userId"],
       "$userId": {
-        ".read": "auth != null && ($userId === auth.uid || root.child('users').child(auth.uid).child('role').val() === 'TEACHER' || root.child('users').child(auth.uid).child('role').val() === 'PARENT')",
+        ".read": "auth != null && ($userId === auth.uid || root.child('relationships').child(auth.uid + '_' + $userId).child('status').val() === 'ACCEPTED')",
         ".write": "$userId === auth.uid",
         "activities": {
-          ".read": "auth != null && ($userId === auth.uid || root.child('users').child(auth.uid).child('role').val() === 'TEACHER' || root.child('users').child(auth.uid).child('role').val() === 'PARENT')",
+          ".read": "auth != null && ($userId === auth.uid || root.child('relationships').child(auth.uid + '_' + $userId).child('status').val() === 'ACCEPTED')",
           ".write": "$userId === auth.uid",
           ".indexOn": ["timestamp"],
           "$activityId": {
-            ".read": "auth != null && ($userId === auth.uid || root.child('users').child(auth.uid).child('role').val() === 'TEACHER' || root.child('users').child(auth.uid).child('role').val() === 'PARENT')",
+            ".read": "auth != null && ($userId === auth.uid || root.child('relationships').child(auth.uid + '_' + $userId).child('status').val() === 'ACCEPTED')",
             ".write": "$userId === auth.uid"
           }
         }
@@ -139,7 +139,7 @@
       ".read": "auth != null",
       ".indexOn": ["userId"],
       "$userId": {
-        ".read": "auth != null && ($userId === auth.uid || root.child('users').child(auth.uid).child('role').val() === 'TEACHER' || root.child('users').child(auth.uid).child('role').val() === 'PARENT')",
+        ".read": "auth != null && ($userId === auth.uid || root.child('relationships').child(auth.uid + '_' + $userId).child('status').val() === 'ACCEPTED')",
         ".write": "$userId === auth.uid",
         ".validate": "newData.hasChildren(['userId','total','bestScore']) || !newData.exists()"
       }
@@ -148,7 +148,7 @@
       ".read": "auth != null",
       ".indexOn": ["userId"],
       "$userId": {
-        ".read": "auth != null && ($userId === auth.uid || root.child('users').child(auth.uid).child('role').val() === 'TEACHER' || root.child('users').child(auth.uid).child('role').val() === 'PARENT')",
+        ".read": "auth != null && ($userId === auth.uid || root.child('relationships').child(auth.uid + '_' + $userId).child('status').val() === 'ACCEPTED')",
         ".write": "$userId === auth.uid && auth.token.email_verified === true"
       }
     },
@@ -161,10 +161,10 @@
       ".read": "auth != null && auth.token.email_verified === true",
       ".indexOn": ["userId"],
       "$userId": {
-        ".read": "auth != null && ($userId === auth.uid || root.child('users').child(auth.uid).child('role').val() === 'TEACHER' || root.child('users').child(auth.uid).child('role').val() === 'PARENT')",
+        ".read": "auth != null && ($userId === auth.uid || root.child('relationships').child(auth.uid + '_' + $userId).child('status').val() === 'ACCEPTED')",
         ".write": "$userId === auth.uid && auth.token.email_verified === true",
         "$milestoneId": {
-          ".read": "auth != null && ($userId === auth.uid || root.child('users').child(auth.uid).child('role').val() === 'TEACHER' || root.child('users').child(auth.uid).child('role').val() === 'PARENT')",
+          ".read": "auth != null && ($userId === auth.uid || root.child('relationships').child(auth.uid + '_' + $userId).child('status').val() === 'ACCEPTED')",
           ".write": "$userId === auth.uid && auth.token.email_verified === true"
         }
       }
@@ -173,7 +173,7 @@
       ".read": "auth != null && auth.token.email_verified === true",
       ".indexOn": ["userId"],
       "$userId": {
-        ".read": "auth != null && ($userId === auth.uid || root.child('users').child(auth.uid).child('role').val() === 'TEACHER' || root.child('users').child(auth.uid).child('role').val() === 'PARENT')",
+        ".read": "auth != null && ($userId === auth.uid || root.child('relationships').child(auth.uid + '_' + $userId).child('status').val() === 'ACCEPTED')",
         ".write": "$userId === auth.uid && auth.token.email_verified === true"
       }
     }

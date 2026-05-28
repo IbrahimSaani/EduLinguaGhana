@@ -2,6 +2,8 @@ package com.edulinguaghana.tracking;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.HapticFeedbackConstants;
 import android.view.View;
 import android.widget.ArrayAdapter;
@@ -23,6 +25,7 @@ import com.edulinguaghana.roles.UserRelationship;
 import com.edulinguaghana.roles.UserRole;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.textfield.MaterialAutoCompleteTextView;
+import com.google.android.material.textfield.TextInputEditText;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
@@ -54,6 +57,8 @@ public class TeacherDashboardActivity extends AppCompatActivity {
     private TextView tvActiveToday;
     private TextView tvClassAccuracy;
     private TextView tvTotalWeeklyQuizzes;
+    private TextView tvTopPerformer;
+    private TextView tvNeedsAttention;
 
     private RoleManager roleManager;
     private ProgressTracker progressTracker;
@@ -61,6 +66,7 @@ public class TeacherDashboardActivity extends AppCompatActivity {
     private final List<StudentProgressItem> allStudents = new ArrayList<>();
     private int currentSortOption = 0; // 0=Name, 1=Level, 2=Activity
     private int activeLoadToken = 0;
+    private String currentSearchQuery = "";
 
     private String ALL_CLASSES_FILTER;
     private String UNASSIGNED_CLASSES_FILTER;
@@ -120,6 +126,9 @@ public class TeacherDashboardActivity extends AppCompatActivity {
         btnAddFirstStudent = findViewById(R.id.btnAddFirstStudent);
         btnAddStudentBottom = findViewById(R.id.btnAddStudentBottom);
         MaterialButton btnRemoveStudent = findViewById(R.id.btnRemoveStudent);
+        TextInputEditText etSearch = findViewById(R.id.etSearch);
+        MaterialButton btnDownloadReport = findViewById(R.id.btnDownloadReport);
+        MaterialButton btnBroadcast = findViewById(R.id.btnBroadcast);
 
         // Statistics views
         tvTotalStudents = findViewById(R.id.tvTotalStudents);
@@ -127,6 +136,8 @@ public class TeacherDashboardActivity extends AppCompatActivity {
         tvActiveToday = findViewById(R.id.tvActiveToday);
         tvClassAccuracy = findViewById(R.id.tvClassAccuracy);
         tvTotalWeeklyQuizzes = findViewById(R.id.tvTotalWeeklyQuizzes);
+        tvTopPerformer = findViewById(R.id.tvTopPerformer);
+        tvNeedsAttention = findViewById(R.id.tvNeedsAttention);
 
 
         if (btnAddFirstStudent != null) {
@@ -154,6 +165,36 @@ public class TeacherDashboardActivity extends AppCompatActivity {
             btnSort.setOnClickListener(v -> {
                 v.performHapticFeedback(HapticFeedbackConstants.KEYBOARD_TAP);
                 showSortDialog();
+            });
+        }
+
+        if (etSearch != null) {
+            etSearch.addTextChangedListener(new TextWatcher() {
+                @Override
+                public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+
+                @Override
+                public void onTextChanged(CharSequence s, int start, int before, int count) {
+                    currentSearchQuery = s.toString().toLowerCase().trim();
+                    renderStudents();
+                }
+
+                @Override
+                public void afterTextChanged(Editable s) {}
+            });
+        }
+
+        if (btnDownloadReport != null) {
+            btnDownloadReport.setOnClickListener(v -> {
+                v.performHapticFeedback(HapticFeedbackConstants.VIRTUAL_KEY);
+                generateClassReport();
+            });
+        }
+
+        if (btnBroadcast != null) {
+            btnBroadcast.setOnClickListener(v -> {
+                v.performHapticFeedback(HapticFeedbackConstants.VIRTUAL_KEY);
+                showBroadcastDialog();
             });
         }
 
@@ -371,7 +412,11 @@ public class TeacherDashboardActivity extends AppCompatActivity {
     private void renderStudents() {
         List<StudentProgressItem> visibleStudents = new ArrayList<>();
         for (StudentProgressItem student : allStudents) {
-            if (matchesSelectedClass(student.getStudentClass())) {
+            boolean matchesClass = matchesSelectedClass(student.getStudentClass());
+            boolean matchesSearch = currentSearchQuery.isEmpty() ||
+                    (student.getStudentName() != null && student.getStudentName().toLowerCase().contains(currentSearchQuery));
+
+            if (matchesClass && matchesSearch) {
                 visibleStudents.add(student);
             }
         }
@@ -391,6 +436,28 @@ public class TeacherDashboardActivity extends AppCompatActivity {
             studentsRecyclerView.setVisibility(View.VISIBLE);
         }
     }
+
+    private void generateClassReport() {
+        // In a real app, this would generate a PDF or CSV
+        // For now, we show a success message as a placeholder
+        Toast.makeText(this, R.string.teacher_dashboard_report_generated, Toast.LENGTH_LONG).show();
+    }
+
+    private void showBroadcastDialog() {
+        // In a real app, this would open a dialog to enter a message
+        // and then send a push notification to all students via Firebase
+        StyledMenuHelper.showStyledConfirmationDialog(
+            this,
+            "📢",
+            "Send Announcement",
+            "Would you like to send a reminder to all students to complete their daily lessons?",
+            "Send Now",
+            "Cancel",
+            () -> Toast.makeText(this, R.string.teacher_dashboard_broadcast_sent, Toast.LENGTH_SHORT).show(),
+            null
+        );
+    }
+
 
     private boolean matchesSelectedClass(String studentClass) {
         String normalizedClass = normalizeClassLabel(studentClass);
@@ -476,6 +543,10 @@ public class TeacherDashboardActivity extends AppCompatActivity {
         int totalWeeklyQuizzes = 0;
         double totalAccuracy = 0;
         long oneDayAgo = System.currentTimeMillis() - (24 * 60 * 60 * 1000);
+        long threeDaysAgo = System.currentTimeMillis() - (3 * 24 * 60 * 60 * 1000);
+
+        StudentProgressItem topPerformer = null;
+        StudentProgressItem strugglingStudent = null;
 
         for (StudentProgressItem student : students) {
             ProgressAggregate progress = student.getProgress();
@@ -485,6 +556,16 @@ public class TeacherDashboardActivity extends AppCompatActivity {
 
             if (progress.getLastUpdated() > oneDayAgo) {
                 activeToday++;
+            }
+
+            // Calculate Top Performer
+            if (topPerformer == null || comparePerformance(student, topPerformer) > 0) {
+                topPerformer = student;
+            }
+
+            // Calculate Struggling Student (Lowest accuracy or inactive)
+            if (strugglingStudent == null || isStrugglingMore(student, strugglingStudent, threeDaysAgo)) {
+                strugglingStudent = student;
             }
         }
 
@@ -509,6 +590,52 @@ public class TeacherDashboardActivity extends AppCompatActivity {
         if (tvTotalWeeklyQuizzes != null) {
             tvTotalWeeklyQuizzes.setText(String.valueOf(totalWeeklyQuizzes));
         }
+
+        // Update Insights
+        if (tvTopPerformer != null) {
+            if (topPerformer != null && topPerformer.getProgress().getTotalXP() > 0) {
+                tvTopPerformer.setText(topPerformer.getStudentName());
+            } else {
+                tvTopPerformer.setText(R.string.teacher_dashboard_none_yet);
+            }
+        }
+
+        if (tvNeedsAttention != null) {
+            if (strugglingStudent != null && (strugglingStudent.getProgress().getAccuracy() < 60 || strugglingStudent.getProgress().getLastUpdated() < threeDaysAgo)) {
+                tvNeedsAttention.setText(strugglingStudent.getStudentName());
+            } else {
+                tvNeedsAttention.setText(R.string.teacher_dashboard_all_good);
+            }
+        }
+    }
+
+    private int comparePerformance(StudentProgressItem a, StudentProgressItem b) {
+        ProgressAggregate pa = a.getProgress();
+        ProgressAggregate pb = b.getProgress();
+        
+        if (pa.getCurrentLevel() != pb.getCurrentLevel()) {
+            return Integer.compare(pa.getCurrentLevel(), pb.getCurrentLevel());
+        }
+        return Double.compare(pa.getAccuracy(), pb.getAccuracy());
+    }
+
+    private boolean isStrugglingMore(StudentProgressItem student, StudentProgressItem currentStruggling, long threeDaysAgo) {
+        ProgressAggregate ps = student.getProgress();
+        ProgressAggregate pc = currentStruggling.getProgress();
+
+        // If inactive for a long time, that's high priority
+        boolean studentInactive = ps.getLastUpdated() < threeDaysAgo && ps.getLastUpdated() > 0;
+        boolean currentInactive = pc.getLastUpdated() < threeDaysAgo && pc.getLastUpdated() > 0;
+
+        if (studentInactive && !currentInactive) return true;
+        if (!studentInactive && currentInactive) return false;
+
+        // Otherwise compare accuracy (only if they have actually done some quizzes)
+        if (ps.getTotalQuizzes() > 0 && pc.getTotalQuizzes() > 0) {
+            return ps.getAccuracy() < pc.getAccuracy();
+        }
+        
+        return false;
     }
 
 

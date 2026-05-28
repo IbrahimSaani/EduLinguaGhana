@@ -175,8 +175,9 @@ public class RoleManager {
                                 return;
                             }
 
-                            // Create new relationship
-                            String relationshipId = java.util.UUID.randomUUID().toString();
+                            // Create new relationship with a predictable ID (supervisorId_studentId)
+                            // This allows for high-performance security rules in Firebase
+                            String relationshipId = supervisorId + "_" + studentId;
                             long now = System.currentTimeMillis();
 
                             UserRelationship relationship = new UserRelationship(

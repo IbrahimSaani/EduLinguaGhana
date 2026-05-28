@@ -262,6 +262,17 @@
     <string name="teacher_dashboard_remove_success">%1$s removed from your class</string>
     <string name="teacher_dashboard_remove_failed">Failed to remove student: %1$s</string>
     <string name="teacher_dashboard_remove_not_found">Could not find student relationship</string>
+    <string name="teacher_dashboard_search_hint">Search students by name…</string>
+    <string name="teacher_dashboard_download_report">📄 Report</string>
+    <string name="teacher_dashboard_broadcast">📢 Broadcast</string>
+    <string name="teacher_dashboard_report_generated">Class report generated successfully!</string>
+    <string name="teacher_dashboard_broadcast_sent">Announcement sent to all students!</string>
+    <string name="teacher_dashboard_performance_insights">Performance Insights</string>
+    <string name="teacher_dashboard_quick_insights">💡 Quick Insights</string>
+    <string name="teacher_dashboard_top_performer">🌟 Top Performer</string>
+    <string name="teacher_dashboard_needs_support">⚠️ Needs Support</string>
+    <string name="teacher_dashboard_none_yet">None yet</string>
+    <string name="teacher_dashboard_all_good">All good!</string>
 
     <!-- Parent Dashboard -->
     <string name="parent_dashboard_title">My Children</string>

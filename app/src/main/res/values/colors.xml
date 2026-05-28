@@ -96,4 +96,12 @@
     <color name="stoneBorder">#757575</color>
     <color name="drumRed">#C62828</color>
     <color name="drumGold">#F9A825</color>
+
+    <!-- Teacher Dashboard Insights -->
+    <color name="insightPositiveBackground">#E8F5E9</color>
+    <color name="insightPositiveStroke">#A5D6A7</color>
+    <color name="insightPositiveText">#2E7D32</color>
+    <color name="insightWarningBackground">#FFF3E0</color>
+    <color name="insightWarningStroke">#FFCC80</color>
+    <color name="insightWarningText">#E65100</color>
 </resources>
