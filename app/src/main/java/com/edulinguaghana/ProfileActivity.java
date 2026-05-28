@@ -823,7 +823,7 @@ public class ProfileActivity extends AppCompatActivity {
         }
     }
 
-    private void handleScannedQRCode(String scannedUserId) {
+    private void handleScannedQRCode(String scannedData) {
         FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
         if (currentUser == null) {
             Toast.makeText(this, "Please sign in first", Toast.LENGTH_SHORT).show();
@@ -831,9 +831,13 @@ public class ProfileActivity extends AppCompatActivity {
         }
 
         String currentUserId = currentUser.getUid();
+        
+        // Extract the actual user ID from the QR data (handles prefix)
+        String extractedId = com.edulinguaghana.social.QRCodeGenerator.extractUserId(scannedData);
+        final String scannedUserId = (extractedId != null) ? extractedId : scannedData;
 
         if (scannedUserId == null || scannedUserId.trim().isEmpty()) {
-            Toast.makeText(this, "Invalid QR code", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "Invalid QR code format", Toast.LENGTH_SHORT).show();
             return;
         }
 

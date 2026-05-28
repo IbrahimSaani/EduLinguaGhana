@@ -44,82 +44,117 @@ public class FriendSuggestionEngine {
      * - Similar learning progress
      */
     public static void getSuggestions(String currentUserId, SuggestionCallback callback) {
-        DatabaseReference usersRef = FirebaseDatabase.getInstance().getReference("users");
+        DatabaseReference database = FirebaseDatabase.getInstance().getReference();
+        DatabaseReference usersRef = database.child("users");
+        DatabaseReference friendsRef = database.child("friends");
 
-        // First, get current user's profile
-        usersRef.child(currentUserId).addListenerForSingleValueEvent(new ValueEventListener() {
+        // First, get current user's friends to exclude them
+        friendsRef.orderByChild("userId").equalTo(currentUserId).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
-            public void onDataChange(DataSnapshot currentUserSnapshot) {
-                if (!currentUserSnapshot.exists()) {
-                    callback.onError("User profile not found");
-                    return;
+            public void onDataChange(DataSnapshot friendsSnapshot1) {
+                final List<String> existingFriendIds = new ArrayList<>();
+                for (DataSnapshot snapshot : friendsSnapshot1.getChildren()) {
+                    String friendId = snapshot.child("friendUserId").getValue(String.class);
+                    if (friendId != null) existingFriendIds.add(friendId);
                 }
 
-                // Get current user's interests/stats
-                String currentUserLanguage = currentUserSnapshot.child("favoriteLanguage").getValue(String.class);
-                Integer currentUserLevel = currentUserSnapshot.child("level").getValue(Integer.class);
-
-                // Now get all other users
-                usersRef.addListenerForSingleValueEvent(new ValueEventListener() {
+                // Also check where current user is the 'friendUserId'
+                friendsRef.orderByChild("friendUserId").equalTo(currentUserId).addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
-                    public void onDataChange(DataSnapshot allUsersSnapshot) {
-                        List<UserSuggestion> suggestions = new ArrayList<>();
+                    public void onDataChange(DataSnapshot friendsSnapshot2) {
+                        for (DataSnapshot snapshot : friendsSnapshot2.getChildren()) {
+                            String friendId = snapshot.child("userId").getValue(String.class);
+                            if (friendId != null) existingFriendIds.add(friendId);
+                        }
 
-                        for (DataSnapshot userSnapshot : allUsersSnapshot.getChildren()) {
-                            String userId = userSnapshot.getKey();
-
-                            // Skip current user
-                            if (userId.equals(currentUserId)) continue;
-
-                            String username = userSnapshot.child("username").getValue(String.class);
-                            String displayName = userSnapshot.child("displayName").getValue(String.class);
-                            String email = userSnapshot.child("email").getValue(String.class);
-                            String favoriteLanguage = userSnapshot.child("favoriteLanguage").getValue(String.class);
-                            Integer level = userSnapshot.child("level").getValue(Integer.class);
-
-                            String name = displayName != null ? displayName :
-                                        (username != null ? username : email);
-
-                            UserSuggestion suggestion = new UserSuggestion(userId, name, email);
-
-                            // Calculate match score
-                            int matchScore = 0;
-
-                            // Same favorite language (+30 points)
-                            if (currentUserLanguage != null && currentUserLanguage.equals(favoriteLanguage)) {
-                                matchScore += 30;
-                                suggestion.commonInterests.add("Learning " + favoriteLanguage);
-                            }
-
-                            // Similar level (+20 points if within 3 levels)
-                            if (currentUserLevel != null && level != null) {
-                                int levelDiff = Math.abs(currentUserLevel - level);
-                                if (levelDiff <= 3) {
-                                    matchScore += 20 - (levelDiff * 5);
-                                    suggestion.commonInterests.add("Level " + level);
+                        // Now get current user's profile
+                        usersRef.child(currentUserId).addListenerForSingleValueEvent(new ValueEventListener() {
+                            @Override
+                            public void onDataChange(DataSnapshot currentUserSnapshot) {
+                                if (!currentUserSnapshot.exists()) {
+                                    callback.onError("User profile not found");
+                                    return;
                                 }
+
+                                // Get current user's interests/stats
+                                String currentUserLanguage = currentUserSnapshot.child("favoriteLanguage").getValue(String.class);
+                                Integer currentUserLevel = currentUserSnapshot.child("level").getValue(Integer.class);
+
+                                // Now get all other users
+                                usersRef.addListenerForSingleValueEvent(new ValueEventListener() {
+                                    @Override
+                                    public void onDataChange(DataSnapshot allUsersSnapshot) {
+                                        List<UserSuggestion> suggestions = new ArrayList<>();
+
+                                        for (DataSnapshot userSnapshot : allUsersSnapshot.getChildren()) {
+                                            String userId = userSnapshot.getKey();
+
+                                            // Skip current user and existing friends
+                                            if (userId == null || userId.equals(currentUserId) || existingFriendIds.contains(userId)) continue;
+
+                                            String username = userSnapshot.child("username").getValue(String.class);
+                                            String displayName = userSnapshot.child("displayName").getValue(String.class);
+                                            String email = userSnapshot.child("email").getValue(String.class);
+                                            String favoriteLanguage = userSnapshot.child("favoriteLanguage").getValue(String.class);
+                                            Integer level = userSnapshot.child("level").getValue(Integer.class);
+
+                                            String name = displayName != null ? displayName :
+                                                        (username != null ? username : email);
+
+                                            UserSuggestion suggestion = new UserSuggestion(userId, name, email);
+
+                                            // Calculate match score
+                                            int matchScore = 0;
+
+                                            // Same favorite language (+30 points)
+                                            if (currentUserLanguage != null && currentUserLanguage.equals(favoriteLanguage)) {
+                                                matchScore += 30;
+                                                suggestion.commonInterests.add("Learning " + favoriteLanguage);
+                                            }
+
+                                            // Similar level (+20 points if within 3 levels)
+                                            if (currentUserLevel != null && level != null) {
+                                                int levelDiff = Math.abs(currentUserLevel - level);
+                                                if (levelDiff <= 3) {
+                                                    matchScore += 20 - (levelDiff * 5);
+                                                    suggestion.commonInterests.add("Level " + level);
+                                                }
+                                            }
+
+                                            // Add random variety (+10 points base for any user)
+                                            matchScore += 10;
+
+                                            suggestion.matchScore = matchScore;
+
+                                            // Only suggest users with match score > 15
+                                            if (matchScore > 15) {
+                                                suggestions.add(suggestion);
+                                            }
+                                        }
+
+                                        // Sort by match score (highest first)
+                                        java.util.Collections.sort(suggestions, (a, b) -> Integer.compare(b.matchScore, a.matchScore));
+
+                                        // Limit to top 10
+                                        if (suggestions.size() > 10) {
+                                            suggestions = new ArrayList<>(suggestions.subList(0, 10));
+                                        }
+
+                                        callback.onSuggestionsReady(suggestions);
+                                    }
+
+                                    @Override
+                                    public void onCancelled(DatabaseError error) {
+                                        callback.onError(error.getMessage());
+                                    }
+                                });
                             }
 
-                            // Add random variety (+10 points base for any user)
-                            matchScore += 10;
-
-                            suggestion.matchScore = matchScore;
-
-                            // Only suggest users with match score > 15
-                            if (matchScore > 15) {
-                                suggestions.add(suggestion);
+                            @Override
+                            public void onCancelled(DatabaseError error) {
+                                callback.onError(error.getMessage());
                             }
-                        }
-
-                        // Sort by match score (highest first)
-                        java.util.Collections.sort(suggestions, (a, b) -> Integer.compare(b.matchScore, a.matchScore));
-
-                        // Limit to top 10
-                        if (suggestions.size() > 10) {
-                            suggestions = suggestions.subList(0, 10);
-                        }
-
-                        callback.onSuggestionsReady(suggestions);
+                        });
                     }
 
                     @Override
