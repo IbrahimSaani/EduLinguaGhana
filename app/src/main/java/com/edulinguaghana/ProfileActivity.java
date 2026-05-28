@@ -32,6 +32,7 @@ import java.util.Calendar;
 import com.edulinguaghana.gamification.XPManager;
 import com.edulinguaghana.gamification.XPState;
 import com.edulinguaghana.roles.RoleManager;
+import com.edulinguaghana.roles.UserRole;
 import com.edulinguaghana.social.SocialProvider;
 import com.edulinguaghana.social.SocialRepository;
 import com.edulinguaghana.social.service.FriendService;
@@ -61,6 +62,7 @@ public class ProfileActivity extends AppCompatActivity {
     private ImageView ivBadgesPreview;
     private View achievementsCard;
     private View lessonsSection;
+    private View learnerDetailsCard;
     private AvatarView profileImage, avatarNotSignedIn;
     private MaterialButton btnAddFriend, btnChallengeFriend;
     private SearchHistory searchHistory;
@@ -143,6 +145,7 @@ public class ProfileActivity extends AppCompatActivity {
         ivBadgesPreview = findViewById(R.id.iv_badges_preview);
         achievementsCard = findViewById(R.id.achievementsCard);
         lessonsSection = findViewById(R.id.lessonsSection);
+        learnerDetailsCard = findViewById(R.id.learnerDetailsCard);
     }
 
     /**
@@ -274,6 +277,9 @@ public class ProfileActivity extends AppCompatActivity {
 
             // Load learner profile details
             loadLearnerProfileDetails(currentUserId);
+            
+            // Check role and hide learner details if necessary
+            checkRoleAndConfigureUi(currentUserId);
 
             // Update sync status
             updateSyncStatus();
@@ -434,6 +440,31 @@ public class ProfileActivity extends AppCompatActivity {
                 FirebaseUser user = mAuth.getCurrentUser();
                 if (user != null) loadLearnerProfileDetails(user.getUid());
             });
+        });
+    }
+
+    private void checkRoleAndConfigureUi(String userId) {
+        if (userId == null) return;
+        
+        RoleManager rm = new RoleManager();
+        rm.getUserRole(this, userId, new RoleManager.RoleCallback() {
+            @Override
+            public void onRoleRetrieved(UserRole role) {
+                runOnUiThread(() -> {
+                    if (learnerDetailsCard != null) {
+                        if (role == UserRole.TEACHER || role == UserRole.PARENT) {
+                            learnerDetailsCard.setVisibility(View.GONE);
+                        } else {
+                            learnerDetailsCard.setVisibility(View.VISIBLE);
+                        }
+                    }
+                });
+            }
+
+            @Override
+            public void onError(String error) {
+                // Default to showing if error occurs or assume student
+            }
         });
     }
 
