@@ -24,6 +24,8 @@ public class ProgressActivity extends AppCompatActivity {
 
     private static final String TAG = "ProgressActivity";
     private TextView tvStatHighScore, tvStatTotalQuizzes, tvStatTotalCorrect, tvStatTotalGames, tvStatAccuracy, tvAchievements;
+    private TextView tvCurrentLevelBadge, tvLevelName, tvXpToNextLevel, tvCurrentXP, tvTargetXP;
+    private com.google.android.material.progressindicator.LinearProgressIndicator progressLevel;
     private MaterialButton btnCloseProgress, btnShareProgress;
     private CircularProgressIndicator progressAccuracy;
     private MaterialToolbar toolbar;
@@ -55,6 +57,14 @@ public class ProgressActivity extends AppCompatActivity {
         cardStats          = findViewById(R.id.cardStats);
         cardAccuracy       = findViewById(R.id.cardAccuracy);
         cardAchievements   = findViewById(R.id.cardAchievements);
+
+        // Level views
+        tvCurrentLevelBadge = findViewById(R.id.tvCurrentLevelBadge);
+        tvLevelName         = findViewById(R.id.tvLevelName);
+        tvXpToNextLevel     = findViewById(R.id.tvXpToNextLevel);
+        tvCurrentXP         = findViewById(R.id.tvCurrentXP);
+        tvTargetXP          = findViewById(R.id.tvTargetXP);
+        progressLevel       = findViewById(R.id.progressLevel);
 
         // Show cards immediately (no animation)
         cardStats.setVisibility(View.VISIBLE);
@@ -197,6 +207,31 @@ public class ProgressActivity extends AppCompatActivity {
         else if (level == 3) { nextLevelTarget = 70; }
         else if (level == 2) { nextLevelTarget = 40; }
         else { nextLevelTarget = 20; }
+
+        int prevLevelTarget = 0;
+        if (level == 5) prevLevelTarget = 100;
+        else if (level == 4) prevLevelTarget = 70;
+        else if (level == 3) prevLevelTarget = 40;
+        else if (level == 2) prevLevelTarget = 20;
+
+        // Update Level Card
+        if (tvCurrentLevelBadge != null) tvCurrentLevelBadge.setText(String.valueOf(level));
+        if (tvLevelName != null) tvLevelName.setText(levelName);
+        if (tvCurrentXP != null) tvCurrentXP.setText(totalCorrect + " XP"); // Using correct answers as XP for simplicity
+        
+        if (nextLevelTarget > 0) {
+            int remaining = nextLevelTarget - totalCorrect;
+            if (tvXpToNextLevel != null) tvXpToNextLevel.setText(remaining + " more correct answers to Level " + (level + 1));
+            if (tvTargetXP != null) tvTargetXP.setText(nextLevelTarget + " XP");
+            if (progressLevel != null) {
+                int progress = (int) (((float)(totalCorrect - prevLevelTarget) / (nextLevelTarget - prevLevelTarget)) * 100);
+                progressLevel.setProgressCompat(Math.max(0, progress), true);
+            }
+        } else {
+            if (tvXpToNextLevel != null) tvXpToNextLevel.setText("Highest Level Reached! 👑");
+            if (tvTargetXP != null) tvTargetXP.setText("MAX");
+            if (progressLevel != null) progressLevel.setProgressCompat(100, true);
+        }
 
         String achievementText;
         if (totalQuizzes == 0) {

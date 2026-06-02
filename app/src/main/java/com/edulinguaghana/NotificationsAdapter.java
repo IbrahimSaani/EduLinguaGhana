@@ -57,23 +57,58 @@ public class NotificationsAdapter extends RecyclerView.Adapter<NotificationsAdap
         );
         holder.tvTime.setText(timeAgo);
 
+        // Background color based on type
+        int bgColor;
+        int emojiBgColor;
+        
+        switch (notification.getType()) {
+            case ACHIEVEMENT:
+                bgColor = ContextCompat.getColor(context, R.color.notification_achievement_bg);
+                emojiBgColor = ContextCompat.getColor(context, R.color.modeRecitalStart);
+                break;
+            case MILESTONE:
+                bgColor = ContextCompat.getColor(context, R.color.notification_milestone_bg);
+                emojiBgColor = ContextCompat.getColor(context, R.color.modeQuizStart);
+                break;
+            case STREAK:
+                bgColor = ContextCompat.getColor(context, R.color.notification_streak_bg);
+                emojiBgColor = ContextCompat.getColor(context, R.color.wrongAnswer);
+                break;
+            case MOTIVATIONAL:
+                bgColor = ContextCompat.getColor(context, R.color.notification_motivational_bg);
+                emojiBgColor = ContextCompat.getColor(context, R.color.modePracticeStart);
+                break;
+            case REMINDER:
+                bgColor = ContextCompat.getColor(context, R.color.notification_reminder_bg);
+                emojiBgColor = ContextCompat.getColor(context, R.color.correctAnswer);
+                break;
+            default:
+                bgColor = ContextCompat.getColor(context, R.color.cardBackground);
+                emojiBgColor = ContextCompat.getColor(context, R.color.colorPrimaryLight);
+                break;
+        }
+
         // Styling based on unread status
         if (notification.isRead()) {
             holder.cardView.setCardElevation(2f);
             holder.cardView.setStrokeColor(ContextCompat.getColor(context, R.color.dividerColor));
+            holder.cardView.setCardBackgroundColor(ContextCompat.getColor(context, R.color.cardBackground));
             holder.unreadDot.setVisibility(View.GONE);
             holder.tvNewTag.setVisibility(View.GONE);
             holder.tvTitle.setAlpha(0.7f);
             holder.tvMessage.setAlpha(0.7f);
             holder.emojiBg.setAlpha(0.5f);
+            holder.emojiBg.setCardBackgroundColor(ContextCompat.getColor(context, R.color.dividerColor));
         } else {
             holder.cardView.setCardElevation(6f);
-            holder.cardView.setStrokeColor(ContextCompat.getColor(context, R.color.colorPrimary));
+            holder.cardView.setStrokeColor(emojiBgColor);
+            holder.cardView.setCardBackgroundColor(bgColor);
             holder.unreadDot.setVisibility(View.VISIBLE);
             holder.tvNewTag.setVisibility(View.VISIBLE);
             holder.tvTitle.setAlpha(1.0f);
             holder.tvMessage.setAlpha(1.0f);
             holder.emojiBg.setAlpha(1.0f);
+            holder.emojiBg.setCardBackgroundColor(emojiBgColor);
             
             // Pulse animation for the "NEW" tag
             holder.tvNewTag.setScaleX(0.8f);
@@ -85,36 +120,6 @@ public class NotificationsAdapter extends RecyclerView.Adapter<NotificationsAdap
                 .setInterpolator(new android.view.animation.CycleInterpolator(1))
                 .start();
         }
-
-        // Background color for emoji bubble based on type
-        int emojiBgColor;
-        switch (notification.getType()) {
-            case ACHIEVEMENT:
-                emojiBgColor = ContextCompat.getColor(context, R.color.notification_achievement_bg);
-                break;
-            case MILESTONE:
-                emojiBgColor = ContextCompat.getColor(context, R.color.notification_milestone_bg);
-                break;
-            case STREAK:
-                emojiBgColor = ContextCompat.getColor(context, R.color.notification_streak_bg);
-                break;
-            case MOTIVATIONAL:
-                emojiBgColor = ContextCompat.getColor(context, R.color.notification_motivational_bg);
-                break;
-            case REMINDER:
-                emojiBgColor = ContextCompat.getColor(context, R.color.notification_reminder_bg);
-                break;
-            case NEW_CONTENT:
-                emojiBgColor = ContextCompat.getColor(context, R.color.notification_milestone_bg);
-                break;
-            case SYSTEM:
-                emojiBgColor = ContextCompat.getColor(context, R.color.colorPrimaryLight);
-                break;
-            default:
-                emojiBgColor = ContextCompat.getColor(context, R.color.colorPrimaryLight);
-                break;
-        }
-        holder.emojiBg.setCardBackgroundColor(emojiBgColor);
 
         // Click listeners
         holder.cardView.setOnClickListener(v -> {

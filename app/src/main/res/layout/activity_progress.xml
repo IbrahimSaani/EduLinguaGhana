@@ -41,6 +41,119 @@
             android:orientation="vertical"
             android:padding="16dp">
 
+            <!-- Level Progress Card -->
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/cardLevelProgress"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp"
+                app:cardCornerRadius="24dp"
+                app:cardElevation="8dp"
+                app:strokeWidth="0dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/bg_hero_glow"
+                    android:orientation="vertical"
+                    android:padding="24dp">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical">
+
+                        <com.google.android.material.card.MaterialCardView
+                            android:layout_width="64dp"
+                            android:layout_height="64dp"
+                            app:cardCornerRadius="32dp"
+                            app:cardElevation="4dp"
+                            app:cardBackgroundColor="@color/white">
+                            <TextView
+                                android:id="@+id/tvCurrentLevelBadge"
+                                android:layout_width="match_parent"
+                                android:layout_height="match_parent"
+                                android:gravity="center"
+                                android:text="1"
+                                android:textSize="28sp"
+                                android:textStyle="bold"
+                                android:textColor="@color/colorPrimary"
+                                android:fontFamily="@font/agbalumo" />
+                        </com.google.android.material.card.MaterialCardView>
+
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:layout_marginStart="16dp"
+                            android:orientation="vertical">
+
+                            <TextView
+                                android:id="@+id/tvLevelName"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Beginner Explorer"
+                                android:textSize="20sp"
+                                android:textStyle="bold"
+                                android:textColor="@color/colorPrimary"
+                                android:fontFamily="@font/agbalumo" />
+
+                            <TextView
+                                android:id="@+id/tvXpToNextLevel"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="250 XP to Level 2"
+                                android:textSize="13sp"
+                                android:textColor="@color/textColorSecondary"
+                                android:alpha="0.8" />
+                        </LinearLayout>
+
+                    </LinearLayout>
+
+                    <com.google.android.material.progressindicator.LinearProgressIndicator
+                        android:id="@+id/progressLevel"
+                        android:layout_width="match_parent"
+                        android:layout_height="12dp"
+                        android:layout_marginTop="20dp"
+                        app:trackThickness="12dp"
+                        app:trackCornerRadius="6dp"
+                        app:trackColor="#E0E0E0"
+                        app:indicatorColor="@color/colorPrimary"
+                        android:progress="40" />
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="8dp"
+                        android:orientation="horizontal">
+
+                        <TextView
+                            android:id="@+id/tvCurrentXP"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="150 XP"
+                            android:textSize="12sp"
+                            android:textStyle="bold"
+                            android:textColor="@color/colorPrimary" />
+
+                        <View
+                            android:layout_width="0dp"
+                            android:layout_height="0dp"
+                            android:layout_weight="1" />
+
+                        <TextView
+                            android:id="@+id/tvTargetXP"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="400 XP"
+                            android:textSize="12sp"
+                            android:textColor="@color/textColorSecondary" />
+                    </LinearLayout>
+
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
             <!-- Statistics Card -->
             <com.google.android.material.card.MaterialCardView
                 android:id="@+id/cardStats"

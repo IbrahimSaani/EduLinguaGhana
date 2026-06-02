@@ -17,8 +17,8 @@ android {
         applicationId = "com.edulinguaghana"
         minSdk = 23
         targetSdk = 35
-        versionCode = 5
-        versionName = "1.0.4"
+        versionCode = 6
+        versionName = "1.0.5"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
@@ -55,12 +55,17 @@ android {
             firebaseAppDistribution {
                 appId = "1:340016497126:android:36b6e04f90691927389627"
                 testers = "ibrahimsaani41@gmail.com, quistkelvin32@gmail.com, 41jamesanderson@gmail.com, lovejoycelyn32@gmail.com, rhozaselorm@gmail.com, selormeyphinegad@gmail.com, ucheemmauel539@gmail.com, jnrhoshea@gmail.com, asiedudennis30@gmail.com"
-                releaseNotes = "Recent updates and bug fixes for testing."
+                releaseNotes = "minor fixes and improvements for testing purposes."
             }
         }
         create("beta") {
             initWith(getByName("release"))
             matchingFallbacks += listOf("release")
+            firebaseAppDistribution {
+                appId = "1:340016497126:android:36b6e04f90691927389627"
+                testers = "ibrahimsaani41@gmail.com, quistkelvin32@gmail.com, 41jamesanderson@gmail.com, lovejoycelyn32@gmail.com, rhozaselorm@gmail.com, selormeyphinegad@gmail.com, ucheemmauel539@gmail.com, jnrhoshea@gmail.com, asiedudennis30@gmail.com"
+                releaseNotes = "minor fixes and improvements for testing purposes."
+            }
         }
     }
     compileOptions {

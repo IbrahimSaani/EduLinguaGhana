@@ -476,45 +476,128 @@ public class TeacherDashboardActivity extends AppCompatActivity {
     }
 
     private void showBroadcastDialog() {
-        android.widget.EditText etMessage = new android.widget.EditText(this);
-        etMessage.setHint("Type your announcement here...");
-        int padding = (int) (16 * getResources().getDisplayMetrics().density);
-        android.widget.FrameLayout container = new android.widget.FrameLayout(this);
-        container.setPadding(padding, padding / 2, padding, 0);
-        container.addView(etMessage);
+        List<StyledMenuHelper.MenuItem> menuItems = new ArrayList<>();
 
-        new androidx.appcompat.app.AlertDialog.Builder(this)
-            .setTitle("📢 Broadcast Announcement")
-            .setMessage("Send a message to all your students.")
-            .setView(container)
-            .setPositiveButton("Send", (dialog, which) -> {
-                String message = etMessage.getText().toString();
-                if (!message.isEmpty()) {
-                    sendBroadcast(message);
-                }
-            })
-            .setNegativeButton("Cancel", null)
-            .show();
+        menuItems.add(new StyledMenuHelper.MenuItem(
+                "📢",
+                "Broadcast to All Students",
+                "Send an announcement to everyone in your class list.",
+                () -> showComposeBroadcastDialog("ALL", null)
+        ));
+
+        // Get list of unique classes from current students
+        java.util.Set<String> classes = new java.util.HashSet<>();
+        for (StudentProgressItem s : allStudents) {
+            if (s.getStudentClass() != null && !s.getStudentClass().isEmpty()) {
+                classes.add(s.getStudentClass());
+            }
+        }
+
+        if (!classes.isEmpty()) {
+            menuItems.add(new StyledMenuHelper.MenuItem("🏫", "Broadcast to Class", "SECTION_HEADER", null));
+            for (String className : classes) {
+                menuItems.add(new StyledMenuHelper.MenuItem(
+                        "🏫",
+                        "Class: " + className,
+                        "Send to all students in " + className,
+                        () -> showComposeBroadcastDialog("CLASS", className)
+                ));
+            }
+        }
+
+        if (!allStudents.isEmpty()) {
+            menuItems.add(new StyledMenuHelper.MenuItem("👤", "Message Individual Student", "SECTION_HEADER", null));
+            for (StudentProgressItem student : allStudents) {
+                menuItems.add(new StyledMenuHelper.MenuItem(
+                        "👤",
+                        student.getStudentName(),
+                        "Send a private message to this student",
+                        () -> showComposeBroadcastDialog("STUDENT", student.getStudentId())
+                ));
+            }
+        }
+
+        StyledMenuHelper.showStyledMenu(
+                this,
+                "📢",
+                "Broadcast Announcement",
+                "Choose who should receive your message.",
+                menuItems,
+                null
+        );
     }
 
-    private void sendBroadcast(String message) {
+    private void showComposeBroadcastDialog(String type, String targetId) {
+        android.widget.EditText etMessage = new android.widget.EditText(this);
+        etMessage.setHint("Type your message here...");
+        etMessage.setMinLines(3);
+        etMessage.setGravity(android.view.Gravity.TOP);
+
+        String title = "Send Broadcast";
+        String subtitle = "Sending to all students";
+
+        if ("CLASS".equals(type)) {
+            title = "Class Announcement";
+            subtitle = "Sending to class: " + targetId;
+        } else if ("STUDENT".equals(type)) {
+            title = "Direct Message";
+            // Find student name
+            String studentName = "Student";
+            for (StudentProgressItem s : allStudents) {
+                if (s.getStudentId().equals(targetId)) {
+                    studentName = s.getStudentName();
+                    break;
+                }
+            }
+            subtitle = "Sending to: " + studentName;
+        }
+
+        StyledMenuHelper.showStyledCustomDialog(
+                this,
+                "✉️",
+                title,
+                subtitle,
+                etMessage,
+                "Send",
+                "Cancel",
+                () -> {
+                    String message = etMessage.getText().toString().trim();
+                    if (!message.isEmpty()) {
+                        sendBroadcast(message, type, targetId);
+                    } else {
+                        Toast.makeText(this, "Message cannot be empty", Toast.LENGTH_SHORT).show();
+                    }
+                },
+                null
+        );
+    }
+
+    private void sendBroadcast(String message, String type, String targetId) {
         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
         if (user == null) return;
 
         DatabaseReference announceRef = FirebaseDatabase.getInstance().getReference("announcements");
         String announcementId = announceRef.push().getKey();
-        
+
         java.util.Map<String, Object> announcement = new java.util.HashMap<>();
         announcement.put("id", announcementId);
         announcement.put("teacherId", user.getUid());
         announcement.put("teacherName", user.getDisplayName() != null ? user.getDisplayName() : "Teacher");
         announcement.put("message", message);
         announcement.put("timestamp", System.currentTimeMillis());
+        announcement.put("type", type); // ALL, CLASS, or STUDENT
+        announcement.put("targetId", targetId); // null, className, or userId
 
         if (announcementId != null) {
             announceRef.child(announcementId).setValue(announcement)
-                .addOnSuccessListener(aVoid -> Toast.makeText(this, "Broadcast sent successfully!", Toast.LENGTH_SHORT).show())
-                .addOnFailureListener(e -> Toast.makeText(this, "Failed to send: " + e.getMessage(), Toast.LENGTH_SHORT).show());
+                    .addOnSuccessListener(aVoid -> {
+                        String targetLabel = "all students";
+                        if ("CLASS".equals(type)) targetLabel = "class " + targetId;
+                        else if ("STUDENT".equals(type)) targetLabel = "student";
+                        
+                        Toast.makeText(this, "Message sent to " + targetLabel + "!", Toast.LENGTH_SHORT).show();
+                    })
+                    .addOnFailureListener(e -> Toast.makeText(this, "Failed to send: " + e.getMessage(), Toast.LENGTH_SHORT).show());
         }
     }
 

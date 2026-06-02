@@ -104,4 +104,15 @@
     <color name="insightWarningBackground">#FFF3E0</color>
     <color name="insightWarningStroke">#FFCC80</color>
     <color name="insightWarningText">#E65100</color>
+    <color name="leaderboard_item_bg">#FFFFFF</color>
+    <color name="leaderboard_rank_bg">#F3F5FF</color>
+
+    <!-- Home Screen Cards -->
+    <color name="funFactCardStart">#F3E5F5</color>
+    <color name="funFactCardEnd">#CE93D8</color>
+    <color name="funFactCardStroke">#BA68C8</color>
+    <color name="motivationCardStart">#FFF9C4</color>
+    <color name="motivationCardEnd">#FFE082</color>
+    <color name="motivationCardStroke">#FFD54F</color>
+    <color name="quickStatsStroke">#CFD8DC</color>
 </resources>

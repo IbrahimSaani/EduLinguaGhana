@@ -80,4 +80,23 @@
     <color name="notification_motivational_bg">#4527A0</color>
     <color name="notification_reminder_bg">#1B5E20</color>
     <color name="random_avatar_stroke_color">#81C784</color>
+    <color name="leaderboard_item_bg">#1E1E1E</color>
+    <color name="leaderboard_rank_bg">#2C2C2C</color>
+
+    <!-- Home Screen Cards - Dark Mode -->
+    <color name="funFactCardStart">#311B92</color>
+    <color name="funFactCardEnd">#1A237E</color>
+    <color name="funFactCardStroke">#4527A0</color>
+    <color name="motivationCardStart">#4A3200</color>
+    <color name="motivationCardEnd">#3E2723</color>
+    <color name="motivationCardStroke">#5D4037</color>
+    <color name="quickStatsStroke">#373737</color>
+
+    <!-- Teacher Dashboard Insights - Dark Mode -->
+    <color name="insightPositiveBackground">#1B300F</color>
+    <color name="insightPositiveStroke">#2E7D32</color>
+    <color name="insightPositiveText">#A5D6A7</color>
+    <color name="insightWarningBackground">#4A3200</color>
+    <color name="insightWarningStroke">#5D4037</color>
+    <color name="insightWarningText">#FFCC80</color>
 </resources>

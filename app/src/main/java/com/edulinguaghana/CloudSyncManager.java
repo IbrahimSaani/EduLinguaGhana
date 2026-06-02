@@ -11,6 +11,7 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ServerValue;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.HashMap;
@@ -292,21 +293,21 @@ public class CloudSyncManager {
                     }
                 }
 
-                Map<String, Object> leaderboardEntry = new HashMap<>();
-                leaderboardEntry.put("userId", userId);
-                leaderboardEntry.put("userName", finalUserName);
-                leaderboardEntry.put("score", score);
-                leaderboardEntry.put("timestamp", System.currentTimeMillis());
+                Map<String, Object> updates = new HashMap<>();
+                updates.put("userId", userId);
+                updates.put("userName", finalUserName);
+                updates.put("score", ServerValue.increment(score));
+                updates.put("timestamp", System.currentTimeMillis());
 
 
-                // Upload to leaderboard
+                // Upload to leaderboard (cumulative score)
                 databaseRef.child("leaderboard").child(userId)
-                    .setValue(leaderboardEntry)
+                    .updateChildren(updates)
                     .addOnSuccessListener(aVoid -> {
-                        callback.onSyncComplete(true, "Score submitted!");
+                        callback.onSyncComplete(true, "Score updated!");
                     })
                     .addOnFailureListener(e -> {
-                        callback.onSyncComplete(false, "Upload failed: " + e.getMessage());
+                        callback.onSyncComplete(false, "Update failed: " + e.getMessage());
                     });
             }
 

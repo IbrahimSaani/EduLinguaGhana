@@ -76,8 +76,6 @@ public class MainActivity extends AppCompatActivity {
     private android.widget.TextView tvStreakCount;
     private android.widget.TextView tvFunFact;
     private android.widget.TextView tvGreeting;
-    private android.widget.TextView tvWordOfDay, tvWordMeaning;
-    private android.view.View btnPronounceWord;
     private android.widget.TextView tvTotalQuizzes;
     private android.widget.TextView tvTotalGames;
     private android.widget.TextView tvAchievements;
@@ -146,9 +144,6 @@ public class MainActivity extends AppCompatActivity {
         tvStreakCount = findViewById(R.id.tvStreakCount);
         tvFunFact = findViewById(R.id.tvFunFact);
         tvGreeting = findViewById(R.id.tvGreeting);
-        tvWordOfDay = findViewById(R.id.tvWordOfDay);
-        tvWordMeaning = findViewById(R.id.tvWordMeaning);
-        btnPronounceWord = findViewById(R.id.btnPronounceWord);
         tvTotalQuizzes = findViewById(R.id.tvTotalQuizzes);
         tvTotalGames = findViewById(R.id.tvTotalGames);
         tvAchievements = findViewById(R.id.tvAchievements);
@@ -627,9 +622,6 @@ public class MainActivity extends AppCompatActivity {
         // Setup time-based greeting
         setupGreeting();
 
-        // Setup Word of the Day
-        setupWordOfDay();
-
         // Setup announcements
         setupAnnouncementsListener();
 
@@ -671,114 +663,63 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    private void setupWordOfDay() {
-        if (tvWordOfDay == null) return;
-
-        DatabaseReference wordRef = FirebaseDatabase.getInstance().getReference("app_config/word_of_the_day");
-        wordRef.addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot snapshot) {
-                if (snapshot.exists()) {
-                    String word = snapshot.child("word").getValue(String.class);
-                    String meaning = snapshot.child("meaning").getValue(String.class);
-                    
-                    if (word != null) tvWordOfDay.setText(word);
-                    if (meaning != null) tvWordMeaning.setText(meaning);
-
-                    if (btnPronounceWord != null) {
-                        btnPronounceWord.setOnClickListener(v -> {
-                            v.performHapticFeedback(android.view.HapticFeedbackConstants.KEYBOARD_TAP);
-                            Toast.makeText(MainActivity.this, "Pronouncing: " + word, Toast.LENGTH_SHORT).show();
-                        });
-                    }
-                } else {
-                    // Default values if not set in Firebase
-                    tvWordOfDay.setText("Akwaaba");
-                    tvWordMeaning.setText("Welcome (Twi)");
-                }
-            }
-
-            @Override
-            public void onCancelled(DatabaseError error) {}
-        });
-
-        // Allow teachers to update the Word of the Day
-        View card = findViewById(R.id.wordOfDayCard);
-        if (card != null) {
-            card.setOnLongClickListener(v -> {
-                FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
-                if (user == null) return false;
-
-                RoleManager roleManager = new RoleManager();
-                roleManager.getUserRole(MainActivity.this, user.getUid(), new RoleManager.RoleCallback() {
-                    @Override
-                    public void onRoleRetrieved(com.edulinguaghana.roles.UserRole role) {
-                        if (role == com.edulinguaghana.roles.UserRole.TEACHER) {
-                            showWordOfDayEditor();
-                        }
-                    }
-                    @Override public void onError(String error) {}
-                });
-                return true;
-            });
-        }
-    }
-
-    private void showWordOfDayEditor() {
-        android.widget.EditText etWord = new android.widget.EditText(this);
-        etWord.setHint("Word (e.g. Akwaaba)");
-        android.widget.EditText etMeaning = new android.widget.EditText(this);
-        etMeaning.setHint("Meaning (e.g. Welcome)");
-
-        android.widget.LinearLayout layout = new android.widget.LinearLayout(this);
-        layout.setOrientation(android.widget.LinearLayout.VERTICAL);
-        int p = (int) (16 * getResources().getDisplayMetrics().density);
-        layout.setPadding(p, p, p, p);
-        layout.addView(etWord);
-        layout.addView(etMeaning);
-
-        new AlertDialog.Builder(this)
-            .setTitle("📝 Update Word of the Day")
-            .setView(layout)
-            .setPositiveButton("Update", (dialog, which) -> {
-                String word = etWord.getText().toString().trim();
-                String meaning = etMeaning.getText().toString().trim();
-                if (!word.isEmpty() && !meaning.isEmpty()) {
-                    DatabaseReference ref = FirebaseDatabase.getInstance().getReference("app_config/word_of_the_day");
-                    java.util.Map<String, String> map = new java.util.HashMap<>();
-                    map.put("word", word);
-                    map.put("meaning", meaning);
-                    ref.setValue(map);
-                }
-            })
-            .setNegativeButton("Cancel", null)
-            .show();
-    }
-
     private void setupAnnouncementsListener() {
         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
         if (user == null) return;
 
+        final String currentUid = user.getUid();
+        
+        // We first need the student's class to filter CLASS broadcasts
+        RoleManager roleManager = new RoleManager();
+        roleManager.getUserStudentClass(currentUid, new RoleManager.StringValueCallback() {
+            @Override
+            public void onValueRetrieved(String studentClass) {
+                listenForAnnouncements(currentUid, studentClass);
+            }
+
+            @Override
+            public void onError(String error) {
+                // If we can't get the class, we just listen for ALL and STUDENT types
+                listenForAnnouncements(currentUid, null);
+            }
+        });
+    }
+
+    private void listenForAnnouncements(String currentUid, String myClass) {
         DatabaseReference announceRef = FirebaseDatabase.getInstance().getReference("announcements");
         // Limit to recent announcements
-        announceRef.orderByChild("timestamp").limitToLast(5).addValueEventListener(new ValueEventListener() {
+        announceRef.orderByChild("timestamp").limitToLast(10).addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot snapshot) {
                 for (DataSnapshot postSnapshot : snapshot.getChildren()) {
-                    long timestamp = postSnapshot.child("timestamp").getValue(Long.class) != null ? 
-                                    postSnapshot.child("timestamp").getValue(Long.class) : 0;
-                    
-                    // Only show if it's new (in the last 5 minutes)
+                    long timestamp = postSnapshot.child("timestamp").getValue(Long.class) != null ?
+                            postSnapshot.child("timestamp").getValue(Long.class) : 0;
+
+                    // Filter by time: Only show if it's new (in the last 5 minutes)
                     if (System.currentTimeMillis() - timestamp < 5 * 60 * 1000) {
+                        String type = postSnapshot.child("type").getValue(String.class);
+                        String targetId = postSnapshot.child("targetId").getValue(String.class);
                         String message = postSnapshot.child("message").getValue(String.class);
                         String teacherName = postSnapshot.child("teacherName").getValue(String.class);
-                        
-                        // Check if we already showed this one (using SharedPreferences to avoid duplicates)
-                        SharedPreferences prefs = getSharedPreferences(PREF_NAME, MODE_PRIVATE);
-                        String lastAnnounceId = prefs.getString("LAST_ANNOUNCEMENT_ID", "");
-                        if (!postSnapshot.getKey().equals(lastAnnounceId)) {
-                            showAnnouncementNotification(teacherName, message);
-                            prefs.edit().putString("LAST_ANNOUNCEMENT_ID", postSnapshot.getKey()).apply();
+
+                        // Filtering logic
+                        boolean isForMe = false;
+                        if (type == null || "ALL".equals(type)) {
+                            isForMe = true;
+                        } else if ("STUDENT".equals(type)) {
+                            isForMe = currentUid.equals(targetId);
+                        } else if ("CLASS".equals(type) && myClass != null) {
+                            isForMe = myClass.equals(targetId);
+                        }
+
+                        if (isForMe) {
+                            // Check if we already showed this one (using SharedPreferences to avoid duplicates)
+                            SharedPreferences prefs = getSharedPreferences(PREF_NAME, MODE_PRIVATE);
+                            String lastAnnounceId = prefs.getString("LAST_ANNOUNCEMENT_ID", "");
+                            if (!postSnapshot.getKey().equals(lastAnnounceId)) {
+                                showAnnouncementNotification(teacherName, message);
+                                prefs.edit().putString("LAST_ANNOUNCEMENT_ID", postSnapshot.getKey()).apply();
+                            }
                         }
                     }
                 }
@@ -859,7 +800,6 @@ public class MainActivity extends AppCompatActivity {
             View motivationCard = findViewById(R.id.motivationCard);
             View streakCard = findViewById(R.id.streakCard);
             View funFactCard = findViewById(R.id.funFactCard);
-            View wordOfDayCard = findViewById(R.id.wordOfDayCard);
 
             if (motivationCard != null) {
                 android.view.animation.Animation anim = AnimationUtils.loadAnimation(this, R.anim.slide_up_gentle);
@@ -877,12 +817,6 @@ public class MainActivity extends AppCompatActivity {
                 android.view.animation.Animation anim = AnimationUtils.loadAnimation(this, R.anim.slide_up_gentle);
                 anim.setStartOffset(400);
                 funFactCard.startAnimation(anim);
-            }
-
-            if (wordOfDayCard != null) {
-                android.view.animation.Animation anim = AnimationUtils.loadAnimation(this, R.anim.slide_up_gentle);
-                anim.setStartOffset(500);
-                wordOfDayCard.startAnimation(anim);
             }
         } catch (Exception e) {
             // Fail silently

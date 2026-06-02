@@ -187,7 +187,8 @@
       ".read": "auth != null",
       ".indexOn": ["teacherId", "timestamp"],
       "$announcementId": {
-        ".write": "auth != null && root.child('users').child(auth.uid).child('role').val() === 'TEACHER' && newData.child('teacherId').val() === auth.uid"
+        ".write": "auth != null && root.child('users').child(auth.uid).child('role').val() === 'TEACHER' && newData.child('teacherId').val() === auth.uid",
+        ".validate": "newData.hasChildren(['message', 'timestamp', 'teacherId', 'type']) && (newData.child('type').val() === 'ALL' || newData.child('type').val() === 'CLASS' || newData.child('type').val() === 'STUDENT')"
       }
     }
   }
