@@ -48,19 +48,25 @@
                 android:id="@+id/tvMenuTitle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textSize="16sp"
+                android:textSize="@dimen/text_body_medium"
                 android:textStyle="bold"
-                android:textColor="@color/textColorPrimary"/>
+                android:textColor="@color/textColorPrimary"
+                app:autoSizeTextType="uniform"
+                app:autoSizeMinTextSize="12sp"
+                app:autoSizeMaxTextSize="16sp" />
 
             <TextView
                 android:id="@+id/tvMenuSubtitle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="4dp"
-                android:textSize="13sp"
+                android:textSize="@dimen/text_body_small"
                 android:textColor="@color/textColorSecondary"
                 android:alpha="0.8"
-                android:visibility="gone"/>
+                android:visibility="gone"
+                app:autoSizeTextType="uniform"
+                app:autoSizeMinTextSize="10sp"
+                app:autoSizeMaxTextSize="13sp" />
 
         </LinearLayout>
 

@@ -57,8 +57,8 @@
                     android:padding="32dp">
 
                     <com.google.android.material.card.MaterialCardView
-                        android:layout_width="100dp"
-                        android:layout_height="100dp"
+                        android:layout_width="@dimen/avatar_size_large"
+                        android:layout_height="@dimen/avatar_size_large"
                         android:layout_gravity="center"
                         android:layout_marginBottom="24dp"
                         app:cardCornerRadius="50dp"
@@ -82,9 +82,12 @@
                         android:text="@string/complete_profile_title"
                         android:textAlignment="center"
                         android:textColor="@color/colorPrimary"
-                        android:textSize="26sp"
+                        android:textSize="@dimen/text_headline_medium"
                         android:fontFamily="@font/agbalumo"
-                        android:textStyle="bold" />
+                        android:textStyle="bold"
+                        app:autoSizeTextType="uniform"
+                        app:autoSizeMinTextSize="18sp"
+                        app:autoSizeMaxTextSize="26sp" />
 
                     <TextView
                         android:id="@+id/tvSubtitle"
@@ -214,7 +217,7 @@
                     <com.google.android.material.button.MaterialButton
                         android:id="@+id/btnContinue"
                         android:layout_width="match_parent"
-                        android:layout_height="56dp"
+                        android:layout_height="@dimen/button_height_normal"
                         android:layout_marginTop="24dp"
                         android:text="@string/complete_profile_continue"
                         android:textStyle="bold"

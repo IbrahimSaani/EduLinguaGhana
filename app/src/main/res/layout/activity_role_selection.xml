@@ -24,8 +24,8 @@
             <!-- Logo -->
             <ImageView
                 android:id="@+id/ivLogo"
-                android:layout_width="120dp"
-                android:layout_height="120dp"
+                android:layout_width="@dimen/logo_size"
+                android:layout_height="@dimen/logo_size"
                 android:src="@drawable/ic_logo"
                 android:contentDescription="@string/app_name"
                 android:layout_marginTop="32dp"
@@ -36,10 +36,13 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Choose Your Role"
-                android:textSize="28sp"
+                android:textSize="@dimen/text_headline_large"
                 android:textStyle="bold"
                 android:textColor="@android:color/white"
-                android:layout_marginBottom="8dp"/>
+                android:layout_marginBottom="8dp"
+                app:autoSizeTextType="uniform"
+                app:autoSizeMinTextSize="18sp"
+                app:autoSizeMaxTextSize="28sp" />
 
             <TextView
                 android:layout_width="wrap_content"
@@ -87,7 +90,7 @@
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:text="🎓 Student"
-                            android:textSize="18sp"
+                            android:textSize="@dimen/text_body_large"
                             android:textStyle="bold"
                             android:padding="16dp"
                             android:layout_marginBottom="12dp"
@@ -102,7 +105,7 @@
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:text="👨‍🏫 Teacher"
-                            android:textSize="18sp"
+                            android:textSize="@dimen/text_body_large"
                             android:textStyle="bold"
                             android:padding="16dp"
                             android:layout_marginBottom="12dp"
@@ -116,7 +119,7 @@
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:text="👨‍👩‍👧‍👦 Parent"
-                            android:textSize="18sp"
+                            android:textSize="@dimen/text_body_large"
                             android:textStyle="bold"
                             android:padding="16dp"
                             android:background="@drawable/role_selector_background"

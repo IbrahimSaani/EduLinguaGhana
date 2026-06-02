@@ -413,8 +413,8 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:clipToPadding="false"
-        android:paddingStart="24dp"
-        android:paddingEnd="24dp"
+        android:paddingStart="@dimen/screen_padding"
+        android:paddingEnd="@dimen/screen_padding"
         android:paddingTop="16dp"
         android:paddingBottom="80dp"
         app:layout_behavior="@string/appbar_scrolling_view_behavior">
@@ -505,12 +505,15 @@
                         android:fontFamily="@font/agbalumo"
                         android:text="@string/app_name"
                         android:textColor="@color/colorPrimary"
-                        android:textSize="26sp" />
+                        android:textSize="@dimen/text_headline_large"
+                        app:autoSizeTextType="uniform"
+                        app:autoSizeMinTextSize="18sp"
+                        app:autoSizeMaxTextSize="28sp" />
 
                     <com.google.android.material.card.MaterialCardView
                         android:id="@+id/animationCard"
-                        android:layout_width="220dp"
-                        android:layout_height="220dp"
+                        android:layout_width="@dimen/hero_animation_size"
+                        android:layout_height="@dimen/hero_animation_size"
                         android:layout_marginTop="20dp"
                         android:layout_marginBottom="16dp"
                         app:cardCornerRadius="110dp"
@@ -540,7 +543,10 @@
                         android:gravity="center"
                         android:text="@string/main_subtitle"
                         android:textColor="@color/textColorPrimary"
-                        android:textSize="20sp" />
+                        android:textSize="@dimen/text_headline_small"
+                        app:autoSizeTextType="uniform"
+                        app:autoSizeMinTextSize="14sp"
+                        app:autoSizeMaxTextSize="20sp" />
 
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
@@ -594,7 +600,7 @@
                             android:layout_height="wrap_content"
                             android:layout_marginTop="4dp"
                             android:text="Keep learning! 🌟"
-                            android:textSize="14sp"
+                            android:textSize="@dimen/text_body_small"
                             android:fontFamily="@font/agbalumo"
                             android:textColor="@color/textColorPrimary" />
                     </LinearLayout>
@@ -632,7 +638,7 @@
                             android:layout_height="wrap_content"
                             android:layout_marginTop="4dp"
                             android:text="🔥 0 days"
-                            android:textSize="18sp"
+                            android:textSize="@dimen/text_body_large"
                             android:fontFamily="@font/agbalumo"
                             android:textColor="@color/colorPrimary" />
                     </LinearLayout>
@@ -702,7 +708,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="📊 Quick Stats"
-                        android:textSize="16sp"
+                        android:textSize="@dimen/text_body_medium"
                         android:textColor="@color/textColorPrimary"
                         android:textStyle="bold"
                         android:fontFamily="@font/agbalumo" />
@@ -728,7 +734,7 @@
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:text="0"
-                                android:textSize="20sp"
+                                android:textSize="@dimen/text_headline_small"
                                 android:textStyle="bold"
                                 android:textColor="@color/colorPrimary"
                                 android:fontFamily="@font/agbalumo" />
@@ -755,7 +761,7 @@
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:text="0"
-                                android:textSize="20sp"
+                                android:textSize="@dimen/text_headline_small"
                                 android:textStyle="bold"
                                 android:textColor="#FF9800"
                                 android:fontFamily="@font/agbalumo" />
@@ -786,7 +792,7 @@
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:text="0/18"
-                                android:textSize="20sp"
+                                android:textSize="@dimen/text_headline_small"
                                 android:textStyle="bold"
                                 android:textColor="#4CAF50"
                                 android:fontFamily="@font/agbalumo" />
@@ -922,8 +928,8 @@
                             android:padding="20dp">
 
                             <ImageView
-                                android:layout_width="48dp"
-                                android:layout_height="48dp"
+                                android:layout_width="@dimen/avatar_size_small"
+                                android:layout_height="@dimen/avatar_size_small"
                                 android:src="@android:drawable/ic_media_play"
                                 android:contentDescription="@null"
                                 app:tint="@color/colorPrimary" />
@@ -936,7 +942,10 @@
                                 android:gravity="center"
                                 android:text="@string/mode_recital_title"
                                 android:textColor="@color/textColorPrimary"
-                                android:textSize="18sp" />
+                                android:textSize="@dimen/text_body_large"
+                                app:autoSizeTextType="uniform"
+                                app:autoSizeMinTextSize="14sp"
+                                app:autoSizeMaxTextSize="18sp" />
 
                             <TextView
                                 android:layout_width="wrap_content"
@@ -971,8 +980,8 @@
                             android:padding="20dp">
 
                             <ImageView
-                                android:layout_width="48dp"
-                                android:layout_height="48dp"
+                                android:layout_width="@dimen/avatar_size_small"
+                                android:layout_height="@dimen/avatar_size_small"
                                 android:src="@android:drawable/ic_btn_speak_now"
                                 android:contentDescription="@null"
                                 app:tint="@color/colorPrimary" />
@@ -985,7 +994,10 @@
                                 android:gravity="center"
                                 android:text="@string/mode_practice_title"
                                 android:textColor="@color/textColorPrimary"
-                                android:textSize="18sp" />
+                                android:textSize="@dimen/text_body_large"
+                                app:autoSizeTextType="uniform"
+                                app:autoSizeMinTextSize="14sp"
+                                app:autoSizeMaxTextSize="18sp" />
 
                             <TextView
                                 android:layout_width="wrap_content"
@@ -1028,8 +1040,8 @@
                             android:padding="20dp">
 
                             <ImageView
-                                android:layout_width="48dp"
-                                android:layout_height="48dp"
+                                android:layout_width="@dimen/avatar_size_small"
+                                android:layout_height="@dimen/avatar_size_small"
                                 android:src="@android:drawable/ic_menu_help"
                                 android:contentDescription="@null"
                                 app:tint="@color/colorPrimary" />
@@ -1042,7 +1054,10 @@
                                 android:gravity="center"
                                 android:text="@string/mode_quiz_title"
                                 android:textColor="@color/textColorPrimary"
-                                android:textSize="18sp" />
+                                android:textSize="@dimen/text_body_large"
+                                app:autoSizeTextType="uniform"
+                                app:autoSizeMinTextSize="14sp"
+                                app:autoSizeMaxTextSize="18sp" />
 
                             <TextView
                                 android:layout_width="wrap_content"
@@ -1077,8 +1092,8 @@
                             android:padding="20dp">
 
                             <ImageView
-                                android:layout_width="48dp"
-                                android:layout_height="48dp"
+                                android:layout_width="@dimen/avatar_size_small"
+                                android:layout_height="@dimen/avatar_size_small"
                                 android:src="@android:drawable/ic_menu_sort_by_size"
                                 android:contentDescription="@null"
                                 app:tint="@color/colorPrimary" />
@@ -1091,7 +1106,10 @@
                                 android:gravity="center"
                                 android:text="@string/mode_progress_title"
                                 android:textColor="@color/textColorPrimary"
-                                android:textSize="18sp" />
+                                android:textSize="@dimen/text_body_large"
+                                app:autoSizeTextType="uniform"
+                                app:autoSizeMinTextSize="14sp"
+                                app:autoSizeMaxTextSize="18sp" />
 
                             <TextView
                                 android:layout_width="wrap_content"

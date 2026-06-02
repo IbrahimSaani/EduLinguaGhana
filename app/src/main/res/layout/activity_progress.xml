@@ -65,8 +65,8 @@
                         android:gravity="center_vertical">
 
                         <com.google.android.material.card.MaterialCardView
-                            android:layout_width="64dp"
-                            android:layout_height="64dp"
+                            android:layout_width="@dimen/avatar_size_medium"
+                            android:layout_height="@dimen/avatar_size_medium"
                             app:cardCornerRadius="32dp"
                             app:cardElevation="4dp"
                             app:cardBackgroundColor="@color/white">
@@ -94,10 +94,13 @@
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:text="Beginner Explorer"
-                                android:textSize="20sp"
+                                android:textSize="@dimen/text_headline_small"
                                 android:textStyle="bold"
                                 android:textColor="@color/colorPrimary"
-                                android:fontFamily="@font/agbalumo" />
+                                android:fontFamily="@font/agbalumo"
+                                app:autoSizeTextType="uniform"
+                                app:autoSizeMinTextSize="14sp"
+                                app:autoSizeMaxTextSize="20sp" />
 
                             <TextView
                                 android:id="@+id/tvXpToNextLevel"
@@ -184,11 +187,14 @@
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
                             android:text="📈 Your Statistics"
-                            android:textSize="20sp"
+                            android:textSize="@dimen/text_headline_small"
                             android:textStyle="bold"
                             android:fontFamily="@font/agbalumo"
                             android:textColor="@color/colorPrimary"
-                            android:letterSpacing="0.02" />
+                            android:letterSpacing="0.02"
+                            app:autoSizeTextType="uniform"
+                            app:autoSizeMinTextSize="16sp"
+                            app:autoSizeMaxTextSize="20sp" />
 
                     </LinearLayout>
 
@@ -541,11 +547,11 @@
                     android:id="@+id/btnShareProgress"
                     style="@style/Widget.MaterialComponents.Button"
                     android:layout_width="0dp"
-                    android:layout_height="56dp"
+                    android:layout_height="@dimen/button_height_normal"
                     android:layout_weight="1"
                     android:layout_marginEnd="8dp"
                     android:text="📤 Share Progress"
-                    android:textSize="15sp"
+                    android:textSize="@dimen/text_body_small"
                     android:textStyle="bold"
                     android:textColor="@color/white"
                     android:backgroundTint="@color/colorPrimary"
@@ -559,11 +565,11 @@
                     android:id="@+id/btnCloseProgress"
                     style="@style/Widget.MaterialComponents.Button.OutlinedButton"
                     android:layout_width="0dp"
-                    android:layout_height="56dp"
+                    android:layout_height="@dimen/button_height_normal"
                     android:layout_weight="1"
                     android:layout_marginStart="8dp"
                     android:text="← Back"
-                    android:textSize="15sp"
+                    android:textSize="@dimen/text_body_small"
                     android:textStyle="bold"
                     android:textColor="@color/colorPrimary"
                     app:strokeColor="@color/colorPrimary"

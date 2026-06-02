@@ -90,7 +90,7 @@
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
                                     android:text="0"
-                                    android:textSize="24sp"
+                                    android:textSize="@dimen/text_headline_medium"
                                     android:textStyle="bold"
                                     android:textColor="@color/colorPrimary"/>
 
@@ -117,7 +117,7 @@
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
                                     android:text="0"
-                                    android:textSize="24sp"
+                                    android:textSize="@dimen/text_headline_medium"
                                     android:textStyle="bold"
                                     android:textColor="@color/correctAnswer"/>
 
@@ -144,7 +144,7 @@
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
                                     android:text="0"
-                                    android:textSize="24sp"
+                                    android:textSize="@dimen/text_headline_medium"
                                     android:textStyle="bold"
                                     android:textColor="@color/colorAccent"/>
 
@@ -181,7 +181,7 @@
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
                                     android:text="0%"
-                                    android:textSize="24sp"
+                                    android:textSize="@dimen/text_headline_medium"
                                     android:textStyle="bold"
                                     android:textColor="@color/correctAnswer"/>
 
@@ -208,7 +208,7 @@
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
                                     android:text="0"
-                                    android:textSize="24sp"
+                                    android:textSize="@dimen/text_headline_medium"
                                     android:textStyle="bold"
                                     android:textColor="@color/colorPrimary"/>
 

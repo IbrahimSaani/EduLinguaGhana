@@ -406,12 +406,11 @@
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="36dp">
 
-                <!-- Navigation Buttons - Styled as bold arrows -->
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/btnPrevNumber"
                     style="@style/Widget.Material3.Button.ElevatedButton"
-                    android:layout_width="56dp"
-                    android:layout_height="56dp"
+                    android:layout_width="@dimen/nav_button_size"
+                    android:layout_height="@dimen/nav_button_size"
                     android:layout_alignParentStart="true"
                     android:layout_centerVertical="true"
                     android:layout_marginStart="2dp"
@@ -476,13 +475,13 @@
                             android:fontFamily="@font/agbalumo"
                             android:text="1"
                             android:textColor="@color/colorAccent"
-                            android:textSize="140sp"
+                            android:textSize="@dimen/big_letter_size"
                             android:textStyle="bold"
                             android:gravity="center"
                             android:maxLines="1"
                             app:autoSizeTextType="uniform"
-                            app:autoSizeMinTextSize="40sp"
-                            app:autoSizeMaxTextSize="140sp"
+                            app:autoSizeMinTextSize="@dimen/big_letter_min_size"
+                            app:autoSizeMaxTextSize="@dimen/big_letter_size"
                             android:shadowColor="#40000000"
                             android:shadowDx="4"
                             android:shadowDy="4"
@@ -579,12 +578,11 @@
                     </LinearLayout>
                 </com.google.android.material.card.MaterialCardView>
 
-                <!-- Navigation Buttons - Styled as bold arrows -->
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/btnNextNumber"
                     style="@style/Widget.Material3.Button.ElevatedButton"
-                    android:layout_width="56dp"
-                    android:layout_height="56dp"
+                    android:layout_width="@dimen/nav_button_size"
+                    android:layout_height="@dimen/nav_button_size"
                     android:layout_alignParentEnd="true"
                     android:layout_centerVertical="true"
                     android:layout_marginEnd="2dp"

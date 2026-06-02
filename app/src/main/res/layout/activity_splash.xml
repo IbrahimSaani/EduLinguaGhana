@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@drawable/bg_splash_gradient"
@@ -126,8 +127,8 @@
 
         <ImageView
             android:id="@+id/ivLogo"
-            android:layout_width="150dp"
-            android:layout_height="150dp"
+            android:layout_width="@dimen/logo_size"
+            android:layout_height="@dimen/logo_size"
             android:contentDescription="EduLingua Ghana Logo"
             android:src="@drawable/ic_logo_professional" />
 
@@ -190,13 +191,16 @@
             android:fontFamily="@font/agbalumo"
             android:text="EduLingua Ghana"
             android:textColor="#FFFFFF"
-            android:textSize="26sp"
+            android:textSize="@dimen/text_headline_large"
             android:textStyle="bold"
             android:shadowColor="#40000000"
             android:shadowDx="2"
             android:shadowDy="2"
             android:shadowRadius="4"
-            android:alpha="0.0" />
+            android:alpha="0.0"
+            app:autoSizeTextType="uniform"
+            app:autoSizeMinTextSize="18sp"
+            app:autoSizeMaxTextSize="28sp" />
 
 
         <TextView

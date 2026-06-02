@@ -105,8 +105,8 @@
             android:visibility="gone">
 
             <com.google.android.material.card.MaterialCardView
-                android:layout_width="140dp"
-                android:layout_height="140dp"
+                android:layout_width="@dimen/logo_size"
+                android:layout_height="@dimen/logo_size"
                 app:cardCornerRadius="70dp"
                 app:cardElevation="8dp"
                 app:strokeWidth="4dp"
@@ -144,10 +144,10 @@
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/btnGoToLogin"
                 android:layout_width="wrap_content"
-                android:layout_height="56dp"
+                android:layout_height="@dimen/button_height_normal"
                 android:layout_marginTop="32dp"
                 android:text="Sign In Now"
-                android:textSize="16sp"
+                android:textSize="@dimen/text_body_medium"
                 android:textStyle="bold"
                 android:paddingStart="40dp"
                 android:paddingEnd="40dp"

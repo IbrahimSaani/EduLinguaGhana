@@ -42,8 +42,11 @@
                 android:fontFamily="@font/agbalumo"
                 android:text="⭐ 0"
                 android:textColor="#4FC3F7"
-                android:textSize="26sp"
-                android:textStyle="bold" />
+                android:textSize="@dimen/text_headline_medium"
+                android:textStyle="bold"
+                app:autoSizeTextType="uniform"
+                app:autoSizeMinTextSize="18sp"
+                app:autoSizeMaxTextSize="26sp" />
 
             <TextView
                 android:id="@+id/tvTimer"
@@ -64,7 +67,10 @@
                 android:fontFamily="@font/agbalumo"
                 android:text="❤️ ❤️ ❤️ ❤️ ❤️"
                 android:textColor="@color/white"
-                android:textSize="24sp" />
+                android:textSize="@dimen/text_headline_medium"
+                app:autoSizeTextType="uniform"
+                app:autoSizeMinTextSize="16sp"
+                app:autoSizeMaxTextSize="24sp" />
 
             <ImageButton
                 android:id="@+id/btnPause"
@@ -197,8 +203,11 @@
                         android:fontFamily="@font/agbalumo"
                         android:text="Game Over"
                         android:textColor="#4FC3F7"
-                        android:textSize="36sp"
-                        android:textStyle="bold" />
+                        android:textSize="@dimen/text_headline_large"
+                        android:textStyle="bold"
+                        app:autoSizeTextType="uniform"
+                        app:autoSizeMinTextSize="24sp"
+                        app:autoSizeMaxTextSize="36sp" />
 
                     <TextView
                         android:id="@+id/tvOverlayScore"
@@ -228,13 +237,13 @@
                     <com.google.android.material.button.MaterialButton
                         android:id="@+id/btnRestart"
                         android:layout_width="match_parent"
-                        android:layout_height="64dp"
+                        android:layout_height="@dimen/button_height_large"
                         android:layout_marginTop="16dp"
                         android:backgroundTint="@null"
                         android:background="@drawable/bg_quiz_success_button"
                         android:text="Play Again"
                         android:textColor="@color/white"
-                        android:textSize="18sp"
+                        android:textSize="@dimen/text_body_large"
                         android:textStyle="bold"
                         android:fontFamily="@font/agbalumo"
                         app:cornerRadius="16dp"
@@ -243,13 +252,13 @@
                     <com.google.android.material.button.MaterialButton
                         android:id="@+id/btnQuit"
                         android:layout_width="match_parent"
-                        android:layout_height="64dp"
+                        android:layout_height="@dimen/button_height_large"
                         android:layout_marginTop="16dp"
                         android:backgroundTint="@null"
                         android:background="@drawable/bg_quiz_error_button"
                         android:text="Quit Mission"
                         android:textColor="@color/white"
-                        android:textSize="18sp"
+                        android:textSize="@dimen/text_body_large"
                         android:textStyle="bold"
                         android:fontFamily="@font/agbalumo"
                         app:cornerRadius="16dp"

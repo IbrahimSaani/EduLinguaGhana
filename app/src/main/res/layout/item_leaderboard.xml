@@ -25,8 +25,8 @@
 
         <!-- Rank Badge -->
         <com.google.android.material.card.MaterialCardView
-            android:layout_width="48dp"
-            android:layout_height="48dp"
+            android:layout_width="@dimen/avatar_size_small"
+            android:layout_height="@dimen/avatar_size_small"
             app:cardCornerRadius="24dp"
             app:cardElevation="0dp"
             app:strokeWidth="1dp"
@@ -48,8 +48,8 @@
 
         <!-- Avatar -->
         <com.google.android.material.card.MaterialCardView
-            android:layout_width="52dp"
-            android:layout_height="52dp"
+            android:layout_width="@dimen/avatar_size_medium"
+            android:layout_height="@dimen/avatar_size_medium"
             android:layout_marginStart="8dp"
             app:cardCornerRadius="26dp"
             app:cardElevation="2dp"
@@ -79,12 +79,15 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="Player Name"
-                android:textSize="16sp"
+                android:textSize="@dimen/text_body_medium"
                 android:textStyle="bold"
                 android:textColor="@color/textColorPrimary"
                 android:fontFamily="@font/agbalumo"
                 android:maxLines="1"
-                android:ellipsize="end" />
+                android:ellipsize="end"
+                app:autoSizeTextType="uniform"
+                app:autoSizeMinTextSize="12sp"
+                app:autoSizeMaxTextSize="16sp" />
 
 
             <TextView
@@ -127,7 +130,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="100"
-                    android:textSize="19sp"
+                    android:textSize="@dimen/text_headline_small"
                     android:textStyle="bold"
                     android:textColor="@color/colorPrimary"
                     android:fontFamily="@font/agbalumo" />

@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Screen-wide margins and paddings reduced for small screens -->
+    <dimen name="screen_padding">16dp</dimen>
+    <dimen name="screen_padding_small">12dp</dimen>
+    <dimen name="card_margin">12dp</dimen>
+    <dimen name="element_spacing">12dp</dimen>
+    <dimen name="element_spacing_small">6dp</dimen>
+
+    <!-- Logo and animations reduced -->
+    <dimen name="logo_size">100dp</dimen>
+    <dimen name="hero_animation_size">160dp</dimen>
+    <dimen name="quiz_welcome_icon_size">140dp</dimen>
+
+    <!-- Text sizes slightly reduced -->
+    <dimen name="text_headline_large">24sp</dimen>
+    <dimen name="text_headline_medium">20sp</dimen>
+    <dimen name="text_headline_small">18sp</dimen>
+    <dimen name="text_body_large">16sp</dimen>
+    <dimen name="text_body_medium">14sp</dimen>
+    <dimen name="text_body_small">13sp</dimen>
+    <dimen name="text_caption">11sp</dimen>
+    <dimen name="text_label">10sp</dimen>
+
+    <!-- Button sizes reduced -->
+    <dimen name="button_height_large">60dp</dimen>
+    <dimen name="button_height_normal">48dp</dimen>
+    <dimen name="quiz_option_height">64dp</dimen>
+
+    <!-- Avatar sizes reduced -->
+    <dimen name="avatar_size_large">80dp</dimen>
+    <dimen name="avatar_size_medium">52dp</dimen>
+    <dimen name="avatar_size_small">40dp</dimen>
+    <dimen name="avatar_size_tiny">28dp</dimen>
+
+    <!-- Specific elements -->
+    <dimen name="leaderboard_podium_1st">75dp</dimen>
+    <dimen name="leaderboard_podium_other">60dp</dimen>
+</resources>

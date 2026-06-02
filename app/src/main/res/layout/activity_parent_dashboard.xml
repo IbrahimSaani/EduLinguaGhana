@@ -90,7 +90,7 @@
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
                                     android:text="0"
-                                    android:textSize="24sp"
+                                    android:textSize="@dimen/text_headline_medium"
                                     android:textStyle="bold"
                                     android:textColor="@color/colorPrimary"/>
 
@@ -117,7 +117,7 @@
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
                                     android:text="0"
-                                    android:textSize="24sp"
+                                    android:textSize="@dimen/text_headline_medium"
                                     android:textStyle="bold"
                                     android:textColor="@color/correctAnswer"/>
 
@@ -144,7 +144,7 @@
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
                                     android:text="0"
-                                    android:textSize="24sp"
+                                    android:textSize="@dimen/text_headline_medium"
                                     android:textStyle="bold"
                                     android:textColor="@color/colorAccent"/>
 
@@ -282,7 +282,7 @@
                     <com.google.android.material.button.MaterialButton
                         android:id="@+id/btnAddChildBottom"
                         android:layout_width="0dp"
-                        android:layout_height="56dp"
+                        android:layout_height="@dimen/button_height_normal"
                         android:layout_weight="1"
                         android:text="➕ Add Child"
                         android:textStyle="bold"
@@ -293,7 +293,7 @@
                         android:id="@+id/btnRemoveChild"
                         style="@style/Widget.MaterialComponents.Button.OutlinedButton"
                         android:layout_width="0dp"
-                        android:layout_height="56dp"
+                        android:layout_height="@dimen/button_height_normal"
                         android:layout_weight="1"
                         android:text="🗑️ Remove Child"
                         android:textStyle="bold"
