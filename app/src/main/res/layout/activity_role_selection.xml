@@ -93,6 +93,7 @@
                             android:layout_marginBottom="12dp"
                             android:background="@drawable/role_selector_background"
                             android:buttonTint="@color/primary"
+                            android:textColor="@color/textColorPrimary"
                             android:checked="true"/>
 
                         <!-- Teacher Option -->
@@ -106,7 +107,8 @@
                             android:padding="16dp"
                             android:layout_marginBottom="12dp"
                             android:background="@drawable/role_selector_background"
-                            android:buttonTint="@color/primary"/>
+                            android:buttonTint="@color/primary"
+                            android:textColor="@color/textColorPrimary"/>
 
                         <!-- Parent Option -->
                         <RadioButton
@@ -118,7 +120,8 @@
                             android:textStyle="bold"
                             android:padding="16dp"
                             android:background="@drawable/role_selector_background"
-                            android:buttonTint="@color/primary"/>
+                            android:buttonTint="@color/primary"
+                            android:textColor="@color/textColorPrimary"/>
 
                     </RadioGroup>
 
@@ -133,7 +136,7 @@
                 android:layout_height="wrap_content"
                 app:cardCornerRadius="16dp"
                 app:cardElevation="8dp"
-                app:cardBackgroundColor="@color/card_background"
+                app:cardBackgroundColor="@color/cardBackground"
                 android:layout_marginBottom="24dp">
 
                 <LinearLayout

@@ -251,6 +251,9 @@ public class LoginActivity extends AppCompatActivity {
         // Restore progress from database
         restoreUserProgress(user);
         
+        // Restore avatar from database
+        AvatarBuilder.syncWithFirebase(this, user.getUid(), null);
+        
         // Mark intro as seen so returning users don't see the tutorial
         markIntroAsSeen();
         

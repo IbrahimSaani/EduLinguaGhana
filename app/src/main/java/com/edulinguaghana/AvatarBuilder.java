@@ -159,11 +159,12 @@ public class AvatarBuilder {
     public AvatarBuilder(Context context) {
         this.context = context;
         this.config = loadConfig(context);
+        if (this.config == null) this.config = new AvatarConfig();
     }
 
     public AvatarBuilder(Context context, AvatarConfig config) {
         this.context = context;
-        this.config = config;
+        this.config = config != null ? config : new AvatarConfig();
     }
 
     /**
@@ -662,6 +663,8 @@ public class AvatarBuilder {
     public static AvatarConfig loadConfig(Context context) {
         SharedPreferences prefs = context.getSharedPreferences(getPrefsName(context), Context.MODE_PRIVATE);
         AvatarConfig config = new AvatarConfig();
+        if (!prefs.contains("skinTone")) return null; // Indicate no local config
+
         try {
             config.skinTone = SkinTone.valueOf(prefs.getString("skinTone", "MEDIUM"));
             config.hairStyle = HairStyle.valueOf(prefs.getString("hairStyle", "SHORT"));
@@ -675,6 +678,41 @@ public class AvatarBuilder {
             config.backgroundColor = prefs.getString("backgroundColor", "#E3F2FD");
         } catch (Exception e) {}
         return config;
+    }
+
+    public void saveLocalOnly(Context context) {
+        SharedPreferences prefs = context.getSharedPreferences(getPrefsName(context), Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = prefs.edit();
+        editor.putString("skinTone", config.skinTone.name());
+        editor.putString("hairStyle", config.hairStyle.name());
+        editor.putString("hairColor", config.hairColor.name());
+        editor.putString("eyeStyle", config.eyeStyle.name());
+        editor.putString("mouthStyle", config.mouthStyle.name());
+        editor.putString("accessory", config.accessory.name());
+        editor.putString("clothingStyle", config.clothingStyle.name());
+        editor.putString("clothingColor", config.clothingColor.name());
+        editor.putString("facialExpression", config.facialExpression.name());
+        editor.putString("backgroundColor", config.backgroundColor);
+        editor.putLong("lastUpdated", System.currentTimeMillis());
+        editor.apply();
+    }
+
+    public static void syncWithFirebase(Context context, String userId, Runnable callback) {
+        if (userId == null) return;
+        DatabaseReference ref = FirebaseDatabase.getInstance().getReference("users").child(userId).child("avatar");
+        ref.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot snapshot) {
+                if (snapshot.exists()) {
+                    Map<String, Object> map = (Map<String, Object>) snapshot.getValue();
+                    AvatarConfig config = AvatarConfig.fromMap(map);
+                    AvatarBuilder builder = new AvatarBuilder(context, config);
+                    builder.saveLocalOnly(context);
+                    if (callback != null) callback.run();
+                }
+            }
+            @Override public void onCancelled(DatabaseError error) {}
+        });
     }
 
     public static void clearCache(Context context) {

@@ -15,6 +15,8 @@ import com.google.android.material.button.MaterialButton;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.tabs.TabLayout;
 import com.google.android.material.tabs.TabLayoutMediator;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.auth.FirebaseAuth;
 
 import androidx.core.content.ContextCompat;
 import java.util.ArrayList;
@@ -71,6 +73,25 @@ public class AvatarEditorActivity extends AppCompatActivity {
 
     private void loadCurrentAvatar() {
         config = AvatarBuilder.loadConfig(this);
+        if (config == null) {
+            // Local cache missing (fresh login), sync from Firebase
+            FirebaseUser user = com.google.firebase.auth.FirebaseAuth.getInstance().getCurrentUser();
+            if (user != null) {
+                AvatarBuilder.syncWithFirebase(this, user.getUid(), () -> {
+                    config = AvatarBuilder.loadConfig(this);
+                    if (config != null) {
+                        runOnUiThread(() -> {
+                            builder = new AvatarBuilder(this, config);
+                            updateAvatarPreview();
+                            updateUIFromConfig();
+                        });
+                    }
+                });
+            }
+            // Use default while waiting for sync
+            config = new AvatarBuilder.AvatarConfig();
+        }
+
         builder = new AvatarBuilder(this, config);
         updateAvatarPreview();
 

@@ -108,7 +108,17 @@ public class AccountManagementActivity extends AppCompatActivity {
             // Load saved avatar config
             if (avatarView != null) {
                 AvatarBuilder.AvatarConfig config = AvatarBuilder.loadConfig(this);
-                avatarView.setAvatarConfig(config);
+                if (config != null) {
+                    avatarView.setAvatarConfig(config);
+                } else if (currentUser != null) {
+                    // Sync from Firebase if local cache missing
+                    AvatarBuilder.syncWithFirebase(this, currentUser.getUid(), () -> {
+                        AvatarBuilder.AvatarConfig syncedConfig = AvatarBuilder.loadConfig(this);
+                        if (syncedConfig != null) {
+                            runOnUiThread(() -> avatarView.setAvatarConfig(syncedConfig));
+                        }
+                    });
+                }
             }
 
             boolean hasPasswordProvider = false;

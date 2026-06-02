@@ -234,7 +234,17 @@ public class ProfileActivity extends AppCompatActivity {
 
             // Load saved avatar config for signed-in user
             AvatarBuilder.AvatarConfig config = AvatarBuilder.loadConfig(this);
-            profileImage.setAvatarConfig(config);
+            if (config != null) {
+                profileImage.setAvatarConfig(config);
+            } else if (currentUserId != null) {
+                // Not in local cache, sync from Firebase
+                AvatarBuilder.syncWithFirebase(this, currentUserId, () -> {
+                    AvatarBuilder.AvatarConfig syncedConfig = AvatarBuilder.loadConfig(this);
+                    if (syncedConfig != null) {
+                        runOnUiThread(() -> profileImage.setAvatarConfig(syncedConfig));
+                    }
+                });
+            }
 
             // Display user info
             String displayName = currentUser != null ? currentUser.getDisplayName() : null;

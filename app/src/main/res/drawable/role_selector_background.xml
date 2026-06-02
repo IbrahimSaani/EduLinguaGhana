@@ -4,7 +4,7 @@
     <item android:state_checked="true">
         <shape android:shape="rectangle">
             <corners android:radius="12dp"/>
-            <solid android:color="@android:color/white"/>
+            <solid android:color="@color/cardBackground"/>
             <stroke android:width="3dp" android:color="@color/primary"/>
         </shape>
     </item>
@@ -13,7 +13,7 @@
     <item android:state_pressed="true">
         <shape android:shape="rectangle">
             <corners android:radius="12dp"/>
-            <solid android:color="#F0F0F0"/>
+            <solid android:color="@color/dividerColor"/>
             <stroke android:width="2dp" android:color="@color/card_stroke"/>
         </shape>
     </item>
@@ -22,9 +22,8 @@
     <item>
         <shape android:shape="rectangle">
             <corners android:radius="12dp"/>
-            <solid android:color="@android:color/white"/>
+            <solid android:color="@color/cardBackground"/>
             <stroke android:width="2dp" android:color="@color/card_stroke"/>
         </shape>
     </item>
 </selector>
-
