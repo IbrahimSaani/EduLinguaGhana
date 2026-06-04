@@ -281,7 +281,7 @@ public class NotificationManager {
             
             if (!todayStr.equals(lastReminderDate)) {
                 sendReminderNotification(
-                    "Time to Practice! 📚",
+                    "Time to Study! 📚",
                     "Don't break your streak! Complete a lesson today."
                 );
                 prefs.edit().putString("LAST_REMINDER_DATE", todayStr).apply();
@@ -294,7 +294,7 @@ public class NotificationManager {
         String[] messages = {
             "Every lesson brings you closer to fluency! Keep going! 💪",
             "Learning a language opens doors to new worlds! 🌍",
-            "Practice makes perfect! You're doing great! ⭐",
+            "Consistency is key! You're doing great! ⭐",
             "Your dedication is inspiring! Keep learning! 🌟",
             "Small steps every day lead to big results! 🚀",
             "You're building valuable skills! Stay consistent! 📈"
@@ -336,7 +336,7 @@ public class NotificationManager {
     public void sendStreakLossAlert(int daysInactive) {
         addNotification(
             "Streak at Risk! 🔥",
-            "You haven't practiced for " + daysInactive + " day(s). Come back today to keep learning!",
+            "You haven't studied for " + daysInactive + " day(s). Come back today to keep learning!",
             "🔥",
             Notification.NotificationType.STREAK
         );

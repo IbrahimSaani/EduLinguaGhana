@@ -184,8 +184,8 @@
     <string name="main_best_score_placeholder">Best quiz score: 0 / 10</string>
     <string name="mode_recital_title">Recital Mode</string>
     <string name="mode_recital_desc">Listen to letters, sounds, and numbers.</string>
-    <string name="mode_practice_title">Game Mode</string>
-    <string name="mode_practice_desc">Play fun games and learn!</string>
+    <string name="mode_game_title">Game Mode</string>
+    <string name="mode_game_desc">Play fun games and learn!</string>
     <string name="mode_quiz_title">Quiz Mode</string>
     <string name="mode_quiz_desc">Play mini-games to test your memory.</string>
     <string name="mode_progress_title">Progress Tracker</string>

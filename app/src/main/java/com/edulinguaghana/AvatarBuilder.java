@@ -708,8 +708,8 @@ public class AvatarBuilder {
                     AvatarConfig config = AvatarConfig.fromMap(map);
                     AvatarBuilder builder = new AvatarBuilder(context, config);
                     builder.saveLocalOnly(context);
-                    if (callback != null) callback.run();
                 }
+                if (callback != null) callback.run();
             }
             @Override public void onCancelled(DatabaseError error) {}
         });

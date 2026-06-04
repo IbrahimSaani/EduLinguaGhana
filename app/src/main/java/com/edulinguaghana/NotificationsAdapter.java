@@ -76,7 +76,7 @@ public class NotificationsAdapter extends RecyclerView.Adapter<NotificationsAdap
                 break;
             case MOTIVATIONAL:
                 bgColor = ContextCompat.getColor(context, R.color.notification_motivational_bg);
-                emojiBgColor = ContextCompat.getColor(context, R.color.modePracticeStart);
+                emojiBgColor = ContextCompat.getColor(context, R.color.modeGameStart);
                 break;
             case REMINDER:
                 bgColor = ContextCompat.getColor(context, R.color.notification_reminder_bg);

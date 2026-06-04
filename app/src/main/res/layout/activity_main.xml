@@ -1019,7 +1019,7 @@
                     </com.google.android.material.card.MaterialCardView>
 
                     <com.google.android.material.card.MaterialCardView
-                        android:id="@+id/btnPracticeMode"
+                        android:id="@+id/btnGameMode"
                         android:layout_width="0dp"
                         android:layout_height="match_parent"
                         android:layout_weight="1"
@@ -1027,7 +1027,7 @@
                         android:clickable="true"
                         android:focusable="true"
                         android:foreground="?attr/selectableItemBackground"
-                        android:contentDescription="@string/mode_practice_title"
+                        android:contentDescription="@string/mode_game_title"
                         app:cardBackgroundColor="@android:color/transparent"
                         app:cardCornerRadius="28dp"
                         app:cardElevation="0dp">
@@ -1035,7 +1035,7 @@
                         <LinearLayout
                             android:layout_width="match_parent"
                             android:layout_height="match_parent"
-                            android:background="@drawable/bg_mode_practice"
+                            android:background="@drawable/bg_mode_game"
                             android:gravity="center"
                             android:orientation="vertical"
                             android:padding="20dp">
@@ -1053,7 +1053,7 @@
                                 android:layout_marginTop="12dp"
                                 android:fontFamily="@font/agbalumo"
                                 android:gravity="center"
-                                android:text="@string/mode_practice_title"
+                                android:text="@string/mode_game_title"
                                 android:textColor="@color/textColorPrimary"
                                 android:textSize="@dimen/text_body_large"
                                 app:autoSizeTextType="uniform"
@@ -1064,7 +1064,7 @@
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:gravity="center"
-                                android:text="@string/mode_practice_desc"
+                                android:text="@string/mode_game_desc"
                                 android:textColor="@color/textColorSecondary"
                                 android:textSize="14sp" />
                         </LinearLayout>

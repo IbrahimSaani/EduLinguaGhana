@@ -111,7 +111,9 @@ public class AccountManagementActivity extends AppCompatActivity {
                 if (config != null) {
                     avatarView.setAvatarConfig(config);
                 } else if (currentUser != null) {
-                    // Sync from Firebase if local cache missing
+                    // Not in local cache, show a default and sync from Firebase
+                    avatarView.setAvatarConfig(new AvatarBuilder.AvatarConfig());
+
                     AvatarBuilder.syncWithFirebase(this, currentUser.getUid(), () -> {
                         AvatarBuilder.AvatarConfig syncedConfig = AvatarBuilder.loadConfig(this);
                         if (syncedConfig != null) {

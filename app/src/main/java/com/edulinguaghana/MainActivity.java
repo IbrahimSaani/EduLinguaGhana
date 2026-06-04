@@ -63,7 +63,7 @@ public class MainActivity extends AppCompatActivity {
 
     private CoordinatorLayout rootCoordinator;
     private ChipGroup languageChipGroup;
-    private MaterialCardView btnRecitalMode, btnPracticeMode, btnQuizMode, btnProgressMode;
+    private MaterialCardView btnRecitalMode, btnGameMode, btnQuizMode, btnProgressMode;
     private MaterialCardView heroCard;
     private LottieAnimationView mascotView;
     private NestedScrollView nestedScrollView;
@@ -93,7 +93,7 @@ public class MainActivity extends AppCompatActivity {
     private ConnectivityManager.NetworkCallback networkCallback;
 
     private boolean recitalAnimated = false;
-    private boolean practiceAnimated = false;
+    private boolean gameAnimated = false;
     private boolean quizAnimated = false;
     private boolean progressAnimated = false;
 
@@ -158,7 +158,7 @@ public class MainActivity extends AppCompatActivity {
         offlineBanner = findViewById(R.id.offlineBanner);
         languageChipGroup = findViewById(R.id.languageChipGroup);
         btnRecitalMode = findViewById(R.id.btnRecitalMode);
-        btnPracticeMode = findViewById(R.id.btnPracticeMode);
+        btnGameMode = findViewById(R.id.btnGameMode);
         btnQuizMode = findViewById(R.id.btnQuizMode);
         btnProgressMode = findViewById(R.id.btnProgressMode);
         mascotView = findViewById(R.id.mascotView);
@@ -398,7 +398,7 @@ public class MainActivity extends AppCompatActivity {
             );
 
             notificationManager.addNotification(
-                "Daily Practice Tip 💡",
+                "Daily Learning Tip 💡",
                 "Just 10 minutes a day can make a huge difference in language learning!",
                 "💡",
                 Notification.NotificationType.MOTIVATIONAL
@@ -1255,7 +1255,7 @@ public class MainActivity extends AppCompatActivity {
             });
         });
 
-        btnPracticeMode.setOnClickListener(v -> {
+        btnGameMode.setOnClickListener(v -> {
             v.performHapticFeedback(HapticFeedbackConstants.KEYBOARD_TAP);
             applyGamingClickEffect(v, () -> {
                 if (!ensureLanguageSelected()) return;
@@ -1406,8 +1406,8 @@ public class MainActivity extends AppCompatActivity {
         StyledMenuHelper.showStyledMenu(
                 this,
                 "🎮",
-                getString(R.string.mode_practice_title),
-                getString(R.string.mode_practice_desc),
+                getString(R.string.mode_game_title),
+                getString(R.string.mode_game_desc),
                 menuItems,
                 null
         );
@@ -1521,7 +1521,7 @@ public class MainActivity extends AppCompatActivity {
         nestedScrollView.setOnScrollChangeListener((NestedScrollView.OnScrollChangeListener) (v, scrollX, scrollY, oldScrollX, oldScrollY) -> {
             if (scrollY > oldScrollY) {
                 if (!recitalAnimated) { animateCard(btnRecitalMode, true); recitalAnimated = true; }
-                if (!practiceAnimated) { animateCard(btnPracticeMode, true); practiceAnimated = true; }
+                if (!gameAnimated) { animateCard(btnGameMode, true); gameAnimated = true; }
                 if (!quizAnimated) { animateCard(btnQuizMode, true); quizAnimated = true; }
                 if (!progressAnimated) { animateCard(btnProgressMode, true); progressAnimated = true; }
             }

@@ -237,7 +237,9 @@ public class ProfileActivity extends AppCompatActivity {
             if (config != null) {
                 profileImage.setAvatarConfig(config);
             } else if (currentUserId != null) {
-                // Not in local cache, sync from Firebase
+                // Not in local cache, show a default and sync from Firebase
+                profileImage.setAvatarConfig(new AvatarBuilder.AvatarConfig());
+
                 AvatarBuilder.syncWithFirebase(this, currentUserId, () -> {
                     AvatarBuilder.AvatarConfig syncedConfig = AvatarBuilder.loadConfig(this);
                     if (syncedConfig != null) {
@@ -299,8 +301,8 @@ public class ProfileActivity extends AppCompatActivity {
             signedInLayout.setVisibility(View.GONE);
 
             // Use placeholder icon for signed-out state
-            avatarNotSignedIn.setImageResource(R.drawable.ic_graduation_cap);
             avatarNotSignedIn.setAvatarConfig(null); // Clear any config if needed
+            avatarNotSignedIn.setImageResource(R.drawable.ic_graduation_cap);
         }
 
         // Configure visibility of friend/challenge actions:

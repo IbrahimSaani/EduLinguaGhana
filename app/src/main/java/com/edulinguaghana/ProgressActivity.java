@@ -227,7 +227,7 @@ public class ProgressActivity extends AppCompatActivity {
             } else if (percentage >= 50) {
                 sb.append("🎓 Good effort. Keep practicing to improve.\n");
             } else {
-                sb.append("🌱 You\'re just getting started. Practice regularly to grow.\n");
+                sb.append("🌱 You\'re just getting started. Study regularly to grow.\n");
             }
 
             sb.append("\nTotal correct answers so far: ").append(totalCorrect);

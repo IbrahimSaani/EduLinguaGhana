@@ -459,6 +459,8 @@ public class LeaderboardActivity extends AppCompatActivity {
                 tvFooterScore.setText(userEntry.getScore() + " pts");
                 if (userEntry.getAvatarData() != null) {
                     ivFooterAvatar.setAvatarConfig(AvatarBuilder.AvatarConfig.fromMap(userEntry.getAvatarData()));
+                } else {
+                    ivFooterAvatar.setAvatarConfig(new AvatarBuilder.AvatarConfig());
                 }
             } else {
                 userRankStickyFooter.setVisibility(View.GONE);

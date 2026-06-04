@@ -16,7 +16,7 @@ import androidx.core.app.NotificationManagerCompat;
 public final class LearningNotificationHelper {
     public static final String CHANNEL_ID = "learning_notifications";
     private static final String CHANNEL_NAME = "Learning Reminders";
-    private static final String CHANNEL_DESC = "Daily practice reminders and streak alerts";
+    private static final String CHANNEL_DESC = "Daily study reminders and streak alerts";
 
     private LearningNotificationHelper() {}
 

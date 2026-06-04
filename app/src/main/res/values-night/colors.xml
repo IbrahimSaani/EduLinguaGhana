@@ -48,8 +48,8 @@
     <color name="languageCardEnd">#1B5E20</color>
     <color name="modeRecitalStart">#FF9800</color>
     <color name="modeRecitalEnd">#E65100</color>
-    <color name="modePracticeStart">#7E57C2</color>
-    <color name="modePracticeEnd">#5E35B1</color>
+    <color name="modeGameStart">#7E57C2</color>
+    <color name="modeGameEnd">#5E35B1</color>
     <color name="modeQuizStart">#00ACC1</color>
     <color name="modeQuizEnd">#00838F</color>
     <color name="modeProgressStart">#43A047</color>

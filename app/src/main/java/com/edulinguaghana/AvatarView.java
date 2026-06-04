@@ -39,6 +39,9 @@ public class AvatarView extends androidx.appcompat.widget.AppCompatImageView {
         if (config != null) {
             this.builder = new AvatarBuilder(getContext(), config);
             updateAvatar();
+        } else {
+            this.builder = null;
+            setImageDrawable(null);
         }
     }
 
