@@ -32,7 +32,7 @@
                 android:layout_height="match_parent"
                 app:cardCornerRadius="48dp"
                 app:cardElevation="2dp"
-                app:cardBackgroundColor="#F5F5F5"
+                app:cardBackgroundColor="@color/buttonSecondary"
                 app:cardPreventCornerOverlap="false">
 
                 <View

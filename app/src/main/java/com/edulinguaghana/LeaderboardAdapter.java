@@ -1,7 +1,6 @@
 package com.edulinguaghana;
 
 import android.content.Context;
-import android.graphics.Color;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -66,13 +65,24 @@ public class LeaderboardAdapter extends RecyclerView.Adapter<LeaderboardAdapter.
 
         // Style main card
         if (isCurrentUser) {
-            holder.cardView.setCardBackgroundColor(Color.parseColor("#E3F2FD")); // Light blue
+            // Highlight current user with a theme-aware color
+            int highlightColor = ContextCompat.getColor(context, R.color.colorPrimaryLight);
+            holder.cardView.setCardBackgroundColor(highlightColor);
             holder.cardView.setStrokeWidth(4);
             holder.cardView.setStrokeColor(ContextCompat.getColor(context, R.color.colorPrimary));
+            
+            // Ensure text is visible on highlight
+            holder.tvUserName.setTextColor(ContextCompat.getColor(context, R.color.textColorPrimary));
+            holder.tvScore.setTextColor(ContextCompat.getColor(context, R.color.colorPrimary));
         } else {
-            holder.cardView.setCardBackgroundColor(Color.WHITE);
+            // Use theme-aware background color for other players
+            holder.cardView.setCardBackgroundColor(ContextCompat.getColor(context, R.color.leaderboard_item_bg));
             holder.cardView.setStrokeWidth(1);
-            holder.cardView.setStrokeColor(Color.parseColor("#EEEEEE"));
+            holder.cardView.setStrokeColor(ContextCompat.getColor(context, R.color.dividerColor));
+            
+            // Ensure text color is theme-aware
+            holder.tvUserName.setTextColor(ContextCompat.getColor(context, R.color.textColorPrimary));
+            holder.tvScore.setTextColor(ContextCompat.getColor(context, R.color.colorPrimary));
         }
         
         holder.cardView.setCardElevation(isCurrentUser ? 6 : 2);

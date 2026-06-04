@@ -104,11 +104,11 @@ public class QuestManager {
     public static List<Quest> generateDefaultDailyQuests() {
         List<Quest> list = new ArrayList<>();
 
-        // Quest 1: Practice once
+        // Quest 1: Study once
         Quest q1 = new Quest();
         q1.id = "daily_practice";
-        q1.title = "Practice once";
-        q1.description = "Complete one practice session today.";
+        q1.title = "Study once";
+        q1.description = "Complete one learning session today.";
         q1.xpReward = 10;
         q1.completed = false;
         q1.target = 1;
@@ -140,11 +140,11 @@ public class QuestManager {
         q3.expiresAt = System.currentTimeMillis() + 24L*60*60*1000L;
         list.add(q3);
 
-        // Quest 4: Multiple practices ← NEW
+        // Quest 4: Study more
         Quest q4 = new Quest();
         q4.id = "practice_streak";
-        q4.title = "Practice 3 times";
-        q4.description = "Complete 3 practice sessions.";
+        q4.title = "Study 3 times";
+        q4.description = "Complete 3 learning sessions.";
         q4.xpReward = 30;
         q4.completed = false;
         q4.target = 3;
@@ -176,11 +176,11 @@ public class QuestManager {
         q6.expiresAt = System.currentTimeMillis() + 24L*60*60*1000L;
         list.add(q6);
 
-        // Quest 7: Language learning ← NEW
+        // Quest 7: Language learning
         Quest q7 = new Quest();
         q7.id = "language_explorer";
-        q7.title = "Practice 2 languages";
-        q7.description = "Practice with 2 different languages.";
+        q7.title = "Learn 2 languages";
+        q7.description = "Study with 2 different languages.";
         q7.xpReward = 40;
         q7.completed = false;
         q7.target = 2;

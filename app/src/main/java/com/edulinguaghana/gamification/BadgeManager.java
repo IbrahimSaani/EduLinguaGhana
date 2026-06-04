@@ -99,11 +99,11 @@ public class BadgeManager {
     private static List<Badge> generateDefaultBadges() {
         List<Badge> list = new ArrayList<>();
 
-        // First practice badge
+        // First lesson badge
         Badge b1 = new Badge();
         b1.id = "first_practice";
-        b1.title = "First Practice";
-        b1.description = "Complete your first practice session.";
+        b1.title = "First Lesson";
+        b1.description = "Complete your first learning session.";
         b1.iconName = "ic_badge_first";
         b1.unlocked = false;
         b1.unlockedAt = 0;
@@ -113,7 +113,7 @@ public class BadgeManager {
         Badge b2 = new Badge();
         b2.id = "seven_days";
         b2.title = "7 Day Streak";
-        b2.description = "Keep practicing 7 days in a row.";
+        b2.description = "Keep learning 7 days in a row.";
         b2.iconName = "ic_badge_seven";
         b2.unlocked = false;
         b2.unlockedAt = 0;
@@ -123,7 +123,7 @@ public class BadgeManager {
         Badge b3 = new Badge();
         b3.id = "thirty_days";
         b3.title = "30 Day Streak";
-        b3.description = "Practice for 30 consecutive days.";
+        b3.description = "Study for 30 consecutive days.";
         b3.iconName = "ic_badge_thirty";
         b3.unlocked = false;
         b3.unlockedAt = 0;
@@ -153,7 +153,7 @@ public class BadgeManager {
         Badge b6 = new Badge();
         b6.id = "multilingual";
         b6.title = "Multilingual";
-        b6.description = "Complete practice in 3 different languages.";
+        b6.description = "Learn in 3 different languages.";
         b6.iconName = "ic_badge_languages";
         b6.unlocked = false;
         b6.unlockedAt = 0;

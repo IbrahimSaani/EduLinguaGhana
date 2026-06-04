@@ -54,7 +54,7 @@
             app:cardCornerRadius="26dp"
             app:cardElevation="2dp"
             app:strokeWidth="2dp"
-            app:strokeColor="@color/white">
+            app:strokeColor="@color/dividerColor">
 
             <com.edulinguaghana.AvatarView
                 android:id="@+id/ivUserAvatar"

@@ -37,7 +37,7 @@
                 android:layout_height="match_parent"
                 app:cardCornerRadius="32dp"
                 app:cardElevation="0dp"
-                app:cardBackgroundColor="#F5F5F5">
+                app:cardBackgroundColor="@color/buttonSecondary">
 
                 <View
                     android:id="@+id/overlayColor"
@@ -184,7 +184,7 @@
                 android:layout_marginTop="4dp"
                 app:cardCornerRadius="10dp"
                 app:cardElevation="0dp"
-                app:cardBackgroundColor="#FFF8E1">
+                app:cardBackgroundColor="@color/notification_achievement_bg">
 
                 <TextView
                     android:id="@+id/tv_quest_points"
