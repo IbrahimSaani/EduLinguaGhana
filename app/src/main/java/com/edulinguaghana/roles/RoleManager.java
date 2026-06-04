@@ -166,22 +166,31 @@ public class RoleManager {
                     checkRelationshipExists(supervisorId, studentId, new RelationshipExistsCallback() {
                         @Override
                         public void onResult(boolean exists, UserRelationship existingRelationship) {
+                            String predictableId = supervisorId + "_" + studentId;
+                            
                             if (exists) {
-                                // Relationship already exists
-                                String status = existingRelationship.getStatus() == UserRelationship.RelationshipStatus.PENDING
-                                    ? "A pending request already exists for this student"
-                                    : "This student is already connected to you";
-                                callback.onError(status);
-                                return;
+                                // If it already exists with the correct predictable ID, we stop and show error
+                                if (existingRelationship.getId() != null && existingRelationship.getId().equals(predictableId)) {
+                                    String status = existingRelationship.getStatus() == UserRelationship.RelationshipStatus.PENDING
+                                        ? "A pending request already exists for this student"
+                                        : "This student is already connected to you";
+                                    callback.onError(status);
+                                    return;
+                                }
+                                
+                                // If it exists but with a different ID (e.g. push key), we'll allow creating the correct one.
+                                // We should delete the old one to avoid duplicates and ensure security rules work.
+                                Log.i(TAG, "Relationship exists with non-predictable ID: " + existingRelationship.getId() + ". Migrating to: " + predictableId);
+                                relationshipsRef.child(existingRelationship.getId()).removeValue();
+                                // We continue to create the new one below
                             }
 
                             // Create new relationship with a predictable ID (supervisorId_studentId)
                             // This allows for high-performance security rules in Firebase
-                            String relationshipId = supervisorId + "_" + studentId;
                             long now = System.currentTimeMillis();
 
                             UserRelationship relationship = new UserRelationship(
-                                relationshipId,
+                                predictableId,
                                 supervisorId,
                                 studentId,
                                 supervisorName,
@@ -193,9 +202,9 @@ public class RoleManager {
                                 0
                             );
 
-                            relationshipsRef.child(relationshipId).setValue(relationship)
+                            relationshipsRef.child(predictableId).setValue(relationship)
                                 .addOnSuccessListener(aVoid -> {
-                                    Log.d(TAG, "Relationship created: " + relationshipId);
+                                    Log.d(TAG, "Relationship created: " + predictableId);
                                     callback.onSuccess(relationship);
                                 })
                                 .addOnFailureListener(e -> {

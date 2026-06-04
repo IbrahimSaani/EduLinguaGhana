@@ -336,7 +336,7 @@ public class StudentDetailActivity extends AppCompatActivity {
 
                 final String errorMessage;
                 if (error != null && error.contains("Permission denied")) {
-                    errorMessage = getString(R.string.student_detail_permission_denied);
+                    errorMessage = "Permission denied. If you just added this student, please ensure they have accepted the request. If this persists, try removing and re-adding the student.";
                 } else if (error != null) {
                     errorMessage = getString(R.string.student_detail_error_loading_progress, error);
                 } else {
