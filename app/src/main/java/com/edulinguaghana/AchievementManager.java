@@ -105,9 +105,9 @@ public class AchievementManager {
         list.add(new Achievement("quiz_100", "Century Club", "Complete 100 quizzes", "👑", "ic_achievement_crown", Achievement.AchievementType.QUIZ_COUNT, 100));
 
         // High Score Achievements
-        list.add(new Achievement("score_50", "Half Way There", "Score 50 or more points", "💪", "ic_achievement_bolt_bronze", Achievement.AchievementType.HIGH_SCORE, 50));
-        list.add(new Achievement("score_75", "Outstanding", "Score 75 or more points", "⚡", "ic_achievement_bolt_silver", Achievement.AchievementType.HIGH_SCORE, 75));
-        list.add(new Achievement("score_90", "Almost Perfect", "Score 90 or more points", "💎", "ic_achievement_diamond", Achievement.AchievementType.HIGH_SCORE, 90));
+        list.add(new Achievement("score_50", "Half Way There", "Score 8 or more points in a quiz", "💪", "ic_achievement_bolt_bronze", Achievement.AchievementType.HIGH_SCORE, 8));
+        list.add(new Achievement("score_75", "Outstanding", "Score 12 or more points in a quiz", "⚡", "ic_achievement_bolt_silver", Achievement.AchievementType.HIGH_SCORE, 12));
+        list.add(new Achievement("score_90", "Quiz Legend", "Score 20 or more points in a quiz", "💎", "ic_achievement_diamond", Achievement.AchievementType.HIGH_SCORE, 20));
 
         // Perfect Score Achievements
         list.add(new Achievement("perfect_1", "Perfectionist", "Get your first perfect score", "✨", "ic_achievement_medal_silver", Achievement.AchievementType.PERFECT_SCORE, 1));
@@ -177,6 +177,7 @@ public class AchievementManager {
         int totalQuizzes = ProgressManager.getTotalQuizzes(context);
         int highScore = ProgressManager.getHighScore(context);
         int accuracy = ProgressManager.getAccuracy(context);
+        int perfectScores = ProgressManager.getPerfectScoresCount(context);
         int currentStreak = streakManager.getCurrentStreak();
         int totalFunGames = FunGameProgressManager.getTotalFunGamesPlayed(context);
 
@@ -198,8 +199,7 @@ public class AchievementManager {
                     shouldUnlock = highScore >= achievement.getRequiredValue();
                     break;
                 case PERFECT_SCORE:
-                    // Count perfect scores (would need tracking, simplified here)
-                    shouldUnlock = highScore == 100 && achievement.getRequiredValue() == 1;
+                    shouldUnlock = perfectScores >= achievement.getRequiredValue();
                     break;
                 case STREAK:
                     shouldUnlock = currentStreak >= achievement.getRequiredValue();

@@ -617,6 +617,19 @@
     <string name="rocket_sort_game_over">Mission Complete!</string>
     <string name="rocket_sort_final_score">Sorted Items: %d</string>
 
+    <string name="stat_high_score">Best Quiz Score: %1$d / 10</string>
+    <string name="stat_total_quizzes">Total Quizzes Taken: %1$d</string>
+    <string name="stat_total_correct">Total Correct Answers: %1$d</string>
+    <string name="stat_total_games">Total Games Played: %1$d</string>
+    <string name="stat_perfect_scores">Perfect Scores (100%%): %1$d</string>
+    <string name="stat_accuracy">Overall Accuracy: %1$d%%</string>
+    <string name="xp_to_next_level">%1$d XP to Level %2$d</string>
+    <string name="role_dashboard_teacher_subtitle">Manage your students and review progress</string>
+    <string name="role_dashboard_parent_subtitle">Monitor your children\'s learning journey</string>
+
+    <string name="mascot_lang_switch">Awesome! Let\'s learn some %1$s! 🚀</string>
+    <string name="pronunciation_not_recognized">Couldn\'t recognize your pronunciation. Try again!</string>
+
     <!-- Alphabet Bridge -->
     <string name="alphabet_bridge_title">Alphabet Bridge</string>
     <string name="alphabet_bridge_prompt">Tap the next letter to help Owlbert cross!</string>

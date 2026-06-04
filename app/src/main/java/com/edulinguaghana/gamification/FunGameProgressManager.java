@@ -122,7 +122,7 @@ public final class FunGameProgressManager {
             FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
             if (user != null) {
                 com.edulinguaghana.tracking.ProgressTracker tracker = new com.edulinguaghana.tracking.ProgressTracker();
-                tracker.logFunGameCompletion(context, user.getUid(), gameId, score, durationSeconds, null);
+                tracker.logFunGameCompletion(context.getApplicationContext(), user.getUid(), gameId, score, durationSeconds, null);
             }
         } catch (Exception e) {
             android.util.Log.e("FunGameProgressManager", "Failed to log fun game to Firebase", e);
@@ -130,7 +130,7 @@ public final class FunGameProgressManager {
 
         // Best-effort cloud persistence for cross-device continuity.
         try {
-            CloudSyncManager cloudSyncManager = new CloudSyncManager(context);
+            CloudSyncManager cloudSyncManager = new CloudSyncManager(context.getApplicationContext());
             if (cloudSyncManager.canSync()) {
                 cloudSyncManager.syncToCloud((success, message) -> {
                     // Silent: this runs in gameplay context, no UI interruption.

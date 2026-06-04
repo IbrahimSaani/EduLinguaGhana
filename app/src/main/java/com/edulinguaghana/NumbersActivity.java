@@ -38,6 +38,7 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.edulinguaghana.tts.OfflineGhanaLPTtsService;
 import com.edulinguaghana.utils.LanguageConversionUtils;
 
+import com.google.android.material.snackbar.Snackbar;
 import android.widget.SeekBar;
 import androidx.recyclerview.widget.RecyclerView;
 import android.view.ViewGroup;
@@ -142,6 +143,12 @@ public class NumbersActivity extends AppCompatActivity {
         audioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
         progressTracker = new ProgressTracker();
         startTime = System.currentTimeMillis();
+
+        // Record practice for streak immediately when starting a learning session
+        try {
+            new StreakManager(this).recordPractice();
+            PracticeTracker.recordPractice(this);
+        } catch (Exception ignored) {}
 
         languageCode = getIntent().getStringExtra("LANG_CODE");
         languageName = getIntent().getStringExtra("LANG_NAME");
@@ -465,19 +472,34 @@ public class NumbersActivity extends AppCompatActivity {
         String normalizedCode = LanguageConversionUtils.normalizeLanguageCode(languageCode);
         switch (normalizedCode) {
             case LanguageConversionUtils.LANG_TWI:
-                tips = getString(R.string.mascot_encouragement_1); // Placeholder or generic tip
+                tips = "Listen to the tone of the number and repeat it clearly!";
                 break;
             case LanguageConversionUtils.LANG_EWE:
-                tips = getString(R.string.mascot_encouragement_2);
+                tips = "Watch out for the 'kple' when combining tens and units!";
                 break;
             case LanguageConversionUtils.LANG_GA:
-                tips = getString(R.string.mascot_encouragement_3);
+                tips = "The 'nyɔŋma' prefix is used for multiples of ten!";
                 break;
         }
 
         if (!tips.isEmpty()) {
-            Toast.makeText(this, getString(R.string.numbers_tip_prefix) + tips, Toast.LENGTH_LONG).show();
+            showMascotMessage(getString(R.string.numbers_tip_prefix) + tips);
         }
+    }
+
+    private void showMascotMessage(String message) {
+        Snackbar snackbar = Snackbar.make(findViewById(android.R.id.content), message, Snackbar.LENGTH_LONG);
+        if (numberCard != null) snackbar.setAnchorView(numberCard);
+        snackbar.setBackgroundTint(getColor(R.color.colorPrimary));
+        snackbar.setTextColor(getColor(android.R.color.white));
+        
+        String fullMessage = "🦉 " + message;
+        
+        View snackbarView = snackbar.getView();
+        TextView tv = snackbarView.findViewById(com.google.android.material.R.id.snackbar_text);
+        if (tv != null) tv.setText(fullMessage);
+        
+        snackbar.show();
     }
 
     private boolean isRecordAudioPermissionGranted() {
@@ -547,7 +569,7 @@ public class NumbersActivity extends AppCompatActivity {
                             promptSpeechInput();
                         } else {
                             speechRetryCount = 0;
-                            Toast.makeText(this, "Couldn't recognize your pronunciation. Try again manually.", Toast.LENGTH_LONG).show();
+                            showMascotMessage(getString(R.string.pronunciation_not_recognized));
                         }
                     }
                 } else {
@@ -557,7 +579,7 @@ public class NumbersActivity extends AppCompatActivity {
                         promptSpeechInput();
                     } else {
                         speechRetryCount = 0;
-                        Toast.makeText(this, "Could not hear you. Try again later.", Toast.LENGTH_LONG).show();
+                        showMascotMessage(getString(R.string.alphabet_toast_not_heard));
                     }
                 }
             } else {
@@ -684,9 +706,15 @@ public class NumbersActivity extends AppCompatActivity {
                 // Play success sound
                 playAudioResource(R.raw.correct);
 
-                Toast.makeText(this,
+                // Gaming UI: Success feedback using Snackbar
+                com.google.android.material.snackbar.Snackbar snackbar = com.google.android.material.snackbar.Snackbar.make(
+                    findViewById(android.R.id.content),
                     getString(R.string.numbers_toast_success, recognized, expected),
-                    Toast.LENGTH_LONG).show();
+                    com.google.android.material.snackbar.Snackbar.LENGTH_LONG
+                );
+                if (numberCard != null) snackbar.setAnchorView(numberCard);
+                snackbar.setBackgroundTint(getColor(R.color.correctAnswer));
+                snackbar.show();
                 
                 // Track progress
                 if (currentNumber > 50) {
@@ -875,7 +903,7 @@ public class NumbersActivity extends AppCompatActivity {
                 null
             );
             
-            Toast.makeText(this, getString(R.string.numbers_lesson_complete, languageName), Toast.LENGTH_LONG).show();
+            showMascotMessage(getString(R.string.numbers_lesson_complete, languageName));
             celebrateAction();
         }
     }

@@ -88,16 +88,24 @@ public class PuzzleGameActivity extends AppCompatActivity {
     }
 
     private void applyGamingClickEffect(View v, Runnable action) {
+        if (isFinishing() || isDestroyed()) return;
         v.animate()
             .scaleX(0.92f)
             .scaleY(0.92f)
             .setDuration(100)
-            .withEndAction(() -> v.animate()
+            .withEndAction(() -> {
+                if (isFinishing() || isDestroyed()) return;
+                v.animate()
                     .scaleX(1.0f)
                     .scaleY(1.0f)
                     .setDuration(100)
-                    .withEndAction(action)
-                    .start())
+                    .withEndAction(() -> {
+                        if (!isFinishing() && !isDestroyed()) {
+                            action.run();
+                        }
+                    })
+                    .start();
+            })
             .start();
     }
 
@@ -148,6 +156,7 @@ public class PuzzleGameActivity extends AppCompatActivity {
         Runnable r = new Runnable() {
             @Override
             public void run() {
+                if (isFinishing() || isDestroyed()) return;
                 if (count[0] > 0) {
                     tvCountdown.setText(String.valueOf(count[0]));
                     count[0]--;
@@ -380,9 +389,14 @@ public class PuzzleGameActivity extends AppCompatActivity {
     }
 
     private void endGame() {
+        if (isFinishing() || isDestroyed()) return;
         isGameOver = true;
         if (gameOverPlayer != null) {
-            gameOverPlayer.start();
+            try {
+                gameOverPlayer.start();
+            } catch (IllegalStateException e) {
+                android.util.Log.e("PuzzleGame", "Failed to play game over sound", e);
+            }
         }
 
         if (score > bestScore) {
@@ -435,19 +449,39 @@ public class PuzzleGameActivity extends AppCompatActivity {
     }
 
     private void celebrate() {
-        konfettiView.start(new nl.dionsegijn.konfetti.core.PartyFactory(new nl.dionsegijn.konfetti.core.emitter.Emitter(100L, java.util.concurrent.TimeUnit.MILLISECONDS).max(30))
-                .position(new nl.dionsegijn.konfetti.core.Position.Relative(0.5, 0.3))
-                .spread(360)
-                .colors(java.util.Arrays.asList(0xfce18a, 0xff726d, 0xf48fb1, 0xafdfff))
-                .build());
+        if (isFinishing() || isDestroyed() || konfettiView == null) return;
+        try {
+            konfettiView.start(new nl.dionsegijn.konfetti.core.PartyFactory(new nl.dionsegijn.konfetti.core.emitter.Emitter(100L, java.util.concurrent.TimeUnit.MILLISECONDS).max(30))
+                    .position(new nl.dionsegijn.konfetti.core.Position.Relative(0.5, 0.3))
+                    .spread(360)
+                    .colors(java.util.Arrays.asList(0xfce18a, 0xff726d, 0xf48fb1, 0xafdfff))
+                    .build());
+        } catch (Exception e) {
+            android.util.Log.e("PuzzleGame", "Konfetti error", e);
+        }
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        if (gameTimer != null) gameTimer.cancel();
-        if (correctPlayer != null) correctPlayer.release();
-        if (wrongPlayer != null) wrongPlayer.release();
-        if (gameOverPlayer != null) gameOverPlayer.release();
+        if (handler != null) {
+            handler.removeCallbacksAndMessages(null);
+        }
+        if (gameTimer != null) {
+            gameTimer.cancel();
+            gameTimer = null;
+        }
+        if (correctPlayer != null) {
+            correctPlayer.release();
+            correctPlayer = null;
+        }
+        if (wrongPlayer != null) {
+            wrongPlayer.release();
+            wrongPlayer = null;
+        }
+        if (gameOverPlayer != null) {
+            gameOverPlayer.release();
+            gameOverPlayer = null;
+        }
     }
 }

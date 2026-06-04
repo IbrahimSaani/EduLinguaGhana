@@ -23,7 +23,7 @@ import com.google.android.material.progressindicator.CircularProgressIndicator;
 public class ProgressActivity extends AppCompatActivity {
 
     private static final String TAG = "ProgressActivity";
-    private TextView tvStatHighScore, tvStatTotalQuizzes, tvStatTotalCorrect, tvStatTotalGames, tvStatAccuracy, tvAchievements;
+    private TextView tvStatHighScore, tvStatTotalQuizzes, tvStatTotalCorrect, tvStatTotalGames, tvStatAccuracy, tvAchievements, tvStatPerfectScores;
     private TextView tvCurrentLevelBadge, tvLevelName, tvXpToNextLevel, tvCurrentXP, tvTargetXP;
     private com.google.android.material.progressindicator.LinearProgressIndicator progressLevel;
     private MaterialButton btnCloseProgress, btnShareProgress;
@@ -47,6 +47,7 @@ public class ProgressActivity extends AppCompatActivity {
         tvStatHighScore    = findViewById(R.id.tvStatHighScore);
         tvStatTotalQuizzes = findViewById(R.id.tvStatTotalQuizzes);
         tvStatTotalCorrect = findViewById(R.id.tvStatTotalCorrect);
+        tvStatPerfectScores = findViewById(R.id.tvStatPerfectScores);
         tvStatTotalGames   = findViewById(R.id.tvStatTotalGames);
         tvStatAccuracy     = findViewById(R.id.tvStatAccuracy);
         tvAchievements     = findViewById(R.id.tvAchievements);
@@ -76,19 +77,40 @@ public class ProgressActivity extends AppCompatActivity {
         final int totalQuizzes  = ProgressManager.getTotalQuizzes(this);
         final int totalGames    = com.edulinguaghana.gamification.FunGameProgressManager.getTotalFunGamesPlayed(this);
         final int totalCorrect  = ProgressManager.getTotalCorrect(this);
+        final int perfectScores = ProgressManager.getPerfectScoresCount(this);
         final int percentage    = ProgressManager.getAccuracy(this);
 
         // Basic stats
         // Cap the high score display at 10 (quiz can have scores > 10 in time-limited mode)
         int displayHighScore = Math.min(highScore, 10);
-        tvStatHighScore.setText("Best quiz score: " + displayHighScore + " / 10");
-        tvStatTotalQuizzes.setText("Total quizzes taken: " + totalQuizzes);
-        tvStatTotalCorrect.setText("Total correct answers: " + totalCorrect);
-        if (tvStatTotalGames != null) {
-            tvStatTotalGames.setText("Total games played: " + totalGames);
+        tvStatHighScore.setText(getString(R.string.stat_high_score, displayHighScore));
+        tvStatTotalQuizzes.setText(getString(R.string.stat_total_quizzes, totalQuizzes));
+        tvStatTotalCorrect.setText(getString(R.string.stat_total_correct, totalCorrect));
+        if (tvStatPerfectScores != null) {
+            tvStatPerfectScores.setText(getString(R.string.stat_perfect_scores, perfectScores));
         }
-        tvStatAccuracy.setText("Overall accuracy: " + percentage + "%");
+        if (tvStatTotalGames != null) {
+            tvStatTotalGames.setText(getString(R.string.stat_total_games, totalGames));
+        }
+        tvStatAccuracy.setText(getString(R.string.stat_accuracy, percentage));
         progressAccuracy.setMax(100);
+
+        // --- Set Level info ---
+        com.edulinguaghana.gamification.XPState xpState = com.edulinguaghana.gamification.XPManager.getState(this);
+        if (tvCurrentLevelBadge != null) tvCurrentLevelBadge.setText(String.valueOf(xpState.level));
+        if (tvLevelName != null) tvLevelName.setText(com.edulinguaghana.gamification.XPManager.getLevelName(xpState.level));
+        
+        int xpRequired = com.edulinguaghana.gamification.XPManager.xpRequiredForLevel(xpState.level);
+        if (progressLevel != null) {
+            progressLevel.setMax(xpRequired);
+            progressLevel.setProgressCompat(xpState.xpIntoLevel, true);
+        }
+        if (tvCurrentXP != null) tvCurrentXP.setText(xpState.xpIntoLevel + " XP");
+        if (tvTargetXP != null) tvTargetXP.setText(xpRequired + " XP");
+        if (tvXpToNextLevel != null) {
+            int remaining = xpRequired - xpState.xpIntoLevel;
+            tvXpToNextLevel.setText(getString(R.string.xp_to_next_level, remaining, xpState.level + 1));
+        }
 
         // --- Set progress immediately (no animation) ---
         Log.d(TAG, "onCreate: Skipping animations.");
@@ -186,56 +208,13 @@ public class ProgressActivity extends AppCompatActivity {
     }
 
     private void setupAchievements(int totalCorrect, int totalQuizzes, int percentage) {
-        int level = 1;
-        if (totalCorrect >= 100)      level = 5;
-        else if (totalCorrect >= 70)  level = 4;
-        else if (totalCorrect >= 40)  level = 3;
-        else if (totalCorrect >= 20)  level = 2;
-
-        String levelName;
-        switch (level) {
-            case 1: levelName = "Beginner Linguist"; break;
-            case 2: levelName = "Rising Speaker"; break;
-            case 3: levelName = "Confident Learner"; break;
-            case 4: levelName = "Fluent Explorer"; break;
-            case 5: default: levelName = "EduLingua Champion"; break;
-        }
-
-        int nextLevelTarget;
-        if (level >= 5) { nextLevelTarget = -1; }
-        else if (level == 4) { nextLevelTarget = 100; }
-        else if (level == 3) { nextLevelTarget = 70; }
-        else if (level == 2) { nextLevelTarget = 40; }
-        else { nextLevelTarget = 20; }
-
-        int prevLevelTarget = 0;
-        if (level == 5) prevLevelTarget = 100;
-        else if (level == 4) prevLevelTarget = 70;
-        else if (level == 3) prevLevelTarget = 40;
-        else if (level == 2) prevLevelTarget = 20;
-
-        // Update Level Card
-        if (tvCurrentLevelBadge != null) tvCurrentLevelBadge.setText(String.valueOf(level));
-        if (tvLevelName != null) tvLevelName.setText(levelName);
-        if (tvCurrentXP != null) tvCurrentXP.setText(totalCorrect + " XP"); // Using correct answers as XP for simplicity
-        
-        if (nextLevelTarget > 0) {
-            int remaining = nextLevelTarget - totalCorrect;
-            if (tvXpToNextLevel != null) tvXpToNextLevel.setText(remaining + " more correct answers to Level " + (level + 1));
-            if (tvTargetXP != null) tvTargetXP.setText(nextLevelTarget + " XP");
-            if (progressLevel != null) {
-                int progress = (int) (((float)(totalCorrect - prevLevelTarget) / (nextLevelTarget - prevLevelTarget)) * 100);
-                progressLevel.setProgressCompat(Math.max(0, progress), true);
-            }
-        } else {
-            if (tvXpToNextLevel != null) tvXpToNextLevel.setText("Highest Level Reached! 👑");
-            if (tvTargetXP != null) tvTargetXP.setText("MAX");
-            if (progressLevel != null) progressLevel.setProgressCompat(100, true);
-        }
+        com.edulinguaghana.gamification.XPState xpState = com.edulinguaghana.gamification.XPManager.getState(this);
+        int level = xpState.level;
+        String levelName = com.edulinguaghana.gamification.XPManager.getLevelName(level);
 
         String achievementText;
         if (totalQuizzes == 0) {
-            achievementText = "Level 1 – Beginner Linguist\n\n" +
+            achievementText = "Level 1 – Beginner Explorer\n\n" +
                     "Start your first quiz to begin your EduLingua Ghana journey!";
         } else {
             StringBuilder sb = new StringBuilder();
@@ -253,20 +232,17 @@ public class ProgressActivity extends AppCompatActivity {
 
             sb.append("\nTotal correct answers so far: ").append(totalCorrect);
 
-            if (nextLevelTarget > 0) {
-                int remaining = nextLevelTarget - totalCorrect;
-                if (remaining > 0) {
-                    sb.append("\n\nNext level at ").append(nextLevelTarget)
-                            .append(" correct answers.\nOnly ")
-                            .append(remaining).append(" more to go!");
-                }
-            } else {
-                sb.append("\n\nYou’ve reached the highest level – keep revising to stay sharp!");
-            }
+            int xpRequired = com.edulinguaghana.gamification.XPManager.xpRequiredForLevel(level);
+            int remaining = xpRequired - xpState.xpIntoLevel;
+            sb.append("\n\nNext level at ").append(xpRequired).append(" XP.\n");
+            sb.append("Only ").append(remaining).append(" more to go!");
+
             achievementText = sb.toString();
         }
 
-        tvAchievements.setText(achievementText);
+        if (tvAchievements != null) {
+            tvAchievements.setText(achievementText);
+        }
     }
 
     private void shareProgress(int highScore, int totalQuizzes, int totalCorrect, int percentage, String achievementText) {

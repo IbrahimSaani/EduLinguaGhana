@@ -78,7 +78,7 @@ public class TutorialActivity extends AppCompatActivity {
         animatedShapesContainer = findViewById(R.id.animatedShapesContainer);
 
         slides = new ArrayList<>();
-        slides.add(new TutorialSlide("🇬🇭", "Hi! I'm Kojo!", "Welcome to EduLingua! I'm so excited to help you learn our beautiful languages!"));
+        slides.add(new TutorialSlide("🇬🇭", "Hi! I'm Owlbert!", "Welcome to EduLingua! I'm so excited to help you learn our beautiful languages!"));
         slides.add(new TutorialSlide("🎤", "Listen & Speak", "I'll say a word, and you repeat it. It's like talking with a friend!"));
         slides.add(new TutorialSlide("📝", "Fun Challenges", "We have cool puzzles and games. Can you get the highest score?"));
         slides.add(new TutorialSlide("🎯", "Speed Games", "Think fast! Play the Speed Challenge to become a language superstar!"));

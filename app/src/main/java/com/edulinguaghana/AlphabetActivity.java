@@ -37,6 +37,7 @@ import com.google.android.material.progressindicator.LinearProgressIndicator;
 import com.google.firebase.auth.FirebaseAuth;
 
 import android.widget.SeekBar;
+import com.google.android.material.snackbar.Snackbar;
 import androidx.recyclerview.widget.RecyclerView;
 import android.view.ViewGroup;
 import android.view.LayoutInflater;
@@ -162,6 +163,12 @@ public class AlphabetActivity extends AppCompatActivity {
         audioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
         progressTracker = new ProgressTracker();
         startTime = System.currentTimeMillis();
+
+        // Record practice for streak immediately when starting a learning session
+        try {
+            new StreakManager(this).recordPractice();
+            PracticeTracker.recordPractice(this);
+        } catch (Exception ignored) {}
 
 
         languageCode = getIntent().getStringExtra("LANG_CODE");
@@ -900,8 +907,25 @@ public class AlphabetActivity extends AppCompatActivity {
         }
 
         if (!tips.isEmpty()) {
-            Toast.makeText(this, getString(R.string.alphabet_tip_prefix) + tips, Toast.LENGTH_LONG).show();
+            showMascotMessage(getString(R.string.alphabet_tip_prefix) + tips);
         }
+    }
+
+    private void showMascotMessage(String message) {
+        Snackbar snackbar = Snackbar.make(findViewById(android.R.id.content), message, Snackbar.LENGTH_LONG);
+        if (letterCard != null) snackbar.setAnchorView(letterCard);
+        snackbar.setBackgroundTint(getColor(R.color.colorPrimary));
+        snackbar.setTextColor(getColor(android.R.color.white));
+        
+        // Add a "Help" emoji to make it feel like Owlbert is talking
+        message = "🦉 " + message;
+        
+        // Find the textview in snackbar to update the text with emoji
+        View snackbarView = snackbar.getView();
+        TextView tv = snackbarView.findViewById(com.google.android.material.R.id.snackbar_text);
+        if (tv != null) tv.setText(message);
+        
+        snackbar.show();
     }
 
     private String getTwiPronunciationTip(String letter) {
@@ -985,14 +1009,14 @@ public class AlphabetActivity extends AppCompatActivity {
                 String recognized = result.get(0).trim();
                 evaluatePronunciation(recognized);
             } else {
-                Toast.makeText(this, getString(R.string.alphabet_toast_not_heard), Toast.LENGTH_SHORT).show();
+                showMascotMessage(getString(R.string.alphabet_toast_not_heard));
             }
         }
     }
 
     private void evaluatePronunciation(String recognized) {
         if (recognized == null || recognized.trim().isEmpty()) {
-            Toast.makeText(this, "🔇 Could not detect any sound.\n\n🎤 Please try again and speak clearly!", Toast.LENGTH_SHORT).show();
+            showMascotMessage(getString(R.string.alphabet_toast_not_heard));
             return;
         }
 
@@ -1090,9 +1114,15 @@ public class AlphabetActivity extends AppCompatActivity {
         // Play success sound
         playAudioResource(R.raw.correct);
 
-        Toast.makeText(this,
+        // Gaming UI: Success feedback using Snackbar
+        com.google.android.material.snackbar.Snackbar snackbar = com.google.android.material.snackbar.Snackbar.make(
+            findViewById(android.R.id.content),
             getString(R.string.alphabet_toast_success, recognized, expected),
-            Toast.LENGTH_LONG).show();
+            com.google.android.material.snackbar.Snackbar.LENGTH_LONG
+        );
+        if (letterCard != null) snackbar.setAnchorView(letterCard);
+        snackbar.setBackgroundTint(getColor(R.color.correctAnswer));
+        snackbar.show();
 
         // Trigger haptic feedback for success
         triggerHapticFeedback(100); // Slightly longer for success
@@ -1325,7 +1355,7 @@ public class AlphabetActivity extends AppCompatActivity {
                 null
             );
             
-            Toast.makeText(this, getString(R.string.alphabet_lesson_complete, languageName), Toast.LENGTH_LONG).show();
+            showMascotMessage(getString(R.string.alphabet_lesson_complete, languageName));
             celebrateAction();
         }
     }

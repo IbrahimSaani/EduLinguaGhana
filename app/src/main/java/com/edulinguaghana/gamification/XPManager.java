@@ -98,6 +98,15 @@ public class XPManager {
         return Math.max(1, level);
     }
 
+    public static String getLevelName(int level) {
+        if (level < 2) return "Beginner Explorer";
+        if (level < 5) return "Language Learner";
+        if (level < 10) return "Fluent Scout";
+        if (level < 20) return "Master Speaker";
+        if (level < 50) return "Language Champion";
+        return "Ultimate Polyglot";
+    }
+
     public static void addListener(XPListener l) {
         listeners.add(l);
     }

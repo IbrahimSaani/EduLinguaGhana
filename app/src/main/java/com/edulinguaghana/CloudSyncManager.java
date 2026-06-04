@@ -80,11 +80,13 @@ public class CloudSyncManager {
             int highScore = ProgressManager.getHighScore(context);
             int totalCorrect = ProgressManager.getTotalCorrect(context);
             int accuracy = ProgressManager.getAccuracy(context);
+            int perfectScores = ProgressManager.getPerfectScoresCount(context);
 
             userData.put("totalQuizzes", totalQuizzes);
             userData.put("highScore", highScore);
             userData.put("totalCorrect", totalCorrect);
             userData.put("accuracy", accuracy);
+            userData.put("perfectScores", perfectScores);
 
             // Streak data
             StreakManager streakManager = new StreakManager(context);
@@ -160,10 +162,12 @@ public class CloudSyncManager {
                             Integer cloudQuizzes = snapshot.child("totalQuizzes").getValue(Integer.class);
                             Integer cloudHighScore = snapshot.child("highScore").getValue(Integer.class);
                             Integer cloudStreak = snapshot.child("currentStreak").getValue(Integer.class);
+                            Integer cloudPerfectScores = snapshot.child("perfectScores").getValue(Integer.class);
 
                             // Get local data
                             int localQuizzes = ProgressManager.getTotalQuizzes(context);
                             int localHighScore = ProgressManager.getHighScore(context);
+                            int localPerfectScores = ProgressManager.getPerfectScoresCount(context);
 
                             // Merge logic: Take the maximum values
                             SharedPreferences prefs = context.getSharedPreferences("EduLinguaPrefs", Context.MODE_PRIVATE);
@@ -175,6 +179,10 @@ public class CloudSyncManager {
 
                             if (cloudHighScore != null && cloudHighScore > localHighScore) {
                                 editor.putInt("HIGH_SCORE", cloudHighScore);
+                            }
+                            
+                            if (cloudPerfectScores != null && cloudPerfectScores > localPerfectScores) {
+                                editor.putInt("PERFECT_SCORES", cloudPerfectScores);
                             }
 
                             Integer cloudTotalFunGames = snapshot.child("totalFunGames").getValue(Integer.class);

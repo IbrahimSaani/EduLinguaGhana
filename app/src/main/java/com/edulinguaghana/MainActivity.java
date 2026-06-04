@@ -18,9 +18,13 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.animation.AnimationUtils;
+import android.net.ConnectivityManager;
+import android.net.Network;
+import android.net.NetworkRequest;
 import android.widget.ImageView;
 import android.widget.Toast;
 
+import com.google.android.material.snackbar.Snackbar;
 import androidx.activity.OnBackPressedCallback;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
@@ -79,10 +83,14 @@ public class MainActivity extends AppCompatActivity {
     private android.widget.TextView tvTotalQuizzes;
     private android.widget.TextView tvTotalGames;
     private android.widget.TextView tvAchievements;
-    private android.view.View offlineBanner;
+    private View offlineBanner;
     private BottomNavigationView bottomNavigation;
     private com.edulinguaghana.social.NotificationPermissionHelper permissionHelper;
     private FloatingActionButton fabRoleDashboard;
+    private MaterialCardView roleDashboardCard;
+    private android.widget.TextView tvRoleTitle, tvRoleSubtitle;
+    private com.google.android.material.button.MaterialButton btnOpenRoleDashboard;
+    private ConnectivityManager.NetworkCallback networkCallback;
 
     private boolean recitalAnimated = false;
     private boolean practiceAnimated = false;
@@ -156,6 +164,10 @@ public class MainActivity extends AppCompatActivity {
         mascotView = findViewById(R.id.mascotView);
         nestedScrollView = findViewById(R.id.nestedScrollView);
         bottomNavigation = findViewById(R.id.bottomNavigation);
+        roleDashboardCard = findViewById(R.id.roleDashboardCard);
+        tvRoleTitle = findViewById(R.id.tvRoleTitle);
+        tvRoleSubtitle = findViewById(R.id.tvRoleSubtitle);
+        btnOpenRoleDashboard = findViewById(R.id.btnOpenRoleDashboard);
 
         setupMascot();
         setupHeroGlow();
@@ -185,14 +197,73 @@ public class MainActivity extends AppCompatActivity {
         if (offlineBanner == null) return;
 
         OfflineManager offlineManager = new OfflineManager(this);
-        if (offlineManager.isOnline()) {
-            offlineBanner.setVisibility(View.GONE);
-        } else {
-            offlineBanner.setVisibility(View.VISIBLE);
-        }
+        boolean isOnline = offlineManager.isOnline();
+        updateOfflineBanner(isOnline);
 
         // Request notification permission (Android 13+)
         requestNotificationPermission();
+    }
+
+    private void updateOfflineBanner(boolean isOnline) {
+        if (offlineBanner == null) return;
+        runOnUiThread(() -> {
+            if (isOnline) {
+                if (offlineBanner.getVisibility() != View.GONE) {
+                    offlineBanner.setVisibility(View.GONE);
+                }
+            } else {
+                if (offlineBanner.getVisibility() != View.VISIBLE) {
+                    offlineBanner.setVisibility(View.VISIBLE);
+                    // Use a more modern animation for entrance
+                    offlineBanner.setAlpha(0f);
+                    offlineBanner.animate().alpha(1f).setDuration(500).start();
+                }
+            }
+        });
+    }
+
+    private void registerNetworkCallback() {
+        try {
+            ConnectivityManager connectivityManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+            if (connectivityManager == null) return;
+
+            NetworkRequest networkRequest = new NetworkRequest.Builder().build();
+            networkCallback = new ConnectivityManager.NetworkCallback() {
+                @Override
+                public void onAvailable(@androidx.annotation.NonNull Network network) {
+                    updateOfflineBanner(true);
+                }
+
+                @Override
+                public void onLost(@androidx.annotation.NonNull Network network) {
+                    updateOfflineBanner(false);
+                }
+            };
+            connectivityManager.registerNetworkCallback(networkRequest, networkCallback);
+        } catch (Exception ignored) {}
+    }
+
+    private void unregisterNetworkCallback() {
+        if (networkCallback != null) {
+            try {
+                ConnectivityManager connectivityManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+                if (connectivityManager != null) {
+                    connectivityManager.unregisterNetworkCallback(networkCallback);
+                }
+            } catch (Exception ignored) {}
+        }
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        registerNetworkCallback();
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        unregisterNetworkCallback();
     }
 
     private void requestNotificationPermission() {
@@ -495,7 +566,20 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void showMascotMessage(String message) {
-        Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
+        if (rootCoordinator == null) {
+            Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        Snackbar snackbar = Snackbar.make(rootCoordinator, message, Snackbar.LENGTH_LONG);
+        if (heroCard != null) {
+            snackbar.setAnchorView(heroCard);
+        }
+        snackbar.setBackgroundTint(ContextCompat.getColor(this, R.color.colorPrimary));
+        snackbar.setTextColor(ContextCompat.getColor(this, android.R.color.white));
+        snackbar.setAction("OK", v -> snackbar.dismiss());
+        snackbar.setActionTextColor(ContextCompat.getColor(this, android.R.color.white));
+        snackbar.show();
     }
 
     private void setupHeroGlow() {
@@ -626,6 +710,7 @@ public class MainActivity extends AppCompatActivity {
         setupAnnouncementsListener();
 
         // Setup daily motivational message
+        setupDailyMotivation();
 
         // Setup learning streak
         setupLearningStreak();
@@ -715,10 +800,22 @@ public class MainActivity extends AppCompatActivity {
                         if (isForMe) {
                             // Check if we already showed this one (using SharedPreferences to avoid duplicates)
                             SharedPreferences prefs = getSharedPreferences(PREF_NAME, MODE_PRIVATE);
-                            String lastAnnounceId = prefs.getString("LAST_ANNOUNCEMENT_ID", "");
-                            if (!postSnapshot.getKey().equals(lastAnnounceId)) {
+                            java.util.Set<String> seenIds = prefs.getStringSet("SEEN_ANNOUNCEMENT_IDS", new java.util.HashSet<>());
+                            
+                            if (seenIds != null && !seenIds.contains(postSnapshot.getKey())) {
                                 showAnnouncementNotification(teacherName, message);
-                                prefs.edit().putString("LAST_ANNOUNCEMENT_ID", postSnapshot.getKey()).apply();
+                                
+                                // Update seen IDs
+                                java.util.Set<String> newSeenIds = new java.util.HashSet<>(seenIds);
+                                newSeenIds.add(postSnapshot.getKey());
+                                
+                                // Clean up if too many IDs tracked (very unlikely to be an issue, but good practice)
+                                if (newSeenIds.size() > 50) {
+                                    List<String> sorted = new java.util.ArrayList<>(newSeenIds);
+                                    newSeenIds = new java.util.HashSet<>(sorted.subList(25, sorted.size()));
+                                }
+                                
+                                prefs.edit().putStringSet("SEEN_ANNOUNCEMENT_IDS", newSeenIds).apply();
                             }
                         }
                     }
@@ -978,6 +1075,9 @@ public class MainActivity extends AppCompatActivity {
         AchievementManager achievementManager = new AchievementManager(this);
         achievementManager.checkAndUnlockAchievements();
 
+        // Setup role-based navigation (refresh in case role changed)
+        setupRoleBasedNavigation();
+
         // previously read high score to show in removed UI; keep prefs access in case other features rely on it
 
         // Only start the dynamic overlay pulse when animations are enabled, dynamic
@@ -1080,6 +1180,13 @@ public class MainActivity extends AppCompatActivity {
                     selectedLangCode = (String) buttonView.getTag();
                     selectedLangName = buttonView.getText().toString();
                     saveLastLanguageSelection(selectedLangCode, selectedLangName);
+                }
+            });
+
+            chip.setOnClickListener(v -> {
+                if (chip.isChecked()) {
+                    showMascotMessage(getString(R.string.mascot_lang_switch, chip.getText().toString()));
+                    playMascotJump();
                 }
             });
             languageChipGroup.addView(chip);
@@ -1583,6 +1690,9 @@ public class MainActivity extends AppCompatActivity {
         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
         if (user == null) {
             // User not logged in, hide role-based features
+            if (roleDashboardCard != null) {
+                roleDashboardCard.setVisibility(View.GONE);
+            }
             return;
         }
 
@@ -1618,15 +1728,21 @@ public class MainActivity extends AppCompatActivity {
      * Setup navigation for teachers
      */
     private void setupTeacherNavigation() {
-        // Find or create FAB for teacher dashboard
-        fabRoleDashboard = findViewById(R.id.fabRoleDashboard);
-        if (fabRoleDashboard == null) {
-            // FAB doesn't exist in layout, don't create it to avoid navbar overlap
-            return;
+        if (roleDashboardCard != null) {
+            roleDashboardCard.setVisibility(View.VISIBLE);
+            if (tvRoleTitle != null) tvRoleTitle.setText(R.string.settings_role_teacher);
+            if (tvRoleSubtitle != null) tvRoleSubtitle.setText(R.string.role_dashboard_teacher_subtitle);
+            if (btnOpenRoleDashboard != null) {
+                btnOpenRoleDashboard.setOnClickListener(v -> {
+                    vibrate();
+                    startActivity(new Intent(this, TeacherDashboardActivity.class));
+                });
+            }
         }
 
+        // Find or create FAB for teacher dashboard
+        fabRoleDashboard = findViewById(R.id.fabRoleDashboard);
         if (fabRoleDashboard != null) {
-            // Hide FAB for teachers to avoid navbar overlap
             fabRoleDashboard.setVisibility(View.GONE);
         }
 
@@ -1638,15 +1754,21 @@ public class MainActivity extends AppCompatActivity {
      * Setup navigation for parents
      */
     private void setupParentNavigation() {
-        // Find or create FAB for parent dashboard
-        fabRoleDashboard = findViewById(R.id.fabRoleDashboard);
-        if (fabRoleDashboard == null) {
-            // FAB doesn't exist in layout, don't create it to avoid navbar overlap
-            return;
+        if (roleDashboardCard != null) {
+            roleDashboardCard.setVisibility(View.VISIBLE);
+            if (tvRoleTitle != null) tvRoleTitle.setText(R.string.settings_role_parent);
+            if (tvRoleSubtitle != null) tvRoleSubtitle.setText(R.string.role_dashboard_parent_subtitle);
+            if (btnOpenRoleDashboard != null) {
+                btnOpenRoleDashboard.setOnClickListener(v -> {
+                    vibrate();
+                    startActivity(new Intent(this, ParentDashboardActivity.class));
+                });
+            }
         }
 
+        // Find or create FAB for parent dashboard
+        fabRoleDashboard = findViewById(R.id.fabRoleDashboard);
         if (fabRoleDashboard != null) {
-            // Hide FAB for parents to avoid navbar overlap
             fabRoleDashboard.setVisibility(View.GONE);
         }
 
@@ -1657,6 +1779,10 @@ public class MainActivity extends AppCompatActivity {
      * Setup navigation for students
      */
     private void setupStudentNavigation() {
+        if (roleDashboardCard != null) {
+            roleDashboardCard.setVisibility(View.GONE);
+        }
+
         // Students get access to connection management in the menu
         invalidateOptionsMenu();
     }

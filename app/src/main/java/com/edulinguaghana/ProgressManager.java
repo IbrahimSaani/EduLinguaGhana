@@ -20,6 +20,7 @@ public class ProgressManager {
 
     // Accuracy mapping
     private static final String KEY_TOTAL_QUESTIONS = "TOTAL_QUESTIONS";
+    private static final String KEY_PERFECT_SCORES = "PERFECT_SCORES";
 
     // Update global progress stats
     public static void updateProgress(Context context, String mode, int score, int correctCount) {
@@ -50,6 +51,13 @@ public class ProgressManager {
         editor.putInt(KEY_TOTAL_QUIZZES, totalQuizzes + 1);
         editor.putInt(KEY_TOTAL_CORRECT, totalCorrect + correctCount);
         editor.putInt(KEY_TOTAL_QUESTIONS, totalQuestionsAcc + totalQuestions);
+
+        // Track perfect scores
+        if (correctCount >= totalQuestions && totalQuestions > 0) {
+            int perfectScores = prefs.getInt(KEY_PERFECT_SCORES, 0);
+            editor.putInt(KEY_PERFECT_SCORES, perfectScores + 1);
+        }
+
         editor.apply();
 
         // Record that user practiced today for notification system
@@ -192,6 +200,12 @@ public class ProgressManager {
 
         if (totalQuestions == 0) return 0;
         return (int) Math.round((correct * 100.0) / totalQuestions);
+    }
+
+    // Get perfect scores count
+    public static int getPerfectScoresCount(Context context) {
+        return context.getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE)
+                .getInt(KEY_PERFECT_SCORES, 0);
     }
 
     public static void saveAllProgress(Context context, int highScore, int totalQuizzes, int totalCorrect, int totalQuestions) {
