@@ -8,12 +8,7 @@
         android:endColor="@color/playfulHeroEnd"
         android:startColor="@color/playfulHeroStart"
         android:type="linear" />
-    <padding
-        android:bottom="8dp"
-        android:left="8dp"
-        android:right="8dp"
-        android:top="8dp" />
     <stroke
-        android:width="2dp"
-        android:color="#40FFFFFF" />
+        android:width="3dp"
+        android:color="@color/colorAccent" />
 </shape>

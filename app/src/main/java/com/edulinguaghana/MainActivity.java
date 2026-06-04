@@ -1545,6 +1545,15 @@ public class MainActivity extends AppCompatActivity {
 
         bottomNavigation.setOnItemSelectedListener(item -> {
             vibrate();
+            
+            // Add a small scale animation to the clicked item icon
+            View itemView = findViewById(item.getItemId());
+            if (itemView != null) {
+                itemView.animate().scaleX(1.15f).scaleY(1.15f).setDuration(150).withEndAction(() -> 
+                    itemView.animate().scaleX(1.0f).scaleY(1.0f).setDuration(150).start()
+                ).start();
+            }
+
             int itemId = item.getItemId();
 
             if (itemId == R.id.nav_home) {

@@ -81,4 +81,9 @@
     <style name="BottomNavTextInactive" parent="TextAppearance.Material3.LabelMedium">
         <item name="android:textSize">11sp</item>
     </style>
+
+    <style name="App.CustomIndicator" parent="Widget.Material3.BottomNavigationView.ActiveIndicator">
+        <item name="android:color">@color/colorPrimaryLight</item>
+        <item name="marginHorizontal">12dp</item>
+    </style>
 </resources>
