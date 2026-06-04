@@ -206,13 +206,42 @@ public class SignUpActivity extends AppCompatActivity {
                                          }
                                      });
                          } else {
-                             Toast.makeText(SignUpActivity.this,
-                                     "Sign up failed: " + task.getException().getMessage(),
-                                     Toast.LENGTH_LONG).show();
+                             String message = getFriendlyErrorMessage(task.getException());
+                             Toast.makeText(SignUpActivity.this, message, Toast.LENGTH_LONG).show();
                          }
                      });
          });
      }
+
+    private String getFriendlyErrorMessage(Exception e) {
+        if (e == null) return getString(R.string.error_auth_generic);
+
+        String message = e.getMessage();
+        if (e instanceof com.google.firebase.auth.FirebaseAuthException) {
+            String errorCode = ((com.google.firebase.auth.FirebaseAuthException) e).getErrorCode();
+            switch (errorCode) {
+                case "ERROR_INVALID_EMAIL":
+                    return getString(R.string.error_auth_invalid_email);
+                case "ERROR_EMAIL_ALREADY_IN_USE":
+                case "ERROR_ACCOUNT_EXISTS_WITH_DIFFERENT_CREDENTIAL":
+                    return getString(R.string.error_auth_email_already_in_use);
+                case "ERROR_WEAK_PASSWORD":
+                    return "That password is a bit weak! Try using at least 6 characters.";
+                case "ERROR_TOO_MANY_REQUESTS":
+                    return getString(R.string.error_auth_too_many_requests);
+            }
+        }
+
+        if (e instanceof com.google.firebase.FirebaseNetworkException) {
+            return getString(R.string.error_auth_network_error);
+        }
+
+        if (message != null && (message.contains("malformed") || message.contains("expired") || message.contains("invalid"))) {
+            return getString(R.string.error_auth_invalid_email);
+        }
+
+        return getString(R.string.error_auth_generic);
+    }
 
      private void sendVerificationEmail(FirebaseUser user, String gender) {
          if (user == null) return;

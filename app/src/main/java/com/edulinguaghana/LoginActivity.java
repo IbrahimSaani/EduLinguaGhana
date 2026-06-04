@@ -203,11 +203,44 @@ public class LoginActivity extends AppCompatActivity {
 
                         proceedAfterLogin(user);
                     } else {
-                        String message = (task.getException() != null) ? task.getException().getMessage() : "Unknown error";
-                        Toast.makeText(LoginActivity.this, "Login failed: " + message,
-                                Toast.LENGTH_LONG).show();
+                        String message = getFriendlyErrorMessage(task.getException());
+                        Toast.makeText(LoginActivity.this, message, Toast.LENGTH_LONG).show();
                     }
                 });
+    }
+
+    private String getFriendlyErrorMessage(Exception e) {
+        if (e == null) return getString(R.string.error_auth_generic);
+        
+        String message = e.getMessage();
+        if (e instanceof com.google.firebase.auth.FirebaseAuthException) {
+            String errorCode = ((com.google.firebase.auth.FirebaseAuthException) e).getErrorCode();
+            switch (errorCode) {
+                case "ERROR_INVALID_EMAIL":
+                    return getString(R.string.error_auth_invalid_email);
+                case "ERROR_WRONG_PASSWORD":
+                    return getString(R.string.error_auth_wrong_password);
+                case "ERROR_USER_NOT_FOUND":
+                    return getString(R.string.error_auth_user_not_found);
+                case "ERROR_USER_DISABLED":
+                    return getString(R.string.error_auth_user_disabled);
+                case "ERROR_TOO_MANY_REQUESTS":
+                    return getString(R.string.error_auth_too_many_requests);
+                case "ERROR_INVALID_CREDENTIAL":
+                    return getString(R.string.error_auth_wrong_password);
+            }
+        }
+        
+        if (e instanceof com.google.firebase.FirebaseNetworkException) {
+            return getString(R.string.error_auth_network_error);
+        }
+
+        // Fallback for technical strings like "malformed or expired"
+        if (message != null && (message.contains("malformed") || message.contains("expired") || message.contains("invalid"))) {
+            return getString(R.string.error_auth_invalid_email);
+        }
+
+        return getString(R.string.error_auth_generic);
     }
 
     private void showEmailVerificationDialog(FirebaseUser user) {
