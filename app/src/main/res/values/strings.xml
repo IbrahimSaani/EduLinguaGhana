@@ -169,6 +169,14 @@
     <string name="quiz_quit_button">Quit</string>
     <string name="splash_progress_label">Loading fun adventures…</string>
 
+    <string name="quiz_result_complete">Quiz Complete!</string>
+    <string name="quiz_result_score_label">SCORE</string>
+    <string name="quiz_result_accuracy_label">ACCURACY</string>
+    <string name="quiz_result_best_label">BEST</string>
+    <string name="quiz_result_xp_label">XP EARNED</string>
+    <string name="quiz_result_replay">Replay</string>
+    <string name="quiz_result_home">Home</string>
+
     <!-- Hidden Shapes Game -->
     <string name="hidden_shapes_title">Hidden Shapes</string>
     <string name="hidden_shapes_prompt">Rub the sand to reveal the hidden character!</string>

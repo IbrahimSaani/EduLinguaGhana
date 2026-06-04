@@ -564,37 +564,27 @@
             android:orientation="vertical"
             android:padding="20dp"
             android:visibility="gone"
+            android:background="@color/appBackground"
             tools:visibility="visible">
 
-            <!-- Lottie Celebration -->
+            <!-- Premium Result Header -->
             <com.airbnb.lottie.LottieAnimationView
                 android:id="@+id/lavEndCelebration"
-                android:layout_width="220dp"
-                android:layout_height="220dp"
-                android:layout_marginBottom="16dp"
+                android:layout_width="180dp"
+                android:layout_height="180dp"
+                android:layout_marginBottom="-30dp"
                 app:lottie_autoPlay="true"
                 app:lottie_loop="true"
-                app:lottie_rawRes="@raw/kids_animation" />
-
-            <!-- Celebration emoji (fallback) -->
-            <TextView
-                android:id="@+id/tvEndCelebrationEmoji"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="16dp"
-                android:gravity="center"
-                android:text="🎉"
-                android:textSize="96sp"
-                android:visibility="gone"
-                android:contentDescription="Celebration" />
+                app:lottie_rawRes="@raw/kids_animation"
+                android:elevation="12dp" />
 
             <com.google.android.material.card.MaterialCardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="20dp"
-                app:cardElevation="8dp"
-                app:cardCornerRadius="16dp"
-                app:strokeWidth="2dp"
+                android:layout_marginBottom="24dp"
+                app:cardElevation="10dp"
+                app:cardCornerRadius="32dp"
+                app:strokeWidth="3dp"
                 app:strokeColor="@color/colorAccent">
 
                 <LinearLayout
@@ -602,8 +592,8 @@
                     android:layout_height="wrap_content"
                     android:orientation="vertical"
                     android:gravity="center"
-                    android:padding="24dp"
-                    android:background="@color/cardBackground">
+                    android:padding="28dp"
+                    android:background="@drawable/bg_hero_glow">
 
                     <TextView
                         android:id="@+id/tvEndTitle"
@@ -611,8 +601,8 @@
                         android:layout_height="wrap_content"
                         android:fontFamily="@font/agbalumo"
                         android:gravity="center"
-                        android:text="@string/quiz_end_title"
-                        android:textAppearance="?attr/textAppearanceHeadline3"
+                        android:text="@string/quiz_result_complete"
+                        android:textSize="32sp"
                         android:textColor="@color/colorPrimary"
                         android:textStyle="bold" />
 
@@ -620,87 +610,137 @@
                         android:id="@+id/tvNewHighScore"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="12dp"
+                        android:layout_marginTop="8dp"
                         android:fontFamily="@font/agbalumo"
                         android:gravity="center"
                         android:text="@string/quiz_end_new_high_score"
-                        android:textAppearance="?attr/textAppearanceHeadline5"
+                        android:textSize="18sp"
                         android:textColor="@color/colorAccent"
                         android:visibility="gone"
-                        android:textStyle="bold"
                         tools:visibility="visible" />
 
-                    <com.google.android.material.card.MaterialCardView
+                    <!-- Stats Grid -->
+                    <GridLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="20dp"
-                        android:layout_marginBottom="12dp"
-                        app:cardElevation="4dp"
-                        app:cardCornerRadius="12dp"
-                        app:strokeWidth="2dp"
-                        app:strokeColor="@color/colorAccent">
+                        android:layout_marginTop="24dp"
+                        android:columnCount="2"
+                        android:rowCount="2"
+                        android:alignmentMode="alignMargins"
+                        android:useDefaultMargins="true">
 
+                        <!-- Main Score -->
                         <LinearLayout
-                            android:layout_width="match_parent"
+                            android:layout_width="0dp"
                             android:layout_height="wrap_content"
-                            android:orientation="vertical"
+                            android:layout_columnWeight="1"
+                            android:layout_margin="6dp"
+                            android:background="@drawable/bg_quiz_stats"
                             android:gravity="center"
-                            android:padding="16dp">
-
+                            android:orientation="vertical"
+                            android:padding="12dp">
                             <TextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="Your Score"
-                                android:textAppearance="?attr/textAppearanceCaption"
-                                android:textColor="@color/textColorSecondary" />
-
+                                android:text="@string/quiz_result_score_label"
+                                android:textSize="11sp"
+                                android:textStyle="bold"
+                                android:alpha="0.7"
+                                android:textColor="@color/textColorPrimary" />
                             <TextView
                                 android:id="@+id/tvFinalScore"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:layout_marginTop="8dp"
-                                android:gravity="center"
-                                android:textAppearance="?attr/textAppearanceHeadline3"
-                                android:textColor="@color/colorAccent"
-                                android:textStyle="bold"
-                                tools:text="12" />
+                                android:fontFamily="@font/agbalumo"
+                                android:text="0"
+                                android:textSize="28sp"
+                                android:textColor="@color/colorPrimary" />
                         </LinearLayout>
-                    </com.google.android.material.card.MaterialCardView>
 
-                    <com.google.android.material.card.MaterialCardView
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        app:cardElevation="4dp"
-                        app:cardCornerRadius="12dp"
-                        app:strokeWidth="2dp"
-                        app:strokeColor="@color/correctAnswer">
-
+                        <!-- Accuracy -->
                         <LinearLayout
-                            android:layout_width="match_parent"
+                            android:layout_width="0dp"
                             android:layout_height="wrap_content"
-                            android:orientation="vertical"
+                            android:layout_columnWeight="1"
+                            android:layout_margin="6dp"
+                            android:background="@drawable/bg_quiz_stats"
                             android:gravity="center"
-                            android:padding="16dp">
-
+                            android:orientation="vertical"
+                            android:padding="12dp">
                             <TextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="Best Score"
-                                android:textAppearance="?attr/textAppearanceCaption"
-                                android:textColor="@color/textColorSecondary" />
+                                android:text="@string/quiz_result_accuracy_label"
+                                android:textSize="11sp"
+                                android:textStyle="bold"
+                                android:alpha="0.7"
+                                android:textColor="@color/textColorPrimary" />
+                            <TextView
+                                android:id="@+id/tvEndAccuracy"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:fontFamily="@font/agbalumo"
+                                android:text="0%"
+                                android:textSize="28sp"
+                                android:textColor="@color/correctAnswer" />
+                        </LinearLayout>
 
+                        <!-- Best Score -->
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_columnWeight="1"
+                            android:layout_margin="6dp"
+                            android:background="@drawable/bg_quiz_stats"
+                            android:gravity="center"
+                            android:orientation="vertical"
+                            android:padding="12dp">
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="@string/quiz_result_best_label"
+                                android:textSize="11sp"
+                                android:textStyle="bold"
+                                android:alpha="0.7"
+                                android:textColor="@color/textColorPrimary" />
                             <TextView
                                 android:id="@+id/tvEndBestScore"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:layout_marginTop="8dp"
-                                android:gravity="center"
-                                android:textAppearance="?attr/textAppearanceHeadline3"
-                                android:textColor="@color/correctAnswer"
-                                android:textStyle="bold"
-                                tools:text="15" />
+                                android:fontFamily="@font/agbalumo"
+                                android:text="0"
+                                android:textSize="28sp"
+                                android:textColor="@color/colorAccent" />
                         </LinearLayout>
-                    </com.google.android.material.card.MaterialCardView>
+
+                        <!-- XP Gained -->
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_columnWeight="1"
+                            android:layout_margin="6dp"
+                            android:background="@drawable/bg_quiz_stats"
+                            android:gravity="center"
+                            android:orientation="vertical"
+                            android:padding="12dp">
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="@string/quiz_result_xp_label"
+                                android:textSize="11sp"
+                                android:textStyle="bold"
+                                android:alpha="0.7"
+                                android:textColor="@color/textColorPrimary" />
+                            <TextView
+                                android:id="@+id/tvEndXP"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:fontFamily="@font/agbalumo"
+                                android:text="+0"
+                                android:textSize="28sp"
+                                android:textColor="@color/progressTitleColor" />
+                        </LinearLayout>
+                    </GridLayout>
 
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
@@ -709,37 +749,41 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:gravity="center_horizontal">
+                android:orientation="horizontal"
+                android:spacing="12dp">
 
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/btnPlayAgain"
-                    android:layout_width="match_parent"
-                    android:layout_height="@dimen/button_height_large"
-                    android:layout_marginBottom="12dp"
-                    android:text="@string/quiz_play_again_button"
-                    android:textSize="@dimen/text_body_large"
+                    android:layout_width="0dp"
+                    android:layout_height="64dp"
+                    android:layout_weight="1"
+                    android:text="@string/quiz_result_replay"
+                    android:textSize="16sp"
                     android:textStyle="bold"
                     android:fontFamily="@font/agbalumo"
-                    app:cornerRadius="16dp"
-                    android:backgroundTint="@null"
-                    android:background="@drawable/bg_quiz_success_button"
+                    app:cornerRadius="20dp"
+                    app:icon="@drawable/ic_rocket"
+                    app:iconGravity="textStart"
+                    android:backgroundTint="@color/colorPrimary"
                     android:textColor="@color/white"
-                    app:elevation="8dp" />
+                    app:elevation="6dp" />
 
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/btnEndQuit"
-                    android:layout_width="match_parent"
-                    android:layout_height="@dimen/button_height_large"
-                    android:text="@string/quiz_quit_button"
-                    android:textSize="@dimen/text_body_large"
+                    style="@style/Widget.Material3.Button.OutlinedButton"
+                    android:layout_width="0dp"
+                    android:layout_height="64dp"
+                    android:layout_weight="1"
+                    android:text="@string/quiz_result_home"
+                    android:textSize="16sp"
                     android:textStyle="bold"
                     android:fontFamily="@font/agbalumo"
-                    app:cornerRadius="16dp"
-                    android:backgroundTint="@null"
-                    android:background="@drawable/bg_quiz_error_button"
-                    android:textColor="@color/white"
-                    app:elevation="8dp" />
+                    app:cornerRadius="20dp"
+                    app:icon="@drawable/ic_home"
+                    app:iconGravity="textStart"
+                    app:strokeColor="@color/wrongAnswer"
+                    app:strokeWidth="2dp"
+                    android:textColor="@color/wrongAnswer" />
             </LinearLayout>
 
         </LinearLayout>

@@ -37,7 +37,10 @@ import com.google.android.material.button.MaterialButton;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.edulinguaghana.tts.OfflineGhanaLPTtsService;
 import com.edulinguaghana.audio.AudioCacheManager;
+import com.edulinguaghana.tracking.ProgressTracker;
 import com.edulinguaghana.utils.LanguageConversionUtils;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -82,14 +85,15 @@ public class QuizActivity extends AppCompatActivity {
 
     // End screen
     private TextView tvFinalScore, tvEndBestScore, tvNewHighScore;
+    private TextView tvEndAccuracy, tvEndXP;
     private MaterialButton btnPlayAgain, btnEndQuit;
-    private TextView tvEndCelebrationEmoji;
 
     private String quizType, languageCode, languageName;
     private String currentSubMode; // Track sub-mode for Mixed Quiz
     private String difficulty = "beginner";  // Default difficulty level
     private String category = "all";  // Default category
     private int score = 0;
+    private int totalQuestionsAttempted = 0;
     private int bestScore = 0;
     private CountDownTimer countDownTimer;
     private long remainingTime;
@@ -200,11 +204,6 @@ public class QuizActivity extends AppCompatActivity {
 
         // End screen buttons
         btnPlayAgain.setOnClickListener(v -> {
-            if (tvEndCelebrationEmoji != null) {
-                tvEndCelebrationEmoji.animate().cancel();
-                tvEndCelebrationEmoji.setVisibility(View.GONE);
-                tvEndCelebrationEmoji.setRotation(0f);
-            }
             endQuizContainer.setVisibility(View.GONE);
             showQuizContent();
         });
@@ -256,11 +255,12 @@ public class QuizActivity extends AppCompatActivity {
 
         tvFinalScore = findViewById(R.id.tvFinalScore);
         tvEndBestScore = findViewById(R.id.tvEndBestScore);
+        tvNewHighScore = findViewById(R.id.tvNewHighScore);
+        tvEndAccuracy = findViewById(R.id.tvEndAccuracy);
+        tvEndXP = findViewById(R.id.tvEndXP);
         btnPlayAgain = findViewById(R.id.btnPlayAgain);
         btnEndQuit = findViewById(R.id.btnEndQuit);
-        tvNewHighScore = findViewById(R.id.tvNewHighScore);
         lavEndCelebration = findViewById(R.id.lavEndCelebration);
-        tvEndCelebrationEmoji = findViewById(R.id.tvEndCelebrationEmoji);
         konfettiView = findViewById(R.id.konfettiView);
     }
 
@@ -530,6 +530,7 @@ public class QuizActivity extends AppCompatActivity {
 
     private void startGame() {
         score = 0;
+        totalQuestionsAttempted = 0;
         quizStartTime = System.currentTimeMillis();
         
         // Use challenge duration if available, else default to 30 seconds
@@ -998,6 +999,7 @@ public class QuizActivity extends AppCompatActivity {
             // Correct Match!
             playSfx(true);
             score++;
+            totalQuestionsAttempted++;
             tvGameScore.setText(String.format(Locale.getDefault(), getString(R.string.quiz_score), score));
             tvGameFeedback.setText(R.string.quiz_feedback_match_found);
             tvGameFeedback.setTextColor(ContextCompat.getColor(this, R.color.correctAnswer));
@@ -1060,6 +1062,7 @@ public class QuizActivity extends AppCompatActivity {
         } else {
             // Wrong Match
             playSfx(false);
+            totalQuestionsAttempted++;
             tvGameFeedback.setText(R.string.quiz_feedback_not_match);
             tvGameFeedback.setTextColor(ContextCompat.getColor(this, R.color.wrongAnswer));
 
@@ -1119,6 +1122,7 @@ public class QuizActivity extends AppCompatActivity {
 
         if (isCorrect) {
             score++;
+            totalQuestionsAttempted++;
             tvGameFeedback.setText(R.string.quiz_feedback_correct);
             tvGameFeedback.setTextColor(ContextCompat.getColor(this, R.color.correctAnswer));
             tvGameFeedback.announceForAccessibility(getString(R.string.accessibility_correct_answer, score));
@@ -1150,6 +1154,7 @@ public class QuizActivity extends AppCompatActivity {
                 celebrate();
             }
         } else {
+            totalQuestionsAttempted++;
             tvGameFeedback.setText(getString(R.string.quiz_feedback_wrong, currentCorrectAnswer));
             tvGameFeedback.setTextColor(ContextCompat.getColor(this, R.color.wrongAnswer));
             tvGameFeedback.announceForAccessibility(getString(R.string.accessibility_wrong_answer, currentCorrectAnswer));
@@ -1219,6 +1224,11 @@ public class QuizActivity extends AppCompatActivity {
         setButtonsEnabled(false);
         
         long durationSeconds = (System.currentTimeMillis() - quizStartTime) / 1000;
+        final int finalScore = score;
+        final int finalTotalQuestions = totalQuestionsAttempted > 0 ? totalQuestionsAttempted : score;
+        final int accuracy = finalTotalQuestions > 0 ? (int) ((finalScore * 100.0) / finalTotalQuestions) : 0;
+        final int xpEarned = Math.max(5, finalScore * 2 + finalScore / 5);
+        
         boolean newHighScore = score > 0 && score >= bestScore;
 
         // Update overall progress with language tracking
@@ -1227,6 +1237,16 @@ public class QuizActivity extends AppCompatActivity {
         // Record practice for streak
         StreakManager streakManager = new StreakManager(this);
         streakManager.recordPractice();
+        PracticeTracker.recordPractice(this);
+
+        // Log completion to Firebase
+        try {
+            FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+            if (user != null) {
+                ProgressTracker tracker = new ProgressTracker();
+                tracker.logQuizCompletion(this, user.getUid(), quizType, finalScore, finalScore, finalTotalQuestions, durationSeconds, null);
+            }
+        } catch (Exception ignored) {}
 
         // Check and unlock achievements
         AchievementManager achievementManager = new AchievementManager(this);
@@ -1247,7 +1267,7 @@ public class QuizActivity extends AppCompatActivity {
         // Trigger notifications for achievements
         NotificationManager notificationManager = new NotificationManager(this);
 
-        if (newHighScore && score >= 80) {
+        if (newHighScore && score >= 8) { // Updated threshold for high score notification
             notificationManager.sendAchievementNotification(
                 "New High Score! 🏆",
                 "Amazing! You scored " + score + " points in " + quizType + " mode!"
@@ -1264,7 +1284,7 @@ public class QuizActivity extends AppCompatActivity {
             } catch (Exception ignored) { }
         }
 
-        if (score == 100) {
+        if (score >= 10) {
             notificationManager.sendAchievementNotification(
                 "Perfect Score! ⭐",
                 "Outstanding! You got a perfect score in " + quizType + " mode!"
@@ -1275,7 +1295,7 @@ public class QuizActivity extends AppCompatActivity {
         try {
             com.edulinguaghana.social.SocialRepository social = com.edulinguaghana.social.SocialProvider.get();
             if (social != null) {
-                String uid = com.google.firebase.auth.FirebaseAuth.getInstance().getCurrentUser() != null ? com.google.firebase.auth.FirebaseAuth.getInstance().getCurrentUser().getUid() : "anonymous";
+                String uid = FirebaseAuth.getInstance().getCurrentUser() != null ? FirebaseAuth.getInstance().getCurrentUser().getUid() : "anonymous";
 
                 // Resolve pending challenges for this user: fetch challenges where challengedId==uid
                 // FirebaseSocialRepository does not provide a synchronous get, so we update via DB query
@@ -1321,12 +1341,19 @@ public class QuizActivity extends AppCompatActivity {
             }
 
             if (tvFinalScore != null) {
-                tvFinalScore.setText(String.format(Locale.getDefault(), getString(R.string.quiz_final_score), score));
+                tvFinalScore.setText(String.valueOf(score));
             }
+            if (tvEndAccuracy != null) {
+                tvEndAccuracy.setText(accuracy + "%");
+            }
+            if (tvEndXP != null) {
+                tvEndXP.setText("+" + xpEarned);
+            }
+            
             // Cap best score display at 10 (quiz can have scores > 10 in time-limited mode)
             int displayBestScore = Math.min(bestScore, 10);
             if (tvEndBestScore != null) {
-                tvEndBestScore.setText(String.format(Locale.getDefault(), getString(R.string.quiz_best_score), displayBestScore));
+                tvEndBestScore.setText(String.valueOf(displayBestScore));
             }
 
             if (newHighScore) {
@@ -1339,12 +1366,6 @@ public class QuizActivity extends AppCompatActivity {
                     lavEndCelebration.setVisibility(View.VISIBLE);
                     lavEndCelebration.playAnimation();
                 }
-                if (tvEndCelebrationEmoji != null) {
-                    tvEndCelebrationEmoji.setVisibility(View.VISIBLE);
-                    tvEndCelebrationEmoji.setText("🏆"); // Trophy for new high score
-                    tvEndCelebrationEmoji.setScaleX(1.3f);
-                    tvEndCelebrationEmoji.setScaleY(1.3f);
-                }
             } else {
                 if (tvNewHighScore != null) {
                     tvNewHighScore.setVisibility(View.GONE);
@@ -1352,12 +1373,9 @@ public class QuizActivity extends AppCompatActivity {
                 if (lavEndCelebration != null) {
                     lavEndCelebration.setVisibility(View.GONE);
                 }
-                if (tvEndCelebrationEmoji != null) {
-                    tvEndCelebrationEmoji.setVisibility(View.VISIBLE);
-                    tvEndCelebrationEmoji.setText("🎮"); // Game icon for normal finish
-                }
             }
         } catch (Exception ignored) {
+            Log.e("QuizActivity", "Error showing end screen: " + ignored.getMessage());
         }
     }
 
