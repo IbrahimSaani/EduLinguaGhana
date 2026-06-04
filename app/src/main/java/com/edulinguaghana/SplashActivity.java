@@ -17,6 +17,8 @@ import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
+import com.google.android.material.card.MaterialCardView;
+
 public class SplashActivity extends AppCompatActivity {
 
     private MediaPlayer startPlayer;
@@ -34,7 +36,7 @@ public class SplashActivity extends AppCompatActivity {
     private ImageView progressSparkle;
     private ImageView topWave;
     private ImageView bottomWave;
-    private LinearLayout centerCard;
+    private MaterialCardView centerCard;
     private LinearLayout morphDotsContainer;
 
     // Morph dots
@@ -42,8 +44,8 @@ public class SplashActivity extends AppCompatActivity {
 
     // Decorative elements
     private ImageView decorStar1, decorStar2;
-    private ImageView decorCircle1, decorCircle2;
-    private ImageView decorDiamond1, decorDiamond2, decorDiamond3;
+    private ImageView decorCircle1;
+    private ImageView decorDiamond1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -80,10 +82,7 @@ public class SplashActivity extends AppCompatActivity {
         decorStar1 = findViewById(R.id.decorStar1);
         decorStar2 = findViewById(R.id.decorStar2);
         decorCircle1 = findViewById(R.id.decorCircle1);
-        decorCircle2 = findViewById(R.id.decorCircle2);
         decorDiamond1 = findViewById(R.id.decorDiamond1);
-        decorDiamond2 = findViewById(R.id.decorDiamond2);
-        decorDiamond3 = findViewById(R.id.decorDiamond3);
 
         progressBar.setMax(100);
         progressBar.setProgress(0);
@@ -164,7 +163,7 @@ public class SplashActivity extends AppCompatActivity {
 
         for (int i = 0; i < dots.length; i++) {
             final View dot = dots[i];
-            final int index = i;
+            final int dotIndex = i;
 
             if (dot != null) {
                 dot.postDelayed(() -> {
@@ -183,7 +182,7 @@ public class SplashActivity extends AppCompatActivity {
                                         .start();
                             })
                             .start();
-                }, baseDelay * index);
+                }, baseDelay * dotIndex);
             }
         }
 
@@ -241,7 +240,6 @@ public class SplashActivity extends AppCompatActivity {
 
         // Circles float
         animateDecorativeElement(decorCircle1, 1600, false);
-        animateDecorativeElement(decorCircle2, 1800, false);
 
         // Only animate one diamond to reduce load
         animateDecorativeElement(decorDiamond1, 2000, false);
