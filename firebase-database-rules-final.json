@@ -87,7 +87,7 @@
       ".indexOn": ["userId", "winRate", "totalChallenges"],
       "$userId": {
         ".read": "auth != null",
-        ".write": "auth != null && $userId === auth.uid",
+        ".write": "auth != null",
         ".validate": "newData.hasChildren(['userId', 'challengesWon', 'challengesLost', 'challengesTied', 'challengesDeclined', 'totalChallenges', 'winRate']) && newData.child('userId').val() === $userId && newData.child('challengesWon').isNumber() && newData.child('challengesLost').isNumber() && newData.child('challengesTied').isNumber() && newData.child('challengesDeclined').isNumber() && newData.child('totalChallenges').isNumber() && newData.child('winRate').isNumber()",
         "challengesWon": {
           ".validate": "newData.isNumber()"

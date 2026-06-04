@@ -175,12 +175,16 @@ public class ChallengeManager {
                         stats = snapshot.getValue(ChallengeStats.class);
                         if (stats == null) {
                             stats = new ChallengeStats(userId);
+                        } else {
+                            // Ensure userId is set correctly even if not in DB
+                            stats.userId = userId;
                         }
                     } else {
                         stats = new ChallengeStats(userId);
                     }
 
                     // Record result
+                    Log.d(TAG, "Recording challenge result for player " + userId + ". Winner: " + winnerId);
                     stats.recordChallengeResult(winnerId);
 
                     // Save updated stats
@@ -222,6 +226,8 @@ public class ChallengeManager {
                         stats = snapshot.getValue(ChallengeStats.class);
                         if (stats == null) {
                             stats = new ChallengeStats(userId);
+                        } else {
+                            stats.userId = userId;
                         }
                     } else {
                         stats = new ChallengeStats(userId);
@@ -299,7 +305,18 @@ public class ChallengeManager {
             .addListenerForSingleValueEvent(new ValueEventListener() {
                 @Override
                 public void onDataChange(DataSnapshot snapshot) {
-                    ChallengeStats stats = snapshot.exists() ? snapshot.getValue(ChallengeStats.class) : new ChallengeStats(userId);
+                    ChallengeStats stats;
+                    if (snapshot.exists()) {
+                        stats = snapshot.getValue(ChallengeStats.class);
+                        if (stats == null) {
+                            stats = new ChallengeStats(userId);
+                        } else {
+                            stats.userId = userId;
+                        }
+                    } else {
+                        stats = new ChallengeStats(userId);
+                    }
+
                     if (stats != null) {
                         stats.recordDecline();
                         dbRef.child(CHALLENGE_STATS_PATH).child(userId).setValue(stats);

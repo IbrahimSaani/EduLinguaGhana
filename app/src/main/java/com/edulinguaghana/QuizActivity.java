@@ -1291,40 +1291,7 @@ public class QuizActivity extends AppCompatActivity {
             );
         }
 
-        // --- Social: resolve challenges ---
-        try {
-            com.edulinguaghana.social.SocialRepository social = com.edulinguaghana.social.SocialProvider.get();
-            if (social != null) {
-                String uid = FirebaseAuth.getInstance().getCurrentUser() != null ? FirebaseAuth.getInstance().getCurrentUser().getUid() : "anonymous";
-
-                // Resolve pending challenges for this user: fetch challenges where challengedId==uid
-                // FirebaseSocialRepository does not provide a synchronous get, so we update via DB query
-                com.google.firebase.database.DatabaseReference challengesRef = com.google.firebase.database.FirebaseDatabase.getInstance().getReference("challenges");
-                challengesRef.addListenerForSingleValueEvent(new com.google.firebase.database.ValueEventListener() {
-                    @Override
-                    public void onDataChange(@androidx.annotation.NonNull com.google.firebase.database.DataSnapshot snapshot) {
-                        for (com.google.firebase.database.DataSnapshot child : snapshot.getChildren()) {
-                            com.edulinguaghana.social.Challenge c = child.getValue(com.edulinguaghana.social.Challenge.class);
-                            if (c != null && c.challengedId != null && c.challengedId.equals(uid) && (c.state == com.edulinguaghana.social.Challenge.State.PENDING || c.state == com.edulinguaghana.social.Challenge.State.ONGOING)) {
-                                // record result
-                                if (c.results == null) c.results = new java.util.HashMap<>();
-                                c.results.put(uid, score);
-                                // Mark completed if challenger also has a result (simple two-player model)
-                                if (c.results.containsKey(c.challengerId)) {
-                                    c.state = com.edulinguaghana.social.Challenge.State.COMPLETED;
-                                } else {
-                                    c.state = com.edulinguaghana.social.Challenge.State.ONGOING;
-                                }
-                                child.getRef().setValue(c);
-                            }
-                        }
-                    }
-
-                    @Override
-                    public void onCancelled(com.google.firebase.database.DatabaseError error) { }
-                });
-            }
-        } catch (Exception ignored) {}
+        // --- Social: challenges are handled by saveChallengeResult() above ---
 
         // Show end screen
         try {
