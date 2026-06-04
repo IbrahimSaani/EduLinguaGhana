@@ -2,13 +2,8 @@ package com.edulinguaghana;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
 
-import android.Manifest;
 import android.content.Context;
-import android.content.Intent;
-import android.content.pm.PackageManager;
 import android.content.res.ColorStateList;
 import android.media.AudioAttributes;
 import android.media.AudioFocusRequest;
@@ -18,7 +13,6 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.VibrationEffect;
 import android.os.Vibrator;
-import android.speech.RecognizerIntent;
 import android.speech.tts.TextToSpeech;
 import android.view.HapticFeedbackConstants;
 import android.view.View;
@@ -26,7 +20,6 @@ import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.edulinguaghana.tracking.ProgressTracker;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
@@ -41,7 +34,6 @@ import com.google.android.material.snackbar.Snackbar;
 import androidx.recyclerview.widget.RecyclerView;
 import android.view.ViewGroup;
 import android.view.LayoutInflater;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
@@ -56,28 +48,19 @@ public class AlphabetActivity extends AppCompatActivity {
     private FloatingActionButton btnBack;
     private LinearProgressIndicator progressBar;
     private MaterialCardView letterCard, languageCard;
-    private MaterialCardView modeBadgeCard;
-    private TextView modeBadgeIcon, modeBadgeText, modeBadgeDescription;
     private ImageView decorativeShape1, decorativeShape2, decorativeShape3, decorativeShape4;
     private ImageView progressIcon;
     private TextView modeIcon;  // Changed to TextView for emoji
     private TextView celebrationEmoji;  // For celebration animations
     private SeekBar seekBarNavigation;  // For smooth navigation
     private MaterialButton btnShowGrid;  // For quick access grid
-    private MaterialButton btnSpeakQuick;  // For quick speak button
-
-    private Vibrator vibrator;  // For haptic feedback
 
     private String languageCode;
     private String languageName;
-    private String mode;           // "recital" or "practice"
-    private boolean isRecitalMode;
 
     private String[] letters;
     private String[] words;
     private int currentIndex = 0;
-    private int practiceRetryCount = 0;
-    private static final int MAX_RETRIES_BEFORE_TIP = 2;
 
 
     private TextToSpeech tts;
@@ -99,9 +82,6 @@ public class AlphabetActivity extends AppCompatActivity {
     // Offline TTS for native Ghanaian languages (loads from res/raw)
     private OfflineGhanaLPTtsService offlineTts;
     private boolean isGhanaLpPlaying = false;
-
-    private static final int REQ_CODE_SPEECH_INPUT = 100;
-    private static final int REQ_CODE_RECORD_AUDIO = 200;
 
     @Override
     protected void onSaveInstanceState(@NonNull Bundle outState) {
@@ -140,10 +120,6 @@ public class AlphabetActivity extends AppCompatActivity {
         progressBar = findViewById(R.id.progressBar);
         letterCard = findViewById(R.id.letterCard);
         languageCard = findViewById(R.id.languageCard);
-        modeBadgeCard = findViewById(R.id.modeBadgeCard);
-        modeBadgeIcon = findViewById(R.id.modeBadgeIcon);
-        modeBadgeText = findViewById(R.id.modeBadgeText);
-        modeBadgeDescription = findViewById(R.id.modeBadgeDescription);
 
         // Initialize decorative elements
         decorativeShape1 = findViewById(R.id.decorativeShape1);
@@ -156,10 +132,8 @@ public class AlphabetActivity extends AppCompatActivity {
         // Initialize navigation controls
         seekBarNavigation = findViewById(R.id.seekBarNavigation);
         btnShowGrid = findViewById(R.id.btnShowGrid);
-        btnSpeakQuick = findViewById(R.id.btnSpeakQuick);
 
         // Initialize vibrator for haptic feedback
-        vibrator = (Vibrator) getSystemService(VIBRATOR_SERVICE);
         audioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
         progressTracker = new ProgressTracker();
         startTime = System.currentTimeMillis();
@@ -173,7 +147,6 @@ public class AlphabetActivity extends AppCompatActivity {
 
         languageCode = getIntent().getStringExtra("LANG_CODE");
         languageName = getIntent().getStringExtra("LANG_NAME");
-        mode = getIntent().getStringExtra("MODE");
 
         if (savedInstanceState != null) {
             currentIndex = savedInstanceState.getInt("CURRENT_INDEX", 0);
@@ -181,13 +154,9 @@ public class AlphabetActivity extends AppCompatActivity {
         }
 
         if (languageName == null) languageName = "Unknown";
-        if (mode == null) mode = "practice";
-
-        isRecitalMode = mode.equals("recital");
 
         tvLanguageTitle.setText(getString(R.string.language_prefix) + " " + languageName);
-        btnSpeak.setText(isRecitalMode ? getString(R.string.alphabet_mode_recital) : getString(R.string.alphabet_mode_practice));
-        updateModeBadge();
+        btnSpeak.setText(getString(R.string.alphabet_mode_recital));
 
         // --- LOAD ALPHABET & WORDS FROM RESOURCES ---
         switch (languageCode) {
@@ -238,9 +207,7 @@ public class AlphabetActivity extends AppCompatActivity {
                 if (status == TextToSpeech.SUCCESS) {
                     tts.setLanguage(com.edulinguaghana.utils.LanguageConversionUtils.getLocaleForLanguage(languageCode));
                     updateLetter();
-                    if (isRecitalMode) {
-                        speakCurrentLetter();
-                    }
+                    speakCurrentLetter();
                 } else {
                     updateLetter();
                 }
@@ -267,7 +234,7 @@ public class AlphabetActivity extends AppCompatActivity {
                 }
                 updateLetterWithAnimation();
                 if (seekBarNavigation != null) seekBarNavigation.setProgress(currentIndex);
-                if (isRecitalMode) speakCurrentLetter();
+                speakCurrentLetter();
             } catch (Exception ignored) {
             }
         });
@@ -284,7 +251,7 @@ public class AlphabetActivity extends AppCompatActivity {
                 if (currentIndex < 0) currentIndex = letters.length - 1;
                 updateLetterWithAnimation();
                 if (seekBarNavigation != null) seekBarNavigation.setProgress(currentIndex);
-                if (isRecitalMode) speakCurrentLetter();
+                speakCurrentLetter();
             } catch (Exception ignored) {
             }
         });
@@ -308,11 +275,7 @@ public class AlphabetActivity extends AppCompatActivity {
                 android.util.Log.w("AlphabetActivity", "Haptic feedback or celebration failed", e);
             }
             try {
-                if (isRecitalMode) {
-                    speakCurrentLetter();
-                } else {
-                    startPracticePronunciation();
-                }
+                speakCurrentLetter();
             } catch (Exception ignored) {
             }
         });
@@ -337,7 +300,7 @@ public class AlphabetActivity extends AppCompatActivity {
                     isUserChanging = true;
                     currentIndex = progress;
                     updateLetterWithAnimation();
-                    if (isRecitalMode) speakCurrentLetter();
+                    speakCurrentLetter();
                 }
             }
 
@@ -360,21 +323,9 @@ public class AlphabetActivity extends AppCompatActivity {
             } catch (Exception ignored) {
             }
         });
-
-        // Quick speak button
-        btnSpeakQuick.setOnClickListener(v -> {
-            try {
-                v.performHapticFeedback(HapticFeedbackConstants.KEYBOARD_TAP);
-                animateButtonPress(btnSpeakQuick);
-                speakCurrentLetter();
-                celebrateAction();
-            } catch (Exception ignored) {
-            }
-        });
     }
 
     private void updateLetter() {
-        practiceRetryCount = 0; // Reset retry count when changing letters
         try {
             // Update text with letter
             String letter = letters[currentIndex];
@@ -558,14 +509,6 @@ public class AlphabetActivity extends AppCompatActivity {
         }
     }
 
-    private boolean isGhanaianLanguage(String code) {
-        if (code == null) return false;
-        String lower = code.toLowerCase();
-        return lower.equals("ak") || lower.equals("twi") ||
-               lower.equals("ee") || lower.equals("ewe") ||
-               lower.equals("gaa") || lower.equals("ga");
-    }
-
     private void speakWithGhanaLP(String text) {
         try {
             if (isGhanaLpPlaying) {
@@ -681,23 +624,6 @@ public class AlphabetActivity extends AppCompatActivity {
                     btnSpeak.setEnabled(true);
                 }
             }
-        }
-    }
-
-    private String normalizeLanguageCodeLegacy(String code) {
-        if (code == null) return "twi";
-        switch (code.toLowerCase()) {
-            case "ak":
-            case "twi":
-                return "twi";
-            case "ee":
-            case "ewe":
-                return "ewe";
-            case "gaa":
-            case "ga":
-                return "ga";
-            default:
-                return code.toLowerCase();
         }
     }
 
@@ -879,38 +805,6 @@ public class AlphabetActivity extends AppCompatActivity {
         }
     }
 
-    private void startPracticePronunciation() {
-        speakCurrentLetter();
-
-        if (!isRecordAudioPermissionGranted()) {
-            requestRecordAudioPermission();
-        } else {
-            promptSpeechInput();
-        }
-    }
-
-    private void showPronunciationTips() {
-        String tips = "";
-        String letter = letters[currentIndex];
-
-        String normalizedCode = com.edulinguaghana.utils.LanguageConversionUtils.normalizeLanguageCode(languageCode);
-        switch (normalizedCode) {
-            case com.edulinguaghana.utils.LanguageConversionUtils.LANG_TWI:
-                tips = getTwiPronunciationTip(letter);
-                break;
-            case com.edulinguaghana.utils.LanguageConversionUtils.LANG_EWE:
-                tips = getEwePronunciationTip(letter);
-                break;
-            case com.edulinguaghana.utils.LanguageConversionUtils.LANG_GA:
-                tips = getGaPronunciationTip(letter);
-                break;
-        }
-
-        if (!tips.isEmpty()) {
-            showMascotMessage(getString(R.string.alphabet_tip_prefix) + tips);
-        }
-    }
-
     private void showMascotMessage(String message) {
         Snackbar snackbar = Snackbar.make(findViewById(android.R.id.content), message, Snackbar.LENGTH_LONG);
         if (letterCard != null) snackbar.setAnchorView(letterCard);
@@ -926,330 +820,6 @@ public class AlphabetActivity extends AppCompatActivity {
         if (tv != null) tv.setText(message);
         
         snackbar.show();
-    }
-
-    private String getTwiPronunciationTip(String letter) {
-        switch (letter) {
-            case "Ɛ": return "Pronounced like 'eh' - open mouth more";
-            case "Ɔ": return "Pronounced like 'aw' - round your lips";
-            default: return "Listen to the audio carefully and repeat!";
-        }
-    }
-
-    private String getEwePronunciationTip(String letter) {
-        switch (letter) {
-            case "Ɛ": return "Open e - sounds like 'eh'";
-            case "Ɔ": return "Open o - sounds like 'aw'";
-            case "Ɖ": return "D with hook - softer than regular D";
-            case "Ƒ": return "F with hook - similar to F but softer";
-            case "Ɣ": return "G with hook - guttural sound";
-            case "Ŋ": return "Ng - velar nasal sound";
-            case "Ʋ": return "V with hook - like a v sound";
-            default: return "Listen carefully and repeat!";
-        }
-    }
-
-    private String getGaPronunciationTip(String letter) {
-        switch (letter) {
-            case "Ɛ": return "Open e - sounds like 'eh'";
-            case "Ɔ": return "Open o - sounds like 'aw'";
-            case "Ŋ": return "Ng - velar nasal sound";
-            default: return "Listen carefully and repeat!";
-        }
-    }
-
-    private boolean isRecordAudioPermissionGranted() {
-        return ContextCompat.checkSelfPermission(this,
-                Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_GRANTED;
-    }
-
-    private void requestRecordAudioPermission() {
-        ActivityCompat.requestPermissions(this,
-                new String[]{Manifest.permission.RECORD_AUDIO},
-                REQ_CODE_RECORD_AUDIO);
-    }
-
-    private void promptSpeechInput() {
-        Intent intent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
-        intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE, getSpeechLocaleCode());
-        intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL,
-                RecognizerIntent.LANGUAGE_MODEL_FREE_FORM);
-        intent.putExtra(RecognizerIntent.EXTRA_PROMPT, getString(R.string.alphabet_pronunciation_prompt));
-
-        try {
-            startActivityForResult(intent, REQ_CODE_SPEECH_INPUT);
-        } catch (Exception e) {
-            Toast.makeText(this, getString(R.string.alphabet_toast_speech_not_supported), Toast.LENGTH_LONG).show();
-        }
-    }
-
-    private String getSpeechLocaleCode() {
-        return com.edulinguaghana.utils.LanguageConversionUtils.getSpeechLocaleCode(languageCode);
-    }
-
-    private Locale getLocaleForLanguage(String code) {
-        if (code == null) return Locale.ENGLISH;
-        switch (code) {
-            case "fr": return Locale.FRENCH;
-            case "ak":
-            case "twi": return new Locale("twi");
-            case "ee": return new Locale("ee");
-            case "gaa": return new Locale("gaa");
-            default: return Locale.ENGLISH;
-        }
-    }
-
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-
-        if (requestCode == REQ_CODE_SPEECH_INPUT && resultCode == RESULT_OK && data != null) {
-            ArrayList<String> result = data.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS);
-            if (result != null && !result.isEmpty()) {
-                String recognized = result.get(0).trim();
-                evaluatePronunciation(recognized);
-            } else {
-                showMascotMessage(getString(R.string.alphabet_toast_not_heard));
-            }
-        }
-    }
-
-    private void evaluatePronunciation(String recognized) {
-        if (recognized == null || recognized.trim().isEmpty()) {
-            showMascotMessage(getString(R.string.alphabet_toast_not_heard));
-            return;
-        }
-
-        String expectedLetter = letters[currentIndex];
-        String recognizedClean = recognized.trim().toLowerCase();
-        String expectedLetterLower = expectedLetter.toLowerCase();
-
-        // 1. Direct match (letter itself or case-insensitive)
-        if (recognizedClean.equals(expectedLetterLower) || recognized.equalsIgnoreCase(expectedLetter)) {
-            handleSuccess(recognized, expectedLetter);
-            return;
-        }
-
-        // 2. First letter match (e.g., user says "Bee" for "B")
-        if (recognizedClean.length() > 0 && String.valueOf(recognizedClean.charAt(0)).equalsIgnoreCase(expectedLetter)) {
-            handleSuccess(recognized, expectedLetter);
-            return;
-        }
-
-        // 3. Phonetic match (check if any of our accepted phonetic spellings match)
-        List<String> acceptedSpellings = getAcceptedPhoneticSpellings(expectedLetter, languageCode);
-        for (String spelling : acceptedSpellings) {
-            if (recognizedClean.contains(spelling.toLowerCase())) {
-                handleSuccess(recognized, expectedLetter);
-                return;
-            }
-        }
-
-        // 4. Example word match (if they say the example word instead of just the letter)
-        String exampleWord = words[currentIndex].toLowerCase();
-        if (recognizedClean.contains(exampleWord)) {
-            handleSuccess(recognized, expectedLetter);
-            return;
-        }
-
-        // 5. Special handling for common misrecognitions
-        if (handleSpecialMisrecognitions(expectedLetter, recognizedClean)) {
-            handleSuccess(recognized, expectedLetter);
-            return;
-        }
-
-        // If all else fails
-        practiceRetryCount++;
-        
-        if (practiceRetryCount >= MAX_RETRIES_BEFORE_TIP) {
-             showPronunciationTips();
-             practiceRetryCount = 0; // Reset after showing tip
-        } else {
-            Toast.makeText(this,
-                "🎤 I heard: \"" + recognized + "\"" +
-                "\n📝 Expected: \"" + expectedLetter + "\"" +
-                "\n\n💡 Try to say it clearly. Listen again if you need to!",
-                Toast.LENGTH_LONG).show();
-        }
-    }
-
-    private void handleSuccess(String recognized, String expected) {
-        practiceRetryCount = 0; // Reset retry count on success
-
-        // Visual indication on the card
-        if (letterCard != null) {
-            // Store original values
-            ColorStateList originalStrokeColor = letterCard.getStrokeColorStateList();
-            ColorStateList originalBgColor = letterCard.getCardBackgroundColor();
-            float originalElevation = letterCard.getCardElevation();
-
-            // Success state - change colors and pop out
-            letterCard.setStrokeColor(ColorStateList.valueOf(getColor(R.color.correctAnswer)));
-            letterCard.setCardBackgroundColor(ColorStateList.valueOf(getColor(R.color.modeProgressStart))); // Light green success background
-            letterCard.setCardElevation(originalElevation * 1.5f);
-
-            // Revert after a delay
-            letterCard.postDelayed(() -> {
-                if (letterCard != null) {
-                    letterCard.setStrokeColor(originalStrokeColor);
-                    letterCard.setCardBackgroundColor(originalBgColor);
-                    letterCard.setCardElevation(originalElevation);
-                }
-            }, 2500);
-        }
-
-        // Change emoji temporarily and trigger celebration
-        if (celebrationEmoji != null) {
-            String originalEmoji = celebrationEmoji.getText().toString();
-            celebrationEmoji.setText("✅");
-            celebrateAction();
-
-            celebrationEmoji.postDelayed(() -> {
-                if (celebrationEmoji != null) {
-                    celebrationEmoji.setText(originalEmoji);
-                }
-            }, 2500);
-        }
-
-        // Play success sound
-        playAudioResource(R.raw.correct);
-
-        // Gaming UI: Success feedback using Snackbar
-        com.google.android.material.snackbar.Snackbar snackbar = com.google.android.material.snackbar.Snackbar.make(
-            findViewById(android.R.id.content),
-            getString(R.string.alphabet_toast_success, recognized, expected),
-            com.google.android.material.snackbar.Snackbar.LENGTH_LONG
-        );
-        if (letterCard != null) snackbar.setAnchorView(letterCard);
-        snackbar.setBackgroundTint(getColor(R.color.correctAnswer));
-        snackbar.show();
-
-        // Trigger haptic feedback for success
-        triggerHapticFeedback(100); // Slightly longer for success
-        
-        // Mark progress - if they complete 50% or more, consider it a good session
-        if (currentIndex > letters.length / 2) {
-             checkAndLogCompletion();
-        }
-    }
-
-    private boolean handleSpecialMisrecognitions(String expected, String recognized) {
-        // Add common misrecognitions here that aren't strictly phonetic
-        if (expected.equalsIgnoreCase("W") && (recognized.contains("double") || recognized.contains("you"))) return true;
-        if (expected.equalsIgnoreCase("Ɛ") && (recognized.contains("air") || recognized.contains("eh") || recognized.contains("at"))) return true;
-        if (expected.equalsIgnoreCase("Ɔ") && (recognized.contains("awe") || recognized.contains("oh") || recognized.contains("or"))) return true;
-        return false;
-    }
-
-    private List<String> getAcceptedPhoneticSpellings(String letter, String language) {
-        List<String> spellings = new ArrayList<>();
-        String upper = letter.toUpperCase();
-
-        if ("fr".equals(language)) {
-            switch (upper) {
-                case "A": spellings.add("a"); break;
-                case "B": spellings.add("be"); spellings.add("bé"); break;
-                case "C": spellings.add("ce"); spellings.add("cé"); break;
-                case "D": spellings.add("de"); spellings.add("dé"); break;
-                case "E": spellings.add("e"); break;
-                case "F": spellings.add("effe"); break;
-                case "G": spellings.add("ge"); spellings.add("gé"); break;
-                case "H": spellings.add("ache"); break;
-                case "I": spellings.add("i"); break;
-                case "J": spellings.add("ji"); break;
-                case "K": spellings.add("ka"); break;
-                case "L": spellings.add("elle"); break;
-                case "M": spellings.add("emme"); break;
-                case "N": spellings.add("enne"); break;
-                case "O": spellings.add("o"); break;
-                case "P": spellings.add("pe"); spellings.add("pé"); break;
-                case "Q": spellings.add("ku"); break;
-                case "R": spellings.add("erre"); break;
-                case "S": spellings.add("esse"); break;
-                case "T": spellings.add("te"); spellings.add("té"); break;
-                case "U": spellings.add("u"); break;
-                case "V": spellings.add("ve"); spellings.add("vé"); break;
-                case "W": spellings.add("double"); break;
-                case "X": spellings.add("ixe"); break;
-                case "Y": spellings.add("grec"); break;
-                case "Z": spellings.add("zed"); break;
-            }
-        } else {
-            // English or general phonetic
-            switch (upper) {
-                case "A": spellings.add("ay"); spellings.add("ey"); spellings.add("ei"); break;
-                case "B": spellings.add("bee"); spellings.add("be"); break;
-                case "C": spellings.add("see"); spellings.add("sea"); spellings.add("si"); break;
-                case "D": spellings.add("dee"); spellings.add("di"); break;
-                case "E": spellings.add("ee"); spellings.add("i"); break;
-                case "F": spellings.add("ef"); spellings.add("eff"); break;
-                case "G": spellings.add("gee"); spellings.add("jee"); spellings.add("gi"); break;
-                case "H": spellings.add("aitch"); spellings.add("edge"); spellings.add("each"); break;
-                case "I": spellings.add("eye"); spellings.add("ai"); break;
-                case "J": spellings.add("jay"); break;
-                case "K": spellings.add("kay"); break;
-                case "L": spellings.add("el"); spellings.add("ell"); break;
-                case "M": spellings.add("em"); break;
-                case "N": spellings.add("en"); break;
-                case "O": spellings.add("oh"); break;
-                case "P": spellings.add("pee"); spellings.add("pi"); break;
-                case "Q": spellings.add("cue"); spellings.add("queue"); break;
-                case "R": spellings.add("are"); break;
-                case "S": spellings.add("es"); spellings.add("ess"); break;
-                case "T": spellings.add("tee"); spellings.add("ti"); break;
-                case "U": spellings.add("you"); break;
-                case "V": spellings.add("vee"); spellings.add("vi"); break;
-                case "W": spellings.add("double"); break;
-                case "X": spellings.add("ex"); break;
-                case "Y": spellings.add("why"); break;
-                case "Z": spellings.add("zee"); spellings.add("zed"); break;
-                
-                // Ghanaian special characters (how they might be recognized by English-trained model)
-                case "Ɛ": 
-                    spellings.add("eh"); spellings.add("air"); spellings.add("at"); 
-                    spellings.add("end"); spellings.add("egg"); spellings.add("et");
-                    break;
-                case "Ɔ": 
-                    spellings.add("aw"); spellings.add("oh"); spellings.add("or"); 
-                    spellings.add("on"); spellings.add("awe"); spellings.add("o");
-                    break;
-                case "Ɖ": spellings.add("de"); spellings.add("the"); break;
-                case "Ƒ": spellings.add("ef"); spellings.add("if"); break;
-                case "Ɣ": spellings.add("ga"); spellings.add("her"); break;
-                case "Ŋ": spellings.add("ng"); spellings.add("ink"); spellings.add("ing"); spellings.add("thing"); break;
-                case "Ʋ": spellings.add("vu"); spellings.add("view"); break;
-            }
-        }
-        return spellings;
-    }
-
-    @Override
-    public void onRequestPermissionsResult(int requestCode,
-                                           @NonNull String[] permissions,
-                                           @NonNull int[] grantResults) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        if (requestCode == REQ_CODE_RECORD_AUDIO) {
-            if (grantResults.length > 0 &&
-                    grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                promptSpeechInput();
-            } else {
-                Toast.makeText(this, getString(R.string.alphabet_toast_mic_needed), Toast.LENGTH_LONG).show();
-            }
-        }
-    }
-
-    /**
-     * Trigger haptic feedback (vibration)
-     * @param durationMs Duration in milliseconds (30-50 for light feedback)
-     */
-    private void triggerHapticFeedback(long durationMs) {
-        if (vibrator != null && vibrator.hasVibrator()) {
-            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
-                vibrator.vibrate(VibrationEffect.createOneShot(durationMs, VibrationEffect.DEFAULT_AMPLITUDE));
-            } else {
-                vibrator.vibrate(durationMs);
-            }
-        }
     }
 
     /**
@@ -1321,7 +891,7 @@ public class AlphabetActivity extends AppCompatActivity {
                     currentIndex = holder.getAdapterPosition();
                     if (seekBarNavigation != null) seekBarNavigation.setProgress(currentIndex);
                     updateLetterWithAnimation();
-                    if (isRecitalMode) speakCurrentLetter();
+                    speakCurrentLetter();
                     dialog.dismiss();
                 });
             }
@@ -1382,32 +952,6 @@ public class AlphabetActivity extends AppCompatActivity {
                     AudioManager.STREAM_MUSIC, AudioManager.AUDIOFOCUS_GAIN_TRANSIENT_MAY_DUCK);
         }
         return result == AudioManager.AUDIOFOCUS_REQUEST_GRANTED;
-    }
-
-    private void updateModeBadge() {
-        try {
-            if (modeBadgeText != null) {
-                if (isRecitalMode) {
-                    modeBadgeIcon.setText("⭐");
-                    modeBadgeText.setText(R.string.alphabet_mode_recital);
-                    modeBadgeDescription.setText(R.string.alphabet_mode_recital_desc);
-                    modeBadgeCard.setCardBackgroundColor(getColor(R.color.colorAccent));
-                    modeBadgeText.setTextColor(getColor(android.R.color.white));
-                    modeBadgeDescription.setTextColor(getColor(android.R.color.white));
-                    modeBadgeDescription.setAlpha(0.8f);
-                } else {
-                    modeBadgeIcon.setText("🎤");
-                    modeBadgeText.setText(R.string.alphabet_mode_practice);
-                    modeBadgeDescription.setText(R.string.alphabet_mode_practice_desc);
-                    modeBadgeCard.setCardBackgroundColor(getColor(R.color.colorPrimary));
-                    modeBadgeText.setTextColor(getColor(android.R.color.white));
-                    modeBadgeDescription.setTextColor(getColor(android.R.color.white));
-                    modeBadgeDescription.setAlpha(0.8f);
-                }
-            }
-        } catch (Exception e) {
-            android.util.Log.e("AlphabetActivity", "Error updating mode badge", e);
-        }
     }
 
     @Override

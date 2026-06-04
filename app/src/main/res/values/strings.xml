@@ -1,14 +1,14 @@
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="MissingTranslation">
     <string name="app_name">EduLinguaGhana</string>
     <string name="language_prefix">Language:</string>
-    <string name="alphabet_mode">Alphabet - Recital / Practice</string>
-    <string name="alphabet_hint">Use Previous / Next to move. Tap Speak to hear or practice.</string>
+    <string name="alphabet_mode">Alphabet - Recital</string>
+    <string name="alphabet_hint">Use Previous / Next to move. Tap Speak to hear.</string>
     <string name="speak_button">Speak</string>
     <string name="previous_button">◀ Previous</string>
     <string name="next_button">Next ▶</string>
     <string name="back_button">Back</string>
-    <string name="numbers_mode">Numbers - Recital / Practice</string>
-    <string name="numbers_hint">Swipe through numbers using Previous / Next. Tap Speak to hear or practice.</string>
+    <string name="numbers_mode">Numbers - Recital</string>
+    <string name="numbers_hint">Swipe through numbers using Previous / Next. Tap Speak to hear.</string>
 
     <!-- Settings Screen -->
     <string name="settings_title">Settings</string>
@@ -184,8 +184,8 @@
     <string name="main_best_score_placeholder">Best quiz score: 0 / 10</string>
     <string name="mode_recital_title">Recital Mode</string>
     <string name="mode_recital_desc">Listen to letters, sounds, and numbers.</string>
-    <string name="mode_practice_title">Practice Mode</string>
-    <string name="mode_practice_desc">Repeat words and polish pronunciation.</string>
+    <string name="mode_practice_title">Game Mode</string>
+    <string name="mode_practice_desc">Play fun games and learn!</string>
     <string name="mode_quiz_title">Quiz Mode</string>
     <string name="mode_quiz_desc">Play mini-games to test your memory.</string>
     <string name="mode_progress_title">Progress Tracker</string>
@@ -363,35 +363,19 @@
     <!-- Alphabet Activity -->
     <string name="alphabet_progress_counter">Letter %1$d of %2$d</string>
     <string name="alphabet_mode_recital">RECITAL</string>
-    <string name="alphabet_mode_practice">PRACTICE</string>
     <string name="alphabet_mode_recital_desc">Listen &amp; Learn</string>
-    <string name="alphabet_mode_practice_desc">Speak &amp; Learn</string>
-    <string name="alphabet_toast_success">🎉 Excellent! You said: \'%1$s\'\n✅ Correct pronunciation of \'%2$s\'!</string>
-    <string name="alphabet_toast_mic_needed">Microphone permission is needed for pronunciation practice.</string>
-    <string name="alphabet_toast_speech_not_supported">Speech recognition not supported on this device.</string>
-    <string name="alphabet_toast_not_heard">Could not hear you. Try again.</string>
     <string name="alphabet_toast_tts_failed">TTS initialization failed</string>
-    <string name="alphabet_pronunciation_prompt">Please repeat the letter</string>
-    <string name="alphabet_practice_instruction">🎤 Try to pronounce: %1$s\n\n📝 Listen carefully to the audio above and repeat it!\n\nTap the letter again to hear it.</string>
     <string name="alphabet_tip_prefix">💡 Tip: </string>
     <string name="alphabet_lesson_complete">🎉 Lesson Complete! You explored all letters in %1$s!</string>
     <string name="alphabet_grid_title">Pick a Letter</string>
 
     <!-- Numbers Activity -->
     <string name="numbers_progress_counter">Number %1$d of 100</string>
-    <string name="numbers_toast_success">🎉 Excellent! You said: %1$s\n✅ Correct pronunciation of %2$d!</string>
-    <string name="numbers_toast_not_heard">Didn\'t catch that — please try again.</string>
-    <string name="numbers_toast_mic_needed">Microphone permission is needed for pronunciation practice.</string>
-    <string name="numbers_toast_speech_not_supported">Speech recognition not supported on this device.</string>
-    <string name="numbers_pronunciation_prompt">Please repeat the number</string>
-    <string name="numbers_practice_instruction">🎤 Try to pronounce: %1$d\n\n📝 Listen carefully to the audio above and repeat it!\n\nTap the number again to hear it.</string>
     <string name="numbers_tip_prefix">💡 Tip: </string>
     <string name="numbers_lesson_complete">🎉 Lesson Complete! You explored all numbers in %1$s!</string>
     <string name="numbers_grid_title">Pick a Number</string>
     <string name="numbers_mode_recital">RECITAL</string>
-    <string name="numbers_mode_practice">PRACTICE</string>
     <string name="numbers_mode_recital_desc">Listen &amp; Learn</string>
-    <string name="numbers_mode_practice_desc">Speak &amp; Learn</string>
 
     <!-- Quiz Activity -->
     <string name="quiz_feedback_match_found">Match found! ✨</string>
@@ -447,7 +431,7 @@
     <string name="content_numbers">Numbers</string>
     <string name="content_numbers_desc">Learn and hear numbers</string>
     <string name="content_recital">Recital</string>
-    <string name="content_practice">Practice</string>
+    <string name="content_practice">Games</string>
 
     <!-- Mascot Messages Extra -->
     <string name="mascot_special_love">I love learning with you! ✨</string>

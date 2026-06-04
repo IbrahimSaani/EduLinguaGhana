@@ -1251,7 +1251,7 @@ public class MainActivity extends AppCompatActivity {
             v.performHapticFeedback(HapticFeedbackConstants.KEYBOARD_TAP);
             applyGamingClickEffect(v, () -> {
                 if (!ensureLanguageSelected()) return;
-                showContentTypeDialog(selectedLangCode, selectedLangName, "recital");
+                showContentTypeDialog(selectedLangCode, selectedLangName);
             });
         });
 
@@ -1259,7 +1259,7 @@ public class MainActivity extends AppCompatActivity {
             v.performHapticFeedback(HapticFeedbackConstants.KEYBOARD_TAP);
             applyGamingClickEffect(v, () -> {
                 if (!ensureLanguageSelected()) return;
-                showContentTypeDialog(selectedLangCode, selectedLangName, "practice");
+                showGameModeDialog(selectedLangCode, selectedLangName);
             });
         });
 
@@ -1277,26 +1277,26 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-    private void showContentTypeDialog(String langCode, String langName, String mode) {
-        String modeLabel = mode.equals("recital") ? getString(R.string.content_recital) : getString(R.string.content_practice);
+    private void showContentTypeDialog(String langCode, String langName) {
+        String modeLabel = getString(R.string.content_recital);
 
         List<StyledMenuHelper.MenuItem> menuItems = new ArrayList<>();
         menuItems.add(new StyledMenuHelper.MenuItem(
                 "🔤",
                 getString(R.string.content_alphabet),
                 getString(R.string.content_alphabet_desc),
-                () -> openAlphabetScreen(langCode, langName, mode)
+                () -> openAlphabetScreen(langCode, langName)
         ));
         menuItems.add(new StyledMenuHelper.MenuItem(
                 "🔢",
                 getString(R.string.content_numbers),
                 getString(R.string.content_numbers_desc),
-                () -> openNumbersScreen(langCode, langName, mode)
+                () -> openNumbersScreen(langCode, langName)
         ));
 
         StyledMenuHelper.showStyledMenu(
                 this,
-                modeLabel.equals(getString(R.string.content_recital)) ? "🎤" : "📝",
+                "🎤",
                 modeLabel + " Mode - " + langName,
                 "",
                 menuItems,
@@ -1304,7 +1304,7 @@ public class MainActivity extends AppCompatActivity {
         );
     }
 
-    // UPDATED: now includes categories for Quizzes and Games
+    // UPDATED: Educational quizzes only (Games moved to Game Mode)
     private void showQuizTypeDialog(String langCode, String langName) {
         List<StyledMenuHelper.MenuItem> menuItems = new ArrayList<>();
         
@@ -1352,6 +1352,19 @@ public class MainActivity extends AppCompatActivity {
                 () -> openQuizScreen(langCode, langName, "mixed", "beginner", "all")
         ));
 
+        StyledMenuHelper.showStyledMenu(
+                this,
+                "📚",
+                getString(R.string.main_section_quizzes),
+                getString(R.string.quiz_desc_mixed),
+                menuItems,
+                null
+        );
+    }
+
+    private void showGameModeDialog(String langCode, String langName) {
+        List<StyledMenuHelper.MenuItem> menuItems = new ArrayList<>();
+
         // --- CATEGORY: FUN MINI-GAMES ---
         menuItems.add(new StyledMenuHelper.MenuItem(
                 "🎮",
@@ -1393,8 +1406,8 @@ public class MainActivity extends AppCompatActivity {
         StyledMenuHelper.showStyledMenu(
                 this,
                 "🎮",
-                getString(R.string.main_activity_pick_title),
-                getString(R.string.main_activity_pick_desc),
+                getString(R.string.mode_practice_title),
+                getString(R.string.mode_practice_desc),
                 menuItems,
                 null
         );
@@ -1418,19 +1431,17 @@ public class MainActivity extends AppCompatActivity {
         // This method is no longer used - quiz launches with default settings
     }
 
-    private void openAlphabetScreen(String langCode, String langName, String mode) {
+    private void openAlphabetScreen(String langCode, String langName) {
         Intent intent = new Intent(MainActivity.this, AlphabetActivity.class);
         intent.putExtra("LANG_CODE", langCode);
         intent.putExtra("LANG_NAME", langName);
-        intent.putExtra("MODE", mode);
         startActivity(intent);
     }
 
-    private void openNumbersScreen(String langCode, String langName, String mode) {
+    private void openNumbersScreen(String langCode, String langName) {
         Intent intent = new Intent(MainActivity.this, NumbersActivity.class);
         intent.putExtra("LANG_CODE", langCode);
         intent.putExtra("LANG_NAME", langName);
-        intent.putExtra("MODE", mode);
         startActivity(intent);
     }
 

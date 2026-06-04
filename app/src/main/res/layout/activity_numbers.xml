@@ -214,27 +214,13 @@
                     <com.google.android.material.button.MaterialButton
                         android:id="@+id/btnShowPicker"
                         style="@style/Widget.Material3.Button"
-                        android:layout_width="0dp"
-                        android:layout_weight="1"
+                        android:layout_width="match_parent"
                         android:layout_height="52dp"
                         android:text="🔢 Grid"
                         android:textSize="13sp"
                         app:cornerRadius="14dp"
                         app:elevation="6dp"
                         app:icon="@drawable/ic_arrow_forward"
-                        app:iconSize="20dp" />
-
-                    <com.google.android.material.button.MaterialButton
-                        android:id="@+id/btnSpeakQuick"
-                        style="@style/Widget.Material3.Button.OutlinedButton"
-                        android:layout_width="0dp"
-                        android:layout_weight="1"
-                        android:layout_height="52dp"
-                        android:text="🎤 Speak"
-                        android:textSize="13sp"
-                        app:cornerRadius="14dp"
-                        app:strokeWidth="2dp"
-                        app:icon="@drawable/ic_speak"
                         app:iconSize="20dp" />
                 </LinearLayout>
             </LinearLayout>
@@ -339,66 +325,6 @@
                     </LinearLayout>
                 </com.google.android.material.card.MaterialCardView>
 
-                <!-- Mode Badge - Shows RECITAL or PRACTICE -->
-                <com.google.android.material.card.MaterialCardView
-                    android:id="@+id/modeBadgeCard"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center_horizontal"
-                    app:cardCornerRadius="16dp"
-                    app:cardElevation="6dp">
-
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:orientation="horizontal"
-                        android:padding="12dp"
-                        android:spacing="8dp"
-                        android:gravity="center_vertical">
-
-                        <TextView
-                            android:id="@+id/modeBadgeIcon"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="🔢"
-                            android:textSize="20sp" />
-
-                        <LinearLayout
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:orientation="vertical"
-                            android:spacing="2dp">
-
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="Current Mode"
-                                android:textColor="@color/colorPrimary"
-                                android:textSize="10sp"
-                                android:alpha="0.7" />
-
-                            <TextView
-                                android:id="@+id/modeBadgeText"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="RECITAL"
-                                android:textColor="@color/colorPrimary"
-                                android:textSize="14sp"
-                                android:textStyle="bold" />
-                        </LinearLayout>
-
-                        <TextView
-                            android:id="@+id/modeBadgeDescription"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="Listen &amp; Learn"
-                            android:textColor="@color/textColorSecondary"
-                            android:textSize="11sp"
-                            android:alpha="0.8"
-                            android:layout_marginEnd="8dp" />
-                    </LinearLayout>
-                </com.google.android.material.card.MaterialCardView>
             </LinearLayout>
 
             <RelativeLayout

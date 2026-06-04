@@ -60,7 +60,6 @@ public class OfflineManager {
             case "ALPHABET":
             case "NUMBERS":
             case "RECITAL":
-            case "PRACTICE":
             case "QUIZ":
                 return true; // Core learning features work offline
 

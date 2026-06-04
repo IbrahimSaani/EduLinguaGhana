@@ -1043,7 +1043,7 @@
                             <ImageView
                                 android:layout_width="@dimen/avatar_size_small"
                                 android:layout_height="@dimen/avatar_size_small"
-                                android:src="@android:drawable/ic_btn_speak_now"
+                                android:src="@drawable/ic_rocket"
                                 android:contentDescription="@null"
                                 app:tint="@color/colorPrimary" />
 

@@ -1,7 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
-    <!--  Mic permission for pronunciation practice mode  -->
-    <uses-permission android:name="android.permission.RECORD_AUDIO"/>
     <!--  Haptic feedback permission -->
     <uses-permission android:name="android.permission.VIBRATE" />
     <!--  Camera permission for QR code scanning  -->
@@ -10,7 +8,6 @@
     <!--  Hardware features (optional - app works without these)  -->
     <uses-feature android:name="android.hardware.camera" android:required="false"/>
     <uses-feature android:name="android.hardware.camera.autofocus" android:required="false"/>
-    <uses-feature android:name="android.hardware.microphone" android:required="false"/>
 
     <!--  Optional: TTS requires internet for language downloads in some cases  -->
     <uses-permission android:name="android.permission.INTERNET"/>
