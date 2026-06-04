@@ -7,7 +7,6 @@ import android.animation.ObjectAnimator;
 import android.animation.ValueAnimator;
 import android.media.MediaPlayer;
 import android.media.AudioManager;
-import android.net.Uri;
 import android.os.Bundle;
 import android.os.Build;
 import android.os.CountDownTimer;
@@ -136,7 +135,7 @@ public class QuizActivity extends AppCompatActivity {
 
         languageName = getIntent().getStringExtra("LANG_NAME");
         languageCode = getIntent().getStringExtra("LANG_CODE");
-        String rawType = getIntent().getStringExtra("QUIZ_TYPE");
+        String initialQuizType = getIntent().getStringExtra("QUIZ_TYPE");
         difficulty = getIntent().getStringExtra("DIFFICULTY");
         category = getIntent().getStringExtra("CATEGORY");
 
@@ -146,11 +145,11 @@ public class QuizActivity extends AppCompatActivity {
 
         if (languageCode == null) languageCode = "en";
         if (languageName == null) languageName = "Unknown";
-        if (rawType == null) rawType = "letters";
+        if (initialQuizType == null) initialQuizType = "letters";
         if (difficulty == null) difficulty = "beginner";
         if (category == null) category = "all";
 
-        quizType = normalizeQuizType(rawType);
+        quizType = normalizeQuizType(initialQuizType);
 
         // --- Bind views ---
         bindViews();
@@ -1243,7 +1242,7 @@ public class QuizActivity extends AppCompatActivity {
         try {
             FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
             if (user != null) {
-                ProgressTracker tracker = new ProgressTracker();
+                ProgressTracker tracker = new ProgressTracker(this);
                 tracker.logQuizCompletion(this, user.getUid(), quizType, finalScore, finalScore, finalTotalQuestions, durationSeconds, null);
             }
         } catch (Exception ignored) {}
@@ -1473,7 +1472,7 @@ public class QuizActivity extends AppCompatActivity {
 
             @Override
             public void onFailure(String error) {
-                runOnUiThread(() -> Toast.makeText(QuizActivity.this, "Failed to save challenge score: " + error, Toast.LENGTH_SHORT).show());
+                runOnUiThread(() -> Toast.makeText(QuizActivity.this, R.string.error_challenge_save_failed, Toast.LENGTH_SHORT).show());
             }
         });
     }

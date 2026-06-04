@@ -172,8 +172,8 @@ public class RoleManager {
                                 // If it already exists with the correct predictable ID, we stop and show error
                                 if (existingRelationship.getId() != null && existingRelationship.getId().equals(predictableId)) {
                                     String status = existingRelationship.getStatus() == UserRelationship.RelationshipStatus.PENDING
-                                        ? "A pending request already exists for this student"
-                                        : "This student is already connected to you";
+                                        ? "A request is already waiting to be accepted!"
+                                        : "You're already connected with this explorer!";
                                     callback.onError(status);
                                     return;
                                 }

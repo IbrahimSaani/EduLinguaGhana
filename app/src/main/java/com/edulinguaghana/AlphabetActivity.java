@@ -135,7 +135,7 @@ public class AlphabetActivity extends AppCompatActivity {
 
         // Initialize vibrator for haptic feedback
         audioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
-        progressTracker = new ProgressTracker();
+        progressTracker = new ProgressTracker(this);
         startTime = System.currentTimeMillis();
 
         // Record practice for streak immediately when starting a learning session

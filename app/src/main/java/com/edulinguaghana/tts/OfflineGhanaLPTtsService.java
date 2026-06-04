@@ -5,6 +5,8 @@ import android.content.res.Resources;
 import android.media.MediaPlayer;
 import android.util.Log;
 
+import com.edulinguaghana.R;
+
 import java.util.Locale;
 
 /**
@@ -67,7 +69,7 @@ public class OfflineGhanaLPTtsService {
      */
     public void speak(String text, String language, PlaybackCallback callback) {
         if (text == null || text.trim().isEmpty()) {
-            if (callback != null) callback.onError("Empty text");
+            if (callback != null) callback.onError(context.getString(R.string.error_generic_try_again));
             return;
         }
 
@@ -115,7 +117,7 @@ public class OfflineGhanaLPTtsService {
 
         // No audio file found
         if (callback != null) {
-            callback.onError("No audio file found for: " + text);
+            callback.onError(context.getString(R.string.error_audio_failed));
         }
     }
 
@@ -129,7 +131,7 @@ public class OfflineGhanaLPTtsService {
             if (resId == 0) {
                 Log.w(TAG, "Audio resource not found: " + resourceName);
                 if (callback != null) {
-                    callback.onError("Audio not found: " + resourceName);
+                    callback.onError(context.getString(R.string.error_audio_failed));
                 }
                 return;
             }
@@ -145,7 +147,7 @@ public class OfflineGhanaLPTtsService {
 
             if (mp == null) {
                 if (callback != null) {
-                    callback.onError("Failed to create MediaPlayer for: " + resourceName);
+                    callback.onError(context.getString(R.string.error_audio_failed));
                 }
                 return;
             }
@@ -166,7 +168,7 @@ public class OfflineGhanaLPTtsService {
                 String error = "MediaPlayer error: " + what + ", " + extra;
                 Log.e(TAG, error);
                 if (callback != null) {
-                    callback.onError(error);
+                    callback.onError(context.getString(R.string.error_audio_failed));
                 }
                 player.release();
                 if (mediaPlayer == player) {
@@ -184,7 +186,7 @@ public class OfflineGhanaLPTtsService {
         } catch (Exception e) {
             Log.e(TAG, "Error playing audio: " + resourceName, e);
             if (callback != null) {
-                callback.onError("Error: " + e.getMessage());
+                callback.onError(context.getString(R.string.error_audio_failed));
             }
         }
     }

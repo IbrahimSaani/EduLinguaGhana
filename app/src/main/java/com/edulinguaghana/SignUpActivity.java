@@ -36,7 +36,6 @@ import com.facebook.FacebookException;
 import com.facebook.login.LoginManager;
 import com.facebook.login.LoginResult;
 
-import java.util.Arrays;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Map;
@@ -485,32 +484,6 @@ public class SignUpActivity extends AppCompatActivity {
         userProfile.put("lastLogin", System.currentTimeMillis());
 
         usersRef.child(user.getUid()).updateChildren(userProfile);
-    }
-
-
-    /**
-     * Save user profile to Firebase Realtime Database with role
-     */
-    private void saveUserToDatabase(FirebaseUser user, UserRole role) {
-        if (user == null) return;
-
-        DatabaseReference usersRef = FirebaseDatabase.getInstance().getReference("users");
-        Map<String, Object> userProfile = new HashMap<>();
-        userProfile.put("uid", user.getUid());
-        userProfile.put("email", user.getEmail());
-        userProfile.put("displayName", user.getDisplayName());
-        userProfile.put("username", user.getDisplayName() != null ? user.getDisplayName() : user.getEmail());
-        userProfile.put("age", "");
-        userProfile.put("school", "");
-        userProfile.put("studentClass", "");
-        userProfile.put("role", role.name());
-        userProfile.put("createdAt", System.currentTimeMillis());
-
-        usersRef.child(user.getUid()).setValue(userProfile);
-
-        // Also set role via RoleManager
-        RoleManager roleManager = new RoleManager();
-        roleManager.setUserRole(this, user.getUid(), role);
     }
 
     private void navigateToMain() {

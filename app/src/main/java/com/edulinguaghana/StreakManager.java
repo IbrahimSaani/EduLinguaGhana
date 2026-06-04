@@ -113,7 +113,7 @@ public class StreakManager {
             try {
                 com.google.firebase.auth.FirebaseUser user = com.google.firebase.auth.FirebaseAuth.getInstance().getCurrentUser();
                 if (user != null) {
-                    com.edulinguaghana.tracking.ProgressTracker tracker = new com.edulinguaghana.tracking.ProgressTracker();
+                    com.edulinguaghana.tracking.ProgressTracker tracker = new com.edulinguaghana.tracking.ProgressTracker(context);
                     tracker.logStreakMilestone(context, user.getUid(), currentStreak, null);
                 }
             } catch (Exception ignored) {}

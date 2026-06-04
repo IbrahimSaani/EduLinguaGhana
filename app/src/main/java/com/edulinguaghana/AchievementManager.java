@@ -220,7 +220,7 @@ public class AchievementManager {
                 try {
                     com.google.firebase.auth.FirebaseUser user = com.google.firebase.auth.FirebaseAuth.getInstance().getCurrentUser();
                     if (user != null) {
-                        com.edulinguaghana.tracking.ProgressTracker tracker = new com.edulinguaghana.tracking.ProgressTracker();
+                        com.edulinguaghana.tracking.ProgressTracker tracker = new com.edulinguaghana.tracking.ProgressTracker(context);
                         tracker.logAchievement(context, user.getUid(), achievement.getId(), achievement.getTitle(), null);
                     }
                 } catch (Exception e) {

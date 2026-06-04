@@ -278,7 +278,7 @@ public class AccountManagementActivity extends AppCompatActivity {
                     } else {
                         showProgress(false);
                         Toast.makeText(AccountManagementActivity.this,
-                                getString(R.string.complete_profile_save_failed, task.getException().getMessage()),
+                                getString(R.string.error_profile_save_failed),
                                 Toast.LENGTH_LONG).show();
                     }
                 });
@@ -305,8 +305,7 @@ public class AccountManagementActivity extends AppCompatActivity {
                                 getString(R.string.account_mgmt_profile_updated), Toast.LENGTH_SHORT).show();
                     } else {
                         Toast.makeText(AccountManagementActivity.this,
-                                getString(R.string.account_mgmt_db_sync_failed,
-                                (task.getException() != null ? task.getException().getMessage() : "Unknown error")),
+                                getString(R.string.error_sync_failed),
                                 Toast.LENGTH_LONG).show();
                     }
                 });
@@ -356,7 +355,7 @@ public class AccountManagementActivity extends AppCompatActivity {
                                     } else {
                                         showProgress(false);
                                         Toast.makeText(AccountManagementActivity.this,
-                                                getString(R.string.account_mgmt_password_sync_failed, updateTask.getException().getMessage()),
+                                                getString(R.string.error_sync_failed),
                                                 Toast.LENGTH_LONG).show();
                                     }
                                 });
@@ -389,8 +388,7 @@ public class AccountManagementActivity extends AppCompatActivity {
                         etConfirmPassword.setText("");
                     } else {
                         Toast.makeText(AccountManagementActivity.this,
-                                getString(R.string.account_mgmt_password_sync_failed, 
-                                (task.getException() != null ? task.getException().getMessage() : "Unknown error")),
+                                getString(R.string.error_sync_failed),
                                 Toast.LENGTH_LONG).show();
                     }
                 });
@@ -415,7 +413,7 @@ public class AccountManagementActivity extends AppCompatActivity {
                         );
                     } else {
                         Toast.makeText(AccountManagementActivity.this,
-                                getString(R.string.complete_profile_save_failed, task.getException().getMessage()),
+                                getString(R.string.error_generic_try_again),
                                 Toast.LENGTH_LONG).show();
                     }
                 });
@@ -441,8 +439,7 @@ public class AccountManagementActivity extends AppCompatActivity {
                         }
                     } else {
                         Toast.makeText(AccountManagementActivity.this,
-                                getString(R.string.account_mgmt_db_status_failed, 
-                                (task.getException() != null ? task.getException().getMessage() : "Unknown error")),
+                                getString(R.string.error_verify_failed),
                                 Toast.LENGTH_LONG).show();
                     }
                 });
@@ -696,10 +693,9 @@ public class AccountManagementActivity extends AppCompatActivity {
                         intent.setFlags(android.content.Intent.FLAG_ACTIVITY_NEW_TASK | android.content.Intent.FLAG_ACTIVITY_CLEAR_TASK);
                         startActivity(intent);
                     } else {
-                        String errorMessage = task.getException() != null ?
-                                task.getException().getMessage() : "Unknown error";
+                        showProgress(false);
                         Toast.makeText(AccountManagementActivity.this,
-                                getString(R.string.account_mgmt_delete_failed, errorMessage),
+                                getString(R.string.error_delete_failed),
                                 Toast.LENGTH_LONG).show();
                     }
                 });

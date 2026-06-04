@@ -121,7 +121,7 @@ public final class FunGameProgressManager {
         try {
             FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
             if (user != null) {
-                com.edulinguaghana.tracking.ProgressTracker tracker = new com.edulinguaghana.tracking.ProgressTracker();
+                com.edulinguaghana.tracking.ProgressTracker tracker = new com.edulinguaghana.tracking.ProgressTracker(context);
                 tracker.logFunGameCompletion(context.getApplicationContext(), user.getUid(), gameId, score, durationSeconds, null);
             }
         } catch (Exception e) {

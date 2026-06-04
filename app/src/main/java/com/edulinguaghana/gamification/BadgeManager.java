@@ -244,7 +244,7 @@ public class BadgeManager {
                     try {
                         com.google.firebase.auth.FirebaseUser user = com.google.firebase.auth.FirebaseAuth.getInstance().getCurrentUser();
                         if (user != null) {
-                            com.edulinguaghana.tracking.ProgressTracker tracker = new com.edulinguaghana.tracking.ProgressTracker();
+                            com.edulinguaghana.tracking.ProgressTracker tracker = new com.edulinguaghana.tracking.ProgressTracker(ctx);
                             // ProgressTracker doesn't have logBadge yet, let's use a generic method or update aggregates
                             tracker.updateAggregates(ctx, user.getUid());
                         }

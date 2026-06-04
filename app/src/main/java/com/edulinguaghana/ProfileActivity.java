@@ -372,7 +372,7 @@ public class ProfileActivity extends AppCompatActivity {
                 String currentUserId = testOverride != null ? testOverride : (currentUser != null ? currentUser.getUid() : null);
 
                 if (currentUserId == null) {
-                    Toast.makeText(this, "Please sign in to use social features", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(this, R.string.error_feature_locked, Toast.LENGTH_SHORT).show();
                     return;
                 }
 
@@ -388,7 +388,7 @@ public class ProfileActivity extends AppCompatActivity {
                 String currentUserId = testOverride != null ? testOverride : (currentUser != null ? currentUser.getUid() : null);
 
                 if (currentUserId == null) {
-                    Toast.makeText(this, "Please sign in to use social features", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(this, R.string.error_feature_locked, Toast.LENGTH_SHORT).show();
                     return;
                 }
 
@@ -435,7 +435,7 @@ public class ProfileActivity extends AppCompatActivity {
     private void performSync() {
         CloudSyncManager syncManager = new CloudSyncManager(this);
         if (!syncManager.canSync()) {
-            Toast.makeText(this, "Internet connection required for sync", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, R.string.error_no_internet, Toast.LENGTH_SHORT).show();
             return;
         }
 
@@ -700,7 +700,7 @@ public class ProfileActivity extends AppCompatActivity {
 
                 @Override
                 public void onCancelled(com.google.firebase.database.DatabaseError error) {
-                    Toast.makeText(ProfileActivity.this, "Search failed: " + error.getMessage(), Toast.LENGTH_SHORT).show();
+                    Toast.makeText(ProfileActivity.this, R.string.error_friend_search_failed, Toast.LENGTH_SHORT).show();
                 }
             });
     }
@@ -751,7 +751,7 @@ public class ProfileActivity extends AppCompatActivity {
                     return;
                 }
                 if (target.equals(currentUserId)) {
-                    Toast.makeText(this, "You can't add yourself", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(this, R.string.error_self_add, Toast.LENGTH_SHORT).show();
                     return;
                 }
                 searchHistory.addUidSearch(target);
@@ -849,12 +849,12 @@ public class ProfileActivity extends AppCompatActivity {
         final String scannedUserId = (extractedId != null) ? extractedId : scannedData;
 
         if (scannedUserId == null || scannedUserId.trim().isEmpty()) {
-            Toast.makeText(this, "Invalid QR code format", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, R.string.error_qr_invalid, Toast.LENGTH_SHORT).show();
             return;
         }
 
         if (scannedUserId.equals(currentUserId)) {
-            Toast.makeText(this, "That's your own QR code!", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, R.string.error_qr_own, Toast.LENGTH_SHORT).show();
             return;
         }
 
@@ -922,7 +922,7 @@ public class ProfileActivity extends AppCompatActivity {
     private void sendFriendRequest(String fromUserId, String toUserId, String friendName) {
         SocialRepository repo = SocialProvider.get();
         if (repo == null) {
-            Toast.makeText(this, "Social features unavailable", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, R.string.error_social_unavailable, Toast.LENGTH_SHORT).show();
             return;
         }
 
@@ -1020,7 +1020,7 @@ public class ProfileActivity extends AppCompatActivity {
             @Override
             public void onError(String error) {
                 progressDialog.dismiss();
-                Toast.makeText(ProfileActivity.this, "Error: " + error, Toast.LENGTH_SHORT).show();
+                Toast.makeText(ProfileActivity.this, R.string.error_generic_try_again, Toast.LENGTH_SHORT).show();
             }
         });
     }
@@ -1092,7 +1092,7 @@ public class ProfileActivity extends AppCompatActivity {
 
     private void showAllUsersInDatabase() {
         android.util.Log.d("ProfileActivity", "Fetching all users from database...");
-        Toast.makeText(this, "Loading users...", Toast.LENGTH_SHORT).show();
+        Toast.makeText(this, "Searching for new friends...", Toast.LENGTH_SHORT).show();
 
         com.google.firebase.database.DatabaseReference usersRef =
             com.google.firebase.database.FirebaseDatabase.getInstance().getReference("users");
@@ -1151,7 +1151,7 @@ public class ProfileActivity extends AppCompatActivity {
             @Override
             public void onCancelled(com.google.firebase.database.DatabaseError error) {
                 android.util.Log.e("ProfileActivity", "Failed to fetch users: " + error.getMessage());
-                Toast.makeText(ProfileActivity.this, "Failed to load users: " + error.getMessage(), Toast.LENGTH_LONG).show();
+                Toast.makeText(ProfileActivity.this, R.string.error_data_load_failed, Toast.LENGTH_LONG).show();
             }
         });
     }
@@ -1281,7 +1281,7 @@ public class ProfileActivity extends AppCompatActivity {
                 @Override
                 public void onCancelled(com.google.firebase.database.DatabaseError error) {
                     android.util.Log.e("ProfileActivity", "Email search error: " + error.getMessage());
-                    Toast.makeText(ProfileActivity.this, "Search failed: " + error.getMessage(), Toast.LENGTH_SHORT).show();
+                    Toast.makeText(ProfileActivity.this, R.string.error_friend_search_failed, Toast.LENGTH_SHORT).show();
                 }
             });
     }
@@ -1324,7 +1324,7 @@ public class ProfileActivity extends AppCompatActivity {
                     return;
                 }
                 if (target.equals(currentUserId)) {
-                    Toast.makeText(this, "You can't challenge yourself", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(this, R.string.error_self_challenge, Toast.LENGTH_SHORT).show();
                     return;
                 }
                 performCreateChallengeWithDialog(currentUserId, target);
@@ -1342,7 +1342,7 @@ public class ProfileActivity extends AppCompatActivity {
             @Override
             public void onDataChange(com.google.firebase.database.DataSnapshot snapshot) {
                 if (!snapshot.exists()) {
-                    Toast.makeText(ProfileActivity.this, "User not found: " + targetUserId, Toast.LENGTH_LONG).show();
+                    Toast.makeText(ProfileActivity.this, R.string.error_friend_search_failed, Toast.LENGTH_LONG).show();
                     return;
                 }
 
@@ -1388,7 +1388,7 @@ public class ProfileActivity extends AppCompatActivity {
 
                 @Override
                 public void onFailure(String error) {
-                    Toast.makeText(ProfileActivity.this, "Failed to create challenge: " + error, Toast.LENGTH_SHORT).show();
+                    Toast.makeText(ProfileActivity.this, R.string.error_challenge_create_failed, Toast.LENGTH_SHORT).show();
                 }
             }
         );
@@ -1400,7 +1400,7 @@ public class ProfileActivity extends AppCompatActivity {
         SocialRepository repo = SocialProvider.get();
         if (repo == null) {
             android.util.Log.e("ProfileActivity", "SocialRepository is null!");
-            Toast.makeText(this, "Social features unavailable", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, R.string.error_social_unavailable, Toast.LENGTH_SHORT).show();
             return;
         }
 
@@ -1417,7 +1417,7 @@ public class ProfileActivity extends AppCompatActivity {
 
                 if (!snapshot.exists()) {
                     android.util.Log.e("ProfileActivity", "User not found: " + toUserId);
-                    Toast.makeText(ProfileActivity.this, "User not found: " + toUserId, Toast.LENGTH_LONG).show();
+                    Toast.makeText(ProfileActivity.this, R.string.error_friend_search_failed, Toast.LENGTH_LONG).show();
                     return;
                 }
 
@@ -1430,7 +1430,7 @@ public class ProfileActivity extends AppCompatActivity {
                     Toast.makeText(ProfileActivity.this, "Friend request sent!", Toast.LENGTH_SHORT).show();
                 } catch (Exception ex) {
                     android.util.Log.e("ProfileActivity", "Error sending friend request", ex);
-                    Toast.makeText(ProfileActivity.this, "Failed to send request: " + ex.getMessage(), Toast.LENGTH_SHORT).show();
+                    Toast.makeText(ProfileActivity.this, R.string.error_request_failed, Toast.LENGTH_SHORT).show();
                 }
             }
 
@@ -1479,7 +1479,7 @@ public class ProfileActivity extends AppCompatActivity {
     private void showFriendsList(String userId) {
         SocialRepository repo = SocialProvider.get();
         if (repo == null) {
-            Toast.makeText(this, "Social features unavailable", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, R.string.error_social_unavailable, Toast.LENGTH_SHORT).show();
             return;
         }
 
@@ -1763,7 +1763,7 @@ public class ProfileActivity extends AppCompatActivity {
 
             @Override
             public void onCancelled(com.google.firebase.database.DatabaseError error) {
-                Toast.makeText(ProfileActivity.this, "Failed to load profile", Toast.LENGTH_SHORT).show();
+                Toast.makeText(ProfileActivity.this, R.string.error_data_load_failed, Toast.LENGTH_SHORT).show();
             }
         });
     }
@@ -1797,7 +1797,7 @@ public class ProfileActivity extends AppCompatActivity {
                             null
                         );
                     } catch (Exception ex) {
-                        Toast.makeText(this, "Failed to remove friend", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(this, R.string.error_request_failed, Toast.LENGTH_SHORT).show();
                     }
                 }
             },
@@ -1808,7 +1808,7 @@ public class ProfileActivity extends AppCompatActivity {
     private void showFriendRequests(String userId) {
         SocialRepository repo = SocialProvider.get();
         if (repo == null) {
-            Toast.makeText(this, "Social features unavailable", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, R.string.error_social_unavailable, Toast.LENGTH_SHORT).show();
             return;
         }
 
@@ -1984,7 +1984,7 @@ public class ProfileActivity extends AppCompatActivity {
     private void acceptAllFriendRequests(java.util.List<Friend> requests) {
         SocialRepository repo = SocialProvider.get();
         if (repo == null) {
-            Toast.makeText(this, "Social features unavailable", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, R.string.error_social_unavailable, Toast.LENGTH_SHORT).show();
             return;
         }
 
@@ -2068,7 +2068,7 @@ public class ProfileActivity extends AppCompatActivity {
                             );
                         }
                     } catch (Exception ex) {
-                        Toast.makeText(this, "Failed to accept request", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(this, R.string.error_request_failed, Toast.LENGTH_SHORT).show();
                     }
                 }
             }
@@ -2103,7 +2103,7 @@ public class ProfileActivity extends AppCompatActivity {
                             );
                         }
                     } catch (Exception ex) {
-                        Toast.makeText(this, "Failed to reject request", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(this, R.string.error_request_failed, Toast.LENGTH_SHORT).show();
                     }
                 }
             }

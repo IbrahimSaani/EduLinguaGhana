@@ -108,7 +108,7 @@ public class TeacherDashboardActivity extends AppCompatActivity {
         selectedClassFilter = ALL_CLASSES_FILTER;
 
         roleManager = new RoleManager();
-        progressTracker = new ProgressTracker();
+        progressTracker = new ProgressTracker(this);
 
         initViews();
         setupRecyclerView();
@@ -344,7 +344,7 @@ public class TeacherDashboardActivity extends AppCompatActivity {
                     emptyTextView.setText(getString(R.string.teacher_dashboard_error_loading_students, error));
                 }
                 Toast.makeText(TeacherDashboardActivity.this,
-                             R.string.teacher_dashboard_load_failed, Toast.LENGTH_SHORT).show();
+                             R.string.error_data_load_failed, Toast.LENGTH_SHORT).show();
                 updateStatistics(new ArrayList<>());
             }
         });

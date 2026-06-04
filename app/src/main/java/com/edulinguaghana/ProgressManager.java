@@ -93,7 +93,7 @@ public class ProgressManager {
         try {
             FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
             if (user != null) {
-                ProgressTracker tracker = new ProgressTracker();
+                ProgressTracker tracker = new ProgressTracker(context);
                 tracker.logQuizCompletion(context, user.getUid(), mode, score,
                                         correctCount, totalQuestions, durationSeconds, null);
             }

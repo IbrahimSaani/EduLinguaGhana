@@ -317,7 +317,7 @@ public class SettingsActivity extends AppCompatActivity {
         try {
             startActivity(Intent.createChooser(intent, "Send Email"));
         } catch (android.content.ActivityNotFoundException ex) {
-            Toast.makeText(this, "There are no email clients installed.", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "Oops! You don't have an email app installed.", Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -516,7 +516,7 @@ public class SettingsActivity extends AppCompatActivity {
         FirebaseUser user = auth.getCurrentUser();
 
         if (user == null) {
-            Toast.makeText(this, "Please log in first", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, R.string.error_feature_locked, Toast.LENGTH_SHORT).show();
             return;
         }
 
@@ -545,13 +545,13 @@ public class SettingsActivity extends AppCompatActivity {
                 try {
                     int testScore = Integer.parseInt(input.getText().toString());
                     if (testScore < 0 || testScore > 100) {
-                        Toast.makeText(this, "Score must be 0-100", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(this, "The score must be between 0 and 100!", Toast.LENGTH_SHORT).show();
                         return;
                     }
 
                     CloudSyncManager.uploadScoreToLeaderboard(user, testScore, this);
                 } catch (NumberFormatException e) {
-                    Toast.makeText(this, "Invalid score", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(this, "Oops! That doesn't look like a valid score.", Toast.LENGTH_SHORT).show();
                 }
             })
             .setNegativeButton("Cancel", null)

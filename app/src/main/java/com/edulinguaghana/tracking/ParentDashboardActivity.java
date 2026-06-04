@@ -68,7 +68,7 @@ public class ParentDashboardActivity extends AppCompatActivity {
         currentUserId = user.getUid();
 
         roleManager = new RoleManager();
-        progressTracker = new ProgressTracker();
+        progressTracker = new ProgressTracker(this);
 
         initViews();
         setupRecyclerView();
@@ -242,7 +242,7 @@ public class ParentDashboardActivity extends AppCompatActivity {
                     emptyTextView.setText(getString(R.string.parent_dashboard_error_loading_children, error));
                 }
                 Toast.makeText(ParentDashboardActivity.this,
-                             R.string.parent_dashboard_load_failed, Toast.LENGTH_SHORT).show();
+                             R.string.error_data_load_failed, Toast.LENGTH_SHORT).show();
                 updateStatistics(new ArrayList<>());
             }
         });

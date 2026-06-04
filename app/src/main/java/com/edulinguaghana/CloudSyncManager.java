@@ -61,13 +61,13 @@ public class CloudSyncManager {
      */
     public void syncToCloud(SyncCallback callback) {
         if (!canSync()) {
-            callback.onSyncComplete(false, "Login and internet required for sync");
+            callback.onSyncComplete(false, context.getString(R.string.error_no_internet));
             return;
         }
 
         String userId = getUserId();
         if (userId == null) {
-            callback.onSyncComplete(false, "User not authenticated");
+            callback.onSyncComplete(false, context.getString(R.string.error_feature_locked));
             return;
         }
 
@@ -126,10 +126,10 @@ public class CloudSyncManager {
                 .setValue(userData)
                 .addOnSuccessListener(aVoid -> {
                     saveLastSyncTime();
-                    callback.onSyncComplete(true, "Data synced successfully!");
+                    callback.onSyncComplete(true, "Progress saved to the cloud! ✨");
                 })
                 .addOnFailureListener(e -> {
-                    callback.onSyncComplete(false, "Sync failed: " + e.getMessage());
+                    callback.onSyncComplete(false, context.getString(R.string.error_sync_failed));
                 });
 
         } catch (Exception e) {
@@ -142,13 +142,13 @@ public class CloudSyncManager {
      */
     public void syncFromCloud(SyncCallback callback) {
         if (!canSync()) {
-            callback.onSyncComplete(false, "Login and internet required for sync");
+            callback.onSyncComplete(false, context.getString(R.string.error_no_internet));
             return;
         }
 
         String userId = getUserId();
         if (userId == null) {
-            callback.onSyncComplete(false, "User not authenticated");
+            callback.onSyncComplete(false, context.getString(R.string.error_feature_locked));
             return;
         }
 
@@ -244,19 +244,19 @@ public class CloudSyncManager {
                             }
 
                             saveLastSyncTime();
-                            callback.onSyncComplete(true, "Data restored from cloud!");
+                            callback.onSyncComplete(true, "Progress restored! Welcome back! 🚀");
 
                         } catch (Exception e) {
-                            callback.onSyncComplete(false, "Error processing data");
+                            callback.onSyncComplete(false, context.getString(R.string.error_generic_try_again));
                         }
                     } else {
-                        callback.onSyncComplete(true, "No cloud data found");
+                        callback.onSyncComplete(true, "No progress found in the cloud yet!");
                     }
                 }
 
                 @Override
                 public void onCancelled(@NonNull DatabaseError error) {
-                    callback.onSyncComplete(false, "Failed to read cloud data");
+                    callback.onSyncComplete(false, context.getString(R.string.error_data_load_failed));
                 }
             });
     }
@@ -266,14 +266,14 @@ public class CloudSyncManager {
      */
     public void uploadToLeaderboard(String userName, int score, SyncCallback callback) {
         if (!canSync()) {
-            callback.onSyncComplete(false, "Login and internet required");
+            callback.onSyncComplete(false, context.getString(R.string.error_no_internet));
             return;
         }
 
         String userId = getUserId();
         FirebaseUser user = auth.getCurrentUser();
         if (userId == null || user == null) {
-            callback.onSyncComplete(false, "User not authenticated");
+            callback.onSyncComplete(false, context.getString(R.string.error_feature_locked));
             return;
         }
 

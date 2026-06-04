@@ -622,6 +622,37 @@
     <string name="mascot_lang_switch">Awesome! Let\'s learn some %1$s! 🚀</string>
     <string name="pronunciation_not_recognized">Couldn\'t recognize your pronunciation. Try again!</string>
 
+    <!-- Friendly General Errors -->
+    <string name="error_no_internet">You\'re offline! Please check your internet to keep exploring.</string>
+    <string name="error_generic_try_again">Something went wrong. Let\'s try that again!</string>
+    <string name="error_social_unavailable">Social features are taking a nap right now. Try again soon!</string>
+    <string name="error_feature_locked">This part is locked for now. Sign in to unlock it!</string>
+    <string name="error_audio_failed">We had some trouble playing the sound. Let\'s try again!</string>
+    <string name="error_file_save_failed">We couldn\'t save some data. Please check your storage!</string>
+    <string name="error_api_limit">We\'re very busy right now! Please try again in a little while.</string>
+    <string name="error_profile_save_failed">We couldn\'t save your changes. Check your connection!</string>
+    <string name="error_delete_failed">Something went wrong while trying to remove your account. Please try again.</string>
+    <string name="error_verify_failed">We couldn\'t check your email status. Try again in a moment!</string>
+
+    <!-- Friendly Social Errors -->
+    <string name="error_friend_search_failed">We couldn\'t find that user. Try checking the spelling!</string>
+    <string name="error_challenge_create_failed">We couldn\'t start the challenge. Let\'s try one more time!</string>
+    <string name="error_challenge_save_failed">Oops! We couldn\'t save your score. Check your connection!</string>
+    <string name="error_request_failed">We couldn\'t send your request. Please try again!</string>
+    <string name="error_qr_invalid">Oops! That QR code doesn\'t look right. Try another one!</string>
+    <string name="error_qr_own">Hey, that\'s your own code! Try scanning a friend\'s code.</string>
+    <string name="error_self_challenge">You can\'t challenge yourself! Try challenging a friend instead.</string>
+    <string name="error_self_add">You can\'t add yourself as a friend!</string>
+
+    <!-- Friendly Progress/Sync Errors -->
+    <string name="error_sync_failed">We couldn\'t sync your progress. Don\'t worry, it\'s safe on your device!</string>
+    <string name="error_data_load_failed">Oops! We had trouble loading your data. Try refreshing!</string>
+    <string name="error_reset_failed">We couldn\'t reset your progress. Try again later!</string>
+
+    <!-- Friendly Role Errors -->
+    <string name="error_relationship_exists">You\'re already connected with this explorer!</string>
+    <string name="error_pending_request">A request is already waiting to be accepted!</string>
+
     <!-- Alphabet Bridge -->
     <string name="alphabet_bridge_title">Alphabet Bridge</string>
     <string name="alphabet_bridge_prompt">Tap the next letter to help Owlbert cross!</string>

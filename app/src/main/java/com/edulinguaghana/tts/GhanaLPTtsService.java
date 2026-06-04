@@ -6,6 +6,8 @@ import android.util.Log;
 
 import androidx.annotation.NonNull;
 
+import com.edulinguaghana.R;
+
 import org.json.JSONObject;
 
 import java.io.File;
@@ -66,14 +68,14 @@ public class GhanaLPTtsService {
      */
     public void synthesize(String text, String language, String speakerId, TtsCallback callback) {
         if (text == null || text.trim().isEmpty()) {
-            callback.onError("Text cannot be empty");
+            callback.onError(context.getString(R.string.error_generic_try_again));
             return;
         }
 
         // Validate language
         String langLower = language.toLowerCase();
         if (!langLower.equals("twi") && !langLower.equals("ewe") && !langLower.equals("ga")) {
-            callback.onError("Unsupported language: " + language + ". Use 'twi', 'ewe', or 'ga'");
+            callback.onError("Unsupported language"); // Internal validation
             return;
         }
 
@@ -103,7 +105,7 @@ public class GhanaLPTtsService {
                 @Override
                 public void onFailure(@NonNull Call call, @NonNull IOException e) {
                     Log.e(TAG, "API request failed", e);
-                    callback.onError("Network error: " + e.getMessage());
+                    callback.onError(context.getString(R.string.error_no_internet));
                 }
 
                 @Override
@@ -119,14 +121,14 @@ public class GhanaLPTtsService {
                             Log.e(TAG, "Error reading error response", e);
                         }
                         Log.e(TAG, errorMsg);
-                        callback.onError(errorMsg);
+                        callback.onError(context.getString(R.string.error_api_limit));
                         return;
                     }
 
                     try {
                         ResponseBody responseBody = response.body();
                         if (responseBody == null) {
-                            callback.onError("Empty response from API");
+                            callback.onError(context.getString(R.string.error_generic_try_again));
                             return;
                         }
 
@@ -136,14 +138,14 @@ public class GhanaLPTtsService {
 
                     } catch (Exception e) {
                         Log.e(TAG, "Error saving audio file", e);
-                        callback.onError("Error saving audio: " + e.getMessage());
+                        callback.onError(context.getString(R.string.error_file_save_failed));
                     }
                 }
             });
 
         } catch (Exception e) {
             Log.e(TAG, "Error creating request", e);
-            callback.onError("Error creating request: " + e.getMessage());
+            callback.onError(context.getString(R.string.error_generic_try_again));
         }
     }
 
@@ -221,7 +223,7 @@ public class GhanaLPTtsService {
             mediaPlayer.setOnErrorListener((mp, what, extra) -> {
                 String error = "MediaPlayer error: " + what + ", " + extra;
                 Log.e(TAG, error);
-                callback.onError(error);
+                callback.onError(context.getString(R.string.error_audio_failed));
                 mp.release();
                 mediaPlayer = null;
                 return true;
@@ -231,7 +233,7 @@ public class GhanaLPTtsService {
 
         } catch (Exception e) {
             Log.e(TAG, "Error playing audio", e);
-            callback.onError("Error playing audio: " + e.getMessage());
+            callback.onError(context.getString(R.string.error_audio_failed));
         }
     }
 

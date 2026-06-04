@@ -99,7 +99,7 @@ public class StudentDetailActivity extends AppCompatActivity {
             return;
         }
 
-        progressTracker = new ProgressTracker();
+        progressTracker = new ProgressTracker(this);
         roleManager = new RoleManager();
         challengeManager = new ChallengeManager();
         progressRef = FirebaseDatabase.getInstance().getReference("progress").child(studentId);
@@ -336,11 +336,11 @@ public class StudentDetailActivity extends AppCompatActivity {
 
                 final String errorMessage;
                 if (error != null && error.contains("Permission denied")) {
-                    errorMessage = "Permission denied. If you just added this student, please ensure they have accepted the request. If this persists, try removing and re-adding the student.";
+                    errorMessage = "Oops! We don't have permission to see this yet. Please make sure the request was accepted!";
                 } else if (error != null) {
-                    errorMessage = getString(R.string.student_detail_error_loading_progress, error);
+                    errorMessage = getString(R.string.error_data_load_failed);
                 } else {
-                    errorMessage = getString(R.string.student_detail_error_loading);
+                    errorMessage = getString(R.string.error_generic_try_again);
                 }
 
                 Toast.makeText(StudentDetailActivity.this, errorMessage, Toast.LENGTH_LONG).show();

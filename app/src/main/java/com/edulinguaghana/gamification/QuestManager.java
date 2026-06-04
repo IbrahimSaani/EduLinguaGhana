@@ -272,7 +272,7 @@ public class QuestManager {
                 try {
                     com.google.firebase.auth.FirebaseUser user = com.google.firebase.auth.FirebaseAuth.getInstance().getCurrentUser();
                     if (user != null) {
-                        com.edulinguaghana.tracking.ProgressTracker tracker = new com.edulinguaghana.tracking.ProgressTracker();
+                        com.edulinguaghana.tracking.ProgressTracker tracker = new com.edulinguaghana.tracking.ProgressTracker(ctx);
                         tracker.updateAggregates(ctx, user.getUid());
                     }
                 } catch (Exception e) {
@@ -304,7 +304,7 @@ public class QuestManager {
                 try {
                     com.google.firebase.auth.FirebaseUser user = com.google.firebase.auth.FirebaseAuth.getInstance().getCurrentUser();
                     if (user != null) {
-                        com.edulinguaghana.tracking.ProgressTracker tracker = new com.edulinguaghana.tracking.ProgressTracker();
+                        com.edulinguaghana.tracking.ProgressTracker tracker = new com.edulinguaghana.tracking.ProgressTracker(ctx);
                         tracker.updateAggregates(ctx, user.getUid());
                     }
                 } catch (Exception e) {

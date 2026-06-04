@@ -111,7 +111,7 @@ public class RelationshipManagementActivity extends AppCompatActivity {
             @Override
             public void onError(String error) {
                 Toast.makeText(RelationshipManagementActivity.this,
-                             getString(R.string.relationship_mgmt_error_loading_role, error), Toast.LENGTH_SHORT).show();
+                             R.string.error_data_load_failed, Toast.LENGTH_SHORT).show();
                 // Default to student
                 currentUserRole = UserRole.STUDENT;
                 setupUIForRole(UserRole.STUDENT);
@@ -187,7 +187,7 @@ public class RelationshipManagementActivity extends AppCompatActivity {
                         btnAddStudent.setEnabled(true);
                         loadingProgress.setVisibility(View.GONE);
                         Toast.makeText(RelationshipManagementActivity.this,
-                                     getString(R.string.relationship_mgmt_search_failed, error.getMessage()), Toast.LENGTH_SHORT).show();
+                                     R.string.error_friend_search_failed, Toast.LENGTH_SHORT).show();
                     }
                 });
     }
@@ -212,7 +212,7 @@ public class RelationshipManagementActivity extends AppCompatActivity {
                     btnAddStudent.setEnabled(true);
                     loadingProgress.setVisibility(View.GONE);
                     Toast.makeText(RelationshipManagementActivity.this,
-                                 R.string.relationship_mgmt_student_not_found, Toast.LENGTH_SHORT).show();
+                                 R.string.error_friend_search_failed, Toast.LENGTH_SHORT).show();
                 }
             }
 
@@ -221,7 +221,7 @@ public class RelationshipManagementActivity extends AppCompatActivity {
                 btnAddStudent.setEnabled(true);
                 loadingProgress.setVisibility(View.GONE);
                 Toast.makeText(RelationshipManagementActivity.this,
-                                     getString(R.string.relationship_mgmt_search_failed, error.getMessage()), Toast.LENGTH_SHORT).show();
+                                     R.string.error_friend_search_failed, Toast.LENGTH_SHORT).show();
             }
         });
     }
@@ -251,7 +251,7 @@ public class RelationshipManagementActivity extends AppCompatActivity {
                 btnAddStudent.setEnabled(true);
                 loadingProgress.setVisibility(View.GONE);
                 Toast.makeText(RelationshipManagementActivity.this,
-                             getString(R.string.relationship_mgmt_create_failed, error), Toast.LENGTH_LONG).show();
+                             R.string.error_challenge_create_failed, Toast.LENGTH_LONG).show();
             }
         });
     }
@@ -332,7 +332,7 @@ public class RelationshipManagementActivity extends AppCompatActivity {
             @Override
             public void onError(String error) {
                 Toast.makeText(RelationshipManagementActivity.this,
-                             getString(R.string.relationship_mgmt_accept_failed, error), Toast.LENGTH_SHORT).show();
+                             R.string.error_generic_try_again, Toast.LENGTH_SHORT).show();
             }
         });
     }
@@ -357,7 +357,7 @@ public class RelationshipManagementActivity extends AppCompatActivity {
                     @Override
                     public void onError(String error) {
                         Toast.makeText(RelationshipManagementActivity.this,
-                                     getString(R.string.relationship_mgmt_reject_failed, error), Toast.LENGTH_SHORT).show();
+                                     R.string.error_generic_try_again, Toast.LENGTH_SHORT).show();
                     }
                 }),
             null

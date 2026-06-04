@@ -23,6 +23,7 @@ import java.util.UUID;
  */
 public class ProgressTracker {
 
+    private final Context context;
     private final DatabaseReference progressRef;
     private final DatabaseReference aggregatesRef;
     private final DatabaseReference milestonesRef;
@@ -32,7 +33,8 @@ public class ProgressTracker {
         void onError(String error);
     }
 
-    public ProgressTracker() {
+    public ProgressTracker(Context context) {
+        this.context = context.getApplicationContext();
         FirebaseDatabase database = FirebaseDatabase.getInstance();
         this.progressRef = database.getReference("progress");
         this.aggregatesRef = database.getReference("aggregates");
@@ -50,7 +52,7 @@ public class ProgressTracker {
             if (user != null) {
                 userId = user.getUid();
             } else {
-                if (callback != null) callback.onError("User not logged in");
+                if (callback != null) callback.onError(context.getString(R.string.error_feature_locked));
                 return;
             }
         }
@@ -87,7 +89,7 @@ public class ProgressTracker {
                 if (callback != null) callback.onSuccess();
             })
             .addOnFailureListener(e -> {
-                if (callback != null) callback.onError(e.getMessage());
+                if (callback != null) callback.onError(context.getString(R.string.error_sync_failed));
             });
     }
 
@@ -100,7 +102,7 @@ public class ProgressTracker {
             if (user != null) {
                 userId = user.getUid();
             } else {
-                if (callback != null) callback.onError("User not logged in");
+                if (callback != null) callback.onError(context.getString(R.string.error_feature_locked));
                 return;
             }
         }
@@ -131,7 +133,7 @@ public class ProgressTracker {
                 if (callback != null) callback.onSuccess();
             })
             .addOnFailureListener(e -> {
-                if (callback != null) callback.onError(e.getMessage());
+                if (callback != null) callback.onError(context.getString(R.string.error_sync_failed));
             });
     }
 
@@ -148,7 +150,7 @@ public class ProgressTracker {
             if (user != null) {
                 userId = user.getUid();
             } else {
-                if (callback != null) callback.onError("User not logged in");
+                if (callback != null) callback.onError(context.getString(R.string.error_feature_locked));
                 return;
             }
         }
@@ -178,7 +180,7 @@ public class ProgressTracker {
                 if (callback != null) callback.onSuccess();
             })
             .addOnFailureListener(e -> {
-                if (callback != null) callback.onError(e.getMessage());
+                if (callback != null) callback.onError(context.getString(R.string.error_sync_failed));
             });
     }
 
@@ -207,7 +209,7 @@ public class ProgressTracker {
                 if (callback != null) callback.onSuccess();
             })
             .addOnFailureListener(e -> {
-                if (callback != null) callback.onError(e.getMessage());
+                if (callback != null) callback.onError(context.getString(R.string.error_sync_failed));
             });
     }
 
@@ -243,7 +245,7 @@ public class ProgressTracker {
                 if (callback != null) callback.onSuccess();
             })
             .addOnFailureListener(e -> {
-                if (callback != null) callback.onError(e.getMessage());
+                if (callback != null) callback.onError(context.getString(R.string.error_sync_failed));
             });
     }
 
@@ -277,7 +279,7 @@ public class ProgressTracker {
                 if (callback != null) callback.onSuccess();
             })
             .addOnFailureListener(e -> {
-                if (callback != null) callback.onError(e.getMessage());
+                if (callback != null) callback.onError(context.getString(R.string.error_sync_failed));
             });
     }
 
@@ -466,7 +468,7 @@ public class ProgressTracker {
 
             @Override
             public void onCancelled(DatabaseError error) {
-                callback.onError(error.getMessage());
+                callback.onError(context.getString(R.string.error_data_load_failed));
             }
         });
     }
