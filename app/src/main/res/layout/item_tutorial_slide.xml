@@ -45,10 +45,10 @@
         android:id="@+id/bubbleCard"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:cardCornerRadius="24dp"
-        app:cardElevation="4dp"
-        app:strokeWidth="3dp"
-        app:strokeColor="@color/colorPrimary"
+        app:cardCornerRadius="32dp"
+        app:cardElevation="8dp"
+        app:strokeWidth="4dp"
+        app:strokeColor="@color/white"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/guideline"
         app:layout_constraintVertical_bias="0.2">
@@ -57,7 +57,8 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:padding="24dp">
+            android:padding="28dp"
+            android:background="@color/cardBackground">
 
             <TextView
                 android:id="@+id/tvSlideTitle"
@@ -66,7 +67,7 @@
                 android:fontFamily="@font/agbalumo"
                 android:text="Welcome"
                 android:textColor="@color/colorPrimary"
-                android:textSize="28sp"
+                android:textSize="32sp"
                 android:textStyle="bold"
                 android:layout_marginBottom="12dp"/>
 
@@ -74,10 +75,11 @@
                 android:id="@+id/tvSlideDescription"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:lineSpacingExtra="6dp"
+                android:lineSpacingExtra="8dp"
                 android:text="Learn Ghanaian languages with ease and fun."
                 android:textColor="@color/textColorPrimary"
-                android:textSize="17sp" />
+                android:fontFamily="sans-serif-medium"
+                android:textSize="18sp" />
 
         </LinearLayout>
     </com.google.android.material.card.MaterialCardView>

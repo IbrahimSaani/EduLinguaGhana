@@ -42,24 +42,25 @@ public class TutorialActivity extends AppCompatActivity {
     private ProgressBar progressBar;
     private View viewBackground;
     private ViewGroup animatedShapesContainer;
+    private nl.dionsegijn.konfetti.xml.KonfettiView konfettiView;
     private List<TutorialSlide> slides;
     
     // Bright, kid-friendly colors for each slide background
     private final int[] colors = {
-        Color.parseColor("#FFEBEE"), // Slide 1: Soft Pink
-        Color.parseColor("#E3F2FD"), // Slide 2: Sky Blue
-        Color.parseColor("#E8F5E9"), // Slide 3: Mint Green
-        Color.parseColor("#FFFDE7"), // Slide 4: Lemon Yellow
-        Color.parseColor("#F3E5F5")  // Slide 5: Soft Purple
+        Color.parseColor("#FFF5E5"), // Slide 1: Warm Peach
+        Color.parseColor("#E0F7FA"), // Slide 2: Light Cyan
+        Color.parseColor("#F1F8E9"), // Slide 3: Light Green
+        Color.parseColor("#F3E5F5"), // Slide 4: Light Purple
+        Color.parseColor("#FFFDE7")  // Slide 5: Light Yellow
     };
 
     // Primary accent colors for the buttons/bubbles
     private final int[] accentColors = {
-        Color.parseColor("#E91E63"), // Pink
-        Color.parseColor("#2196F3"), // Blue
-        Color.parseColor("#4CAF50"), // Green
-        Color.parseColor("#FBC02D"), // Yellow/Amber
-        Color.parseColor("#9C27B0")  // Purple
+        Color.parseColor("#FFAB40"), // Accent Orange
+        Color.parseColor("#00BCD4"), // Cyan
+        Color.parseColor("#8BC34A"), // Green
+        Color.parseColor("#9C27B0"), // Purple
+        Color.parseColor("#FBC02D")  // Yellow
     };
 
     private final ArgbEvaluator argbEvaluator = new ArgbEvaluator();
@@ -76,13 +77,14 @@ public class TutorialActivity extends AppCompatActivity {
         progressBar = findViewById(R.id.progressBarTutorial);
         viewBackground = findViewById(R.id.viewBackground);
         animatedShapesContainer = findViewById(R.id.animatedShapesContainer);
+        konfettiView = findViewById(R.id.konfettiView);
 
         slides = new ArrayList<>();
-        slides.add(new TutorialSlide("🇬🇭", "Hi! I'm Owlbert!", "Welcome to EduLingua! I'm so excited to help you learn our beautiful languages!"));
-        slides.add(new TutorialSlide("🎤", "Listen & Speak", "I'll say a word, and you repeat it. It's like talking with a friend!"));
-        slides.add(new TutorialSlide("📝", "Fun Challenges", "We have cool puzzles and games. Can you get the highest score?"));
-        slides.add(new TutorialSlide("🎯", "Speed Games", "Think fast! Play the Speed Challenge to become a language superstar!"));
-        slides.add(new TutorialSlide("🏆", "Win Prizes!", "Earn shiny badges and unlock achievements as you learn. You're going to be great!"));
+        slides.add(new TutorialSlide("🇬🇭", "Hi! I'm Owlbert!", "Welcome to EduLingua! I'm so excited to be your guide as we explore the amazing languages of Ghana!"));
+        slides.add(new TutorialSlide("🎧", "Listen & Learn", "Tap any letter or number to hear how it sounds. It's like having a talking book!"));
+        slides.add(new TutorialSlide("🚀", "Play Time", "Play fun mini-games like Bubble Pop and Rocket Sort! Learning feels like playing!"));
+        slides.add(new TutorialSlide("🧩", "Brain Quest", "Test your memory with cool puzzles and quizzes. Can you become a language champion?"));
+        slides.add(new TutorialSlide("🏆", "Shiny Badges!", "Earn badges and stars for everything you do. Let's see how many you can collect!"));
 
         TutorialAdapter adapter = new TutorialAdapter(slides, this);
         viewPager.setAdapter(adapter);
@@ -151,6 +153,19 @@ public class TutorialActivity extends AppCompatActivity {
     private void celebrateAndFinish() {
         vibrate(100);
         
+        if (konfettiView != null) {
+            konfettiView.start(
+                new nl.dionsegijn.konfetti.core.PartyFactory(
+                    new nl.dionsegijn.konfetti.core.emitter.Emitter(1000L, java.util.concurrent.TimeUnit.MILLISECONDS).max(100)
+                )
+                .spread(360)
+                .colors(java.util.Arrays.asList(0xfce18a, 0xff726d, 0xf48fb1, 0xafdfff))
+                .setSpeedBetween(10f, 30f)
+                .position(new nl.dionsegijn.konfetti.core.Position.Relative(0.5, 0.3))
+                .build()
+            );
+        }
+
         // Burst animation for all background shapes
         if (animatedShapesContainer != null) {
             for (int i = 0; i < animatedShapesContainer.getChildCount(); i++) {
