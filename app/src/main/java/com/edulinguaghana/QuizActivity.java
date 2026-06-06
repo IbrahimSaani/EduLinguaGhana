@@ -80,7 +80,7 @@ public class QuizActivity extends AppCompatActivity {
     private nl.dionsegijn.konfetti.xml.KonfettiView konfettiView;
 
     // UI Animations
-    private com.airbnb.lottie.LottieAnimationView ivWelcomeIcon, lavEndCelebration;
+    private com.airbnb.lottie.LottieAnimationView ivWelcomeIcon;
 
     // End screen
     private TextView tvFinalScore, tvEndBestScore, tvNewHighScore;
@@ -259,7 +259,6 @@ public class QuizActivity extends AppCompatActivity {
         tvEndXP = findViewById(R.id.tvEndXP);
         btnPlayAgain = findViewById(R.id.btnPlayAgain);
         btnEndQuit = findViewById(R.id.btnEndQuit);
-        lavEndCelebration = findViewById(R.id.lavEndCelebration);
         konfettiView = findViewById(R.id.konfettiView);
     }
 
@@ -1328,16 +1327,9 @@ public class QuizActivity extends AppCompatActivity {
                     Animation bouncePop = AnimationUtils.loadAnimation(this, R.anim.bounce_pop);
                     tvNewHighScore.startAnimation(bouncePop);
                 }
-                if (lavEndCelebration != null) {
-                    lavEndCelebration.setVisibility(View.VISIBLE);
-                    lavEndCelebration.playAnimation();
-                }
             } else {
                 if (tvNewHighScore != null) {
                     tvNewHighScore.setVisibility(View.GONE);
-                }
-                if (lavEndCelebration != null) {
-                    lavEndCelebration.setVisibility(View.GONE);
                 }
             }
         } catch (Exception ignored) {

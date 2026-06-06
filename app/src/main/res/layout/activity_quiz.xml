@@ -567,17 +567,6 @@
             android:background="@color/appBackground"
             tools:visibility="visible">
 
-            <!-- Premium Result Header -->
-            <com.airbnb.lottie.LottieAnimationView
-                android:id="@+id/lavEndCelebration"
-                android:layout_width="180dp"
-                android:layout_height="180dp"
-                android:layout_marginBottom="-30dp"
-                app:lottie_autoPlay="true"
-                app:lottie_loop="true"
-                app:lottie_rawRes="@raw/kids_animation"
-                android:elevation="12dp" />
-
             <com.google.android.material.card.MaterialCardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"

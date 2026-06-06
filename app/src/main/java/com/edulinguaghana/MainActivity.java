@@ -191,6 +191,81 @@ public class MainActivity extends AppCompatActivity {
 
         // Setup role-based navigation
         setupRoleBasedNavigation();
+
+        // Listen for incoming challenges
+        setupChallengesListener();
+    }
+
+    private void setupChallengesListener() {
+        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+        if (user == null) return;
+
+        final String currentUid = user.getUid();
+        DatabaseReference challengesRef = FirebaseDatabase.getInstance().getReference("challenges");
+
+        // Listen for challenges where I am the challenged person
+        challengesRef.orderByChild("challengedId").equalTo(currentUid).addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot snapshot) {
+                if (!snapshot.exists()) return;
+
+                NotificationManager nm = new NotificationManager(MainActivity.this);
+                SharedPreferences prefs = getSharedPreferences(PREF_NAME, MODE_PRIVATE);
+                java.util.Set<String> seenChallengeIds = prefs.getStringSet("SEEN_CHALLENGE_IDS", new java.util.HashSet<>());
+                boolean updated = false;
+
+                for (DataSnapshot child : snapshot.getChildren()) {
+                    String challengeId = child.getKey();
+                    String state = child.child("state").getValue(String.class);
+
+                    // Only notify for PENDING challenges that we haven't seen yet
+                    if ("PENDING".equals(state) && challengeId != null && !seenChallengeIds.contains(challengeId)) {
+                        String challengerId = child.child("challengerId").getValue(String.class);
+                        String quizType = child.child("quizType").getValue(String.class);
+                        
+                        // We need the challenger's name
+                        fetchChallengerNameAndNotify(challengerId, quizType, challengeId, nm);
+                        
+                        seenChallengeIds.add(challengeId);
+                        updated = true;
+                    }
+                }
+
+                if (updated) {
+                    prefs.edit().putStringSet("SEEN_CHALLENGE_IDS", seenChallengeIds).apply();
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError error) {}
+        });
+    }
+
+    private void fetchChallengerNameAndNotify(String challengerId, String quizType, String challengeId, NotificationManager nm) {
+        if (challengerId == null) return;
+        
+        DatabaseReference userRef = FirebaseDatabase.getInstance().getReference("users").child(challengerId);
+        userRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot snapshot) {
+                String name = snapshot.child("displayName").getValue(String.class);
+                if (name == null) name = snapshot.child("username").getValue(String.class);
+                if (name == null) name = "A friend";
+
+                String title = getString(R.string.notification_challenge_title);
+                String message = getString(R.string.notification_challenge_message, name, quizType);
+
+                nm.addNotification(
+                    title,
+                    message,
+                    "⚔️",
+                    Notification.NotificationType.MOTIVATIONAL
+                );
+            }
+
+            @Override
+            public void onCancelled(DatabaseError error) {}
+        });
     }
 
     private void setupOfflineIndicator() {

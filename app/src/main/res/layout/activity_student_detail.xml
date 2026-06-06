@@ -855,6 +855,20 @@
                                 android:textColor="@color/colorAccent"/>
                         </LinearLayout>
                     </LinearLayout>
+
+                    <!-- Report Button (Teacher only) -->
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btnDownloadStudentReport"
+                        style="@style/Widget.Material3.Button.TonalButton"
+                        android:layout_width="match_parent"
+                        android:layout_height="60dp"
+                        android:layout_marginTop="24dp"
+                        android:text="@string/student_detail_generate_report"
+                        android:textColor="@color/white"
+                        app:backgroundTint="@color/colorPrimary"
+                        app:icon="@drawable/ic_share"
+                        app:iconTint="@color/white"
+                        android:visibility="gone" />
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
         </LinearLayout>

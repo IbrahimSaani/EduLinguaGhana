@@ -2529,13 +2529,19 @@ public class ProfileActivity extends AppCompatActivity {
         }
 
         java.util.List<StyledMenuHelper.MenuItem> menuItems = new java.util.ArrayList<>();
+        java.text.SimpleDateFormat sdf = new java.text.SimpleDateFormat("MMM dd, yyyy", java.util.Locale.getDefault());
+        
         for (int i = 0; i < challenges.size(); i++) {
             com.edulinguaghana.social.Challenge selectedChallenge = challenges.get(i);
             String itemTitle = challengeItems[i];
+            String dateStr = selectedChallenge.completedAt != null ? 
+                    "Completed on " + sdf.format(new java.util.Date(selectedChallenge.completedAt)) : 
+                    "View the final result";
+            
             menuItems.add(new StyledMenuHelper.MenuItem(
                 "🏆",
                 itemTitle,
-                "View the final result",
+                dateStr,
                 () -> showChallengeResultDetails(selectedChallenge, userId)
             ));
         }
@@ -2577,6 +2583,11 @@ public class ProfileActivity extends AppCompatActivity {
                         "Opponent Score: " + (opponentScore != null ? opponentScore : "N/A") + "\n" +
                         "Language: " + getLanguageNameFromCode(challenge.language) + "\n" +
                         "Quiz: " + challenge.quizType;
+        
+        if (challenge.completedAt != null) {
+            java.text.SimpleDateFormat sdf = new java.text.SimpleDateFormat("MMM dd, yyyy 'at' h:mm a", java.util.Locale.getDefault());
+            message += "\nCompleted: " + sdf.format(new java.util.Date(challenge.completedAt));
+        }
 
         StyledMenuHelper.showStyledConfirmationDialog(
             this,

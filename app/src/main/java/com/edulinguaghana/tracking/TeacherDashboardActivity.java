@@ -457,11 +457,13 @@ public class TeacherDashboardActivity extends AppCompatActivity {
         }
 
         StringBuilder csv = new StringBuilder();
-        csv.append("Student Name,Level,Total XP,Weekly Quizzes,Accuracy\n");
+        csv.append("Student Name,Level,Best Quiz Score (Max 10),Total XP,Weekly Quizzes,Accuracy\n");
         for (StudentProgressItem student : allStudents) {
             ProgressAggregate p = student.getProgress();
+            int cappedBestScore = Math.min(p.getHighestScore(), 10);
             csv.append(student.getStudentName()).append(",")
                .append(p.getCurrentLevel()).append(",")
+               .append(cappedBestScore).append(",")
                .append(p.getTotalXP()).append(",")
                .append(p.getQuizzesThisWeek()).append(",")
                .append(String.format(Locale.getDefault(), "%.1f%%", p.getAccuracy()))

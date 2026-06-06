@@ -11,7 +11,7 @@
     },
     "users": {
       ".indexOn": ["email", "username", "role"],
-      ".read": "auth != null && (query.orderByChild == 'email' || query.orderByChild == 'username' || query.orderByChild == 'role')",
+      ".read": "auth != null",
       "$userId": {
         ".read": "auth != null",
         ".write": "$userId === auth.uid && (auth.token.email_verified === true || !data.exists())",
@@ -57,7 +57,7 @@
     },
     "challenges": {
       ".read": "auth != null",
-      ".indexOn": ["state", "challengedId", "challengerId", "completedAt", "createdAt"],
+      ".indexOn": ["state", "challengedId", "challengerId", "completedAt", "createdAt", "timestamp"],
       "$challengeId": {
         ".read": "auth != null",
         ".write": "auth != null && auth.token.email_verified === true && (!data.exists() || data.child('challengerId').val() === auth.uid || data.child('challengedId').val() === auth.uid || newData.child('challengerId').val() === auth.uid || newData.child('challengedId').val() === auth.uid)",
@@ -146,7 +146,7 @@
       }
     },
     "aggregates": {
-      ".indexOn": ["userId"],
+      ".indexOn": ["userId", "totalXP", "currentStreak"],
       "$userId": {
         ".read": "auth != null && ($userId === auth.uid || root.child('relationships').child(auth.uid + '_' + $userId).child('status').val() === 'ACCEPTED')",
         ".write": "$userId === auth.uid && auth.token.email_verified === true"
@@ -183,7 +183,7 @@
     },
     "announcements": {
       ".read": "auth != null",
-      ".indexOn": ["teacherId", "timestamp"],
+      ".indexOn": ["teacherId", "timestamp", "type", "targetId"],
       "$announcementId": {
         ".write": "auth != null && root.child('users').child(auth.uid).child('role').val() === 'TEACHER' && newData.child('teacherId').val() === auth.uid",
         ".validate": "newData.hasChildren(['message', 'timestamp', 'teacherId', 'type']) && (newData.child('type').val() === 'ALL' || newData.child('type').val() === 'CLASS' || newData.child('type').val() === 'STUDENT')"

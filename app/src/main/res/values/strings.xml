@@ -347,6 +347,8 @@
 
     <!-- Student Detail -->
     <string name="student_detail_id_not_found">Student ID not found</string>
+    <string name="student_detail_generate_report">📄 Generate Student Report</string>
+    <string name="student_detail_report_subject">Student Progress Report: %1$s</string>
     <string name="student_detail_child_prefix">Child: %1$s</string>
     <string name="student_detail_student_prefix">Student: %1$s</string>
     <string name="student_detail_child_progress">Child Progress</string>

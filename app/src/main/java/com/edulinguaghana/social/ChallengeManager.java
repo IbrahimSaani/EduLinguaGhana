@@ -106,6 +106,7 @@ public class ChallengeManager {
                     // If both scores are recorded, determine winner and update state
                     if (challenge.challengerScore != null && challenge.challengedScore != null) {
                         challenge.state = Challenge.State.COMPLETED;
+                        challenge.completedAt = System.currentTimeMillis();
                         challenge.determineWinner();
 
                         // Update challenge stats for both players

@@ -14,6 +14,7 @@ public class Challenge {
     public State state;
     public long createdAt;
     public Long expiresAt;
+    public Long completedAt;      // When the challenge was finished
     public Long durationMinutes;  // Challenge duration in minutes
     public Integer hearts;        // Number of hearts (for games like Rocket Sort)
 

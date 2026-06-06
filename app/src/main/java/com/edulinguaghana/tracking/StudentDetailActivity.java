@@ -62,6 +62,7 @@ public class StudentDetailActivity extends AppCompatActivity {
     private TextView tvTimeSpent;
     private TextView tvChallengesWon;
     private TextView tvChallengesLost;
+    private com.google.android.material.button.MaterialButton btnDownloadStudentReport;
 
     // Section views for role-based customization
     private View dividerStreaks;
@@ -198,6 +199,10 @@ public class StudentDetailActivity extends AppCompatActivity {
                 if (tvLabelChallenges != null) tvLabelChallenges.setVisibility(View.VISIBLE);
                 if (layoutChallenges != null) layoutChallenges.setVisibility(View.VISIBLE);
                 if (dividerChallenges != null) dividerChallenges.setVisibility(View.VISIBLE);
+                
+                if (btnDownloadStudentReport != null) {
+                    btnDownloadStudentReport.setVisibility(View.VISIBLE);
+                }
                 break;
         }
     }
@@ -247,6 +252,7 @@ public class StudentDetailActivity extends AppCompatActivity {
         tvTimeSpent = findViewById(R.id.tvTimeSpent);
         tvChallengesWon = findViewById(R.id.tvChallengesWon);
         tvChallengesLost = findViewById(R.id.tvChallengesLost);
+        btnDownloadStudentReport = findViewById(R.id.btnDownloadStudentReport);
 
         dividerStreaks = findViewById(R.id.dividerStreaks);
         tvLabelStreaks = findViewById(R.id.tvLabelStreaks);
@@ -315,6 +321,7 @@ public class StudentDetailActivity extends AppCompatActivity {
         initialLoadComplete = false;
         loadingProgress.setVisibility(View.VISIBLE);
         statsCard.setVisibility(View.GONE);
+        if (btnDownloadStudentReport != null) btnDownloadStudentReport.setEnabled(false);
 
         Log.d(TAG, "Loading progress for student: " + studentId);
 
@@ -324,6 +331,10 @@ public class StudentDetailActivity extends AppCompatActivity {
                 loadingProgress.setVisibility(View.GONE);
                 initialLoadComplete = true;
                 statsCard.setVisibility(View.VISIBLE);
+                if (btnDownloadStudentReport != null) {
+                    btnDownloadStudentReport.setEnabled(true);
+                    btnDownloadStudentReport.setOnClickListener(v -> generateStudentReport(aggregate));
+                }
                 Log.d(TAG, "Progress loaded successfully");
                 displayProgress(aggregate);
             }
@@ -355,7 +366,11 @@ public class StudentDetailActivity extends AppCompatActivity {
         tvLongestStreak.setText(getString(R.string.student_detail_days_suffix, aggregate.getLongestStreak()));
         tvTotalQuizzes.setText(String.valueOf(aggregate.getTotalQuizzes()));
         tvAccuracy.setText(String.format(Locale.getDefault(), "%.1f%%", aggregate.getAccuracy()));
-        tvHighScore.setText(String.valueOf(aggregate.getHighestScore()));
+        
+        // Best score capped at 10 for display as requested
+        int cappedBestScore = Math.min(aggregate.getHighestScore(), 10);
+        tvHighScore.setText(String.valueOf(cappedBestScore));
+        
         tvAverageScore.setText(String.format(Locale.getDefault(), "%.1f", aggregate.getAverageScore()));
         tvTotalQuestions.setText(String.valueOf(aggregate.getTotalQuestions()));
         tvQuizzesThisWeek.setText(String.valueOf(aggregate.getQuizzesThisWeek()));
@@ -425,6 +440,40 @@ public class StudentDetailActivity extends AppCompatActivity {
                         // Silently fail - not critical
                     }
                 });
+    }
+
+    private void generateStudentReport(ProgressAggregate p) {
+        if (p == null) return;
+
+        String name = studentName != null ? studentName : "Student";
+        int cappedBestScore = Math.min(p.getHighestScore(), 10);
+        
+        StringBuilder report = new StringBuilder();
+        report.append("EDU LINGUA GHANA - PROGRESS REPORT\n");
+        report.append("==================================\n");
+        report.append("Student: ").append(name).append("\n");
+        report.append("Class: ").append(tvStudentClass.getText()).append("\n");
+        report.append("Date: ").append(new SimpleDateFormat("MMM dd, yyyy", Locale.getDefault()).format(new Date())).append("\n\n");
+        
+        report.append("PERFORMANCE SUMMARY:\n");
+        report.append("--------------------\n");
+        report.append("• Current Level: ").append(p.getCurrentLevel()).append("\n");
+        report.append("• Total XP: ").append(p.getTotalXP()).append("\n");
+        report.append("• Best Quiz Score: ").append(cappedBestScore).append("/10\n");
+        report.append("• Overall Accuracy: ").append(String.format(Locale.getDefault(), "%.1f%%", p.getAccuracy())).append("\n");
+        report.append("• Total Quizzes: ").append(p.getTotalQuizzes()).append("\n\n");
+        
+        report.append("ENGAGEMENT:\n");
+        report.append("-----------\n");
+        report.append("• Days Active: ").append(p.getDaysActive()).append("\n");
+        report.append("• Quizzes This Week: ").append(p.getQuizzesThisWeek()).append("\n");
+        report.append("• Current Streak: ").append(p.getCurrentStreak()).append(" days\n");
+
+        android.content.Intent intent = new android.content.Intent(android.content.Intent.ACTION_SEND);
+        intent.setType("text/plain");
+        intent.putExtra(android.content.Intent.EXTRA_SUBJECT, getString(R.string.student_detail_report_subject, name));
+        intent.putExtra(android.content.Intent.EXTRA_TEXT, report.toString());
+        startActivity(android.content.Intent.createChooser(intent, "Share Student Report"));
     }
 
     private long extractLatestTimestamp(DataSnapshot snapshot) {
