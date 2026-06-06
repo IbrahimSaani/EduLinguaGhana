@@ -50,8 +50,8 @@ public class ChallengeCreationDialog {
         // Setup language spinner
         String[] languages = {"English", "French", "Twi", "Ewe", "Ga"};
         ArrayAdapter<String> languageAdapter = new ArrayAdapter<>(context,
-            android.R.layout.simple_spinner_item, languages);
-        languageAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+            R.layout.item_spinner, languages);
+        languageAdapter.setDropDownViewResource(R.layout.item_spinner_dropdown);
         languageSpinner.setAdapter(languageAdapter);
 
         // Setup quiz type spinner
@@ -60,15 +60,15 @@ public class ChallengeCreationDialog {
             "Rocket Sort", "Bubble Pop", "Hidden Shape", "Shape Match Puzzle"
         };
         ArrayAdapter<String> quizAdapter = new ArrayAdapter<>(context,
-            android.R.layout.simple_spinner_item, quizTypes);
-        quizAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+            R.layout.item_spinner, quizTypes);
+        quizAdapter.setDropDownViewResource(R.layout.item_spinner_dropdown);
         quizTypeSpinner.setAdapter(quizAdapter);
 
         // Setup duration spinner
         String[] durations = {"30 seconds", "1 minute", "2 minutes", "3 minutes", "5 minutes"};
         ArrayAdapter<String> durationAdapter = new ArrayAdapter<>(context,
-            android.R.layout.simple_spinner_item, durations);
-        durationAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+            R.layout.item_spinner, durations);
+        durationAdapter.setDropDownViewResource(R.layout.item_spinner_dropdown);
         durationSpinner.setAdapter(durationAdapter);
         durationSpinner.setSelection(1);  // Default to 1 minute
 
@@ -78,8 +78,8 @@ public class ChallengeCreationDialog {
             heartsList.add(i + (i == 1 ? " Heart" : " Hearts"));
         }
         ArrayAdapter<String> heartsAdapter = new ArrayAdapter<>(context,
-            android.R.layout.simple_spinner_item, heartsList);
-        heartsAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+            R.layout.item_spinner, heartsList);
+        heartsAdapter.setDropDownViewResource(R.layout.item_spinner_dropdown);
         heartsSpinner.setAdapter(heartsAdapter);
         heartsSpinner.setSelection(4); // Default to 5 hearts
 

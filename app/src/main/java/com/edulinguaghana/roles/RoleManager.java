@@ -84,9 +84,31 @@ public class RoleManager {
 
         // Try local cache first
         SharedPreferences prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
-        String cachedRole = prefs.getString(KEY_USER_ROLE, null);
+        String cachedRoleStr = prefs.getString(KEY_USER_ROLE, null);
+        
+        if (cachedRoleStr != null) {
+            UserRole cachedRole = UserRole.fromString(cachedRoleStr);
+            if (cachedRole != null) {
+                // Return cached role immediately for better UX
+                callback.onRoleRetrieved(cachedRole);
+                
+                // Still update from Firebase in background to ensure consistency
+                usersRef.child(userId).child("role").addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(DataSnapshot snapshot) {
+                        String roleStr = snapshot.getValue(String.class);
+                        if (roleStr != null) {
+                            prefs.edit().putString(KEY_USER_ROLE, roleStr).apply();
+                        }
+                    }
+                    @Override
+                    public void onCancelled(DatabaseError error) {}
+                });
+                return;
+            }
+        }
 
-        // Also fetch from Firebase to ensure consistency
+        // No cache, fetch from Firebase
         usersRef.child(userId).child("role").addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot snapshot) {
@@ -94,19 +116,16 @@ public class RoleManager {
                 UserRole role = UserRole.fromString(roleStr);
 
                 // Update cache
-                prefs.edit().putString(KEY_USER_ROLE, role.name()).apply();
+                if (roleStr != null) {
+                    prefs.edit().putString(KEY_USER_ROLE, roleStr).apply();
+                }
 
                 callback.onRoleRetrieved(role);
             }
 
             @Override
             public void onCancelled(DatabaseError error) {
-                // Fall back to cached role if available
-                if (cachedRole != null) {
-                    callback.onRoleRetrieved(UserRole.fromString(cachedRole));
-                } else {
-                    callback.onError(error.getMessage());
-                }
+                callback.onError(error.getMessage());
             }
         });
     }

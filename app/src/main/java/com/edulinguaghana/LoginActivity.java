@@ -227,7 +227,7 @@ public class LoginActivity extends AppCompatActivity {
                 case "ERROR_TOO_MANY_REQUESTS":
                     return getString(R.string.error_auth_too_many_requests);
                 case "ERROR_INVALID_CREDENTIAL":
-                    return getString(R.string.error_auth_wrong_password);
+                    return getString(R.string.error_auth_invalid_email);
             }
         }
         
@@ -402,7 +402,16 @@ public class LoginActivity extends AppCompatActivity {
 
         if (!Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
             if (etEmail != null) {
-                etEmail.setError("Enter a valid email address");
+                etEmail.setError("Enter a valid email address (e.g., example@gmail.com)");
+                etEmail.requestFocus();
+            }
+            return false;
+        }
+
+        // Specific check for Gmail format if it looks like one but is missing .com
+        if (email.contains("@gmail") && !email.contains("@gmail.com")) {
+            if (etEmail != null) {
+                etEmail.setError("Please use the full @gmail.com format");
                 etEmail.requestFocus();
             }
             return false;

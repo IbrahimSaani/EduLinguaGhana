@@ -194,36 +194,34 @@ public class RelationshipManagementActivity extends AppCompatActivity {
 
     private void searchByCode(String code) {
         DatabaseReference usersRef = FirebaseDatabase.getInstance().getReference("users");
-        usersRef.addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
-                boolean found = false;
-                for (DataSnapshot child : snapshot.getChildren()) {
-                    String uid = child.getKey();
-                    if (uid != null && uid.startsWith(code)) {
-                        String studentName = child.child("displayName").getValue(String.class);
-                        createRelationship(uid, studentName);
-                        found = true;
-                        break;
-                    }
-                }
+        // Use range query on keys for high performance
+        usersRef.orderByKey().startAt(code).endAt(code + "\uf8ff")
+                .addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot snapshot) {
+                        if (snapshot.exists()) {
+                            for (DataSnapshot child : snapshot.getChildren()) {
+                                String uid = child.getKey();
+                                String studentName = child.child("displayName").getValue(String.class);
+                                createRelationship(uid, studentName);
+                                return;
+                            }
+                        }
 
-                if (!found) {
-                    btnAddStudent.setEnabled(true);
-                    loadingProgress.setVisibility(View.GONE);
-                    Toast.makeText(RelationshipManagementActivity.this,
-                                 R.string.error_friend_search_failed, Toast.LENGTH_SHORT).show();
-                }
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-                btnAddStudent.setEnabled(true);
-                loadingProgress.setVisibility(View.GONE);
-                Toast.makeText(RelationshipManagementActivity.this,
+                        btnAddStudent.setEnabled(true);
+                        loadingProgress.setVisibility(View.GONE);
+                        Toast.makeText(RelationshipManagementActivity.this,
                                      R.string.error_friend_search_failed, Toast.LENGTH_SHORT).show();
-            }
-        });
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError error) {
+                        btnAddStudent.setEnabled(true);
+                        loadingProgress.setVisibility(View.GONE);
+                        Toast.makeText(RelationshipManagementActivity.this,
+                                     R.string.error_friend_search_failed, Toast.LENGTH_SHORT).show();
+                    }
+                });
     }
 
     private void createRelationship(String studentId, String studentName) {
