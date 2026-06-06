@@ -737,7 +737,16 @@ public class BubblePopActivity extends AppCompatActivity {
     }
 
     private void updateScoreDisplay() {
+        if (tvScore == null) return;
         tvScore.setText("⭐ Score: " + score);
+        
+        // Premium Score Pop Animation
+        tvScore.animate()
+            .scaleX(1.3f)
+            .scaleY(1.3f)
+            .setDuration(150)
+            .withEndAction(() -> tvScore.animate().scaleX(1.0f).scaleY(1.0f).setDuration(100).start())
+            .start();
     }
 
     private void celebrate() {

@@ -612,6 +612,14 @@ public class SpeedGameActivity extends AppCompatActivity {
             tvGameFeedback.setTextColor(ContextCompat.getColor(this, R.color.correctAnswer));
             tvGameScore.setText(getString(R.string.quiz_score, score));
 
+            // Premium Score Pop Animation
+            tvGameScore.animate()
+                .scaleX(1.4f)
+                .scaleY(1.4f)
+                .setDuration(150)
+                .withEndAction(() -> tvGameScore.animate().scaleX(1.0f).scaleY(1.0f).setDuration(100).start())
+                .start();
+
             playSfx(true);
             
             // Gaming UI: Background change and scale animation

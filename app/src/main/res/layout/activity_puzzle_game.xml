@@ -66,40 +66,68 @@
             android:layout_below="@id/hudPanel"
             android:gravity="center"
             android:orientation="vertical"
-            android:padding="20dp">
+            android:padding="16dp">
 
             <TextView
                 android:id="@+id/tvPrompt"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="30dp"
+                android:layout_marginBottom="24dp"
                 android:fontFamily="@font/agbalumo"
                 android:text="Match the letters!"
                 android:textColor="@color/white"
-                android:textSize="24sp"
+                android:textSize="28sp"
                 android:shadowColor="#000000"
-                android:shadowRadius="10" />
+                android:shadowRadius="8" />
 
-            <!-- Target Slots -->
-            <LinearLayout
-                android:id="@+id/slotContainer"
+            <!-- Main Game Board -->
+            <com.google.android.material.card.MaterialCardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:gravity="center"
-                android:orientation="horizontal"
-                android:layout_marginBottom="60dp">
-                <!-- Slots will be added here -->
-            </LinearLayout>
+                android:layout_marginBottom="24dp"
+                app:cardBackgroundColor="#22FFFFFF"
+                app:cardCornerRadius="32dp"
+                app:cardElevation="0dp"
+                app:strokeWidth="1.5dp"
+                app:strokeColor="#44FFFFFF">
 
-            <!-- Draggable Pieces -->
-            <LinearLayout
-                android:id="@+id/pieceContainer"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:gravity="center"
-                android:orientation="horizontal">
-                <!-- Pieces will be added here -->
-            </LinearLayout>
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="20dp"
+                    android:gravity="center">
+
+                    <!-- Target Slots -->
+                    <LinearLayout
+                        android:id="@+id/slotContainer"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:gravity="center"
+                        android:orientation="horizontal"
+                        android:layout_marginBottom="32dp">
+                        <!-- Slots will be added here -->
+                    </LinearLayout>
+
+                    <!-- Divider -->
+                    <View
+                        android:layout_width="100dp"
+                        android:layout_height="3dp"
+                        android:background="#33FFFFFF"
+                        android:layout_marginBottom="32dp"/>
+
+                    <!-- Draggable Pieces -->
+                    <LinearLayout
+                        android:id="@+id/pieceContainer"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:gravity="center"
+                        android:orientation="horizontal">
+                        <!-- Pieces will be added here -->
+                    </LinearLayout>
+
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
 
         </LinearLayout>
 

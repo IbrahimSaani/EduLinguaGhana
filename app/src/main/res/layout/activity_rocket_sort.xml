@@ -28,58 +28,59 @@
             android:id="@+id/topBar"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_margin="16dp"
+            android:layout_marginHorizontal="16dp"
+            android:layout_marginTop="16dp"
             android:background="@drawable/bg_hud_panel"
             android:gravity="center_vertical"
             android:orientation="horizontal"
-            android:padding="16dp">
+            android:padding="12dp">
 
-            <TextView
-                android:id="@+id/tvScore"
+            <LinearLayout
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:fontFamily="@font/agbalumo"
-                android:text="⭐ 0"
-                android:textColor="#4FC3F7"
-                android:textSize="@dimen/text_headline_medium"
-                android:textStyle="bold"
-                app:autoSizeTextType="uniform"
-                app:autoSizeMinTextSize="18sp"
-                app:autoSizeMaxTextSize="26sp" />
+                android:orientation="vertical"
+                android:layout_marginStart="8dp">
 
-            <TextView
-                android:id="@+id/tvTimer"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginEnd="16dp"
-                android:fontFamily="@font/agbalumo"
-                android:text="⏱️ 60s"
-                android:textColor="#4FC3F7"
-                android:textSize="22sp"
-                android:visibility="gone" />
+                <TextView
+                    android:id="@+id/tvScore"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="@font/agbalumo"
+                    android:text="⭐ 0"
+                    android:textColor="#FFD54F"
+                    android:textSize="22sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="MISSION SCORE"
+                    android:textColor="#AAFFFFFF"
+                    android:textSize="10sp"
+                    android:textStyle="bold"
+                    android:letterSpacing="0.1" />
+            </LinearLayout>
 
             <TextView
                 android:id="@+id/tvLives"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginEnd="16dp"
+                android:layout_marginHorizontal="16dp"
                 android:fontFamily="@font/agbalumo"
-                android:text="❤️ ❤️ ❤️ ❤️ ❤️"
+                android:text="❤️❤️❤️❤️❤️"
                 android:textColor="@color/white"
-                android:textSize="@dimen/text_headline_medium"
-                app:autoSizeTextType="uniform"
-                app:autoSizeMinTextSize="16sp"
-                app:autoSizeMaxTextSize="24sp" />
+                android:textSize="20sp" />
 
-            <ImageButton
+            <com.google.android.material.button.MaterialButton
                 android:id="@+id/btnPause"
-                android:layout_width="44dp"
-                android:layout_height="44dp"
-                android:background="?attr/selectableItemBackgroundBorderless"
-                android:contentDescription="Pause"
-                android:src="@drawable/ic_pause"
-                app:tint="#4FC3F7" />
+                style="@style/Widget.Material3.Button.IconButton"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:backgroundTint="#22FFFFFF"
+                app:icon="@drawable/ic_pause"
+                app:iconTint="#4FC3F7"
+                app:cornerRadius="12dp" />
         </LinearLayout>
 
         <!-- Game Area -->

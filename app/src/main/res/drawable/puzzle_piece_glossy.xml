@@ -1,28 +1,42 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layer-list xmlns:android="http://schemas.android.com/apk/res/android">
-    <!-- Shadow -->
-    <item android:top="4dp" android:left="4dp">
+    <!-- Drop Shadow -->
+    <item android:top="6dp" android:left="4dp">
         <shape>
-            <solid android:color="#44000000" />
+            <solid android:color="#66000000" />
             <corners android:radius="20dp" />
         </shape>
     </item>
-    <!-- Main Glassy Piece -->
-    <item>
+
+    <!-- Main Piece Body -->
+    <item android:bottom="4dp" android:right="2dp">
         <shape>
             <gradient
                 android:startColor="#FF4FC3F7"
-                android:endColor="#FF0288D1"
+                android:centerColor="#FF0288D1"
+                android:endColor="#FF01579B"
                 android:angle="270" />
             <corners android:radius="18dp" />
-            <stroke android:width="2dp" android:color="#FFFFFF" />
+            <stroke android:width="2dp" android:color="#CCFFFFFF" />
         </shape>
     </item>
-    <!-- Top Reflection -->
-    <item android:bottom="40dp" android:left="10dp" android:right="10dp" android:top="4dp">
+
+    <!-- Top Gloss Highlight -->
+    <item android:bottom="40dp" android:left="10dp" android:right="10dp" android:top="6dp">
         <shape>
-            <solid android:color="#33FFFFFF" />
+            <gradient
+                android:startColor="#99FFFFFF"
+                android:endColor="#00FFFFFF"
+                android:angle="270" />
             <corners android:radius="10dp" />
+        </shape>
+    </item>
+
+    <!-- Bottom Bevel -->
+    <item android:top="60dp" android:left="12dp" android:right="12dp" android:bottom="8dp">
+        <shape>
+            <solid android:color="#22000000" />
+            <corners android:radius="8dp" />
         </shape>
     </item>
 </layer-list>

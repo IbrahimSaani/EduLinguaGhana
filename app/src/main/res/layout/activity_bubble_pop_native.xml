@@ -36,22 +36,39 @@
             android:id="@+id/statsCard"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_margin="16dp"
+            android:layout_marginHorizontal="16dp"
+            android:layout_marginTop="16dp"
             android:background="@drawable/bg_hud_panel"
             android:gravity="center_vertical"
             android:orientation="horizontal"
-            android:padding="16dp">
+            android:padding="12dp">
 
-            <TextView
-                android:id="@+id/tvScore"
+            <LinearLayout
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:fontFamily="@font/agbalumo"
-                android:text="⭐ 0"
-                android:textColor="#4FC3F7"
-                android:textSize="26sp"
-                android:textStyle="bold" />
+                android:orientation="vertical"
+                android:layout_marginStart="8dp">
+
+                <TextView
+                    android:id="@+id/tvScore"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="@font/agbalumo"
+                    android:text="⭐ 0"
+                    android:textColor="#FFD54F"
+                    android:textSize="22sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="POINTS"
+                    android:textColor="#AAFFFFFF"
+                    android:textSize="10sp"
+                    android:textStyle="bold"
+                    android:letterSpacing="0.1" />
+            </LinearLayout>
 
             <TextView
                 android:id="@+id/tvTimer"
@@ -61,39 +78,47 @@
                 android:fontFamily="@font/agbalumo"
                 android:text="60s"
                 android:textColor="@color/white"
-                android:textSize="24sp"
+                android:textSize="22sp"
                 android:textStyle="bold" />
 
-            <!-- Target Letter Display -->
-            <LinearLayout
+            <!-- Target Display Pill -->
+            <com.google.android.material.card.MaterialCardView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:gravity="center"
-                android:orientation="vertical">
+                app:cardCornerRadius="16dp"
+                app:cardBackgroundColor="#44FFFFFF"
+                app:cardElevation="0dp"
+                app:strokeWidth="1dp"
+                app:strokeColor="#AAFFFFFF">
 
-                <TextView
-                    android:id="@+id/tvTargetLabel"
+                <LinearLayout
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="POP THIS!"
-                    android:textColor="@color/white"
-                    android:textSize="12sp"
-                    android:textStyle="bold" />
+                    android:paddingHorizontal="16dp"
+                    android:paddingVertical="4dp"
+                    android:gravity="center"
+                    android:orientation="vertical">
 
-                <TextView
-                    android:id="@+id/tvTarget"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:fontFamily="@font/agbalumo"
-                    android:text="A"
-                    android:textColor="#FFAB40"
-                    android:textSize="36sp"
-                    android:textStyle="bold"
-                    android:shadowColor="#000000"
-                    android:shadowRadius="5"
-                    android:shadowDx="2"
-                    android:shadowDy="2"/>
-            </LinearLayout>
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="TARGET"
+                        android:textColor="#FFFFFF"
+                        android:textSize="9sp"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:id="@+id/tvTarget"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:fontFamily="@font/agbalumo"
+                        android:text="A"
+                        android:textColor="#FFAB40"
+                        android:textSize="28sp"
+                        android:textStyle="bold" />
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
         </LinearLayout>
 
         <!-- Game Area -->
@@ -133,7 +158,7 @@
             <com.google.android.material.card.MaterialCardView
                 android:layout_width="300dp"
                 android:layout_height="wrap_content"
-                app:cardBackgroundColor="#F5F5FA"
+                app:cardBackgroundColor="@color/cardBackground"
                 app:cardCornerRadius="32dp"
                 app:cardElevation="24dp"
                 app:strokeColor="#FF4081"

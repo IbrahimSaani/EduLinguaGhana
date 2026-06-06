@@ -5,7 +5,7 @@
             <item android:top="4dp">
                 <shape android:shape="rectangle">
                     <corners android:radius="16dp" />
-                    <solid android:color="#BBDEFB" />
+                    <solid android:color="@color/colorAccent" />
                 </shape>
             </item>
         </layer-list>
@@ -16,15 +16,15 @@
             <item android:top="6dp">
                 <shape android:shape="rectangle">
                     <corners android:radius="16dp" />
-                    <solid android:color="#90CAF9" />
+                    <solid android:color="@color/dividerColor" />
                 </shape>
             </item>
             <!-- Face -->
             <item android:bottom="6dp">
                 <shape android:shape="rectangle">
                     <corners android:radius="16dp" />
-                    <solid android:color="#E3F2FD" />
-                    <stroke android:width="1.5dp" android:color="#FFFFFF" />
+                    <solid android:color="@color/cardBackground" />
+                    <stroke android:width="1.5dp" android:color="@color/card_stroke" />
                 </shape>
             </item>
         </layer-list>

@@ -588,6 +588,15 @@ public class RocketSortActivity extends AppCompatActivity {
     private void updateUI() {
         if (isFinishing() || isDestroyed()) return;
         tvScore.setText("⭐ " + score);
+        
+        // Premium Score Pop Animation
+        tvScore.animate()
+            .scaleX(1.3f)
+            .scaleY(1.3f)
+            .setDuration(150)
+            .withEndAction(() -> tvScore.animate().scaleX(1.0f).scaleY(1.0f).setDuration(100).start())
+            .start();
+
         StringBuilder hearts = new StringBuilder();
         for (int i = 0; i < lives; i++) hearts.append("❤️ ");
         tvLives.setText(hearts.toString().trim());

@@ -46,56 +46,74 @@
             android:layout_height="wrap_content"
             android:layout_marginBottom="24dp"
             android:background="@drawable/bg_hud_panel"
+            android:gravity="center_vertical"
             android:orientation="horizontal"
-            android:padding="16dp">
+            android:padding="12dp">
 
-            <TextView
-                android:id="@+id/tvScore"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginEnd="16dp"
-                android:fontFamily="@font/agbalumo"
-                android:text="⭐ 0"
-                android:textColor="#4FC3F7"
-                android:textSize="22sp"
-                android:textStyle="bold" />
-
-            <TextView
-                android:id="@+id/tvPrompt"
+            <LinearLayout
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:fontFamily="@font/agbalumo"
-                android:text="@string/hidden_shapes_prompt"
-                android:textColor="@color/white"
-                android:textSize="18sp"
-                android:textStyle="bold"
-                android:shadowColor="#000000"
-                android:shadowDx="2"
-                android:shadowDy="2"
-                android:shadowRadius="4"/>
+                android:orientation="vertical"
+                android:layout_marginStart="8dp">
+
+                <TextView
+                    android:id="@+id/tvScore"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="@font/agbalumo"
+                    android:text="⭐ 0"
+                    android:textColor="#FFD54F"
+                    android:textSize="22sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="STARS"
+                    android:textColor="#AAFFFFFF"
+                    android:textSize="10sp"
+                    android:textStyle="bold"
+                    android:letterSpacing="0.1" />
+            </LinearLayout>
 
             <TextView
                 android:id="@+id/tvTimer"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="16dp"
-                android:layout_marginEnd="8dp"
+                android:layout_marginEnd="16dp"
                 android:fontFamily="@font/agbalumo"
                 android:text="60s"
-                android:textColor="#FFAB40"
+                android:textColor="@color/white"
                 android:textSize="22sp"
                 android:textStyle="bold" />
 
-            <ImageButton
+            <com.google.android.material.button.MaterialButton
                 android:id="@+id/btnPause"
-                android:layout_width="44dp"
-                android:layout_height="44dp"
-                android:background="?attr/selectableItemBackgroundBorderless"
-                android:contentDescription="Pause"
-                android:src="@drawable/ic_pause"
-                app:tint="#FFAB40" />
+                style="@style/Widget.Material3.Button.IconButton"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:backgroundTint="#22FFFFFF"
+                app:icon="@drawable/ic_pause"
+                app:iconTint="#FFAB40"
+                app:cornerRadius="12dp" />
         </LinearLayout>
+
+        <TextView
+            android:id="@+id/tvPrompt"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="20dp"
+            android:fontFamily="@font/agbalumo"
+            android:text="@string/hidden_shapes_prompt"
+            android:textColor="@color/white"
+            android:textSize="20sp"
+            android:gravity="center"
+            android:textStyle="bold"
+            android:shadowColor="#000000"
+            android:shadowDx="2"
+            android:shadowDy="2"
+            android:shadowRadius="4"/>
 
         <!-- Scratch Area with Professional Border -->
         <com.google.android.material.card.MaterialCardView
@@ -105,7 +123,7 @@
             app:cardElevation="16dp"
             app:strokeColor="#FFAB40"
             app:strokeWidth="6dp"
-            app:cardBackgroundColor="#F5F5FA">
+            app:cardBackgroundColor="@color/cardBackground">
 
             <com.edulinguaghana.ScratchRevealView
                 android:id="@+id/scratchView"
@@ -162,7 +180,7 @@
         <com.google.android.material.card.MaterialCardView
             android:layout_width="300dp"
             android:layout_height="wrap_content"
-            app:cardBackgroundColor="#F5F5FA"
+            app:cardBackgroundColor="@color/cardBackground"
             app:cardCornerRadius="32dp"
             app:cardElevation="24dp"
             app:strokeColor="#FFAB40"

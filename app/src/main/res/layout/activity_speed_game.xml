@@ -148,10 +148,10 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="16dp"
-                app:cardCornerRadius="24dp"
+                app:cardCornerRadius="32dp"
                 app:cardElevation="12dp"
-                app:cardBackgroundColor="#F5F5FA"
-                app:strokeWidth="4dp"
+                app:cardBackgroundColor="@color/cardBackground"
+                app:strokeWidth="3dp"
                 app:strokeColor="#FFAB40">
 
                 <LinearLayout
@@ -168,9 +168,9 @@
                         android:gravity="center"
                         android:fontFamily="@font/agbalumo"
                         android:textColor="@color/colorPrimary"
-                        android:textSize="22sp"
+                        android:textSize="26sp"
                         android:textStyle="bold"
-                        android:lineSpacingMultiplier="1.2"
+                        android:lineSpacingMultiplier="1.1"
                         tools:text="Listen carefully!\nTap the correct letter" />
 
                     <com.google.android.material.floatingactionbutton.FloatingActionButton
