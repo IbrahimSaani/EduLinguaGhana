@@ -294,7 +294,8 @@ public class StudentDetailActivity extends AppCompatActivity {
                     }
 
                     if (tvStudentAge != null) {
-                        tvStudentAge.setText(isValidValue(age) ? age : getString(R.string.student_detail_not_set));
+                        tvStudentAge.setText(isValidValue(age) ? age + " yrs" : getString(R.string.student_detail_not_set));
+                        tvStudentAge.setVisibility(isValidValue(age) ? View.VISIBLE : View.GONE);
                     }
 
                     if (tvStudentClass != null) {
@@ -360,55 +361,76 @@ public class StudentDetailActivity extends AppCompatActivity {
     }
 
     private void displayProgress(ProgressAggregate aggregate) {
-        tvLevel.setText(getString(R.string.student_detail_level, aggregate.getCurrentLevel()));
-        tvTotalXP.setText(getString(R.string.student_detail_xp_suffix, aggregate.getTotalXP()));
-        tvCurrentStreak.setText(getString(R.string.student_detail_days_suffix, aggregate.getCurrentStreak()));
-        tvLongestStreak.setText(getString(R.string.student_detail_days_suffix, aggregate.getLongestStreak()));
-        tvTotalQuizzes.setText(String.valueOf(aggregate.getTotalQuizzes()));
-        tvAccuracy.setText(String.format(Locale.getDefault(), "%.1f%%", aggregate.getAccuracy()));
+        if (tvLevel != null) tvLevel.setText(String.valueOf(aggregate.getCurrentLevel()));
+        if (tvTotalXP != null) tvTotalXP.setText(String.format(Locale.getDefault(), "%,d", aggregate.getTotalXP()));
+        if (tvCurrentStreak != null) tvCurrentStreak.setText(getString(R.string.student_detail_days_suffix, aggregate.getCurrentStreak()));
+        if (tvLongestStreak != null) tvLongestStreak.setText(getString(R.string.student_detail_days_suffix, aggregate.getLongestStreak()));
+        if (tvTotalQuizzes != null) tvTotalQuizzes.setText(String.valueOf(aggregate.getTotalQuizzes()));
+        if (tvAccuracy != null) tvAccuracy.setText(String.format(Locale.getDefault(), "%.1f%%", aggregate.getAccuracy()));
         
         // Best score capped at 10 for display as requested
         int cappedBestScore = Math.min(aggregate.getHighestScore(), 10);
-        tvHighScore.setText(String.valueOf(cappedBestScore));
+        if (tvHighScore != null) tvHighScore.setText(cappedBestScore + "/10");
         
-        tvAverageScore.setText(String.format(Locale.getDefault(), "%.1f", aggregate.getAverageScore()));
-        tvTotalQuestions.setText(String.valueOf(aggregate.getTotalQuestions()));
-        tvQuizzesThisWeek.setText(String.valueOf(aggregate.getQuizzesThisWeek()));
-        tvXPThisWeek.setText(String.valueOf(aggregate.getXpThisWeek()));
-        tvTotalAchievements.setText(String.valueOf(aggregate.getTotalAchievements()));
-        tvTotalBadges.setText(String.valueOf(aggregate.getTotalBadges()));
-        tvDaysActive.setText(String.valueOf(aggregate.getDaysActive()));
+        if (tvAverageScore != null) tvAverageScore.setText(String.format(Locale.getDefault(), "%.1f", aggregate.getAverageScore()));
+        if (tvTotalQuestions != null) tvTotalQuestions.setText(String.valueOf(aggregate.getTotalQuestions()));
+        if (tvQuizzesThisWeek != null) tvQuizzesThisWeek.setText(String.valueOf(aggregate.getQuizzesThisWeek()));
+        if (tvXPThisWeek != null) tvXPThisWeek.setText("+" + aggregate.getXpThisWeek());
+        if (tvTotalAchievements != null) tvTotalAchievements.setText(String.valueOf(aggregate.getTotalAchievements()));
+        if (tvTotalBadges != null) tvTotalBadges.setText(String.valueOf(aggregate.getTotalBadges()));
+        if (tvDaysActive != null) tvDaysActive.setText(String.valueOf(aggregate.getDaysActive()));
 
         // Format time spent (convert seconds to minutes)
-        long minutes = aggregate.getTotalTimeSpentSeconds() / 60;
-        if (minutes < 60) {
-            tvTimeSpent.setText(getString(R.string.student_detail_minutes_suffix, minutes));
-        } else {
-            long hours = minutes / 60;
-            long remainingMinutes = minutes % 60;
-            tvTimeSpent.setText(getString(R.string.student_detail_hours_minutes_suffix, hours, remainingMinutes));
+        if (tvTimeSpent != null) {
+            long minutes = aggregate.getTotalTimeSpentSeconds() / 60;
+            if (minutes < 60) {
+                tvTimeSpent.setText(getString(R.string.student_detail_minutes_suffix, minutes));
+            } else {
+                long hours = minutes / 60;
+                long remainingMinutes = minutes % 60;
+                tvTimeSpent.setText(getString(R.string.student_detail_hours_minutes_suffix, hours, remainingMinutes));
+            }
         }
 
         // Format last active time
-        if (aggregate.getLastUpdated() > 0) {
-            SimpleDateFormat sdf = new SimpleDateFormat(getString(R.string.student_detail_date_format), Locale.getDefault());
-            String formattedDate = sdf.format(new Date(aggregate.getLastUpdated()));
-            tvLastActive.setText(formattedDate);
-        } else {
-            tvLastActive.setText(R.string.student_detail_not_active);
+        if (tvLastActive != null) {
+            if (aggregate.getLastUpdated() > 0) {
+                long diff = System.currentTimeMillis() - aggregate.getLastUpdated();
+                long hours = diff / (1000 * 60 * 60);
+                if (hours < 1) {
+                    tvLastActive.setText(R.string.student_active_now);
+                } else if (hours < 24) {
+                    tvLastActive.setText(getString(R.string.student_active_hours_ago, (int)hours));
+                } else {
+                    tvLastActive.setText(getString(R.string.student_active_days_ago, (int)(hours / 24)));
+                }
+            } else {
+                tvLastActive.setText(R.string.student_detail_not_active);
+            }
         }
 
-        if (statsCard != null) {
-            statsCard.setAlpha(0f);
-            statsCard.setScaleX(0.98f);
-            statsCard.setScaleY(0.98f);
-            statsCard.animate()
-                    .alpha(1f)
-                    .scaleX(1f)
-                    .scaleY(1f)
-                    .setDuration(220)
-                    .start();
-        }
+        // Animation sequence for a premium feel
+        animateEntrance(findViewById(R.id.headerCard), 0);
+        animateEntrance(findViewById(R.id.layoutQuizStats), 100);
+        animateEntrance(findViewById(R.id.layoutEngagement), 200);
+        animateEntrance(findViewById(R.id.layoutChallenges), 300);
+        animateEntrance(findViewById(R.id.layoutAchievements), 400);
+        animateEntrance(findViewById(R.id.layoutStreaks), 500);
+        animateEntrance(btnDownloadStudentReport, 600);
+    }
+
+    private void animateEntrance(View view, int delay) {
+        if (view == null || view.getVisibility() != View.VISIBLE) return;
+        
+        view.setAlpha(0f);
+        view.setTranslationY(30f);
+        view.animate()
+                .alpha(1f)
+                .translationY(0f)
+                .setDuration(400)
+                .setStartDelay(delay)
+                .setInterpolator(new android.view.animation.DecelerateInterpolator())
+                .start();
     }
 
     /**

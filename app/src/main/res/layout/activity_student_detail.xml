@@ -1,31 +1,28 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.coordinatorlayout.widget.CoordinatorLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:fitsSystemWindows="true"
-    android:background="@color/appBackground">
+    android:background="@color/appBackground"
+    android:fitsSystemWindows="true">
 
     <com.google.android.material.appbar.AppBarLayout
         android:id="@+id/appBarLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@drawable/gradient_background"
-        android:elevation="8dp"
-        android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar">
+        android:background="@android:color/transparent"
+        android:elevation="0dp">
 
         <com.google.android.material.appbar.MaterialToolbar
             android:id="@+id/toolbar"
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
             android:background="@android:color/transparent"
-            android:elevation="0dp"
-            app:title="Student Details"
-            app:titleTextAppearance="@style/ToolbarTitleStyle"
-            app:titleTextColor="@color/white"
             app:navigationIcon="@drawable/ic_back"
-            app:navigationIconTint="@color/white" />
+            app:navigationIconTint="@color/textColorPrimary"
+            app:title="Student Progress"
+            app:titleTextColor="@color/textColorPrimary" />
     </com.google.android.material.appbar.AppBarLayout>
 
     <androidx.core.widget.NestedScrollView
@@ -45,833 +42,581 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
                 android:layout_margin="32dp"
-                android:visibility="gone"/>
+                android:visibility="gone" />
 
-            <com.google.android.material.card.MaterialCardView
+            <View
                 android:id="@+id/statsCard"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:visibility="gone" />
+
+            <!-- PREMIUM HEADER CARD -->
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/headerCard"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                app:cardCornerRadius="16dp"
-                app:cardElevation="4dp"
-                app:cardBackgroundColor="@color/cardBackground">
+                android:layout_marginBottom="16dp"
+                app:cardCornerRadius="24dp"
+                app:cardElevation="2dp"
+                app:strokeWidth="0dp">
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:background="@drawable/bg_hero_glow"
+                    android:gravity="center"
                     android:orientation="vertical"
-                    android:padding="20dp">
+                    android:padding="24dp">
 
-                    <!-- Student Header -->
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:orientation="vertical"
-                        android:gravity="center"
-                        android:layout_marginBottom="20dp">
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="🎓"
-                            android:textSize="48sp"
-                            android:layout_marginBottom="8dp"/>
-
-                        <TextView
-                            android:id="@+id/tvStudentName"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:text="Student Name"
-                            android:textSize="24sp"
-                            android:textStyle="bold"
-                            android:textColor="@color/colorPrimary"
-                            android:gravity="center"
-                            android:maxLines="1"
-                            android:ellipsize="end"/>
-
-                        <TextView
-                            android:id="@+id/tvLastActive"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="Not active yet"
-                            android:textSize="14sp"
-                            android:textColor="@color/textColorSecondary"
-                            android:layout_marginTop="4dp"
-                            android:gravity="center"/>
-                    </LinearLayout>
-
-                    <com.google.android.material.card.MaterialCardView
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
+                    <TextView
+                        android:layout_width="80dp"
+                        android:layout_height="80dp"
                         android:layout_marginBottom="16dp"
-                        app:cardCornerRadius="14dp"
-                        app:cardElevation="2dp"
-                        app:cardBackgroundColor="@color/appBackground">
+                        android:background="@drawable/circle_background_white"
+                        android:elevation="4dp"
+                        android:gravity="center"
+                        android:text="🎓"
+                        android:textSize="40sp" />
 
-                        <LinearLayout
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:orientation="vertical"
-                            android:padding="16dp">
-
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="Student Profile"
-                                android:textSize="16sp"
-                                android:textStyle="bold"
-                                android:textColor="@color/colorPrimary"
-                                android:layout_marginBottom="12dp" />
-
-                            <LinearLayout
-                                android:layout_width="match_parent"
-                                android:layout_height="wrap_content"
-                                android:orientation="horizontal"
-                                android:layout_marginBottom="10dp">
-
-                                <TextView
-                                    android:layout_width="0dp"
-                                    android:layout_height="wrap_content"
-                                    android:layout_weight="1"
-                                    android:text="Age"
-                                    android:textColor="@color/textColorSecondary"
-                                    android:textSize="13sp" />
-
-                                <TextView
-                                    android:id="@+id/tvStudentAge"
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:text="Not set"
-                                    android:textColor="@color/textColorPrimary"
-                                    android:textStyle="bold"
-                                    android:textSize="13sp" />
-                            </LinearLayout>
-
-                            <LinearLayout
-                                android:layout_width="match_parent"
-                                android:layout_height="wrap_content"
-                                android:orientation="horizontal">
-
-                                <TextView
-                                    android:layout_width="0dp"
-                                    android:layout_height="wrap_content"
-                                    android:layout_weight="1"
-                                    android:text="Class"
-                                    android:textColor="@color/textColorSecondary"
-                                    android:textSize="13sp" />
-
-                                <TextView
-                                    android:id="@+id/tvStudentClass"
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:text="Not set"
-                                    android:textColor="@color/textColorPrimary"
-                                    android:textStyle="bold"
-                                    android:textSize="13sp" />
-                            </LinearLayout>
-                        </LinearLayout>
-                    </com.google.android.material.card.MaterialCardView>
-
-                    <!-- XP and Level -->
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:orientation="horizontal"
-                        android:weightSum="2"
-                        android:layout_marginBottom="16dp">
-
-                        <com.google.android.material.card.MaterialCardView
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:layout_marginEnd="8dp"
-                            app:cardCornerRadius="12dp"
-                            app:cardElevation="2dp"
-                            app:cardBackgroundColor="@color/cardBackground">
-
-                            <LinearLayout
-                                android:layout_width="match_parent"
-                                android:layout_height="wrap_content"
-                                android:orientation="vertical"
-                                android:gravity="center"
-                                android:padding="16dp">
-
-                                <TextView
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:text="⭐ Level"
-                                    android:textSize="14sp"
-                                    android:textColor="@color/textColorSecondary"
-                                    android:layout_marginBottom="4dp"/>
-
-                                <TextView
-                                    android:id="@+id/tvLevel"
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:text="1"
-                                    android:textSize="28sp"
-                                    android:textStyle="bold"
-                                    android:textColor="@color/colorPrimary"/>
-                            </LinearLayout>
-                        </com.google.android.material.card.MaterialCardView>
-
-                        <com.google.android.material.card.MaterialCardView
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            app:cardCornerRadius="12dp"
-                            app:cardElevation="2dp"
-                            app:cardBackgroundColor="@color/cardBackground">
-
-                            <LinearLayout
-                                android:layout_width="match_parent"
-                                android:layout_height="wrap_content"
-                                android:orientation="vertical"
-                                android:gravity="center"
-                                android:padding="16dp">
-
-                                <TextView
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:text="✨ Total XP"
-                                    android:textSize="14sp"
-                                    android:textColor="@color/textColorSecondary"
-                                    android:layout_marginBottom="4dp"/>
-
-                                <TextView
-                                    android:id="@+id/tvTotalXP"
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:text="0"
-                                    android:textSize="28sp"
-                                    android:textStyle="bold"
-                                    android:textColor="@color/colorAccent"/>
-                            </LinearLayout>
-                        </com.google.android.material.card.MaterialCardView>
-                    </LinearLayout>
-
-                    <!-- Divider -->
-                    <View
-                        android:id="@+id/dividerStreaks"
-                        android:layout_width="match_parent"
-                        android:layout_height="1dp"
-                        android:background="@color/dividerColor"
-                        android:layout_marginBottom="16dp"/>
-
-                    <!-- Streaks -->
                     <TextView
-                        android:id="@+id/tvLabelStreaks"
+                        android:id="@+id/tvStudentName"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="🔥 Streaks"
-                        android:textSize="18sp"
-                        android:textStyle="bold"
+                        android:fontFamily="@font/agbalumo"
+                        android:text="Student Name"
                         android:textColor="@color/colorPrimary"
-                        android:layout_marginBottom="12dp"/>
+                        android:textSize="26sp"
+                        android:textStyle="bold" />
 
                     <LinearLayout
-                        android:id="@+id/layoutStreaks"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:orientation="horizontal"
-                        android:layout_marginBottom="16dp">
-
-                        <LinearLayout
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:orientation="vertical"
-                            android:gravity="center"
-                            android:padding="12dp">
-
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="Current Streak"
-                                android:textSize="12sp"
-                                android:textColor="@color/textColorSecondary"
-                                android:layout_marginBottom="4dp"/>
-
-                            <TextView
-                                android:id="@+id/tvCurrentStreak"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="0 days"
-                                android:textSize="18sp"
-                                android:textStyle="bold"
-                                android:textColor="@color/correctAnswer"/>
-                        </LinearLayout>
-
-                        <View
-                            android:layout_width="1dp"
-                            android:layout_height="match_parent"
-                            android:background="@color/dividerColor"/>
-
-                        <LinearLayout
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:orientation="vertical"
-                            android:gravity="center"
-                            android:padding="12dp">
-
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="Longest Streak"
-                                android:textSize="12sp"
-                                android:textColor="@color/textColorSecondary"
-                                android:layout_marginBottom="4dp"/>
-
-                            <TextView
-                                android:id="@+id/tvLongestStreak"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="0 days"
-                                android:textSize="18sp"
-                                android:textStyle="bold"
-                                android:textColor="@color/colorAccent"/>
-                        </LinearLayout>
-                    </LinearLayout>
-
-                    <!-- Divider -->
-                    <View
-                        android:id="@+id/dividerQuizStats"
-                        android:layout_width="match_parent"
-                        android:layout_height="1dp"
-                        android:background="@color/dividerColor"
-                        android:layout_marginBottom="16dp"/>
-
-                    <!-- Quiz Stats -->
-                    <TextView
-                        android:id="@+id/tvLabelQuizPerformance"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="📝 Quiz Performance"
-                        android:textSize="18sp"
-                        android:textStyle="bold"
-                        android:textColor="@color/colorPrimary"
-                        android:layout_marginBottom="12dp"/>
-
-                    <LinearLayout
-                        android:id="@+id/layoutQuizStats"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:orientation="vertical"
-                        android:layout_marginBottom="16dp">
-
-                        <LinearLayout
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:orientation="horizontal">
-
-                            <LinearLayout
-                                android:layout_width="0dp"
-                                android:layout_height="wrap_content"
-                                android:layout_weight="1"
-                                android:orientation="vertical"
-                                android:gravity="center"
-                                android:padding="8dp">
-
-                                <TextView
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:text="Total Quizzes"
-                                    android:textSize="12sp"
-                                    android:textColor="@color/textColorSecondary"
-                                    android:layout_marginBottom="4dp"/>
-
-                                <TextView
-                                    android:id="@+id/tvTotalQuizzes"
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:text="0"
-                                    android:textSize="20sp"
-                                    android:textStyle="bold"
-                                    android:textColor="@color/textColorPrimary"/>
-                            </LinearLayout>
-
-                            <View
-                                android:layout_width="1dp"
-                                android:layout_height="match_parent"
-                                android:background="@color/dividerColor"/>
-
-                            <LinearLayout
-                                android:layout_width="0dp"
-                                android:layout_height="wrap_content"
-                                android:layout_weight="1"
-                                android:orientation="vertical"
-                                android:gravity="center"
-                                android:padding="8dp">
-
-                                <TextView
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:text="Accuracy"
-                                    android:textSize="12sp"
-                                    android:textColor="@color/textColorSecondary"
-                                    android:layout_marginBottom="4dp"/>
-
-                                <TextView
-                                    android:id="@+id/tvAccuracy"
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:text="0%"
-                                    android:textSize="20sp"
-                                    android:textStyle="bold"
-                                    android:textColor="@color/correctAnswer"/>
-                            </LinearLayout>
-
-                            <View
-                                android:layout_width="1dp"
-                                android:layout_height="match_parent"
-                                android:background="@color/dividerColor"/>
-
-                            <LinearLayout
-                                android:layout_width="0dp"
-                                android:layout_height="wrap_content"
-                                android:layout_weight="1"
-                                android:orientation="vertical"
-                                android:gravity="center"
-                                android:padding="8dp">
-
-                                <TextView
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:text="High Score"
-                                    android:textSize="12sp"
-                                    android:textColor="@color/textColorSecondary"
-                                    android:layout_marginBottom="4dp"/>
-
-                                <TextView
-                                    android:id="@+id/tvHighScore"
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:text="0"
-                                    android:textSize="20sp"
-                                    android:textStyle="bold"
-                                    android:textColor="@color/colorAccent"/>
-                            </LinearLayout>
-                        </LinearLayout>
-
-                        <View
-                            android:layout_width="match_parent"
-                            android:layout_height="1dp"
-                            android:background="@color/dividerColor"
-                            android:layout_marginTop="8dp"
-                            android:layout_marginBottom="8dp"/>
-
-                        <LinearLayout
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:orientation="horizontal">
-
-                            <LinearLayout
-                                android:layout_width="0dp"
-                                android:layout_height="wrap_content"
-                                android:layout_weight="1"
-                                android:orientation="vertical"
-                                android:gravity="center"
-                                android:padding="8dp">
-
-                                <TextView
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:text="Avg Score"
-                                    android:textSize="12sp"
-                                    android:textColor="@color/textColorSecondary"
-                                    android:layout_marginBottom="4dp"/>
-
-                                <TextView
-                                    android:id="@+id/tvAverageScore"
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:text="0.0"
-                                    android:textSize="20sp"
-                                    android:textStyle="bold"
-                                    android:textColor="@color/colorPrimary"/>
-                            </LinearLayout>
-
-                            <View
-                                android:layout_width="1dp"
-                                android:layout_height="match_parent"
-                                android:background="@color/dividerColor"/>
-
-                            <LinearLayout
-                                android:layout_width="0dp"
-                                android:layout_height="wrap_content"
-                                android:layout_weight="1"
-                                android:orientation="vertical"
-                                android:gravity="center"
-                                android:padding="8dp">
-
-                                <TextView
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:text="Questions"
-                                    android:textSize="12sp"
-                                    android:textColor="@color/textColorSecondary"
-                                    android:layout_marginBottom="4dp"/>
-
-                                <TextView
-                                    android:id="@+id/tvTotalQuestions"
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:text="0"
-                                    android:textSize="20sp"
-                                    android:textStyle="bold"
-                                    android:textColor="@color/textColorPrimary"/>
-                            </LinearLayout>
-                        </LinearLayout>
-                    </LinearLayout>
-
-                    <!-- Engagement Divider (Teacher only) -->
-                    <View
-                        android:id="@+id/dividerEngagement"
-                        android:layout_width="match_parent"
-                        android:layout_height="1dp"
-                        android:background="@color/dividerColor"
-                        android:layout_marginBottom="16dp"/>
-
-                    <!-- Learning Activity (Teacher only) -->
-                    <TextView
-                        android:id="@+id/tvLabelEngagement"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="📈 Learning Activity"
-                        android:textSize="18sp"
-                        android:textStyle="bold"
-                        android:textColor="@color/colorPrimary"
-                        android:layout_marginBottom="12dp"/>
-
-                    <LinearLayout
-                        android:id="@+id/layoutEngagement"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:orientation="horizontal"
-                        android:layout_marginBottom="16dp">
-
-                        <LinearLayout
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:orientation="vertical"
-                            android:gravity="center"
-                            android:padding="12dp">
-
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="Days Active"
-                                android:textSize="12sp"
-                                android:textColor="@color/textColorSecondary"
-                                android:layout_marginBottom="4dp"/>
-
-                            <TextView
-                                android:id="@+id/tvDaysActive"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="0"
-                                android:textSize="20sp"
-                                android:textStyle="bold"
-                                android:textColor="@color/textColorPrimary"/>
-                        </LinearLayout>
-
-                        <View
-                            android:layout_width="1dp"
-                            android:layout_height="match_parent"
-                            android:background="@color/dividerColor"/>
-
-                        <LinearLayout
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:orientation="vertical"
-                            android:gravity="center"
-                            android:padding="12dp">
-
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="Time Spent"
-                                android:textSize="12sp"
-                                android:textColor="@color/textColorSecondary"
-                                android:layout_marginBottom="4dp"/>
-
-                            <TextView
-                                android:id="@+id/tvTimeSpent"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="0m"
-                                android:textSize="20sp"
-                                android:textStyle="bold"
-                                android:textColor="@color/colorAccent"/>
-                        </LinearLayout>
-                    </LinearLayout>
-
-                    <!-- Divider -->
-                    <View
-                        android:layout_width="match_parent"
-                        android:layout_height="1dp"
-                        android:background="@color/dividerColor"
-                        android:layout_marginBottom="16dp"/>
-
-                    <!-- This Week -->
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="📅 This Week"
-                        android:textSize="18sp"
-                        android:textStyle="bold"
-                        android:textColor="@color/colorPrimary"
-                        android:layout_marginBottom="12dp"/>
-
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:orientation="horizontal"
-                        android:layout_marginBottom="16dp">
-
-                        <LinearLayout
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:orientation="vertical"
-                            android:gravity="center"
-                            android:padding="12dp">
-
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="Quizzes"
-                                android:textSize="12sp"
-                                android:textColor="@color/textColorSecondary"
-                                android:layout_marginBottom="4dp"/>
-
-                            <TextView
-                                android:id="@+id/tvQuizzesThisWeek"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="0"
-                                android:textSize="20sp"
-                                android:textStyle="bold"
-                                android:textColor="@color/textColorPrimary"/>
-                        </LinearLayout>
-
-                        <View
-                            android:layout_width="1dp"
-                            android:layout_height="match_parent"
-                            android:background="@color/dividerColor"/>
-
-                        <LinearLayout
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:orientation="vertical"
-                            android:gravity="center"
-                            android:padding="12dp">
-
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="XP Earned"
-                                android:textSize="12sp"
-                                android:textColor="@color/textColorSecondary"
-                                android:layout_marginBottom="4dp"/>
-
-                            <TextView
-                                android:id="@+id/tvXPThisWeek"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="0"
-                                android:textSize="20sp"
-                                android:textStyle="bold"
-                                android:textColor="@color/colorAccent"/>
-                        </LinearLayout>
-                    </LinearLayout>
-
-                    <!-- Divider -->
-                    <View
-                        android:id="@+id/dividerChallenges"
-                        android:layout_width="match_parent"
-                        android:layout_height="1dp"
-                        android:background="@color/dividerColor"
-                        android:layout_marginBottom="16dp"/>
-
-                    <!-- Challenges -->
-                    <TextView
-                        android:id="@+id/tvLabelChallenges"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="⚔️ Challenges"
-                        android:textSize="18sp"
-                        android:textStyle="bold"
-                        android:textColor="@color/colorPrimary"
-                        android:layout_marginBottom="12dp"/>
-
-                    <LinearLayout
-                        android:id="@+id/layoutChallenges"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:orientation="horizontal"
-                        android:layout_marginBottom="16dp">
-
-                        <LinearLayout
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:orientation="vertical"
-                            android:gravity="center"
-                            android:padding="12dp">
-
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="Won"
-                                android:textSize="12sp"
-                                android:textColor="@color/textColorSecondary"
-                                android:layout_marginBottom="4dp"/>
-
-                            <TextView
-                                android:id="@+id/tvChallengesWon"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="0"
-                                android:textSize="20sp"
-                                android:textStyle="bold"
-                                android:textColor="@color/correctAnswer"/>
-                        </LinearLayout>
-
-                        <View
-                            android:layout_width="1dp"
-                            android:layout_height="match_parent"
-                            android:background="@color/dividerColor"/>
-
-                        <LinearLayout
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:orientation="vertical"
-                            android:gravity="center"
-                            android:padding="12dp">
-
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="Lost"
-                                android:textSize="12sp"
-                                android:textColor="@color/textColorSecondary"
-                                android:layout_marginBottom="4dp"/>
-
-                            <TextView
-                                android:id="@+id/tvChallengesLost"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="0"
-                                android:textSize="20sp"
-                                android:textStyle="bold"
-                                android:textColor="@color/wrongAnswer"/>
-                        </LinearLayout>
-                    </LinearLayout>
-
-                    <!-- Divider -->
-                    <View
-                        android:id="@+id/dividerAchievements"
-                        android:layout_width="match_parent"
-                        android:layout_height="1dp"
-                        android:background="@color/dividerColor"
-                        android:layout_marginBottom="16dp"/>
-
-                    <!-- Achievements -->
-                    <TextView
-                        android:id="@+id/tvLabelAchievements"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="🏆 Achievements"
-                        android:textSize="18sp"
-                        android:textStyle="bold"
-                        android:textColor="@color/colorPrimary"
-                        android:layout_marginBottom="12dp"/>
-
-                    <LinearLayout
-                        android:id="@+id/layoutAchievements"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
+                        android:layout_marginTop="8dp"
+                        android:gravity="center"
                         android:orientation="horizontal">
 
-                        <LinearLayout
-                            android:layout_width="0dp"
+                        <TextView
+                            android:id="@+id/tvStudentClass"
+                            android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:orientation="vertical"
-                            android:gravity="center"
-                            android:padding="12dp">
+                            android:background="@drawable/bg_new_tag"
+                            android:backgroundTint="@color/colorPrimary"
+                            android:paddingHorizontal="12dp"
+                            android:paddingVertical="4dp"
+                            android:text="Class 4"
+                            android:textColor="@color/white"
+                            android:textSize="12sp"
+                            android:textStyle="bold" />
 
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="Achievements"
-                                android:textSize="12sp"
-                                android:textColor="@color/textColorSecondary"
-                                android:layout_marginBottom="4dp"/>
-
-                            <TextView
-                                android:id="@+id/tvTotalAchievements"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="0"
-                                android:textSize="20sp"
-                                android:textStyle="bold"
-                                android:textColor="@color/colorPrimary"/>
-                        </LinearLayout>
-
-                        <View
-                            android:layout_width="1dp"
-                            android:layout_height="match_parent"
-                            android:background="@color/dividerColor"/>
-
-                        <LinearLayout
-                            android:layout_width="0dp"
+                        <TextView
+                            android:id="@+id/tvStudentAge"
+                            android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:orientation="vertical"
-                            android:gravity="center"
-                            android:padding="12dp">
-
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="Badges"
-                                android:textSize="12sp"
-                                android:textColor="@color/textColorSecondary"
-                                android:layout_marginBottom="4dp"/>
-
-                            <TextView
-                                android:id="@+id/tvTotalBadges"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="0"
-                                android:textSize="20sp"
-                                android:textStyle="bold"
-                                android:textColor="@color/colorAccent"/>
-                        </LinearLayout>
+                            android:layout_marginStart="8dp"
+                            android:background="@drawable/bg_new_tag"
+                            android:backgroundTint="@color/colorAccent"
+                            android:paddingHorizontal="12dp"
+                            android:paddingVertical="4dp"
+                            android:text="10 yrs"
+                            android:textColor="@color/colorPrimary"
+                            android:textSize="12sp"
+                            android:textStyle="bold" />
                     </LinearLayout>
 
-                    <!-- Report Button (Teacher only) -->
-                    <com.google.android.material.button.MaterialButton
-                        android:id="@+id/btnDownloadStudentReport"
-                        style="@style/Widget.Material3.Button.TonalButton"
-                        android:layout_width="match_parent"
-                        android:layout_height="60dp"
-                        android:layout_marginTop="24dp"
-                        android:text="@string/student_detail_generate_report"
-                        android:textColor="@color/white"
-                        app:backgroundTint="@color/colorPrimary"
-                        app:icon="@drawable/ic_share"
-                        app:iconTint="@color/white"
-                        android:visibility="gone" />
+                    <TextView
+                        android:id="@+id/tvLastActive"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="12dp"
+                        android:alpha="0.7"
+                        android:text="Active 2 hours ago"
+                        android:textColor="@color/textColorPrimary"
+                        android:textSize="13sp" />
+
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
+
+            <!-- OVERVIEW: LEVEL & XP -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp"
+                android:orientation="horizontal"
+                android:weightSum="2">
+
+                <com.google.android.material.card.MaterialCardView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="8dp"
+                    android:layout_weight="1"
+                    app:cardCornerRadius="16dp"
+                    app:cardElevation="2dp"
+                    app:strokeWidth="0.5dp"
+                    app:strokeColor="@color/dividerColor">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:gravity="center"
+                        android:orientation="vertical"
+                        android:padding="16dp">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="🏆 Level"
+                            android:textColor="@color/textColorSecondary"
+                            android:textSize="12sp"
+                            android:textStyle="bold" />
+
+                        <TextView
+                            android:id="@+id/tvLevel"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="4dp"
+                            android:fontFamily="@font/agbalumo"
+                            android:text="12"
+                            android:textColor="@color/colorPrimary"
+                            android:textSize="32sp" />
+                    </LinearLayout>
+                </com.google.android.material.card.MaterialCardView>
+
+                <com.google.android.material.card.MaterialCardView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="8dp"
+                    android:layout_weight="1"
+                    app:cardCornerRadius="16dp"
+                    app:cardElevation="2dp"
+                    app:strokeWidth="0.5dp"
+                    app:strokeColor="@color/dividerColor">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:gravity="center"
+                        android:orientation="vertical"
+                        android:padding="16dp">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="✨ Total XP"
+                            android:textColor="@color/textColorSecondary"
+                            android:textSize="12sp"
+                            android:textStyle="bold" />
+
+                        <TextView
+                            android:id="@+id/tvTotalXP"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="4dp"
+                            android:fontFamily="@font/agbalumo"
+                            android:text="2,450"
+                            android:textColor="@color/colorAccent"
+                            android:textSize="32sp" />
+                    </LinearLayout>
+                </com.google.android.material.card.MaterialCardView>
+            </LinearLayout>
+
+            <!-- ACADEMIC PERFORMANCE (TEACHER) -->
+            <TextView
+                android:id="@+id/tvLabelQuizPerformance"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="8dp"
+                android:layout_marginStart="4dp"
+                android:text="QUIZ PERFORMANCE"
+                android:textColor="@color/textColorSecondary"
+                android:textSize="12sp"
+                android:textStyle="bold"
+                android:letterSpacing="0.1"/>
+
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/layoutQuizStats"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp"
+                app:cardCornerRadius="16dp"
+                app:cardElevation="1dp"
+                app:strokeWidth="0dp">
+
+                <GridLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:columnCount="2"
+                    android:padding="12dp">
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_columnWeight="1"
+                        android:orientation="vertical"
+                        android:padding="12dp">
+                        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Accuracy" android:textSize="11sp" android:textColor="@color/textColorSecondary" />
+                        <TextView android:id="@+id/tvAccuracy" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="85%" android:textSize="20sp" android:textStyle="bold" android:textColor="@color/correctAnswer" />
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_columnWeight="1"
+                        android:orientation="vertical"
+                        android:padding="12dp">
+                        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Quizzes Taken" android:textSize="11sp" android:textColor="@color/textColorSecondary" />
+                        <TextView android:id="@+id/tvTotalQuizzes" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="42" android:textSize="20sp" android:textStyle="bold" android:textColor="@color/textColorPrimary" />
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_columnWeight="1"
+                        android:orientation="vertical"
+                        android:padding="12dp">
+                        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Best Score" android:textSize="11sp" android:textColor="@color/textColorSecondary" />
+                        <TextView android:id="@+id/tvHighScore" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="10/10" android:textSize="20sp" android:textStyle="bold" android:textColor="@color/colorAccent" />
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_columnWeight="1"
+                        android:orientation="vertical"
+                        android:padding="12dp">
+                        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Avg Score" android:textSize="11sp" android:textColor="@color/textColorSecondary" />
+                        <TextView android:id="@+id/tvAverageScore" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="8.2" android:textSize="20sp" android:textStyle="bold" android:textColor="@color/colorPrimary" />
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_columnWeight="1"
+                        android:orientation="vertical"
+                        android:padding="12dp">
+                        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Questions Answered" android:textSize="11sp" android:textColor="@color/textColorSecondary" />
+                        <TextView android:id="@+id/tvTotalQuestions" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="420" android:textSize="18sp" android:textStyle="bold" android:textColor="@color/textColorPrimary" />
+                    </LinearLayout>
+                </GridLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- LEARNING ENGAGEMENT (TEACHER) -->
+            <TextView
+                android:id="@+id/tvLabelEngagement"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="8dp"
+                android:layout_marginStart="4dp"
+                android:text="LEARNING ACTIVITY"
+                android:textColor="@color/textColorSecondary"
+                android:textSize="12sp"
+                android:textStyle="bold"
+                android:letterSpacing="0.1"/>
+
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/layoutEngagement"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp"
+                app:cardCornerRadius="16dp"
+                app:cardElevation="1dp"
+                app:strokeWidth="0dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:padding="12dp"
+                    android:weightSum="2">
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:gravity="center"
+                        android:orientation="vertical"
+                        android:padding="12dp">
+                        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="📅 Days Active" android:textSize="11sp" android:textColor="@color/textColorSecondary" />
+                        <TextView android:id="@+id/tvDaysActive" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="15" android:textSize="20sp" android:textStyle="bold" android:textColor="@color/colorPrimary" />
+                    </LinearLayout>
+
+                    <View android:layout_width="1dp" android:layout_height="match_parent" android:background="@color/dividerColor" android:layout_marginVertical="8dp"/>
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:gravity="center"
+                        android:orientation="vertical"
+                        android:padding="12dp">
+                        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="⏱️ Time Spent" android:textSize="11sp" android:textColor="@color/textColorSecondary" />
+                        <TextView android:id="@+id/tvTimeSpent" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="4h 20m" android:textSize="20sp" android:textStyle="bold" android:textColor="@color/colorAccent" />
+                    </LinearLayout>
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- THIS WEEK SECTION -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="8dp"
+                android:layout_marginStart="4dp"
+                android:text="THIS WEEK"
+                android:textColor="@color/textColorSecondary"
+                android:textSize="12sp"
+                android:textStyle="bold"
+                android:letterSpacing="0.1"/>
+
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp"
+                app:cardCornerRadius="16dp"
+                app:cardElevation="1dp"
+                app:strokeWidth="0dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:padding="12dp"
+                    android:weightSum="2">
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:gravity="center"
+                        android:orientation="vertical"
+                        android:padding="12dp">
+                        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Quizzes" android:textSize="11sp" android:textColor="@color/textColorSecondary" />
+                        <TextView android:id="@+id/tvQuizzesThisWeek" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="8" android:textSize="20sp" android:textStyle="bold" android:textColor="@color/textColorPrimary" />
+                    </LinearLayout>
+
+                    <View android:layout_width="1dp" android:layout_height="match_parent" android:background="@color/dividerColor" android:layout_marginVertical="8dp"/>
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:gravity="center"
+                        android:orientation="vertical"
+                        android:padding="12dp">
+                        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="XP Earned" android:textSize="11sp" android:textColor="@color/textColorSecondary" />
+                        <TextView android:id="@+id/tvXPThisWeek" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="+240" android:textSize="20sp" android:textStyle="bold" android:textColor="@color/colorAccent" />
+                    </LinearLayout>
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- CHALLENGES SECTION -->
+            <TextView
+                android:id="@+id/tvLabelChallenges"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="8dp"
+                android:layout_marginStart="4dp"
+                android:text="CHALLENGES"
+                android:textColor="@color/textColorSecondary"
+                android:textSize="12sp"
+                android:textStyle="bold"
+                android:letterSpacing="0.1"/>
+
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/layoutChallenges"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp"
+                app:cardCornerRadius="16dp"
+                app:cardElevation="1dp"
+                app:strokeWidth="0dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:padding="12dp"
+                    android:weightSum="2">
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:gravity="center"
+                        android:orientation="vertical"
+                        android:padding="12dp">
+                        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Won" android:textSize="11sp" android:textColor="@color/textColorSecondary" />
+                        <TextView android:id="@+id/tvChallengesWon" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="5" android:textSize="20sp" android:textStyle="bold" android:textColor="@color/correctAnswer" />
+                    </LinearLayout>
+
+                    <View android:layout_width="1dp" android:layout_height="match_parent" android:background="@color/dividerColor" android:layout_marginVertical="8dp"/>
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:gravity="center"
+                        android:orientation="vertical"
+                        android:padding="12dp">
+                        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Lost" android:textSize="11sp" android:textColor="@color/textColorSecondary" />
+                        <TextView android:id="@+id/tvChallengesLost" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="2" android:textSize="20sp" android:textStyle="bold" android:textColor="@color/wrongAnswer" />
+                    </LinearLayout>
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- ACHIEVEMENTS (PARENT) -->
+            <TextView
+                android:id="@+id/tvLabelAchievements"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="8dp"
+                android:layout_marginStart="4dp"
+                android:text="ACHIEVEMENTS"
+                android:textColor="@color/textColorSecondary"
+                android:textSize="12sp"
+                android:textStyle="bold"
+                android:letterSpacing="0.1"/>
+
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/layoutAchievements"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp"
+                app:cardCornerRadius="16dp"
+                app:cardElevation="1dp"
+                app:strokeWidth="0dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:padding="12dp"
+                    android:weightSum="2">
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:gravity="center"
+                        android:orientation="vertical"
+                        android:padding="12dp">
+                        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Milestones" android:textSize="11sp" android:textColor="@color/textColorSecondary" />
+                        <TextView android:id="@+id/tvTotalAchievements" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="12" android:textSize="20sp" android:textStyle="bold" android:textColor="@color/colorPrimary" />
+                    </LinearLayout>
+
+                    <View android:layout_width="1dp" android:layout_height="match_parent" android:background="@color/dividerColor" android:layout_marginVertical="8dp"/>
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:gravity="center"
+                        android:orientation="vertical"
+                        android:padding="12dp">
+                        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Badges" android:textSize="11sp" android:textColor="@color/textColorSecondary" />
+                        <TextView android:id="@+id/tvTotalBadges" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="5" android:textSize="20sp" android:textStyle="bold" android:textColor="@color/colorAccent" />
+                    </LinearLayout>
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- STREAKS (PARENT) -->
+            <TextView
+                android:id="@+id/tvLabelStreaks"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="8dp"
+                android:layout_marginStart="4dp"
+                android:text="STUDY STREAKS"
+                android:textColor="@color/textColorSecondary"
+                android:textSize="12sp"
+                android:textStyle="bold"
+                android:letterSpacing="0.1"/>
+
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/layoutStreaks"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="24dp"
+                app:cardCornerRadius="16dp"
+                app:cardElevation="1dp"
+                app:strokeWidth="0dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:padding="12dp"
+                    android:weightSum="2">
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:gravity="center"
+                        android:orientation="vertical"
+                        android:padding="12dp">
+                        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Current" android:textSize="11sp" android:textColor="@color/textColorSecondary" />
+                        <TextView android:id="@+id/tvCurrentStreak" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="5 days" android:textSize="20sp" android:textStyle="bold" android:textColor="@color/correctAnswer" />
+                    </LinearLayout>
+
+                    <View android:layout_width="1dp" android:layout_height="match_parent" android:background="@color/dividerColor" android:layout_marginVertical="8dp"/>
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:gravity="center"
+                        android:orientation="vertical"
+                        android:padding="12dp">
+                        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Longest" android:textSize="11sp" android:textColor="@color/textColorSecondary" />
+                        <TextView android:id="@+id/tvLongestStreak" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="12 days" android:textSize="20sp" android:textStyle="bold" android:textColor="@color/colorAccent" />
+                    </LinearLayout>
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- Action Button -->
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnDownloadStudentReport"
+                android:layout_width="match_parent"
+                android:layout_height="64dp"
+                android:layout_marginBottom="32dp"
+                android:fontFamily="@font/agbalumo"
+                android:text="@string/student_detail_generate_report"
+                android:textAllCaps="false"
+                android:textSize="16sp"
+                app:cornerRadius="20dp"
+                app:elevation="4dp"
+                app:icon="@drawable/ic_share"
+                app:iconSize="20dp"
+                android:backgroundTint="@color/colorPrimary"
+                android:textColor="@color/white"
+                android:visibility="gone" />
+
+            <View
+                android:id="@+id/dividerStreaks"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:visibility="gone" />
+            <View
+                android:id="@+id/dividerQuizStats"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:visibility="gone" />
+            <View
+                android:id="@+id/dividerEngagement"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:visibility="gone" />
+            <View
+                android:id="@+id/dividerAchievements"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:visibility="gone" />
+            <View
+                android:id="@+id/dividerChallenges"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:visibility="gone" />
+
         </LinearLayout>
     </androidx.core.widget.NestedScrollView>
-</androidx.coordinatorlayout.widget.CoordinatorLayout>
 
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

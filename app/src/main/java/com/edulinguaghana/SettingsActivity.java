@@ -313,7 +313,7 @@ public class SettingsActivity extends AppCompatActivity {
     private void contactDevelopers() {
         Intent intent = new Intent(Intent.ACTION_SENDTO);
         intent.setData(Uri.parse("mailto:edulinguaghana4@gmail.com"));
-        intent.putExtra(Intent.EXTRA_SUBJECT, "Feedback for EduLingua Ghana");
+        intent.putExtra(Intent.EXTRA_SUBJECT, "[App Feedback] EduLingua Ghana");
         try {
             startActivity(Intent.createChooser(intent, "Send Email"));
         } catch (android.content.ActivityNotFoundException ex) {
