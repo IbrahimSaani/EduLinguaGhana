@@ -67,7 +67,7 @@ public class QuizActivity extends AppCompatActivity {
     private View startQuizContainer, quizContentContainer, endQuizContainer;
 
     // Start screen
-    private TextView tvStartTitle, tvStartDescription;
+    private TextView tvStartTitle, tvStartDescription, tvStartTimer;
     private MaterialButton btnStartQuiz;
 
     // Game screen
@@ -227,6 +227,7 @@ public class QuizActivity extends AppCompatActivity {
 
         tvStartTitle = findViewById(R.id.tvStartTitle);
         tvStartDescription = findViewById(R.id.tvStartDescription);
+        tvStartTimer = findViewById(R.id.tvStartTimer);
         ivWelcomeIcon = findViewById(R.id.ivWelcomeIcon);
         btnStartQuiz = findViewById(R.id.btnStartQuiz);
 
@@ -354,6 +355,15 @@ public class QuizActivity extends AppCompatActivity {
         }
         if (ivWelcomeIcon != null) {
             ivWelcomeIcon.setImageResource(iconRes);
+        }
+
+        if (tvStartTimer != null) {
+            if (isChallengeMode) {
+                long durationSeconds = getIntent().getLongExtra("CHALLENGE_DURATION", 60L);
+                tvStartTimer.setText(durationSeconds + "s");
+            } else {
+                tvStartTimer.setText("30s");
+            }
         }
 
         if (btnStartQuiz != null) {

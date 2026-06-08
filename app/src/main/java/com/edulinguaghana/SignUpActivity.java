@@ -395,6 +395,13 @@ public class SignUpActivity extends AppCompatActivity {
             return false;
         }
 
+        // Strict check for Gmail format: if it contains "@gmail", it MUST end with "@gmail.com"
+        if (email.toLowerCase().contains("@gmail") && !email.toLowerCase().endsWith("@gmail.com")) {
+            etEmail.setError("Please use the full @gmail.com format");
+            etEmail.requestFocus();
+            return false;
+        }
+
         if (TextUtils.isEmpty(password)) {
             etPassword.setError("Password is required");
             etPassword.requestFocus();

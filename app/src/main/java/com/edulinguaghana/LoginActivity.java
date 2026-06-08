@@ -177,9 +177,9 @@ public class LoginActivity extends AppCompatActivity {
 
         mAuth.signInWithEmailAndPassword(email, password)
                 .addOnCompleteListener(this, task -> {
-                    btnLogin.setEnabled(true);
-                    if (progressBar != null) progressBar.setVisibility(android.view.View.GONE);
                     if (task.isSuccessful()) {
+                        btnLogin.setEnabled(true);
+                        if (progressBar != null) progressBar.setVisibility(android.view.View.GONE);
                         FirebaseUser user = mAuth.getCurrentUser();
                         
                         if (user != null && !user.isEmailVerified()) {
@@ -193,9 +193,6 @@ public class LoginActivity extends AppCompatActivity {
                             }
 
                             if (isPasswordProvider) {
-                                btnLogin.setEnabled(true);
-                                if (progressBar != null) progressBar.setVisibility(android.view.View.GONE);
-                                
                                 showEmailVerificationDialog(user);
                                 return;
                             }
@@ -203,7 +200,34 @@ public class LoginActivity extends AppCompatActivity {
 
                         proceedAfterLogin(user);
                     } else {
-                        String message = getFriendlyErrorMessage(task.getException());
+                        // Improved error detection: Differentiate between wrong password and invalid email
+                        Exception e = task.getException();
+                        if (e instanceof com.google.firebase.auth.FirebaseAuthException) {
+                            String errorCode = ((com.google.firebase.auth.FirebaseAuthException) e).getErrorCode();
+                            
+                            // ERROR_INVALID_CREDENTIAL often masks whether the email or password was wrong
+                            if ("ERROR_INVALID_CREDENTIAL".equals(errorCode)) {
+                                mAuth.fetchSignInMethodsForEmail(email).addOnCompleteListener(fetchTask -> {
+                                    btnLogin.setEnabled(true);
+                                    if (progressBar != null) progressBar.setVisibility(android.view.View.GONE);
+                                    
+                                    if (fetchTask.isSuccessful() && fetchTask.getResult() != null && 
+                                        fetchTask.getResult().getSignInMethods() != null && 
+                                        !fetchTask.getResult().getSignInMethods().isEmpty()) {
+                                        // The email exists in our system, so the password must be the incorrect part
+                                        Toast.makeText(LoginActivity.this, R.string.error_auth_wrong_password, Toast.LENGTH_LONG).show();
+                                    } else {
+                                        // The email is not found or other error, show the generic invalid email message
+                                        Toast.makeText(LoginActivity.this, R.string.error_auth_invalid_email, Toast.LENGTH_LONG).show();
+                                    }
+                                });
+                                return;
+                            }
+                        }
+                        
+                        btnLogin.setEnabled(true);
+                        if (progressBar != null) progressBar.setVisibility(android.view.View.GONE);
+                        String message = getFriendlyErrorMessage(e);
                         Toast.makeText(LoginActivity.this, message, Toast.LENGTH_LONG).show();
                     }
                 });
@@ -408,8 +432,8 @@ public class LoginActivity extends AppCompatActivity {
             return false;
         }
 
-        // Specific check for Gmail format if it looks like one but is missing .com
-        if (email.contains("@gmail") && !email.contains("@gmail.com")) {
+        // Strict check for Gmail format: if it contains "@gmail", it MUST end with "@gmail.com"
+        if (email.toLowerCase().contains("@gmail") && !email.toLowerCase().endsWith("@gmail.com")) {
             if (etEmail != null) {
                 etEmail.setError("Please use the full @gmail.com format");
                 etEmail.requestFocus();

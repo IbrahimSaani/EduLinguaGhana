@@ -9,7 +9,6 @@ import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
-import androidx.cardview.widget.CardView;
 import androidx.annotation.NonNull;
 
 import com.edulinguaghana.R;
@@ -40,7 +39,7 @@ public class StudentDetailActivity extends AppCompatActivity {
     private UserRole currentUserRole = UserRole.STUDENT;
 
     private ProgressBar loadingProgress;
-    private CardView statsCard;
+    private View statsCard;
     private TextView tvStudentName;
     private TextView tvStudentAge;
     private TextView tvStudentClass;

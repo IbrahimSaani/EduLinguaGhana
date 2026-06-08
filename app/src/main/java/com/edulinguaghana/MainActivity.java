@@ -1420,18 +1420,12 @@ public class MainActivity extends AppCompatActivity {
                 getString(R.string.quiz_desc_word_recog),
                 () -> openQuizScreen(langCode, langName, "odd_one_out", "beginner", "all")
         ));
-        menuItems.add(new StyledMenuHelper.MenuItem(
-                "🎲",
-                getString(R.string.quiz_mode_mixed),
-                getString(R.string.quiz_desc_mixed),
-                () -> openQuizScreen(langCode, langName, "mixed", "beginner", "all")
-        ));
 
         StyledMenuHelper.showStyledMenu(
                 this,
                 "📚",
                 getString(R.string.main_section_quizzes),
-                getString(R.string.quiz_desc_mixed),
+                getString(R.string.main_section_quizzes_desc),
                 menuItems,
                 null
         );

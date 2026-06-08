@@ -979,11 +979,11 @@
                         android:layout_marginEnd="8dp"
                         android:clickable="true"
                         android:focusable="true"
-                        android:foreground="?attr/selectableItemBackground"
+                        android:foreground="@drawable/ripple_card_effect"
                         android:contentDescription="@string/mode_recital_title"
                         app:cardBackgroundColor="@android:color/transparent"
                         app:cardCornerRadius="28dp"
-                        app:cardElevation="0dp">
+                        app:cardElevation="4dp">
 
                         <LinearLayout
                             android:layout_width="match_parent"
@@ -1031,11 +1031,11 @@
                         android:layout_marginStart="8dp"
                         android:clickable="true"
                         android:focusable="true"
-                        android:foreground="?attr/selectableItemBackground"
+                        android:foreground="@drawable/ripple_card_effect"
                         android:contentDescription="@string/mode_game_title"
                         app:cardBackgroundColor="@android:color/transparent"
                         app:cardCornerRadius="28dp"
-                        app:cardElevation="0dp">
+                        app:cardElevation="4dp">
 
                         <LinearLayout
                             android:layout_width="match_parent"
@@ -1091,11 +1091,11 @@
                         android:layout_marginEnd="8dp"
                         android:clickable="true"
                         android:focusable="true"
-                        android:foreground="?attr/selectableItemBackground"
+                        android:foreground="@drawable/ripple_card_effect"
                         android:contentDescription="@string/mode_quiz_title"
                         app:cardBackgroundColor="@android:color/transparent"
                         app:cardCornerRadius="28dp"
-                        app:cardElevation="0dp">
+                        app:cardElevation="4dp">
 
                         <LinearLayout
                             android:layout_width="match_parent"

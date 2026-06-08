@@ -2617,6 +2617,8 @@ public class ProfileActivity extends AppCompatActivity {
                     intent = new Intent(ProfileActivity.this, com.edulinguaghana.games.rocketsort.RocketSortActivity.class);
                 } else if (normalizedType.contains("bubble")) {
                     intent = new Intent(ProfileActivity.this, com.edulinguaghana.games.bubblepop.BubblePopActivity.class);
+                } else if (normalizedType.contains("speed")) {
+                    intent = new Intent(ProfileActivity.this, SpeedGameActivity.class);
                 } else if (normalizedType.contains("puzzle")) {
                     intent = new Intent(ProfileActivity.this, com.edulinguaghana.games.PuzzleGameActivity.class);
                 } else if (normalizedType.contains("hidden")) {

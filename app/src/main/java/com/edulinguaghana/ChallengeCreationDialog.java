@@ -56,8 +56,10 @@ public class ChallengeCreationDialog {
 
         // Setup quiz type spinner
         String[] quizTypes = {
-            "Letter Quiz", "Number Sequencing", "Matching", "Mixed Mode",
-            "Rocket Sort", "Bubble Pop", "Hidden Shape", "Shape Match Puzzle"
+            "Letter Quiz", "Number Quiz", "Number Sequencing",
+            "Matching Quiz", "Word Recognition", "Shadow Match",
+            "Rocket Sort", "Bubble Pop", "Speed Challenge",
+            "Hidden Shapes", "Shape Match Puzzle"
         };
         ArrayAdapter<String> quizAdapter = new ArrayAdapter<>(context,
             R.layout.item_spinner, quizTypes);

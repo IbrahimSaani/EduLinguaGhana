@@ -140,6 +140,7 @@
                                 android:textColor="@color/textColorSecondary" />
 
                             <TextView
+                                android:id="@+id/tvStartTimer"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:layout_marginTop="4dp"
