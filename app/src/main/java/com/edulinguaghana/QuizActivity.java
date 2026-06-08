@@ -97,6 +97,10 @@ public class QuizActivity extends AppCompatActivity {
     private CountDownTimer countDownTimer;
     private long remainingTime;
     private long quizStartTime;
+    
+    // Pause functionality
+    private MaterialButton btnPauseResume;
+    private boolean isPaused = false;
 
     // Challenge mode
     private boolean isChallengeMode = false;
@@ -201,6 +205,14 @@ public class QuizActivity extends AppCompatActivity {
             btnPlayAudio.setOnClickListener(v -> { v.performHapticFeedback(HapticFeedbackConstants.LONG_PRESS); speakPrompt(); });
         }
 
+        // Pause/Resume button
+        if (btnPauseResume != null) {
+            btnPauseResume.setOnClickListener(v -> {
+                v.performHapticFeedback(HapticFeedbackConstants.KEYBOARD_TAP);
+                togglePause();
+            });
+        }
+
         // End screen buttons
         btnPlayAgain.setOnClickListener(v -> {
             endQuizContainer.setVisibility(View.GONE);
@@ -234,6 +246,7 @@ public class QuizActivity extends AppCompatActivity {
         tvGameTimer = findViewById(R.id.tvTimer);
         tvGameScore = findViewById(R.id.tvScore);
         tvGameBest = findViewById(R.id.tvBest);
+        btnPauseResume = findViewById(R.id.btnPauseResume);
         tvGameFeedback = findViewById(R.id.tvFeedback);
         tvGamePrompt = findViewById(R.id.tvGamePrompt);
 
@@ -1112,6 +1125,11 @@ public class QuizActivity extends AppCompatActivity {
     }
 
     private void checkAnswer(MaterialButton clickedButton) {
+        if (isPaused) {
+            // Don't process answers when paused
+            return;
+        }
+        
         String effectiveMode = "mixed".equals(quizType) ? currentSubMode : quizType;
         
         if ("shadow_match".equals(effectiveMode) && !"drag_success".equals(clickedButton.getTag(R.id.scratchCard))) {
@@ -1154,6 +1172,13 @@ public class QuizActivity extends AppCompatActivity {
             if (score > bestScore) {
                 bestScore = score;
                 saveHighScore();
+                
+                // Update best score display (cap at 10 for display)
+                int displayBestScore = Math.min(bestScore, 10);
+                if (tvGameBest != null) {
+                    tvGameBest.setText(String.format(Locale.getDefault(), getString(R.string.quiz_best_score), displayBestScore));
+                }
+                
                 animateHighScore();
                 
                 // Play high score sound and celebrate immediately when broken
@@ -1195,6 +1220,67 @@ public class QuizActivity extends AppCompatActivity {
                 startTimer();
             }
         }, 1200);
+    }
+
+    private void togglePause() {
+        if (isPaused) {
+            // Resume the quiz
+            resumeQuiz();
+        } else {
+            // Pause the quiz
+            pauseQuiz();
+        }
+    }
+
+    private void pauseQuiz() {
+        isPaused = true;
+        cancelTimer();
+        
+        // Disable all answer buttons
+        setButtonsEnabled(false);
+        
+        // Disable audio and other interactive elements
+        if (btnPlayAudio != null) {
+            btnPlayAudio.setEnabled(false);
+        }
+        
+        // Update pause button appearance
+        if (btnPauseResume != null) {
+            btnPauseResume.setText("⏯");
+            btnPauseResume.setContentDescription("Resume quiz");
+        }
+        
+        // Show pause overlay or message
+        if (tvGameFeedback != null) {
+            tvGameFeedback.setText("Quiz Paused - Tap Resume to continue");
+            tvGameFeedback.setTextColor(ContextCompat.getColor(this, R.color.colorPrimary));
+        }
+    }
+
+    private void resumeQuiz() {
+        isPaused = false;
+        
+        // Re-enable all answer buttons
+        setButtonsEnabled(true);
+        
+        // Re-enable audio button
+        if (btnPlayAudio != null) {
+            btnPlayAudio.setEnabled(true);
+        }
+        
+        // Update pause button appearance
+        if (btnPauseResume != null) {
+            btnPauseResume.setText("⏸");
+            btnPauseResume.setContentDescription("Pause quiz");
+        }
+        
+        // Clear feedback message
+        if (tvGameFeedback != null) {
+            tvGameFeedback.setText("");
+        }
+        
+        // Restart the timer with remaining time
+        startTimer();
     }
 
     private void startTimer() {

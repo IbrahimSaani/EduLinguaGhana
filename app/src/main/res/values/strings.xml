@@ -158,6 +158,7 @@
     <string name="quiz_title">Quiz Mode</string>
     <string name="quiz_start_button">Start Quiz</string>
     <string name="quiz_play_audio_description">Play Audio Prompt</string>
+    <string name="quiz_pause_button">Pause Quiz</string>
     <string name="bubble_pop_escaped">Oh no! The letter escaped. Try again! 🎈</string>
     <string name="bubble_pop_title">Letter Bubble Pop</string>
     <string name="bubble_pop_score">⭐ Score: %d</string>
