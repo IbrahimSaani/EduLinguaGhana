@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/rocketSortRoot"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -218,6 +219,18 @@
                         android:text="Final Score: 0"
                         android:textColor="@color/white"
                         android:textSize="22sp" />
+
+                    <TextView
+                        android:id="@+id/tvChallengeResult"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="12dp"
+                        android:fontFamily="@font/agbalumo"
+                        android:textSize="24sp"
+                        android:textStyle="bold"
+                        android:visibility="gone"
+                        tools:text="🏆 YOU WON!"
+                        tools:visibility="visible" />
 
                     <com.google.android.material.button.MaterialButton
                         android:id="@+id/btnResume"

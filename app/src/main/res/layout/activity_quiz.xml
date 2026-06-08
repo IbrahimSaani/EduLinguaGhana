@@ -609,6 +609,19 @@
                         android:visibility="gone"
                         tools:visibility="visible" />
 
+                    <TextView
+                        android:id="@+id/tvChallengeResult"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="8dp"
+                        android:fontFamily="@font/agbalumo"
+                        android:gravity="center"
+                        android:textSize="24sp"
+                        android:textStyle="bold"
+                        android:visibility="gone"
+                        tools:text="🏆 YOU WON!"
+                        tools:visibility="visible" />
+
                     <!-- Stats Grid -->
                     <GridLayout
                         android:layout_width="match_parent"

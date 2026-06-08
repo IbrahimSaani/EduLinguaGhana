@@ -212,6 +212,18 @@
                     android:textColor="@color/textColorPrimary"
                     android:textSize="22sp" />
 
+                <TextView
+                    android:id="@+id/tvChallengeResult"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="12dp"
+                    android:fontFamily="@font/agbalumo"
+                    android:textSize="24sp"
+                    android:textStyle="bold"
+                    android:visibility="gone"
+                    tools:text="🏆 YOU WON!"
+                    tools:visibility="visible" />
+
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/btnResume"
                     android:layout_width="match_parent"

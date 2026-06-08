@@ -24,7 +24,7 @@ import java.util.Random;
 public class HiddenShapesActivity extends AppCompatActivity {
 
     private ScratchRevealView scratchView;
-    private TextView tvPrompt, tvCountdown, tvTimer, tvScore;
+    private TextView tvPrompt, tvCountdown, tvTimer, tvScore, tvChallengeResult;
     private MaterialButton btnNext, btnRestart, btnResume;
     private View overlayLayout;
     private nl.dionsegijn.konfetti.xml.KonfettiView konfettiView;
@@ -87,6 +87,7 @@ public class HiddenShapesActivity extends AppCompatActivity {
         tvCountdown = findViewById(R.id.tvCountdown);
         tvTimer = findViewById(R.id.tvTimer);
         tvScore = findViewById(R.id.tvScore);
+        tvChallengeResult = findViewById(R.id.tvChallengeResult);
         btnNext = findViewById(R.id.btnNext);
         btnRestart = findViewById(R.id.btnRestart);
         btnResume = findViewById(R.id.btnResume);
@@ -271,6 +272,27 @@ public class HiddenShapesActivity extends AppCompatActivity {
             public void onSuccess(com.edulinguaghana.social.Challenge challenge) {
                 runOnUiThread(() -> {
                     String msg = "Challenge score saved: " + score + " points! ⏳";
+                    if (challenge.state == com.edulinguaghana.social.Challenge.State.COMPLETED) {
+                        msg = "Challenge Completed!";
+                        if (tvChallengeResult != null) {
+                            tvChallengeResult.setVisibility(View.VISIBLE);
+                            Integer myScore = user.getUid().equals(challenge.challengerId) ? challenge.challengerScore : challenge.challengedScore;
+                            Integer opScore = user.getUid().equals(challenge.challengerId) ? challenge.challengedScore : challenge.challengerScore;
+                            if (myScore != null && opScore != null) {
+                                if (myScore > opScore) {
+                                    tvChallengeResult.setText("🏆 YOU WON!");
+                                    tvChallengeResult.setTextColor(androidx.core.content.ContextCompat.getColor(HiddenShapesActivity.this, R.color.correctAnswer));
+                                    celebrate();
+                                } else if (myScore < opScore) {
+                                    tvChallengeResult.setText("💔 YOU LOST");
+                                    tvChallengeResult.setTextColor(androidx.core.content.ContextCompat.getColor(HiddenShapesActivity.this, R.color.wrongAnswer));
+                                } else {
+                                    tvChallengeResult.setText("🤝 IT'S A DRAW");
+                                    tvChallengeResult.setTextColor(androidx.core.content.ContextCompat.getColor(HiddenShapesActivity.this, R.color.colorAccent));
+                                }
+                            }
+                        }
+                    }
                     android.widget.Toast.makeText(HiddenShapesActivity.this, msg, android.widget.Toast.LENGTH_LONG).show();
                 });
             }

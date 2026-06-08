@@ -38,7 +38,7 @@ import nl.dionsegijn.konfetti.xml.KonfettiView;
 public class RocketSortActivity extends AppCompatActivity {
 
     private FrameLayout starFieldContainer, asteroidContainer;
-    private TextView tvScore, tvLives, tvCountdown, tvTimer;
+    private TextView tvScore, tvLives, tvCountdown, tvTimer, tvChallengeResult;
     private View overlayLayout;
     private ImageView ivRocketLeft, ivRocketRight;
     private KonfettiView konfettiView;
@@ -111,6 +111,7 @@ public class RocketSortActivity extends AppCompatActivity {
         tvLives = findViewById(R.id.tvLives);
         tvCountdown = findViewById(R.id.tvCountdown);
         tvTimer = findViewById(R.id.tvTimer);
+        tvChallengeResult = findViewById(R.id.tvChallengeResult);
         overlayLayout = findViewById(R.id.overlayLayout);
         ivRocketLeft = findViewById(R.id.ivRocketLeft);
         ivRocketRight = findViewById(R.id.ivRocketRight);
@@ -641,6 +642,27 @@ public class RocketSortActivity extends AppCompatActivity {
             public void onSuccess(com.edulinguaghana.social.Challenge challenge) {
                 runOnUiThread(() -> {
                     String msg = "Challenge score saved: " + score + " points! 🚀";
+                    if (challenge.state == com.edulinguaghana.social.Challenge.State.COMPLETED) {
+                        msg = "Challenge Completed!";
+                        if (tvChallengeResult != null) {
+                            tvChallengeResult.setVisibility(View.VISIBLE);
+                            Integer myScore = user.getUid().equals(challenge.challengerId) ? challenge.challengerScore : challenge.challengedScore;
+                            Integer opScore = user.getUid().equals(challenge.challengerId) ? challenge.challengedScore : challenge.challengerScore;
+                            if (myScore != null && opScore != null) {
+                                if (myScore > opScore) {
+                                    tvChallengeResult.setText("🏆 YOU WON!");
+                                    tvChallengeResult.setTextColor(androidx.core.content.ContextCompat.getColor(RocketSortActivity.this, R.color.correctAnswer));
+                                    celebrate();
+                                } else if (myScore < opScore) {
+                                    tvChallengeResult.setText("💔 YOU LOST");
+                                    tvChallengeResult.setTextColor(androidx.core.content.ContextCompat.getColor(RocketSortActivity.this, R.color.wrongAnswer));
+                                } else {
+                                    tvChallengeResult.setText("🤝 IT'S A DRAW");
+                                    tvChallengeResult.setTextColor(androidx.core.content.ContextCompat.getColor(RocketSortActivity.this, R.color.colorAccent));
+                                }
+                            }
+                        }
+                    }
                     android.widget.Toast.makeText(RocketSortActivity.this, msg, android.widget.Toast.LENGTH_LONG).show();
                 });
             }

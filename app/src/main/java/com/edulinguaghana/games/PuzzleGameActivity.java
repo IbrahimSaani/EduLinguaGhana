@@ -32,7 +32,7 @@ import java.util.Random;
 public class PuzzleGameActivity extends AppCompatActivity {
 
     private LinearLayout slotContainer, pieceContainer;
-    private TextView tvScore, tvTimer, tvCountdown, tvPrompt;
+    private TextView tvScore, tvTimer, tvCountdown, tvPrompt, tvChallengeResult;
     private View overlayLayout;
     private nl.dionsegijn.konfetti.xml.KonfettiView konfettiView;
 
@@ -114,6 +114,7 @@ public class PuzzleGameActivity extends AppCompatActivity {
         pieceContainer = findViewById(R.id.pieceContainer);
         tvScore = findViewById(R.id.tvScore);
         tvTimer = findViewById(R.id.tvTimer);
+        tvChallengeResult = findViewById(R.id.tvChallengeResult);
         tvCountdown = findViewById(R.id.tvCountdown);
         tvPrompt = findViewById(R.id.tvPrompt);
         overlayLayout = findViewById(R.id.overlayLayout);
@@ -446,6 +447,27 @@ public class PuzzleGameActivity extends AppCompatActivity {
             public void onSuccess(com.edulinguaghana.social.Challenge challenge) {
                 runOnUiThread(() -> {
                     String msg = "Challenge score saved: " + score + " points! 🧩";
+                    if (challenge.state == com.edulinguaghana.social.Challenge.State.COMPLETED) {
+                        msg = "Challenge Completed!";
+                        if (tvChallengeResult != null) {
+                            tvChallengeResult.setVisibility(View.VISIBLE);
+                            Integer myScore = user.getUid().equals(challenge.challengerId) ? challenge.challengerScore : challenge.challengedScore;
+                            Integer opScore = user.getUid().equals(challenge.challengerId) ? challenge.challengedScore : challenge.challengerScore;
+                            if (myScore != null && opScore != null) {
+                                if (myScore > opScore) {
+                                    tvChallengeResult.setText("🏆 YOU WON!");
+                                    tvChallengeResult.setTextColor(androidx.core.content.ContextCompat.getColor(PuzzleGameActivity.this, R.color.correctAnswer));
+                                    celebrate();
+                                } else if (myScore < opScore) {
+                                    tvChallengeResult.setText("💔 YOU LOST");
+                                    tvChallengeResult.setTextColor(androidx.core.content.ContextCompat.getColor(PuzzleGameActivity.this, R.color.wrongAnswer));
+                                } else {
+                                    tvChallengeResult.setText("🤝 IT'S A DRAW");
+                                    tvChallengeResult.setTextColor(androidx.core.content.ContextCompat.getColor(PuzzleGameActivity.this, R.color.colorAccent));
+                                }
+                            }
+                        }
+                    }
                     android.widget.Toast.makeText(PuzzleGameActivity.this, msg, android.widget.Toast.LENGTH_LONG).show();
                 });
             }

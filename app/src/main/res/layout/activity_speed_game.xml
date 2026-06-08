@@ -201,6 +201,18 @@
                         android:textStyle="bold"
                         android:minHeight="32dp"
                         tools:text="✅ Great job!" />
+
+                    <TextView
+                        android:id="@+id/tvChallengeResult"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="12dp"
+                        android:fontFamily="@font/agbalumo"
+                        android:textSize="24sp"
+                        android:textStyle="bold"
+                        android:visibility="gone"
+                        tools:text="🏆 YOU WON!"
+                        tools:visibility="visible" />
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
 

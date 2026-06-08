@@ -44,7 +44,7 @@ import java.util.Set;
 public class SpeedGameActivity extends AppCompatActivity {
 
     // Views
-    private TextView tvGameTitle, tvGameTimer, tvGameScore, tvGameBest, tvGameFeedback, tvGamePrompt;
+    private TextView tvGameTitle, tvGameTimer, tvGameScore, tvGameBest, tvGameFeedback, tvGamePrompt, tvChallengeResult;
     private FloatingActionButton btnPlayAudio;
     private MaterialButton btnOption1, btnOption2, btnOption3, btnOption4, btnOption5, btnOption6;
     private MaterialButton btnBack;
@@ -59,6 +59,8 @@ public class SpeedGameActivity extends AppCompatActivity {
     private CountDownTimer countDownTimer;
     private long timeLeftMs;
     private long gameStartTime;
+    private boolean isChallengeMode = false;
+    private String challengeId;
     private String quizType = "letters";  // NEW: Support different quiz modes
     private String[] alphabet;  // NEW: Language-specific alphabet
 
@@ -116,12 +118,17 @@ public class SpeedGameActivity extends AppCompatActivity {
         // NEW: Get language-specific alphabet
         alphabet = LanguageConversionUtils.getAlphabetForLanguage(languageCode);
 
+        // Check for challenge mode
+        isChallengeMode = getIntent().getBooleanExtra("CHALLENGE_MODE", false);
+        challengeId = getIntent().getStringExtra("CHALLENGE_ID");
+
         // ...existing code...
         tvGameTimer    = findViewById(R.id.tvGameTimer);
         tvGameScore    = findViewById(R.id.tvGameScore);
         tvGameBest     = findViewById(R.id.tvGameBest);
         tvGameFeedback = findViewById(R.id.tvGameFeedback);
         tvGamePrompt   = findViewById(R.id.tvGamePrompt);
+        tvChallengeResult = findViewById(R.id.tvChallengeResult);
         speedProgressBar = findViewById(R.id.speedProgressBar);
 
         btnOption1 = findViewById(R.id.btnGameOpt1);
@@ -260,6 +267,14 @@ public class SpeedGameActivity extends AppCompatActivity {
     private void startNewRound() {
         score = 0;
         gameStartTime = System.currentTimeMillis();
+        
+        // Support challenge duration
+        if (isChallengeMode) {
+            timeLeftMs = getIntent().getLongExtra("CHALLENGE_DURATION", 60) * 1000;
+        } else {
+            timeLeftMs = TOTAL_TIME_MS;
+        }
+        
         tvGameScore.setText(getString(R.string.quiz_score, score));
         tvGameFeedback.setText("");
         timeLeftMs = TOTAL_TIME_MS;
@@ -672,7 +687,8 @@ public class SpeedGameActivity extends AppCompatActivity {
                 tvGameTimer.setText(getString(R.string.quiz_timer, (int)s));
 
                 if (speedProgressBar != null) {
-                    int progress = (int) ((millisUntilFinished * 100) / TOTAL_TIME_MS);
+                    long total = isChallengeMode ? (getIntent().getLongExtra("CHALLENGE_DURATION", 60) * 1000) : TOTAL_TIME_MS;
+                    int progress = (int) ((millisUntilFinished * 100) / total);
                     speedProgressBar.setProgress(progress);
                 }
                 
@@ -700,6 +716,12 @@ public class SpeedGameActivity extends AppCompatActivity {
                 setOptionsEnabled(false);
 
                 long durationSeconds = (System.currentTimeMillis() - gameStartTime) / 1000;
+                
+                // Save challenge result if in challenge mode
+                if (isChallengeMode && challengeId != null) {
+                    saveChallengeResult();
+                }
+
                 try {
                     FunGameProgressManager.recordGameCompleted(
                             SpeedGameActivity.this,
@@ -771,6 +793,49 @@ public class SpeedGameActivity extends AppCompatActivity {
         SharedPreferences.Editor ed = prefs.edit();
         ed.putInt(KEY_HIGH_SCORE, value);
         ed.apply();
+    }
+
+    private void saveChallengeResult() {
+        com.edulinguaghana.social.ChallengeManager challengeManager = new com.edulinguaghana.social.ChallengeManager();
+        com.google.firebase.auth.FirebaseUser user = com.google.firebase.auth.FirebaseAuth.getInstance().getCurrentUser();
+        
+        if (user == null) return;
+        
+        challengeManager.recordScore(challengeId, user.getUid(), score, new com.edulinguaghana.social.ChallengeManager.ScoreRecordingCallback() {
+            @Override
+            public void onSuccess(com.edulinguaghana.social.Challenge challenge) {
+                runOnUiThread(() -> {
+                    String msg = "Challenge score saved: " + score + " points! 🏃";
+                    if (challenge.state == com.edulinguaghana.social.Challenge.State.COMPLETED) {
+                        msg = "Challenge Completed!";
+                        if (tvChallengeResult != null) {
+                            tvChallengeResult.setVisibility(View.VISIBLE);
+                            Integer myScore = user.getUid().equals(challenge.challengerId) ? challenge.challengerScore : challenge.challengedScore;
+                            Integer opScore = user.getUid().equals(challenge.challengerId) ? challenge.challengedScore : challenge.challengerScore;
+                            if (myScore != null && opScore != null) {
+                                if (myScore > opScore) {
+                                    tvChallengeResult.setText("🏆 YOU WON!");
+                                    tvChallengeResult.setTextColor(androidx.core.content.ContextCompat.getColor(SpeedGameActivity.this, R.color.correctAnswer));
+                                    celebrate();
+                                } else if (myScore < opScore) {
+                                    tvChallengeResult.setText("💔 YOU LOST");
+                                    tvChallengeResult.setTextColor(androidx.core.content.ContextCompat.getColor(SpeedGameActivity.this, R.color.wrongAnswer));
+                                } else {
+                                    tvChallengeResult.setText("🤝 IT'S A DRAW");
+                                    tvChallengeResult.setTextColor(androidx.core.content.ContextCompat.getColor(SpeedGameActivity.this, R.color.colorAccent));
+                                }
+                            }
+                        }
+                    }
+                    android.widget.Toast.makeText(SpeedGameActivity.this, msg, android.widget.Toast.LENGTH_LONG).show();
+                });
+            }
+
+            @Override
+            public void onFailure(String error) {
+                runOnUiThread(() -> android.widget.Toast.makeText(SpeedGameActivity.this, "Failed to save challenge: " + error, android.widget.Toast.LENGTH_SHORT).show());
+            }
+        });
     }
 
     private void playWrongAnimation(View button) {

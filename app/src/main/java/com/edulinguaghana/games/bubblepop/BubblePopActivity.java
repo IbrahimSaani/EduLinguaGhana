@@ -49,7 +49,7 @@ import nl.dionsegijn.konfetti.xml.KonfettiView;
 public class BubblePopActivity extends AppCompatActivity {
 
     private FrameLayout bubbleContainer, ambientParticles;
-    private TextView tvScore, tvTarget, tvCountdown, tvTimer;
+    private TextView tvScore, tvTarget, tvCountdown, tvTimer, tvChallengeResult;
     private View overlayLayout;
     private KonfettiView konfettiView;
 
@@ -134,6 +134,7 @@ public class BubblePopActivity extends AppCompatActivity {
         tvTarget = findViewById(R.id.tvTarget);
         tvCountdown = findViewById(R.id.tvCountdown);
         tvTimer = findViewById(R.id.tvTimer);
+        tvChallengeResult = findViewById(R.id.tvChallengeResult);
         overlayLayout = findViewById(R.id.overlayLayout);
         konfettiView = findViewById(R.id.konfettiView);
 
@@ -364,6 +365,28 @@ public class BubblePopActivity extends AppCompatActivity {
             public void onSuccess(com.edulinguaghana.social.Challenge challenge) {
                 runOnUiThread(() -> {
                     String msg = "Challenge score saved: " + score + " points! 🎈";
+                    if (challenge.state == com.edulinguaghana.social.Challenge.State.COMPLETED) {
+                        msg = "Challenge Completed!";
+                        if (tvChallengeResult != null) {
+                            tvChallengeResult.setVisibility(View.VISIBLE);
+                            Integer myScore = user.getUid().equals(challenge.challengerId) ? challenge.challengerScore : challenge.challengedScore;
+                            Integer opScore = user.getUid().equals(challenge.challengerId) ? challenge.challengedScore : challenge.challengerScore;
+
+                            if (myScore != null && opScore != null) {
+                                if (myScore > opScore) {
+                                    tvChallengeResult.setText("🏆 YOU WON!");
+                                    tvChallengeResult.setTextColor(androidx.core.content.ContextCompat.getColor(BubblePopActivity.this, R.color.correctAnswer));
+                                    celebrate();
+                                } else if (myScore < opScore) {
+                                    tvChallengeResult.setText("💔 YOU LOST");
+                                    tvChallengeResult.setTextColor(androidx.core.content.ContextCompat.getColor(BubblePopActivity.this, R.color.wrongAnswer));
+                                } else {
+                                    tvChallengeResult.setText("🤝 IT'S A DRAW");
+                                    tvChallengeResult.setTextColor(androidx.core.content.ContextCompat.getColor(BubblePopActivity.this, R.color.colorAccent));
+                                }
+                            }
+                        }
+                    }
                     Toast.makeText(BubblePopActivity.this, msg, Toast.LENGTH_LONG).show();
                 });
             }

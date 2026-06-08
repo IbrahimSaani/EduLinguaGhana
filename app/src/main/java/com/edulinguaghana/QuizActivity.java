@@ -83,7 +83,7 @@ public class QuizActivity extends AppCompatActivity {
     private com.airbnb.lottie.LottieAnimationView ivWelcomeIcon;
 
     // End screen
-    private TextView tvFinalScore, tvEndBestScore, tvNewHighScore;
+    private TextView tvFinalScore, tvEndBestScore, tvNewHighScore, tvChallengeResult;
     private TextView tvEndAccuracy, tvEndXP;
     private MaterialButton btnPlayAgain, btnEndQuit;
 
@@ -256,6 +256,7 @@ public class QuizActivity extends AppCompatActivity {
         tvFinalScore = findViewById(R.id.tvFinalScore);
         tvEndBestScore = findViewById(R.id.tvEndBestScore);
         tvNewHighScore = findViewById(R.id.tvNewHighScore);
+        tvChallengeResult = findViewById(R.id.tvChallengeResult);
         tvEndAccuracy = findViewById(R.id.tvEndAccuracy);
         tvEndXP = findViewById(R.id.tvEndXP);
         btnPlayAgain = findViewById(R.id.btnPlayAgain);
@@ -1467,6 +1468,28 @@ public class QuizActivity extends AppCompatActivity {
                     String msg = getString(R.string.quiz_challenge_saved, score);
                     if (challenge.state == com.edulinguaghana.social.Challenge.State.COMPLETED) {
                         msg = getString(R.string.quiz_challenge_completed, score);
+                        
+                        // Show result on end screen if it's visible
+                        if (tvChallengeResult != null) {
+                            tvChallengeResult.setVisibility(View.VISIBLE);
+                            
+                            Integer myScore = user.getUid().equals(challenge.challengerId) ? challenge.challengerScore : challenge.challengedScore;
+                            Integer opScore = user.getUid().equals(challenge.challengerId) ? challenge.challengedScore : challenge.challengerScore;
+                            
+                            if (myScore != null && opScore != null) {
+                                if (myScore > opScore) {
+                                    tvChallengeResult.setText("🏆 YOU WON!");
+                                    tvChallengeResult.setTextColor(ContextCompat.getColor(QuizActivity.this, R.color.correctAnswer));
+                                    celebrate();
+                                } else if (myScore < opScore) {
+                                    tvChallengeResult.setText("💔 YOU LOST");
+                                    tvChallengeResult.setTextColor(ContextCompat.getColor(QuizActivity.this, R.color.wrongAnswer));
+                                } else {
+                                    tvChallengeResult.setText("🤝 IT'S A DRAW");
+                                    tvChallengeResult.setTextColor(ContextCompat.getColor(QuizActivity.this, R.color.colorAccent));
+                                }
+                            }
+                        }
                     }
                     Toast.makeText(QuizActivity.this, msg, Toast.LENGTH_LONG).show();
                 });
