@@ -598,7 +598,7 @@ public class LoginActivity extends AppCompatActivity {
             public void onCancelled(DatabaseError error) {}
         });
 
-        // 2. Restore Badges and Quests
+        // 2. Restore Badges, Quests, Achievements and Fun Games
         DatabaseReference userRef = FirebaseDatabase.getInstance().getReference("users").child(userId);
         userRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
@@ -634,6 +634,35 @@ public class LoginActivity extends AppCompatActivity {
                     if (!achievements.isEmpty()) {
                         com.edulinguaghana.AchievementManager achievementManager = new com.edulinguaghana.AchievementManager(LoginActivity.this);
                         achievementManager.saveAllAchievements(achievements);
+                    }
+                }
+
+                // Restore Fun Games Progress
+                if (snapshot.hasChild("funGames")) {
+                    DataSnapshot funGamesSnap = snapshot.child("funGames");
+                    Long totalFunGames = funGamesSnap.child("totalFunGames").getValue(Long.class);
+                    Long bestScore = funGamesSnap.child("bestScore").getValue(Long.class);
+                    Long speedGamesPlayed = funGamesSnap.child("speedGamesPlayed").getValue(Long.class);
+                    Long puzzleGamesPlayed = funGamesSnap.child("puzzleGamesPlayed").getValue(Long.class);
+
+                    java.util.List<String> gamesPlayedList = new java.util.ArrayList<>();
+                    DataSnapshot gamesPlayedSnap = funGamesSnap.child("funGamesPlayedSet");
+                    if (gamesPlayedSnap.exists()) {
+                        for (DataSnapshot gameSnap : gamesPlayedSnap.getChildren()) {
+                            String gameId = gameSnap.getValue(String.class);
+                            if (gameId != null) {
+                                gamesPlayedList.add(gameId);
+                            }
+                        }
+                    }
+
+                    if (totalFunGames != null && totalFunGames >= 0) {
+                        com.edulinguaghana.gamification.FunGameProgressManager.saveAllFunGameProgress(LoginActivity.this,
+                                totalFunGames.intValue(),
+                                bestScore != null ? bestScore.intValue() : 0,
+                                speedGamesPlayed != null ? speedGamesPlayed.intValue() : 0,
+                                puzzleGamesPlayed != null ? puzzleGamesPlayed.intValue() : 0,
+                                new java.util.HashSet<>(gamesPlayedList));
                     }
                 }
             }

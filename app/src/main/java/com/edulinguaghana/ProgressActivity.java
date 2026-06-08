@@ -246,8 +246,10 @@ public class ProgressActivity extends AppCompatActivity {
     }
 
     private void shareProgress(int highScore, int totalQuizzes, int totalCorrect, int percentage, String achievementText) {
+        // Cap the high score at 10 for sharing (same as display)
+        int displayHighScore = Math.min(highScore, 10);
         String shareText = "My EduLingua Ghana Progress:\n\n"
-                + "Best quiz score: " + highScore + " / 10\n"
+                + "Best quiz score: " + displayHighScore + " / 10\n"
                 + "Total quizzes taken: " + totalQuizzes + "\n"
                 + "Total correct answers: " + totalCorrect + "\n"
                 + "Overall accuracy: " + percentage + "%\n\n"

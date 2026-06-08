@@ -140,6 +140,28 @@ public final class FunGameProgressManager {
         }
     }
 
+    public static void saveAllFunGameProgress(Context context, int totalFunGames, int bestScore,
+                                              int speedGamesPlayed, int puzzleGamesPlayed,
+                                              java.util.Set<String> gamesPlayedSet) {
+        if (context == null) return;
+
+        SharedPreferences prefs = context.getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = prefs.edit();
+
+        editor.putInt(KEY_TOTAL_FUN_GAMES, totalFunGames);
+        editor.putInt(KEY_FUN_GAME_BEST_SCORE, bestScore);
+        editor.putInt(KEY_SPEED_GAMES_PLAYED, speedGamesPlayed);
+        editor.putInt(KEY_PUZZLE_GAMES_PLAYED, puzzleGamesPlayed);
+
+        if (gamesPlayedSet != null && !gamesPlayedSet.isEmpty()) {
+            editor.putStringSet(KEY_FUN_GAMES_PLAYED_SET, new HashSet<>(gamesPlayedSet));
+        } else {
+            editor.remove(KEY_FUN_GAMES_PLAYED_SET);
+        }
+
+        editor.apply();
+    }
+
     public static int getTotalFunGamesPlayed(Context context) {
         if (context == null) return 0;
         return context.getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE).getInt(KEY_TOTAL_FUN_GAMES, 0);
@@ -243,4 +265,3 @@ public final class FunGameProgressManager {
         }
     }
 }
-
