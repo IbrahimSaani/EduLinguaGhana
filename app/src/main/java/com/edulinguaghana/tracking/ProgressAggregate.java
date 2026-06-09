@@ -31,6 +31,11 @@ public class ProgressAggregate {
     private int totalAchievements;
     private int totalBadges;
 
+    // Fun Games statistics
+    private int totalFunGames;
+    private int bestFunGameScore;
+    private int funGamesThisWeek;
+
     // Recent activity (last 7 days)
     private int quizzesThisWeek;
     private int xpThisWeek;
@@ -92,6 +97,15 @@ public class ProgressAggregate {
 
     public int getTotalBadges() { return totalBadges; }
     public void setTotalBadges(int totalBadges) { this.totalBadges = totalBadges; }
+
+    public int getTotalFunGames() { return totalFunGames; }
+    public void setTotalFunGames(int totalFunGames) { this.totalFunGames = totalFunGames; }
+
+    public int getBestFunGameScore() { return bestFunGameScore; }
+    public void setBestFunGameScore(int bestFunGameScore) { this.bestFunGameScore = bestFunGameScore; }
+
+    public int getFunGamesThisWeek() { return funGamesThisWeek; }
+    public void setFunGamesThisWeek(int funGamesThisWeek) { this.funGamesThisWeek = funGamesThisWeek; }
 
     public int getQuizzesThisWeek() { return quizzesThisWeek; }
     public void setQuizzesThisWeek(int quizzesThisWeek) { this.quizzesThisWeek = quizzesThisWeek; }

@@ -11,7 +11,7 @@
     <item android:bottom="4dp">
         <shape android:shape="rectangle">
             <corners android:radius="16dp" />
-            <solid android:color="#F44336" />
+            <solid android:color="@color/wrongAnswer" />
             <stroke android:width="2dp" android:color="#EF9A9A" />
         </shape>
     </item>

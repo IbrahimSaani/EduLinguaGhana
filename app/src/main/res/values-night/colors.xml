@@ -10,6 +10,7 @@
     <color name="colorPrimaryDark">#7E57C2</color>
     <color name="colorPrimaryLight">#4527A0</color>
     <color name="colorAccent">#FFD54F</color> <!-- Brighter yellow for better contrast -->
+    <color name="colorOnAccent">#1A237E</color> <!-- Dark blue for contrast on yellow -->
 
     <!-- UI elements - optimized for dark mode -->
     <color name="appBackground">#121212</color> <!-- Material Design standard dark background -->

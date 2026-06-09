@@ -297,6 +297,9 @@ public class ProgressTracker {
                 int totalQuizzesCount = 0;
                 int totalCorrectCount = 0;
                 int totalQuestionsCount = 0;
+                int totalFunGamesCount = 0;
+                int bestFunGameScore = 0;
+                int funGamesThisWeek = 0;
                 
                 long now = System.currentTimeMillis();
                 long oneWeekAgo = now - (7L * 24 * 60 * 60 * 1000);
@@ -315,6 +318,16 @@ public class ProgressTracker {
                                 quizzesThisWeek++;
                                 xpThisWeek += activity.getXpEarned();
                             }
+                        } else if (activity.getActivityType() == ProgressActivity.ActivityType.FUN_GAME_COMPLETED) {
+                            totalFunGamesCount++;
+                            if (activity.getScore() > bestFunGameScore) {
+                                bestFunGameScore = activity.getScore();
+                            }
+                            
+                            if (activity.getTimestamp() >= oneWeekAgo) {
+                                funGamesThisWeek++;
+                                xpThisWeek += activity.getXpEarned();
+                            }
                         } else if (activity.getActivityType() == ProgressActivity.ActivityType.XP_EARNED) {
                             if (activity.getTimestamp() >= oneWeekAgo) {
                                 xpThisWeek += activity.getXpEarned();
@@ -329,6 +342,9 @@ public class ProgressTracker {
                 final int finalQuizzesCount = totalQuizzesCount;
                 final int finalCorrectCount = totalCorrectCount;
                 final int finalQuestionsCount = totalQuestionsCount;
+                final int finalFunGamesCount = totalFunGamesCount;
+                final int finalBestFunGameScore = bestFunGameScore;
+                final int finalFunGamesWeek = funGamesThisWeek;
 
                 aggregatesRef.child(userId).addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
@@ -361,6 +377,11 @@ public class ProgressTracker {
                             aggregate.setTotalTimeSpentSeconds(finalTotalTime);
                             aggregate.setQuizzesThisWeek(finalQuizzesWeek);
                             aggregate.setXpThisWeek(finalXpWeek);
+                            
+                            // Fun Games
+                            aggregate.setTotalFunGames(finalFunGamesCount);
+                            aggregate.setBestFunGameScore(finalBestFunGameScore);
+                            aggregate.setFunGamesThisWeek(finalFunGamesWeek);
 
                             // Calculate accuracy
                             if (finalQuestionsCount > 0) {

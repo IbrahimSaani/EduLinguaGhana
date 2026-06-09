@@ -43,13 +43,15 @@ public class ShadowView extends View {
     }
 
     private void init() {
+        int silhouetteColor = androidx.core.content.ContextCompat.getColor(getContext(), R.color.textColorSecondary);
+        
         shadowPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
-        // Create a dark "silhouette" effect
-        shadowPaint.setColorFilter(new PorterDuffColorFilter(Color.DKGRAY, PorterDuff.Mode.SRC_IN));
+        // Create a silhouette effect that adapts to light/dark mode
+        shadowPaint.setColorFilter(new PorterDuffColorFilter(silhouetteColor, PorterDuff.Mode.SRC_IN));
         shadowPaint.setAlpha(120);
 
         textPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
-        textPaint.setColor(Color.DKGRAY);
+        textPaint.setColor(silhouetteColor);
         textPaint.setTextSize(240f);
         textPaint.setTextAlign(Paint.Align.CENTER);
         textPaint.setAlpha(120);
@@ -80,7 +82,8 @@ public class ShadowView extends View {
     public void setCharacter(String character) {
         this.text = character;
         this.isRevealed = false;
-        textPaint.setColor(Color.DKGRAY);
+        int silhouetteColor = androidx.core.content.ContextCompat.getColor(getContext(), R.color.textColorSecondary);
+        textPaint.setColor(silhouetteColor);
         textPaint.setAlpha(120);
         invalidate();
     }

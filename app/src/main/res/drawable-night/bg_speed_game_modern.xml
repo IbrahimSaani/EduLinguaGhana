@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Darker Tech Gradient for Night Mode -->
+    <item>
+        <shape>
+            <gradient
+                android:angle="315"
+                android:startColor="#0D1117"
+                android:centerColor="#1A237E"
+                android:endColor="#006064" />
+        </shape>
+    </item>
+
+    <!-- Tech Grid Overlay -->
+    <item>
+        <shape>
+            <stroke
+                android:width="0.5dp"
+                android:color="#11FFFFFF"
+                android:dashWidth="40dp"
+                android:dashGap="40dp" />
+        </shape>
+    </item>
+</layer-list>

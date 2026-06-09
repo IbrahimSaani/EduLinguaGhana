@@ -73,6 +73,8 @@ public class ScratchRevealView extends View {
     }
 
     private void init() {
+        int primaryColor = androidx.core.content.ContextCompat.getColor(getContext(), R.color.colorPrimary);
+        
         scratchPath = new Path();
         scratchPaint = new Paint();
         scratchPaint.setAntiAlias(true);
@@ -85,7 +87,7 @@ public class ScratchRevealView extends View {
         backgroundPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
         
         textPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
-        textPaint.setColor(Color.parseColor("#1A237E")); // primary color
+        textPaint.setColor(primaryColor);
         textPaint.setTextAlign(Paint.Align.CENTER);
         textPaint.setFakeBoldText(true);
         textPaint.setShadowLayer(10, 0, 0, Color.LTGRAY);

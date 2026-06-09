@@ -2,7 +2,7 @@
   "rules": {
     "leaderboard": {
       ".read": "auth != null && auth.token.email_verified === true",
-      ".indexOn": ["score", "timestamp"],
+      ".indexOn": ["score", "timestamp", "userId"],
       "$userId": {
         ".read": "auth != null",
         ".write": "$userId === auth.uid && auth.token.email_verified === true && root.child('users').child(auth.uid).child('role').val() === 'STUDENT'",
@@ -138,11 +138,17 @@
       }
     },
     "funGames": {
-      ".indexOn": ["userId"],
+      ".indexOn": ["userId", "bestScore"],
       "$userId": {
         ".read": "auth != null && ($userId === auth.uid || root.child('relationships').child(auth.uid + '_' + $userId).child('status').val() === 'ACCEPTED')",
         ".write": "$userId === auth.uid",
-        ".validate": "newData.hasChildren(['userId','totalFunGames','bestScore']) || !newData.exists()"
+        ".validate": "newData.hasChildren(['userId','totalFunGames','bestScore']) || !newData.exists()",
+        "bestScore": {
+          ".validate": "newData.isNumber() && newData.val() >= 0"
+        },
+        "totalFunGames": {
+          ".validate": "newData.isNumber() && newData.val() >= 0"
+        }
       }
     },
     "aggregates": {

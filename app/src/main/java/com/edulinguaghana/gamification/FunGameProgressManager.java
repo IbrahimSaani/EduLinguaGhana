@@ -117,6 +117,18 @@ public final class FunGameProgressManager {
         // Re-evaluate achievements after updating counters.
         new AchievementManager(context).checkAndUnlockAchievements();
 
+        // Real-time Leaderboard Tracking: Upload score to leaderboard if significant
+        if (score >= 10) {
+            try {
+                FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+                if (user != null) {
+                    CloudSyncManager.uploadScoreToLeaderboard(user, score, context);
+                }
+            } catch (Exception e) {
+                android.util.Log.e("FunGameProgressManager", "Failed to upload to leaderboard", e);
+            }
+        }
+
         // Real-time Progress Tracking: Log to Firebase and update aggregates
         try {
             FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();

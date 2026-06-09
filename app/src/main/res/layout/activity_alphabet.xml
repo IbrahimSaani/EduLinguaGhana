@@ -132,7 +132,7 @@
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:text="Progress"
-                                android:textColor="@android:color/white"
+                                android:textColor="@color/colorOnAccent"
                                 android:textSize="12sp"
                                 android:alpha="0.8" />
 
@@ -141,7 +141,7 @@
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:text="Letter 1 of 26"
-                                android:textColor="@android:color/white"
+                                android:textColor="@color/colorOnAccent"
                                 android:textSize="18sp"
                                 android:textStyle="bold"
                                 android:fontFamily="@font/agbalumo" />

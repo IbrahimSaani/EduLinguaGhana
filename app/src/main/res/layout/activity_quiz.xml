@@ -25,8 +25,8 @@
             android:elevation="0dp"
             app:title="@string/quiz_title"
             app:titleTextAppearance="@style/ToolbarTitleStyle"
-            app:titleTextColor="@color/white"
-            app:navigationIconTint="@color/white" />
+            app:titleTextColor="@color/colorPrimary"
+            app:navigationIconTint="@color/colorPrimary" />
 
     </com.google.android.material.appbar.AppBarLayout>
 
