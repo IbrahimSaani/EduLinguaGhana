@@ -10,30 +10,62 @@
 
     <com.google.android.material.appbar.AppBarLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="@drawable/gradient_background"
-        app:elevation="8dp">
+        android:layout_height="220dp"
+        android:background="@drawable/bg_settings_header"
+        android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar">
 
-        <androidx.appcompat.widget.Toolbar
-            android:id="@+id/toolbar"
+        <com.google.android.material.appbar.CollapsingToolbarLayout
             android:layout_width="match_parent"
-            android:layout_height="?attr/actionBarSize"
-            app:titleTextColor="@color/white"
-            app:navigationIcon="?attr/homeAsUpIndicator"
-            app:navigationIconTint="@color/white">
+            android:layout_height="match_parent"
+            app:layout_scrollFlags="scroll|exitUntilCollapsed"
+            app:contentScrim="?attr/colorPrimary"
+            app:titleEnabled="false">
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/settings_title"
-                android:textAppearance="@style/ToolbarTitleStyle"
-                android:textColor="@color/white"
-                android:textSize="20sp"
-                android:textStyle="bold" />
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="vertical"
+                android:gravity="center"
+                android:paddingTop="48dp"
+                app:layout_collapseMode="parallax">
 
-        </androidx.appcompat.widget.Toolbar>
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="⚙️"
+                    android:textSize="48sp" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:text="@string/settings_title"
+                    android:textColor="@color/white"
+                    android:textSize="28sp"
+                    android:textStyle="bold"
+                    android:fontFamily="@font/agbalumo" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Personalize your learning experience"
+                    android:textColor="#B0BEC5"
+                    android:textSize="14sp" />
+
+            </LinearLayout>
+
+            <androidx.appcompat.widget.Toolbar
+                android:id="@+id/toolbar"
+                android:layout_width="match_parent"
+                android:layout_height="?attr/actionBarSize"
+                app:layout_collapseMode="pin"
+                app:navigationIcon="?attr/homeAsUpIndicator"
+                app:navigationIconTint="@color/white" />
+
+        </com.google.android.material.appbar.CollapsingToolbarLayout>
 
     </com.google.android.material.appbar.AppBarLayout>
+
 
     <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
@@ -48,57 +80,79 @@
             android:padding="16dp">
 
             <!-- Audio Section -->
-            <TextView
-                android:id="@+id/tvAudioHeader"
-                android:layout_width="wrap_content"
+            <LinearLayout
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="8dp"
-                android:layout_marginBottom="8dp"
-                android:text="🔊 Audio &amp; Sound"
-                android:textColor="@color/colorPrimary"
-                android:textStyle="bold"
-                android:fontFamily="@font/agbalumo" />
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:layout_marginBottom="12dp"
+                android:layout_marginTop="8dp">
+
+                <View
+                    android:layout_width="4dp"
+                    android:layout_height="24dp"
+                    android:background="@color/colorAccent" />
+
+                <TextView
+                    android:id="@+id/tvAudioHeader"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="12dp"
+                    android:text="Audio &amp; Sound"
+                    android:textColor="@color/colorPrimary"
+                    android:textSize="18sp"
+                    android:textStyle="bold"
+                    android:fontFamily="@font/agbalumo" />
+            </LinearLayout>
 
             <com.google.android.material.card.MaterialCardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="20dp"
-                app:cardCornerRadius="20dp"
-                app:cardElevation="4dp"
-                app:strokeWidth="0dp"
+                android:layout_marginBottom="24dp"
+                app:cardCornerRadius="24dp"
+                app:cardElevation="2dp"
+                app:strokeWidth="1dp"
+                app:strokeColor="#0D000000"
                 app:cardBackgroundColor="@color/cardBackground">
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="vertical"
-                    android:padding="12dp">
+                    android:padding="8dp">
 
                     <com.google.android.material.switchmaterial.SwitchMaterial
                         android:id="@+id/switchMusic"
+                        style="@style/Widget.Material3.CompoundButton.Switch"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:text="Background Music"
-                        android:padding="12dp" />
+                        android:padding="16dp"
+                        android:thumbTint="@color/colorPrimary"
+                        app:trackTint="@color/colorPrimaryLight" />
 
                     <com.google.android.material.switchmaterial.SwitchMaterial
                         android:id="@+id/switchSfx"
+                        style="@style/Widget.Material3.CompoundButton.Switch"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:text="Sound Effects"
-                        android:padding="12dp" />
+                        android:padding="16dp"
+                        android:thumbTint="@color/colorPrimary"
+                        app:trackTint="@color/colorPrimaryLight" />
 
                     <View
                         android:layout_width="match_parent"
                         android:layout_height="1dp"
-                        android:layout_marginHorizontal="12dp"
-                        android:background="@color/dividerColor" />
+                        android:layout_marginHorizontal="16dp"
+                        android:background="@color/dividerColor"
+                        android:alpha="0.3" />
 
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:orientation="vertical"
-                        android:padding="12dp">
+                        android:padding="16dp">
 
                         <LinearLayout
                             android:layout_width="match_parent"
@@ -109,12 +163,13 @@
                                 android:layout_height="wrap_content"
                                 android:layout_weight="1"
                                 android:text="Quiz Music Volume"
-                                android:textStyle="bold" />
+                                android:textColor="@color/textColorPrimary" />
                             <TextView
                                 android:id="@+id/tvQuizMusicVolumeValue"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:text="50%"
+                                android:textStyle="bold"
                                 android:textColor="@color/colorPrimary" />
                         </LinearLayout>
 
@@ -122,126 +177,182 @@
                             android:id="@+id/seekBarQuizMusicVolume"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:layout_marginTop="12dp"
-                            android:max="100" />
+                            android:layout_marginTop="16dp"
+                            android:max="100"
+                            android:progressTint="@color/colorPrimary"
+                            android:thumbTint="@color/colorPrimary" />
                     </LinearLayout>
 
                 </LinearLayout>
 
             </com.google.android.material.card.MaterialCardView>
 
+
             <!-- Display Section -->
-            <TextView
-                android:id="@+id/tvVisualHeader"
-                android:layout_width="wrap_content"
+            <LinearLayout
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="8dp"
-                android:layout_marginBottom="8dp"
-                android:text="@string/settings_visual_title"
-                android:textColor="@color/colorPrimary"
-                android:textStyle="bold"
-                android:fontFamily="@font/agbalumo" />
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:layout_marginBottom="12dp">
+
+                <View
+                    android:layout_width="4dp"
+                    android:layout_height="24dp"
+                    android:background="@color/colorAccent" />
+
+                <TextView
+                    android:id="@+id/tvVisualHeader"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="12dp"
+                    android:text="Visuals"
+                    android:textColor="@color/colorPrimary"
+                    android:textSize="18sp"
+                    android:textStyle="bold"
+                    android:fontFamily="@font/agbalumo" />
+            </LinearLayout>
 
             <com.google.android.material.card.MaterialCardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="20dp"
-                app:cardCornerRadius="20dp"
-                app:cardElevation="4dp"
+                android:layout_marginBottom="24dp"
+                app:cardCornerRadius="24dp"
+                app:cardElevation="2dp"
+                app:strokeWidth="1dp"
+                app:strokeColor="#0D000000"
                 app:cardBackgroundColor="@color/cardBackground">
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="vertical"
-                    android:padding="12dp">
+                    android:padding="8dp">
 
                     <com.google.android.material.switchmaterial.SwitchMaterial
                         android:id="@+id/switchAnimations"
+                        style="@style/Widget.Material3.CompoundButton.Switch"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:text="@string/settings_background_animations"
-                        android:padding="12dp" />
+                        android:padding="16dp"
+                        android:thumbTint="@color/colorPrimary"
+                        app:trackTint="@color/colorPrimaryLight" />
 
                     <com.google.android.material.switchmaterial.SwitchMaterial
                         android:id="@+id/switchLowPowerAnimations"
+                        style="@style/Widget.Material3.CompoundButton.Switch"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:text="@string/settings_low_power_animations"
-                        android:padding="12dp" />
-
-                    <View
-                        android:layout_width="match_parent"
-                        android:layout_height="1dp"
-                        android:layout_marginHorizontal="12dp"
-                        android:background="@color/dividerColor" />
+                        android:padding="16dp"
+                        android:thumbTint="@color/colorPrimary"
+                        app:trackTint="@color/colorPrimaryLight" />
 
                 </LinearLayout>
 
             </com.google.android.material.card.MaterialCardView>
 
+
             <!-- Notifications Section -->
-            <TextView
-                android:id="@+id/tvNotificationsHeader"
-                android:layout_width="wrap_content"
+            <LinearLayout
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="8dp"
-                android:layout_marginBottom="8dp"
-                android:text="@string/settings_notifications_title"
-                android:textColor="@color/colorPrimary"
-                android:textStyle="bold"
-                android:fontFamily="@font/agbalumo" />
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:layout_marginBottom="12dp">
+
+                <View
+                    android:layout_width="4dp"
+                    android:layout_height="24dp"
+                    android:background="@color/colorAccent" />
+
+                <TextView
+                    android:id="@+id/tvNotificationsHeader"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="12dp"
+                    android:text="Notifications"
+                    android:textColor="@color/colorPrimary"
+                    android:textSize="18sp"
+                    android:textStyle="bold"
+                    android:fontFamily="@font/agbalumo" />
+            </LinearLayout>
 
             <com.google.android.material.card.MaterialCardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="20dp"
-                app:cardCornerRadius="20dp"
-                app:cardElevation="4dp"
+                android:layout_marginBottom="24dp"
+                app:cardCornerRadius="24dp"
+                app:cardElevation="2dp"
+                app:strokeWidth="1dp"
+                app:strokeColor="#0D000000"
                 app:cardBackgroundColor="@color/cardBackground">
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="vertical"
-                    android:padding="12dp">
+                    android:padding="8dp">
 
                     <com.google.android.material.switchmaterial.SwitchMaterial
                         android:id="@+id/switchDailyReminders"
+                        style="@style/Widget.Material3.CompoundButton.Switch"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:text="@string/settings_daily_reminder"
-                        android:padding="12dp" />
+                        android:padding="16dp"
+                        android:thumbTint="@color/colorPrimary"
+                        app:trackTint="@color/colorPrimaryLight" />
 
                     <com.google.android.material.switchmaterial.SwitchMaterial
                         android:id="@+id/switchStreakAlerts"
+                        style="@style/Widget.Material3.CompoundButton.Switch"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:text="@string/settings_streak_alerts"
-                        android:padding="12dp" />
+                        android:padding="16dp"
+                        android:thumbTint="@color/colorPrimary"
+                        app:trackTint="@color/colorPrimaryLight" />
 
                 </LinearLayout>
 
             </com.google.android.material.card.MaterialCardView>
+
 
             <!-- Account Section -->
-            <TextView
-                android:id="@+id/tvAccountHeader"
-                android:layout_width="wrap_content"
+            <LinearLayout
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="8dp"
-                android:layout_marginBottom="8dp"
-                android:text="👤 Account &amp; Role"
-                android:textColor="@color/colorPrimary"
-                android:textStyle="bold"
-                android:fontFamily="@font/agbalumo" />
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:layout_marginBottom="12dp">
+
+                <View
+                    android:layout_width="4dp"
+                    android:layout_height="24dp"
+                    android:background="@color/colorAccent" />
+
+                <TextView
+                    android:id="@+id/tvAccountHeader"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="12dp"
+                    android:text="Account &amp; Role"
+                    android:textColor="@color/colorPrimary"
+                    android:textSize="18sp"
+                    android:textStyle="bold"
+                    android:fontFamily="@font/agbalumo" />
+            </LinearLayout>
 
             <com.google.android.material.card.MaterialCardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="20dp"
-                app:cardCornerRadius="20dp"
-                app:cardElevation="4dp"
+                android:layout_marginBottom="24dp"
+                app:cardCornerRadius="24dp"
+                app:cardElevation="2dp"
+                app:strokeWidth="1dp"
+                app:strokeColor="#0D000000"
                 app:cardBackgroundColor="@color/cardBackground">
 
                 <LinearLayout
@@ -249,76 +360,137 @@
                     android:layout_height="wrap_content"
                     android:orientation="vertical"
                     android:padding="20dp">
-
-                    <TextView
-                        android:id="@+id/tvCurrentRole"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Role: Student"
-                        android:textStyle="bold"
-                        android:textColor="@color/textColorPrimary" />
-
-                    <com.google.android.material.button.MaterialButton
-                        android:id="@+id/btnChangeRole"
-                        style="@style/Widget.Material3.Button.TonalButton"
-                        android:layout_width="match_parent"
-                        android:layout_height="52dp"
-                        android:layout_marginTop="16dp"
-                        android:text="Change App Role"
-                        app:cornerRadius="26dp" />
-
-                </LinearLayout>
-
-            </com.google.android.material.card.MaterialCardView>
-
-            <!-- Backup Section -->
-            <TextView
-                android:id="@+id/tvCloudHeader"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="8dp"
-                android:layout_marginBottom="8dp"
-                android:text="☁️ Cloud Backup"
-                android:textColor="@color/colorPrimary"
-                android:textStyle="bold"
-                android:fontFamily="@font/agbalumo" />
-
-            <com.google.android.material.card.MaterialCardView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="20dp"
-                app:cardCornerRadius="20dp"
-                app:cardElevation="4dp"
-                app:cardBackgroundColor="@color/cardBackground">
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:padding="20dp">
-
-                    <TextView
-                        android:id="@+id/tvLastSync"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Last sync: Never"
-                        android:textSize="12sp"
-                        android:textColor="@color/textColorSecondary" />
 
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:orientation="horizontal"
-                        android:layout_marginTop="16dp">
+                        android:gravity="center_vertical">
+
+                        <ImageView
+                            android:layout_width="40dp"
+                            android:layout_height="40dp"
+                            android:src="@drawable/ic_graduation_cap"
+                            app:tint="@color/colorPrimary" />
+
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:layout_marginStart="16dp"
+                            android:orientation="vertical">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Active Role"
+                                android:textSize="12sp"
+                                android:textColor="@color/textColorSecondary" />
+
+                            <TextView
+                                android:id="@+id/tvCurrentRole"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Student"
+                                android:textSize="18sp"
+                                android:textStyle="bold"
+                                android:textColor="@color/textColorPrimary" />
+                        </LinearLayout>
+                    </LinearLayout>
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btnChangeRole"
+                        style="@style/Widget.Material3.Button.TonalButton"
+                        android:layout_width="match_parent"
+                        android:layout_height="56dp"
+                        android:layout_marginTop="20dp"
+                        android:text="Change App Role"
+                        app:cornerRadius="28dp"
+                        app:icon="@drawable/ic_arrow_forward"
+                        app:iconGravity="textEnd" />
+
+                </LinearLayout>
+
+            </com.google.android.material.card.MaterialCardView>
+
+
+            <!-- Backup Section -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:layout_marginBottom="12dp">
+
+                <View
+                    android:layout_width="4dp"
+                    android:layout_height="24dp"
+                    android:background="@color/colorAccent" />
+
+                <TextView
+                    android:id="@+id/tvCloudHeader"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="12dp"
+                    android:text="Cloud Sync"
+                    android:textColor="@color/colorPrimary"
+                    android:textSize="18sp"
+                    android:textStyle="bold"
+                    android:fontFamily="@font/agbalumo" />
+            </LinearLayout>
+
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="24dp"
+                app:cardCornerRadius="24dp"
+                app:cardElevation="2dp"
+                app:strokeWidth="1dp"
+                app:strokeColor="#0D000000"
+                app:cardBackgroundColor="@color/cardBackground">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="20dp">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical">
+
+                        <ImageView
+                            android:layout_width="32dp"
+                            android:layout_height="32dp"
+                            android:src="@drawable/ic_progress_sparkle"
+                            app:tint="@color/colorAccent" />
+
+                        <TextView
+                            android:id="@+id/tvLastSync"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="12dp"
+                            android:text="Last sync: Never"
+                            android:textSize="13sp"
+                            android:textColor="@color/textColorSecondary" />
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:layout_marginTop="20dp">
 
                         <com.google.android.material.button.MaterialButton
                             android:id="@+id/btnSyncToCloud"
-                            style="@style/Widget.Material3.Button.OutlinedButton"
+                            style="@style/Widget.Material3.Button.TonalButton"
                             android:layout_width="0dp"
                             android:layout_height="52dp"
                             android:layout_weight="1"
                             android:layout_marginEnd="6dp"
-                            android:text="Backup"
+                            android:text="Backup Now"
                             app:cornerRadius="26dp" />
 
                         <com.google.android.material.button.MaterialButton
@@ -337,24 +509,40 @@
 
             </com.google.android.material.card.MaterialCardView>
 
+
             <!-- Support Section -->
-            <TextView
-                android:id="@+id/tvAboutHeader"
-                android:layout_width="wrap_content"
+            <LinearLayout
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="8dp"
-                android:layout_marginBottom="8dp"
-                android:text="@string/settings_about_title"
-                android:textColor="@color/colorPrimary"
-                android:textStyle="bold"
-                android:fontFamily="@font/agbalumo" />
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:layout_marginBottom="12dp">
+
+                <View
+                    android:layout_width="4dp"
+                    android:layout_height="24dp"
+                    android:background="@color/colorAccent" />
+
+                <TextView
+                    android:id="@+id/tvAboutHeader"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="12dp"
+                    android:text="Support &amp; About"
+                    android:textColor="@color/colorPrimary"
+                    android:textSize="18sp"
+                    android:textStyle="bold"
+                    android:fontFamily="@font/agbalumo" />
+            </LinearLayout>
 
             <com.google.android.material.card.MaterialCardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="20dp"
-                app:cardCornerRadius="20dp"
-                app:cardElevation="4dp"
+                android:layout_marginBottom="24dp"
+                app:cardCornerRadius="24dp"
+                app:cardElevation="2dp"
+                app:strokeWidth="1dp"
+                app:strokeColor="#0D000000"
                 app:cardBackgroundColor="@color/cardBackground">
 
                 <LinearLayout
@@ -366,7 +554,8 @@
                         android:id="@+id/btnAppTutorial"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:padding="16dp"
+                        android:padding="20dp"
+                        android:gravity="center_vertical"
                         android:background="?attr/selectableItemBackground"
                         android:clickable="true"
                         android:focusable="true">
@@ -375,6 +564,7 @@
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
                             android:text="App Tutorial"
+                            android:textSize="15sp"
                             android:textColor="@color/textColorPrimary" />
                         <ImageView
                             android:layout_width="20dp"
@@ -383,14 +573,14 @@
                             app:tint="@color/dividerColor" />
                     </LinearLayout>
 
-                    <View android:layout_width="match_parent" android:layout_height="1dp" android:background="@color/dividerColor" android:layout_marginHorizontal="16dp" />
-
+                    <View android:layout_width="match_parent" android:layout_height="1dp" android:background="@color/dividerColor" android:layout_marginHorizontal="20dp" android:alpha="0.2" />
 
                     <LinearLayout
                         android:id="@+id/btnContactUs"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:padding="16dp"
+                        android:padding="20dp"
+                        android:gravity="center_vertical"
                         android:background="?attr/selectableItemBackground"
                         android:clickable="true"
                         android:focusable="true">
@@ -399,6 +589,7 @@
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
                             android:text="Contact Us"
+                            android:textSize="15sp"
                             android:textColor="@color/textColorPrimary" />
                         <ImageView
                             android:layout_width="20dp"
@@ -407,13 +598,14 @@
                             app:tint="@color/dividerColor" />
                     </LinearLayout>
 
-                    <View android:layout_width="match_parent" android:layout_height="1dp" android:background="@color/dividerColor" android:layout_marginHorizontal="16dp" />
+                    <View android:layout_width="match_parent" android:layout_height="1dp" android:background="@color/dividerColor" android:layout_marginHorizontal="20dp" android:alpha="0.2" />
 
                     <LinearLayout
                         android:id="@+id/btnPrivacyPolicy"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:padding="16dp"
+                        android:padding="20dp"
+                        android:gravity="center_vertical"
                         android:background="?attr/selectableItemBackground"
                         android:clickable="true"
                         android:focusable="true">
@@ -422,6 +614,7 @@
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
                             android:text="Privacy Policy"
+                            android:textSize="15sp"
                             android:textColor="@color/textColorPrimary" />
                         <ImageView
                             android:layout_width="20dp"
@@ -430,13 +623,13 @@
                             app:tint="@color/dividerColor" />
                     </LinearLayout>
 
-                    <View android:layout_width="match_parent" android:layout_height="1dp" android:background="@color/dividerColor" android:layout_marginHorizontal="16dp" />
+                    <View android:layout_width="match_parent" android:layout_height="1dp" android:background="@color/dividerColor" android:layout_marginHorizontal="20dp" android:alpha="0.2" />
 
                     <TextView
                         android:id="@+id/tvAppVersion"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:padding="16dp"
+                        android:padding="20dp"
                         android:textAlignment="center"
                         android:textSize="12sp"
                         android:textColor="@color/textColorSecondary"
@@ -446,27 +639,41 @@
 
             </com.google.android.material.card.MaterialCardView>
 
+
             <!-- Danger Zone -->
-            <TextView
-                android:id="@+id/tvProgressHeader"
-                android:layout_width="wrap_content"
+            <LinearLayout
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="8dp"
-                android:layout_marginBottom="8dp"
-                android:text="🧨 Danger Zone"
-                android:textColor="@android:color/holo_red_dark"
-                android:textStyle="bold"
-                android:fontFamily="@font/agbalumo" />
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:layout_marginBottom="12dp">
+
+                <View
+                    android:layout_width="4dp"
+                    android:layout_height="24dp"
+                    android:background="@android:color/holo_red_dark" />
+
+                <TextView
+                    android:id="@+id/tvProgressHeader"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="12dp"
+                    android:text="Danger Zone"
+                    android:textColor="@android:color/holo_red_dark"
+                    android:textSize="18sp"
+                    android:textStyle="bold"
+                    android:fontFamily="@font/agbalumo" />
+            </LinearLayout>
 
             <com.google.android.material.card.MaterialCardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="32dp"
-                app:cardCornerRadius="20dp"
-                app:cardElevation="4dp"
+                android:layout_marginBottom="48dp"
+                app:cardCornerRadius="24dp"
+                app:cardElevation="0dp"
                 app:strokeWidth="1dp"
-                app:strokeColor="@android:color/holo_red_dark"
-                app:cardBackgroundColor="@color/cardBackground">
+                app:strokeColor="#1A880000"
+                app:cardBackgroundColor="#FFF5F5">
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -477,23 +684,26 @@
                     <TextView
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="This will permanently delete all your local progress and achievements."
-                        android:textColor="@color/textColorSecondary"
+                        android:text="This will permanently delete all your local progress and achievements. This action cannot be undone."
+                        android:textColor="#C62828"
                         android:textSize="13sp" />
 
                     <com.google.android.material.button.MaterialButton
                         android:id="@+id/btnResetProgress"
+                        style="@style/Widget.Material3.Button.TonalButton"
                         android:layout_width="match_parent"
-                        android:layout_height="52dp"
-                        android:layout_marginTop="16dp"
+                        android:layout_height="56dp"
+                        android:layout_marginTop="20dp"
                         android:text="Reset All Progress"
-                        android:textColor="@color/white"
-                        app:backgroundTint="@android:color/holo_red_dark"
-                        app:cornerRadius="26dp" />
+                        android:textColor="@android:color/holo_red_dark"
+                        app:cornerRadius="28dp"
+                        app:icon="@android:drawable/ic_menu_delete"
+                        app:iconTint="@android:color/holo_red_dark" />
 
                 </LinearLayout>
 
             </com.google.android.material.card.MaterialCardView>
+
 
         </LinearLayout>
     </androidx.core.widget.NestedScrollView>

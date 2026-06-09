@@ -389,6 +389,16 @@
     <string name="numbers_mode_recital">RECITAL</string>
     <string name="numbers_mode_recital_desc">Listen &amp; Learn</string>
 
+    <!-- Recital Common -->
+    <string name="recital_progress_label">Progress</string>
+    <string name="recital_quick_nav_label">Quick Navigation</string>
+    <string name="recital_nav_hint_alphabet">💡 Slide smoothly to jump between letters</string>
+    <string name="recital_nav_hint_numbers">💡 Slide smoothly to jump between numbers</string>
+    <string name="recital_grid_button_alphabet">📋 Grid</string>
+    <string name="recital_grid_button_numbers">🔢 Grid</string>
+    <string name="recital_language_label">Language</string>
+    <string name="recital_tap_for_sound">Tap for sound 🔊</string>
+
     <!-- Quiz Activity -->
     <string name="quiz_feedback_match_found">Match found! ✨</string>
     <string name="quiz_feedback_match_remaining">Match found! (%1$d pairs left)</string>

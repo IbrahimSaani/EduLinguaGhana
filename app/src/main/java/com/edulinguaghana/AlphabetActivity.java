@@ -44,7 +44,7 @@ public class AlphabetActivity extends AppCompatActivity {
 
     private TextView tvLanguageTitle, tvLetter, tvLetterWord;
     private TextView tvProgressCounter;
-    private MaterialButton btnPrev, btnNext, btnSpeak;
+    private MaterialButton btnPrev, btnNext;
     private FloatingActionButton btnBack;
     private LinearProgressIndicator progressBar;
     private MaterialCardView letterCard, languageCard;
@@ -114,7 +114,6 @@ public class AlphabetActivity extends AppCompatActivity {
         btnPrev = findViewById(R.id.btnPrev);
         btnNext = findViewById(R.id.btnNext);
         btnBack = findViewById(R.id.btnBack);
-        btnSpeak = findViewById(R.id.btnSpeak);
 
         // Initialize other views
         progressBar = findViewById(R.id.progressBar);
@@ -156,8 +155,7 @@ public class AlphabetActivity extends AppCompatActivity {
         if (languageName == null) languageName = "Unknown";
 
         tvLanguageTitle.setText(getString(R.string.language_prefix) + " " + languageName);
-        btnSpeak.setText(getString(R.string.alphabet_mode_recital));
-
+        
         // --- LOAD ALPHABET & WORDS FROM RESOURCES ---
         switch (languageCode) {
             case "ak":
@@ -264,20 +262,6 @@ public class AlphabetActivity extends AppCompatActivity {
                 android.util.Log.w("AlphabetActivity", "Haptic feedback failed", e);
             }
             finish();
-        });
-
-        btnSpeak.setOnClickListener(v -> {
-            try {
-                v.performHapticFeedback(HapticFeedbackConstants.LONG_PRESS);
-                animateButtonPress(btnSpeak);
-                celebrateAction();  // Celebration animation
-            } catch (Exception e) {
-                android.util.Log.w("AlphabetActivity", "Haptic feedback or celebration failed", e);
-            }
-            try {
-                speakCurrentLetter();
-            } catch (Exception ignored) {
-            }
         });
 
         // Make letter card tappable to speak
@@ -518,11 +502,6 @@ public class AlphabetActivity extends AppCompatActivity {
             // Normalize language code for audio file lookup
             final String apiLangCode = com.edulinguaghana.utils.LanguageConversionUtils.normalizeLanguageCode(languageCode);
 
-            // Disable speak button during playback
-            if (btnSpeak != null) {
-                btnSpeak.setEnabled(false);
-            }
-
             // Speak the LETTER for recital mode (not the word)
             // For recital, we want to speak the individual letter
             String letterToSpeak = text;
@@ -539,11 +518,6 @@ public class AlphabetActivity extends AppCompatActivity {
                     @Override
                     public void onComplete() {
                         isGhanaLpPlaying = false;
-                        runOnUiThread(() -> {
-                            if (btnSpeak != null) {
-                                btnSpeak.setEnabled(true);
-                            }
-                        });
                     }
 
                     @Override
@@ -559,11 +533,6 @@ public class AlphabetActivity extends AppCompatActivity {
                                 @Override
                                 public void onComplete() {
                                     isGhanaLpPlaying = false;
-                                    runOnUiThread(() -> {
-                                        if (btnSpeak != null) {
-                                            btnSpeak.setEnabled(true);
-                                        }
-                                    });
                                 }
 
                                 @Override
@@ -571,9 +540,6 @@ public class AlphabetActivity extends AppCompatActivity {
                                     // Final fallback to Android TTS
                                     isGhanaLpPlaying = false;
                                     runOnUiThread(() -> {
-                                        if (btnSpeak != null) {
-                                            btnSpeak.setEnabled(true);
-                                        }
                                         android.util.Log.w("AlphabetActivity", "No offline audio found for: " + text);
                                         try {
                                             if (tts != null) {
@@ -589,17 +555,11 @@ public class AlphabetActivity extends AppCompatActivity {
                             android.util.Log.e("AlphabetActivity", "Error in fallback letter speak", e);
                             isGhanaLpPlaying = false;
                             try {
-                                if (btnSpeak != null) {
-                                    btnSpeak.setEnabled(true);
-                                }
                                 if (tts != null) {
                                     tts.speak(text, TextToSpeech.QUEUE_FLUSH, null, "LETTER_ID");
                                 }
                             } catch (Exception ttsError) {
                                 android.util.Log.e("AlphabetActivity", "Final TTS fallback also failed", ttsError);
-                                if (btnSpeak != null) {
-                                    btnSpeak.setEnabled(true);
-                                }
                             }
                         }
                     }
@@ -609,9 +569,6 @@ public class AlphabetActivity extends AppCompatActivity {
             android.util.Log.e("AlphabetActivity", "Error in speakWithGhanaLP", e);
             isGhanaLpPlaying = false;
             try {
-                if (btnSpeak != null) {
-                    btnSpeak.setEnabled(true);
-                }
                 if (tts != null && tts.isSpeaking()) {
                     tts.stop();
                 }
@@ -620,9 +577,6 @@ public class AlphabetActivity extends AppCompatActivity {
                 }
             } catch (Exception ttsError) {
                 android.util.Log.e("AlphabetActivity", "TTS ultimate fallback failed", ttsError);
-                if (btnSpeak != null) {
-                    btnSpeak.setEnabled(true);
-                }
             }
         }
     }
@@ -633,55 +587,18 @@ public class AlphabetActivity extends AppCompatActivity {
         String langLower = lang.toLowerCase(Locale.ROOT);
         String letterLower = letter.toLowerCase(Locale.ROOT);
 
-        // For Ewe language, map special characters to safe filenames
+        // Normalize language prefix for file lookup
+        String filePrefix;
         if ("ee".equals(langLower) || "ewe".equals(langLower)) {
-            String sanitizedLetter = letterLower;
-            switch (letterLower) {
-                case "ɛ":
-                    sanitizedLetter = "e_open";
-                    break;
-                case "ɔ":
-                    sanitizedLetter = "o_open";
-                    break;
-                case "ŋ":
-                    sanitizedLetter = "ng";
-                    break;
-                case "ɖ":
-                    sanitizedLetter = "d_caron";
-                    break;
-                case "ƒ":
-                    sanitizedLetter = "f_hook";
-                    break;
-                case "ɣ":
-                    sanitizedLetter = "g_hook";
-                    break;
-                case "ʋ":
-                    sanitizedLetter = "v_hook";
-                    break;
-            }
-            String fileName = "ewe_letter_" + sanitizedLetter;
-            return getResources().getIdentifier(fileName, "raw", getPackageName());
+            filePrefix = "ewe";
+        } else if ("ak".equals(langLower) || "twi".equals(langLower) || "akan".equals(langLower)) {
+            filePrefix = "twi";
+        } else if ("gaa".equals(langLower) || "ga".equals(langLower)) {
+            filePrefix = "gaa";
+        } else {
+            filePrefix = langLower;
         }
 
-        // For Gaa language, try direct character match first, then fallback to safe names
-        if ("gaa".equals(langLower) || "ga".equals(langLower)) {
-            String sanitizedLetter = letterLower;
-            switch (letterLower) {
-                case "ɛ":
-                    sanitizedLetter = "e_open";
-                    break;
-                case "ɔ":
-                    sanitizedLetter = "o_open";
-                    break;
-                case "ŋ":
-                    sanitizedLetter = "ng";
-                    break;
-            }
-            String fileName = "gaa_letter_" + sanitizedLetter;
-            return getResources().getIdentifier(fileName, "raw", getPackageName());
-        }
-
-        // For other languages (Akan, French, English)
         String sanitizedLetter = letterLower;
         switch (letterLower) {
             case "ɛ":
@@ -693,9 +610,21 @@ public class AlphabetActivity extends AppCompatActivity {
             case "ŋ":
                 sanitizedLetter = "ng";
                 break;
+            case "ɖ":
+                sanitizedLetter = "d_caron";
+                break;
+            case "ƒ":
+                sanitizedLetter = "f_hook";
+                break;
+            case "ɣ":
+                sanitizedLetter = "g_hook";
+                break;
+            case "ʋ":
+                sanitizedLetter = "v_hook";
+                break;
         }
 
-        String fileName = langLower + "_letter_" + sanitizedLetter;
+        String fileName = filePrefix + "_letter_" + sanitizedLetter;
         return getResources().getIdentifier(fileName, "raw", getPackageName());
     }
 

@@ -46,9 +46,8 @@ public class NumbersActivity extends AppCompatActivity {
     private TextView celebrationEmoji;
     private MaterialButton btnPrevNumber, btnNextNumber;
     private FloatingActionButton btnBackNumber;
-    private Button btnSpeakNumber;
     private LinearProgressIndicator progressBar;
-    private MaterialCardView numberCard;
+    private MaterialCardView mainNumberCard;
     private SeekBar seekBarNavigation;  // For smooth navigation
     private MaterialButton btnShowPicker;  // For quick number picker
 
@@ -103,9 +102,8 @@ public class NumbersActivity extends AppCompatActivity {
         btnPrevNumber = findViewById(R.id.btnPrevNumber);
         btnNextNumber = findViewById(R.id.btnNextNumber);
         btnBackNumber = findViewById(R.id.btnBackNumber);
-        btnSpeakNumber = findViewById(R.id.btnSpeakNumber);
         progressBar = findViewById(R.id.progressBar);
-        numberCard = findViewById(R.id.numberCard);
+        mainNumberCard = findViewById(R.id.mainNumberCard);
 
         // Initialize navigation controls
         seekBarNavigation = findViewById(R.id.seekBarNavigation);
@@ -132,7 +130,6 @@ public class NumbersActivity extends AppCompatActivity {
         if (languageName == null) languageName = "Unknown";
 
         tvLanguageTitleNum.setText(getString(R.string.language_prefix) + " " + languageName);
-        btnSpeakNumber.setText(getString(R.string.numbers_mode_recital));
 
         progressBar.setMax(100);
         if (seekBarNavigation != null) {
@@ -200,21 +197,8 @@ public class NumbersActivity extends AppCompatActivity {
             finish();
         });
 
-        btnSpeakNumber.setOnClickListener(v -> {
-            try {
-                v.performHapticFeedback(HapticFeedbackConstants.LONG_PRESS);
-                celebrateAction();  // Celebration animation
-            } catch (Exception e) {
-                android.util.Log.w("NumbersActivity", "Haptic feedback or celebration failed", e);
-            }
-            try {
-                speakCurrentNumber();
-            } catch (Exception ignored) {
-            }
-        });
-
         // Make number card tappable to speak
-        numberCard.setOnClickListener(v -> {
+        mainNumberCard.setOnClickListener(v -> {
             try {
                 v.performHapticFeedback(HapticFeedbackConstants.VIRTUAL_KEY);
                 speakCurrentNumber();
@@ -317,11 +301,6 @@ public class NumbersActivity extends AppCompatActivity {
             // Normalize language code for audio file lookup
             final String apiLangCode = LanguageConversionUtils.normalizeLanguageCode(languageCode);
 
-            // Disable speak button during playback
-            if (btnSpeakNumber != null) {
-                btnSpeakNumber.setEnabled(false);
-            }
-
             // Use speakNumber for numbers
             offlineTts.speakNumber(
                 number,
@@ -335,11 +314,6 @@ public class NumbersActivity extends AppCompatActivity {
                     @Override
                     public void onComplete() {
                         isGhanaLpPlaying = false;
-                        runOnUiThread(() -> {
-                            if (btnSpeakNumber != null) {
-                                btnSpeakNumber.setEnabled(true);
-                            }
-                        });
                     }
 
                     @Override
@@ -347,9 +321,6 @@ public class NumbersActivity extends AppCompatActivity {
                         // Fallback to Android TTS if no offline audio found
                         isGhanaLpPlaying = false;
                         runOnUiThread(() -> {
-                            if (btnSpeakNumber != null) {
-                                btnSpeakNumber.setEnabled(true);
-                            }
                             try {
                                 if (tts != null) {
                                     tts.speak(String.valueOf(number), TextToSpeech.QUEUE_FLUSH, null, "NUMBER_ID");
@@ -369,26 +340,30 @@ public class NumbersActivity extends AppCompatActivity {
                 if (tts != null) {
                     tts.speak(String.valueOf(number), TextToSpeech.QUEUE_FLUSH, null, "NUMBER_ID");
                 }
-                if (btnSpeakNumber != null) {
-                    btnSpeakNumber.setEnabled(true);
-                }
             } catch (Exception ignored) {
-                if (btnSpeakNumber != null) {
-                    btnSpeakNumber.setEnabled(true);
-                }
             }
         }
     }
 
     private int getNumberAudioResId(String lang, int num) {
         if (lang == null) return 0;
-        // Format number with leading zeros (001-099, 0100 for 100)
-        String fileName;
-        if (num == 100) {
-            fileName = lang.toLowerCase(Locale.ROOT) + "_number_0100";
+        
+        String langLower = lang.toLowerCase(Locale.ROOT);
+        String filePrefix;
+        if ("ee".equals(langLower) || "ewe".equals(langLower)) {
+            filePrefix = "ewe";
+        } else if ("ak".equals(langLower) || "twi".equals(langLower) || "akan".equals(langLower)) {
+            filePrefix = "twi";
+        } else if ("gaa".equals(langLower) || "ga".equals(langLower)) {
+            filePrefix = "gaa";
         } else {
-            fileName = String.format(Locale.ROOT, "%s_number_%03d", lang.toLowerCase(Locale.ROOT), num);
+            filePrefix = langLower;
         }
+
+        // Format number with leading zeros (001-099, 100)
+        // Note: The files are named ewe_number_001.mp3 ... ewe_number_100.mp3
+        String fileName = String.format(Locale.ROOT, "%s_number_%03d", filePrefix, num);
+
         return getResources().getIdentifier(fileName, "raw", getPackageName());
     }
 
@@ -516,7 +491,7 @@ public class NumbersActivity extends AppCompatActivity {
 
     private void showMascotMessage(String message) {
         Snackbar snackbar = Snackbar.make(findViewById(android.R.id.content), message, Snackbar.LENGTH_LONG);
-        if (numberCard != null) snackbar.setAnchorView(numberCard);
+        if (mainNumberCard != null) snackbar.setAnchorView(mainNumberCard);
         snackbar.setBackgroundTint(getColor(R.color.colorPrimary));
         snackbar.setTextColor(getColor(android.R.color.white));
         

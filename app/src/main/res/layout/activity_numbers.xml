@@ -87,7 +87,7 @@
                             <TextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="Progress"
+                                android:text="@string/recital_progress_label"
                                 android:textColor="@android:color/white"
                                 android:textSize="12sp"
                                 android:alpha="0.8" />
@@ -145,7 +145,7 @@
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Quick Navigation"
+                            android:text="@string/recital_quick_nav_label"
                             android:textColor="@color/colorPrimary"
                             android:textSize="12sp"
                             android:textStyle="bold"
@@ -166,7 +166,7 @@
                     <TextView
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="💡 Slide smoothly to jump between numbers"
+                        android:text="@string/recital_nav_hint_numbers"
                         android:textColor="@color/textColorSecondary"
                         android:textSize="11sp"
                         android:gravity="center"
@@ -216,7 +216,7 @@
                         style="@style/Widget.Material3.Button"
                         android:layout_width="match_parent"
                         android:layout_height="52dp"
-                        android:text="🔢 Grid"
+                        android:text="@string/recital_grid_button_numbers"
                         android:textSize="13sp"
                         app:cornerRadius="14dp"
                         app:elevation="6dp"
@@ -281,7 +281,7 @@
                             <TextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="Language"
+                                android:text="@string/recital_language_label"
                                 android:textColor="@color/textColorSecondary"
                                 android:textSize="11sp"
                                 android:textStyle="bold"
@@ -352,157 +352,86 @@
                     app:iconTint="@color/white" />
 
                 <com.google.android.material.card.MaterialCardView
+                    android:id="@+id/mainNumberCard"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_toStartOf="@id/btnNextNumber"
                     android:layout_toEndOf="@id/btnPrevNumber"
                     android:layout_centerVertical="true"
-                    android:layout_marginStart="2dp"
-                    android:layout_marginEnd="2dp"
-                    app:cardCornerRadius="32dp"
+                    android:layout_marginStart="8dp"
+                    android:layout_marginEnd="8dp"
+                    android:foreground="?attr/selectableItemBackground"
+                    android:clickable="true"
+                    android:focusable="true"
+                    app:cardCornerRadius="40dp"
                     app:cardElevation="16dp"
                     app:strokeColor="@color/colorPrimary"
-                    app:strokeWidth="4dp">
-
-                    <!-- Gradient background -->
-                    <View
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:alpha="0.1"
-                        android:background="@drawable/bg_splash_gradient" />
+                    app:strokeWidth="1dp">
 
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:gravity="center_horizontal"
+                        android:gravity="center"
                         android:orientation="vertical"
-                        android:padding="24dp">
+                        android:paddingTop="48dp"
+                        android:paddingBottom="48dp"
+                        android:paddingStart="24dp"
+                        android:paddingEnd="24dp">
 
-                        <!-- Emoji decoration -->
-                        <FrameLayout
+                        <TextView
+                            android:id="@+id/celebrationEmoji"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_marginBottom="18dp">
+                            android:text="🎉"
+                            android:textSize="48sp"
+                            android:layout_marginBottom="24dp" />
 
-                            <TextView
-                                android:id="@+id/celebrationEmoji"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="🎉"
-                                android:textSize="48sp" />
-                        </FrameLayout>
-
-                        <!-- Main number with shadow effect -->
                         <TextView
                             android:id="@+id/tvNumber"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:layout_marginBottom="24dp"
+                            android:layout_marginBottom="40dp"
                             android:fontFamily="@font/agbalumo"
                             android:text="1"
-                            android:textColor="@color/colorAccent"
-                            android:textSize="@dimen/big_letter_size"
+                            android:textColor="@color/colorPrimary"
+                            android:textSize="120sp"
                             android:textStyle="bold"
                             android:gravity="center"
-                            android:maxLines="1"
-                            app:autoSizeTextType="uniform"
-                            app:autoSizeMinTextSize="@dimen/big_letter_min_size"
-                            app:autoSizeMaxTextSize="@dimen/big_letter_size"
-                            android:shadowColor="#40000000"
-                            android:shadowDx="4"
-                            android:shadowDy="4"
-                            android:shadowRadius="8" />
+                            android:shadowColor="#20000000"
+                            android:shadowDx="6"
+                            android:shadowDy="6"
+                            android:shadowRadius="12" />
 
-                        <!-- Number spelling with enhanced styling -->
-                        <LinearLayout
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:layout_marginBottom="36dp"
-                            android:layout_marginStart="8dp"
-                            android:layout_marginEnd="8dp"
-                            android:orientation="vertical"
-                            android:gravity="center_horizontal"
-                            android:spacing="12dp">
+                        <View
+                            android:layout_width="60dp"
+                            android:layout_height="4dp"
+                            android:background="@color/colorAccent"
+                            android:layout_marginBottom="32dp" />
 
-                            <LinearLayout
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:orientation="horizontal"
-                                android:spacing="6dp"
-                                android:gravity="center">
-
-                                <TextView
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:text="📝"
-                                    android:textSize="16sp" />
-
-                                <TextView
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:text="Number Spelling"
-                                    android:textColor="@color/textColorSecondary"
-                                    android:textSize="12sp"
-                                    android:textStyle="bold"
-                                    android:alpha="0.75" />
-                            </LinearLayout>
-
-                            <TextView
-                                android:id="@+id/tvNumberSpelling"
-                                android:layout_width="match_parent"
-                                android:layout_height="wrap_content"
-                                android:textColor="@color/colorPrimary"
-                                android:textSize="20sp"
-                                android:textStyle="bold"
-                                android:fontFamily="@font/agbalumo"
-                                android:letterSpacing="0.01"
-                                android:gravity="center"
-                                android:maxLines="2"
-                                app:autoSizeTextType="uniform"
-                                app:autoSizeMinTextSize="12sp"
-                                app:autoSizeMaxTextSize="20sp"
-                                android:ellipsize="end"
-                                android:hyphenationFrequency="none"
-                                android:breakStrategy="simple"
-                                tools:text="One Hundred" />
-                        </LinearLayout>
-
-                          <!-- Speak button - Enhanced -->
-                           <com.google.android.material.button.MaterialButton
-                               android:id="@+id/btnSpeakNumber"
-                               style="@style/Widget.Material3.Button"
-                               android:layout_width="match_parent"
-                               android:layout_height="60dp"
-                               android:minWidth="0dp"
-                               android:paddingStart="16dp"
-                               android:paddingEnd="16dp"
-                               android:text="@string/speak_button"
-                               android:textSize="16sp"
-                               android:textStyle="bold"
-                               android:maxLines="1"
-                               android:singleLine="true"
-                               android:ellipsize="end"
-                               android:hyphenationFrequency="none"
-                               app:cornerRadius="30dp"
-                               app:elevation="8dp"
-                               app:icon="@drawable/ic_speak"
-                               app:iconSize="20dp"
-                               app:iconGravity="start"
-                               app:iconPadding="8dp" />
-
-                        <!-- Hint text -->
                         <TextView
+                            android:id="@+id/tvNumberSpelling"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:layout_marginTop="12dp"
+                            android:textColor="@color/textColorPrimary"
+                            android:textSize="32sp"
+                            android:textStyle="bold"
+                            android:fontFamily="@font/agbalumo"
                             android:gravity="center"
-                            android:text="✨ Tap to hear pronunciation!"
-                            android:textColor="@color/colorAccent"
-                            android:textSize="11sp"
-                            android:alpha="0.75"
-                            android:textStyle="bold" />
+                            android:layout_marginBottom="12dp"
+                            tools:text="One" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/recital_tap_for_sound"
+                            android:textColor="@color/textColorSecondary"
+                            android:textSize="12sp"
+                            android:textStyle="bold"
+                            android:alpha="0.6" />
+
                     </LinearLayout>
                 </com.google.android.material.card.MaterialCardView>
+
 
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/btnNextNumber"
