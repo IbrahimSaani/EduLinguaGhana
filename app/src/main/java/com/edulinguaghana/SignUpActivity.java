@@ -159,7 +159,7 @@ public class SignUpActivity extends AppCompatActivity {
 
          int selectedGenderId = rgGender.getCheckedRadioButtonId();
          if (selectedGenderId == -1) {
-             Toast.makeText(this, "Please select your gender", Toast.LENGTH_SHORT).show();
+             Toast.makeText(this, getString(R.string.error_validation_gender_required), Toast.LENGTH_SHORT).show();
              return;
          }
          String gender = selectedGenderId == R.id.rbMale ? "Male" : "Female";
@@ -176,10 +176,10 @@ public class SignUpActivity extends AppCompatActivity {
              if (exists) {
                  btnSignUp.setEnabled(true);
                  if (progressBar != null) progressBar.setVisibility(android.view.View.GONE);
-                 etEmail.setError("This email is already registered");
+                 etEmail.setError(getString(R.string.error_validation_email_exists));
                  etEmail.requestFocus();
                  Toast.makeText(SignUpActivity.this,
-                         "Email address is already in use. Please use a different email or log in.",
+                         getString(R.string.error_validation_email_exists),
                          Toast.LENGTH_LONG).show();
                  return;
              }
@@ -378,50 +378,50 @@ public class SignUpActivity extends AppCompatActivity {
 
     private boolean validateInput(String name, String email, String password, String confirmPassword) {
         if (TextUtils.isEmpty(name)) {
-            etName.setError("Name is required");
+            etName.setError(getString(R.string.error_validation_name_required));
             etName.requestFocus();
             return false;
         }
 
         if (TextUtils.isEmpty(email)) {
-            etEmail.setError("Email is required");
+            etEmail.setError(getString(R.string.error_validation_email_required));
             etEmail.requestFocus();
             return false;
         }
 
         if (!Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
-            etEmail.setError("Enter a valid email address");
+            etEmail.setError(getString(R.string.error_validation_email_invalid));
             etEmail.requestFocus();
             return false;
         }
 
         // Strict check for Gmail format: if it contains "@gmail", it MUST end with "@gmail.com"
         if (email.toLowerCase().contains("@gmail") && !email.toLowerCase().endsWith("@gmail.com")) {
-            etEmail.setError("Please use the full @gmail.com format");
+            etEmail.setError(getString(R.string.error_validation_gmail_format));
             etEmail.requestFocus();
             return false;
         }
 
         if (TextUtils.isEmpty(password)) {
-            etPassword.setError("Password is required");
+            etPassword.setError(getString(R.string.error_validation_password_required));
             etPassword.requestFocus();
             return false;
         }
 
         if (password.length() < 6) {
-            etPassword.setError("Password must be at least 6 characters");
+            etPassword.setError(getString(R.string.error_validation_password_short));
             etPassword.requestFocus();
             return false;
         }
 
         if (TextUtils.isEmpty(confirmPassword)) {
-            etConfirmPassword.setError("Please confirm your password");
+            etConfirmPassword.setError(getString(R.string.error_validation_confirm_password));
             etConfirmPassword.requestFocus();
             return false;
         }
 
         if (!Objects.equals(password, confirmPassword)) {
-            etConfirmPassword.setError("Passwords do not match");
+            etConfirmPassword.setError(getString(R.string.error_validation_password_mismatch));
             etConfirmPassword.requestFocus();
             return false;
         }

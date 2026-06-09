@@ -419,7 +419,7 @@ public class LoginActivity extends AppCompatActivity {
     private boolean validateInput(String email, String password) {
         if (TextUtils.isEmpty(email)) {
             if (etEmail != null) {
-                etEmail.setError("Email is required");
+                etEmail.setError(getString(R.string.error_validation_email_required));
                 etEmail.requestFocus();
             }
             return false;
@@ -427,7 +427,7 @@ public class LoginActivity extends AppCompatActivity {
 
         if (!Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
             if (etEmail != null) {
-                etEmail.setError("Enter a valid email address (e.g., example@gmail.com)");
+                etEmail.setError(getString(R.string.error_validation_email_invalid));
                 etEmail.requestFocus();
             }
             return false;
@@ -436,7 +436,7 @@ public class LoginActivity extends AppCompatActivity {
         // Strict check for Gmail format: if it contains "@gmail", it MUST end with "@gmail.com"
         if (email.toLowerCase().contains("@gmail") && !email.toLowerCase().endsWith("@gmail.com")) {
             if (etEmail != null) {
-                etEmail.setError("Please use the full @gmail.com format");
+                etEmail.setError(getString(R.string.error_validation_gmail_format));
                 etEmail.requestFocus();
             }
             return false;
@@ -444,7 +444,7 @@ public class LoginActivity extends AppCompatActivity {
 
         if (TextUtils.isEmpty(password)) {
             if (etPassword != null) {
-                etPassword.setError("Password is required");
+                etPassword.setError(getString(R.string.error_validation_password_required));
                 etPassword.requestFocus();
             }
             return false;
@@ -452,7 +452,7 @@ public class LoginActivity extends AppCompatActivity {
 
         if (password.length() < 6) {
             if (etPassword != null) {
-                etPassword.setError("Password must be at least 6 characters");
+                etPassword.setError(getString(R.string.error_validation_password_short));
                 etPassword.requestFocus();
             }
             return false;
