@@ -14,55 +14,119 @@
     <com.google.android.material.appbar.AppBarLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@drawable/gradient_background"
-        app:elevation="8dp"
+        android:background="@drawable/gradient_background_premium"
+        app:elevation="0dp"
         android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar">
 
-        <androidx.appcompat.widget.Toolbar
-            android:id="@+id/toolbar"
+        <com.google.android.material.appbar.CollapsingToolbarLayout
             android:layout_width="match_parent"
-            android:layout_height="?attr/actionBarSize"
-            android:background="@android:color/transparent"
-            android:elevation="0dp"
-            app:titleTextColor="@color/white"
-            app:popupTheme="@style/ThemeOverlay.AppCompat.Light">
+            android:layout_height="wrap_content"
+            app:layout_scrollFlags="scroll|exitUntilCollapsed"
+            app:contentScrim="?attr/colorPrimary">
+
+            <androidx.appcompat.widget.Toolbar
+                android:id="@+id/toolbar"
+                android:layout_width="match_parent"
+                android:layout_height="?attr/actionBarSize"
+                app:layout_collapseMode="pin"
+                android:background="@android:color/transparent"
+                app:titleTextColor="@color/white"
+                app:popupTheme="@style/ThemeOverlay.AppCompat.Light">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:paddingEnd="16dp">
+
+                    <TextView
+                        android:id="@+id/toolbarTitle"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="@string/profile_title"
+                        android:textAppearance="@style/ToolbarTitleStyle"
+                        android:textSize="20sp"
+                        android:textColor="@color/white"
+                        android:textStyle="bold" />
+
+                    <androidx.appcompat.widget.AppCompatImageButton
+                        android:id="@+id/btn_profile_settings"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="end|center_vertical"
+                        android:padding="12dp"
+                        android:minWidth="48dp"
+                        android:minHeight="48dp"
+                        android:src="@drawable/ic_settings"
+                        android:contentDescription="@string/nav_settings"
+                        android:background="?attr/selectableItemBackgroundBorderless"
+                        app:tint="@color/white" />
+
+                </LinearLayout>
+
+            </androidx.appcompat.widget.Toolbar>
 
             <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:orientation="horizontal"
-                android:gravity="center_vertical"
-                android:paddingEnd="16dp">
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:paddingTop="70dp"
+                android:paddingBottom="40dp"
+                android:gravity="center"
+                app:layout_collapseMode="parallax">
+
+                <!-- Profile Picture with Premium Ring -->
+                <com.google.android.material.card.MaterialCardView
+                    android:layout_width="150dp"
+                    android:layout_height="150dp"
+                    app:cardCornerRadius="75dp"
+                    app:cardElevation="12dp"
+                    app:strokeWidth="5dp"
+                    app:strokeColor="@color/drumGold"
+                    app:cardBackgroundColor="@color/cardBackground">
+
+                    <com.edulinguaghana.AvatarView
+                        android:id="@+id/profileImage"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:padding="4dp"
+                        android:scaleType="centerInside"
+                        android:contentDescription="@string/profile_picture_desc" />
+
+                </com.google.android.material.card.MaterialCardView>
 
                 <TextView
-                    android:id="@+id/toolbarTitle"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="@string/profile_title"
-                    android:textAppearance="@style/ToolbarTitleStyle"
-                    android:textSize="20sp"
-                    android:textColor="@color/white"
-                    android:textStyle="bold" />
-
-                <androidx.appcompat.widget.AppCompatImageButton
-                    android:id="@+id/btn_profile_settings"
+                    android:id="@+id/tvUserName"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_gravity="end|center_vertical"
-                    android:padding="12dp"
-                    android:minWidth="48dp"
-                    android:minHeight="48dp"
-                    android:src="@drawable/ic_settings"
-                    android:contentDescription="@string/nav_settings"
-                    android:background="?attr/selectableItemBackgroundBorderless"
-                    app:tint="@color/white" />
+                    android:layout_marginTop="16dp"
+                    android:text="@string/profile_default_name"
+                    android:textSize="32sp"
+                    android:textStyle="bold"
+                    android:fontFamily="@font/agbalumo"
+                    android:textColor="@color/white"
+                    android:shadowColor="#40000000"
+                    android:shadowDx="2"
+                    android:shadowDy="2"
+                    android:shadowRadius="4"/>
+
+                <TextView
+                    android:id="@+id/tvUserEmail"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
+                    android:text="@string/profile_default_email"
+                    android:textSize="14sp"
+                    android:textColor="#E0E0E0" />
 
             </LinearLayout>
 
-        </androidx.appcompat.widget.Toolbar>
+        </com.google.android.material.appbar.CollapsingToolbarLayout>
 
     </com.google.android.material.appbar.AppBarLayout>
+
 
     <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
@@ -152,12 +216,14 @@
                 android:gravity="center_horizontal"
                 android:visibility="visible">
 
-                <!-- Profile Header Card -->
+                <!-- Premium Stats Summary Card -->
                 <com.google.android.material.card.MaterialCardView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    app:cardCornerRadius="32dp"
-                    app:cardElevation="8dp"
+                    android:layout_marginTop="-30dp"
+                    android:layout_marginHorizontal="8dp"
+                    app:cardCornerRadius="24dp"
+                    app:cardElevation="12dp"
                     app:strokeWidth="0dp"
                     app:cardBackgroundColor="@color/cardBackground">
 
@@ -165,56 +231,17 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:orientation="vertical"
-                        android:padding="24dp"
+                        android:padding="20dp"
                         android:gravity="center">
-
-                        <!-- Profile Picture -->
-                        <com.google.android.material.card.MaterialCardView
-                            android:layout_width="140dp"
-                            android:layout_height="140dp"
-                            app:cardCornerRadius="70dp"
-                            app:cardElevation="8dp"
-                            app:strokeWidth="4dp"
-                            app:strokeColor="@color/colorPrimary"
-                            app:cardBackgroundColor="@color/cardBackground">
-
-                            <com.edulinguaghana.AvatarView
-                                android:id="@+id/profileImage"
-                                android:layout_width="match_parent"
-                                android:layout_height="match_parent"
-                                android:padding="4dp"
-                                android:scaleType="centerInside"
-                                android:contentDescription="@string/profile_picture_desc" />
-
-                        </com.google.android.material.card.MaterialCardView>
-
-                        <TextView
-                            android:id="@+id/tvUserName"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginTop="16dp"
-                            android:text="@string/profile_default_name"
-                            android:textSize="28sp"
-                            android:textStyle="bold"
-                            android:fontFamily="@font/agbalumo"
-                            android:textColor="@color/colorPrimary" />
-
-                        <TextView
-                            android:id="@+id/tvUserEmail"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginTop="4dp"
-                            android:text="@string/profile_default_email"
-                            android:textSize="14sp"
-                            android:textColor="@color/textColorSecondary" />
 
                         <com.google.android.material.button.MaterialButton
                             android:id="@+id/btnEditAvatar"
-                            style="@style/Widget.Material3.Button.TextButton"
+                            style="@style/Widget.Material3.Button.TonalButton"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="Edit Avatar"
                             android:textSize="12sp"
+                            app:cornerRadius="20dp"
                             app:icon="@android:drawable/ic_menu_edit" />
 
                         <com.google.android.material.card.MaterialCardView
@@ -265,41 +292,44 @@
 
                         </com.google.android.material.card.MaterialCardView>
 
-                        <!-- Quick Actions -->
-                        <LinearLayout
+                        <!-- Quick Actions Grid -->
+                        <GridLayout
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:orientation="horizontal"
-                            android:layout_marginTop="20dp"
-                            android:gravity="center">
+                            android:layout_marginTop="16dp"
+                            android:columnCount="2"
+                            android:rowCount="1">
 
                             <com.google.android.material.button.MaterialButton
                                 android:id="@+id/btnAddFriend"
                                 style="@style/Widget.Material3.Button.TonalButton"
                                 android:layout_width="0dp"
-                                android:layout_height="52dp"
-                                android:layout_weight="1"
+                                android:layout_height="56dp"
+                                android:layout_columnWeight="1"
                                 android:layout_marginEnd="6dp"
                                 android:text="Friends"
-                                app:cornerRadius="26dp"
+                                android:textStyle="bold"
+                                app:cornerRadius="16dp"
                                 app:icon="@android:drawable/ic_menu_add" />
 
                             <com.google.android.material.button.MaterialButton
                                 android:id="@+id/btnChallengeFriend"
                                 style="@style/Widget.Material3.Button.TonalButton"
                                 android:layout_width="0dp"
-                                android:layout_height="52dp"
-                                android:layout_weight="1"
+                                android:layout_height="56dp"
+                                android:layout_columnWeight="1"
                                 android:layout_marginStart="6dp"
                                 android:text="Challenge"
-                                app:cornerRadius="26dp"
+                                android:textStyle="bold"
+                                app:cornerRadius="16dp"
                                 app:icon="@android:drawable/ic_menu_send" />
 
-                        </LinearLayout>
+                        </GridLayout>
 
                     </LinearLayout>
 
                 </com.google.android.material.card.MaterialCardView>
+
 
                 <!-- Gamification Card -->
                 <com.google.android.material.card.MaterialCardView
@@ -308,19 +338,21 @@
                     android:layout_marginTop="16dp"
                     app:cardCornerRadius="24dp"
                     app:cardElevation="6dp"
+                    app:strokeWidth="1dp"
+                    app:strokeColor="#1A000000"
                     app:cardBackgroundColor="@color/cardBackground">
 
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:orientation="vertical"
-                        android:padding="20dp">
+                        android:padding="24dp">
 
                         <LinearLayout
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:orientation="horizontal"
-                            android:gravity="center_vertical">
+                            android:gravity="bottom">
 
                             <TextView
                                 android:id="@+id/tv_level"
@@ -328,7 +360,7 @@
                                 android:layout_height="wrap_content"
                                 android:layout_weight="1"
                                 android:text="Level 5"
-                                android:textSize="18sp"
+                                android:textSize="24sp"
                                 android:textStyle="bold"
                                 android:fontFamily="@font/agbalumo"
                                 android:textColor="@color/colorPrimary" />
@@ -338,7 +370,8 @@
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:text="450/1000 XP"
-                                android:textSize="13sp"
+                                android:textSize="14sp"
+                                android:textStyle="bold"
                                 android:textColor="@color/textColorSecondary" />
                         </LinearLayout>
 
@@ -346,19 +379,18 @@
                             android:id="@+id/pb_xp"
                             style="@android:style/Widget.ProgressBar.Horizontal"
                             android:layout_width="match_parent"
-                            android:layout_height="12dp"
+                            android:layout_height="16dp"
                             android:layout_marginTop="12dp"
                             android:progress="45"
-                            android:progressDrawable="@drawable/custom_progress_bar" />
+                            android:progressDrawable="@drawable/custom_progress_bar_premium" />
 
-                        <ImageView
-                            android:id="@+id/iv_badges_preview"
-                            android:layout_width="match_parent"
-                            android:layout_height="40dp"
-                            android:layout_marginTop="12dp"
-                            android:src="@drawable/ic_badges"
-                            android:visibility="gone"
-                            app:tint="@color/colorPrimary" />
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="8dp"
+                            android:text="Collect XP to reach the next level!"
+                            android:textSize="12sp"
+                            android:textColor="@color/textColorSecondary" />
 
                     </LinearLayout>
 
@@ -377,38 +409,42 @@
                         android:layout_height="wrap_content"
                         android:layout_columnWeight="1"
                         android:layout_marginEnd="8dp"
-                        app:cardCornerRadius="20dp"
-                        app:cardElevation="4dp"
+                        app:cardCornerRadius="24dp"
+                        app:cardElevation="8dp"
+                        app:strokeWidth="1dp"
+                        app:strokeColor="#0D000000"
                         app:cardBackgroundColor="@color/cardBackground">
 
                         <LinearLayout
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:orientation="vertical"
-                            android:padding="16dp"
+                            android:padding="20dp"
                             android:gravity="center">
 
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="🔥"
-                                android:textSize="32sp" />
+                            <View
+                                android:layout_width="56dp"
+                                android:layout_height="56dp"
+                                android:background="@drawable/stats_icon_bg_streak" />
 
                             <TextView
                                 android:id="@+id/tvProfileStreak"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:layout_marginTop="4dp"
+                                android:layout_marginTop="12dp"
                                 android:text="7 days"
-                                android:textSize="20sp"
+                                android:textSize="22sp"
                                 android:textStyle="bold"
-                                android:fontFamily="@font/agbalumo" />
+                                android:fontFamily="@font/agbalumo"
+                                android:textColor="#F4511E"/>
 
                             <TextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="Streak"
-                                android:textSize="12sp"
+                                android:text="STREAK"
+                                android:textSize="11sp"
+                                android:textStyle="bold"
+                                android:letterSpacing="0.1"
                                 android:textColor="@color/textColorSecondary" />
                         </LinearLayout>
                     </com.google.android.material.card.MaterialCardView>
@@ -418,43 +454,48 @@
                         android:layout_height="wrap_content"
                         android:layout_columnWeight="1"
                         android:layout_marginStart="8dp"
-                        app:cardCornerRadius="20dp"
-                        app:cardElevation="4dp"
+                        app:cardCornerRadius="24dp"
+                        app:cardElevation="8dp"
+                        app:strokeWidth="1dp"
+                        app:strokeColor="#0D000000"
                         app:cardBackgroundColor="@color/cardBackground">
 
                         <LinearLayout
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:orientation="vertical"
-                            android:padding="16dp"
+                            android:padding="20dp"
                             android:gravity="center">
 
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="⭐"
-                                android:textSize="32sp" />
+                            <View
+                                android:layout_width="56dp"
+                                android:layout_height="56dp"
+                                android:background="@drawable/stats_icon_bg_score" />
 
                             <TextView
                                 android:id="@+id/tvBestScore"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:layout_marginTop="4dp"
+                                android:layout_marginTop="12dp"
                                 android:text="950"
-                                android:textSize="20sp"
+                                android:textSize="22sp"
                                 android:textStyle="bold"
-                                android:fontFamily="@font/agbalumo" />
+                                android:fontFamily="@font/agbalumo"
+                                android:textColor="#FB8C00"/>
 
                             <TextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="Best Score"
-                                android:textSize="12sp"
+                                android:text="BEST SCORE"
+                                android:textSize="11sp"
+                                android:textStyle="bold"
+                                android:letterSpacing="0.1"
                                 android:textColor="@color/textColorSecondary" />
                         </LinearLayout>
                     </com.google.android.material.card.MaterialCardView>
 
                 </GridLayout>
+
 
                 <!-- Learner Details Card -->
                 <com.google.android.material.card.MaterialCardView

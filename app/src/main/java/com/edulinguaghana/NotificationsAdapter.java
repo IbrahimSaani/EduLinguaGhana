@@ -40,9 +40,11 @@ public class NotificationsAdapter extends RecyclerView.Adapter<NotificationsAdap
         return new NotificationViewHolder(view);
     }
 
+    private int lastAnimatedPosition = -1;
+
     @Override
     public void onBindViewHolder(@NonNull NotificationViewHolder holder, int position) {
-        Notification notification = notifications.get(position);
+        Notification notification = notifications.get(holder.getAdapterPosition());
 
         holder.tvEmoji.setText(notification.getEmoji());
         holder.tvTitle.setText(notification.getTitle());
@@ -134,16 +136,26 @@ public class NotificationsAdapter extends RecyclerView.Adapter<NotificationsAdap
             }
         });
 
-        // Entrance animation
-        holder.itemView.setAlpha(0f);
-        holder.itemView.setTranslationY(30f);
-        holder.itemView.animate()
-            .alpha(1f)
-            .translationY(0f)
-            .setDuration(400)
-            .setStartDelay(position * 50L)
-            .start();
+        // Entrance animation - only for new items or first load
+        int adapterPos = holder.getAdapterPosition();
+        if (adapterPos > lastAnimatedPosition) {
+            holder.itemView.setAlpha(0f);
+            holder.itemView.setTranslationX(100f);
+            holder.itemView.animate()
+                .alpha(1f)
+                .translationX(0f)
+                .setDuration(500)
+                .setInterpolator(new android.view.animation.DecelerateInterpolator())
+                .setStartDelay(Math.min(adapterPos * 50L, 500L))
+                .start();
+            lastAnimatedPosition = adapterPos;
+        } else {
+            holder.itemView.setAlpha(1f);
+            holder.itemView.setTranslationX(0f);
+        }
     }
+
+
 
     @Override
     public int getItemCount() {

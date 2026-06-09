@@ -177,154 +177,107 @@ public class LeaderboardActivity extends AppCompatActivity {
     }
 
     private void loadLeaderboard() {
-        // Detect whether this load was triggered by swipe-to-refresh so we can show a small indicator
+        // Detect whether this load was triggered by swipe-to-refresh
         final boolean swipeTriggered = (swipeRefreshLayout != null && swipeRefreshLayout.isRefreshing());
 
-        // If this was not triggered by swipe-refresh, show the central progress indicator;
-        // otherwise keep the current content visible and let the swipe spinner show progress.
         if (!swipeTriggered) {
             progressBar.setVisibility(View.VISIBLE);
             mainContentLayout.setVisibility(View.GONE);
         }
 
         // Query top 100 scores ordered by score
-        Query leaderboardQuery = leaderboardRef.orderByChild("score").limitToLast(100);
+        // Use a faster approach: just read the leaderboard data directly.
+        // The data should already contain usernames and avatars thanks to CloudSyncManager improvements.
+        leaderboardRef.orderByChild("score").limitToLast(100)
+            .addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot snapshot) {
+                    leaderboardList.clear();
 
-        leaderboardQuery.addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
-                leaderboardList.clear();
+                    if (!snapshot.exists()) {
+                        progressBar.setVisibility(View.GONE);
+                        if (swipeRefreshLayout != null && swipeRefreshLayout.isRefreshing()) {
+                            swipeRefreshLayout.setRefreshing(false);
+                        }
+                        emptyStateLayout.setVisibility(View.VISIBLE);
+                        mainContentLayout.setVisibility(View.GONE);
+                        return;
+                    }
 
-                if (!snapshot.exists()) {
-                    // No data yet - show empty state
+                    // Process entries immediately - much faster than re-fetching every user
+                    for (DataSnapshot entrySnapshot : snapshot.getChildren()) {
+                        LeaderboardEntry entry = entrySnapshot.getValue(LeaderboardEntry.class);
+                        if (entry != null) {
+                            // Check for legacy "avatar" key if "avatarData" is missing
+                            if (entry.getAvatarData() == null && entrySnapshot.hasChild("avatar")) {
+                                entry.setAvatarData((java.util.Map<String, Object>) entrySnapshot.child("avatar").getValue());
+                            }
+                            
+                            // Basic sanitization: if username is UID-like, try to make it look better
+                            String name = entry.getUserName();
+                            if (name == null || name.isEmpty() || name.equals(entry.getUserId())) {
+                                entry.setUserName("Learner " + entry.getUserId().substring(0, Math.min(5, entry.getUserId().length())));
+                            }
+                            
+                            leaderboardList.add(entry);
+                        }
+                    }
+
+                    // Sort and update UI
+                    finishLoadingLeaderboard(swipeTriggered);
+                    
+                    // Optional: Re-fetch ONLY the current user's info to ensure it's up to date in the Hero section
+                    if (currentUser != null) {
+                        FirebaseDatabase.getInstance().getReference("users").child(currentUser.getUid())
+                            .addListenerForSingleValueEvent(new ValueEventListener() {
+                                @Override
+                                public void onDataChange(@NonNull DataSnapshot userSnapshot) {
+                                    if (userSnapshot.exists()) {
+                                        updateCurrentUserInList(userSnapshot);
+                                    }
+                                }
+                                @Override
+                                public void onCancelled(@NonNull DatabaseError error) {}
+                            });
+                    }
+                }
+
+                @Override
+                public void onCancelled(@NonNull DatabaseError error) {
                     progressBar.setVisibility(View.GONE);
                     if (swipeRefreshLayout != null && swipeRefreshLayout.isRefreshing()) {
                         swipeRefreshLayout.setRefreshing(false);
                     }
-                    emptyStateLayout.setVisibility(View.VISIBLE);
-                    mainContentLayout.setVisibility(View.GONE);
-                    tvYourRank.setText("#--");
-                    tvYourScore.setText("0");
-                    if (swipeTriggered) {
-                        Snackbar.make(findViewById(android.R.id.content), "No rankings yet", Snackbar.LENGTH_SHORT).show();
-                    }
-                    return;
+                    Toast.makeText(LeaderboardActivity.this, "Load failed: " + error.getMessage(), Toast.LENGTH_SHORT).show();
                 }
-
-                // First, collect all entries
-                List<LeaderboardEntry> tempList = new ArrayList<>();
-                for (DataSnapshot entrySnapshot : snapshot.getChildren()) {
-                    LeaderboardEntry entry = entrySnapshot.getValue(LeaderboardEntry.class);
-                    if (entry != null) {
-                        tempList.add(entry);
-                    }
-                }
-
-                // Now fetch usernames from users node for each entry
-                DatabaseReference usersRef = FirebaseDatabase.getInstance().getReference("users");
-                final int totalEntries = tempList.size();
-                final int[] processedCount = {0};
-
-                if (totalEntries == 0) {
-                    progressBar.setVisibility(View.GONE);
-                    if (swipeRefreshLayout != null && swipeRefreshLayout.isRefreshing()) {
-                        swipeRefreshLayout.setRefreshing(false);
-                    }
-                    emptyStateLayout.setVisibility(View.VISIBLE);
-                    mainContentLayout.setVisibility(View.GONE);
-                    return;
-                }
-
-                for (LeaderboardEntry entry : tempList) {
-                    // Fetch whole user snapshot to check role, username, and avatar
-                    usersRef.child(entry.getUserId()).addListenerForSingleValueEvent(new ValueEventListener() {
-                        @Override
-                        public void onDataChange(@NonNull DataSnapshot userSnapshot) {
-                            if (userSnapshot.exists()) {
-                                // 1. Check user role - ONLY STUDENTS should be on the leaderboard
-                                String roleStr = userSnapshot.child("role").getValue(String.class);
-                                com.edulinguaghana.roles.UserRole role = com.edulinguaghana.roles.UserRole.fromString(roleStr);
-
-                                if (role != com.edulinguaghana.roles.UserRole.STUDENT) {
-                                    // Skip non-students
-                                    processedCount[0]++;
-                                    if (processedCount[0] == totalEntries) {
-                                        finishLoadingLeaderboard(swipeTriggered);
-                                    }
-                                    return;
-                                }
-
-                                // 2. Handle username (Check if missing or looks like a UID)
-                                String userName = entry.getUserName();
-                                boolean isLikelyUID = userName == null || userName.isEmpty() ||
-                                                      userName.length() > 20 ||
-                                                      userName.equals(entry.getUserId()) ||
-                                                      (userName.length() >= 20 && !userName.contains(" "));
-
-                                if (isLikelyUID) {
-                                    String displayName = userSnapshot.child("displayName").getValue(String.class);
-                                    String email = userSnapshot.child("email").getValue(String.class);
-
-                                    if (displayName != null && !displayName.isEmpty() &&
-                                        displayName.length() <= 30 &&
-                                        !displayName.equals(entry.getUserId())) {
-                                        entry.setUserName(displayName);
-                                    } else if (email != null && email.contains("@")) {
-                                        // Use email prefix if displayName is invalid
-                                        entry.setUserName(email.split("@")[0]);
-                                    } else {
-                                        // Last resort: generate a username from UID
-                                        entry.setUserName("User" + entry.getUserId().substring(0, Math.min(6, entry.getUserId().length())));
-                                    }
-                                }
-
-                                // 3. Fetch avatar data
-                                if (userSnapshot.child("avatar").exists()) {
-                                    entry.setAvatarData((java.util.Map<String, Object>) userSnapshot.child("avatar").getValue());
-                                } else if (userSnapshot.child("avatarData").exists()) {
-                                    // Fallback for legacy key
-                                    entry.setAvatarData((java.util.Map<String, Object>) userSnapshot.child("avatarData").getValue());
-                                }
-
-                                leaderboardList.add(entry);
-                            } else {
-                                // User not found in database, we can't verify role so skip to be safe
-                                android.util.Log.d("Leaderboard", "User " + entry.getUserId() + " not found, skipping.");
-                            }
-
-                            processedCount[0]++;
-                            if (processedCount[0] == totalEntries) {
-                                finishLoadingLeaderboard(swipeTriggered);
-                            }
-                        }
-
-                        @Override
-                        public void onCancelled(@NonNull DatabaseError error) {
-                            // Skip entry on error
-                            processedCount[0]++;
-                            if (processedCount[0] == totalEntries) {
-                                finishLoadingLeaderboard(swipeTriggered);
-                            }
-                        }
-                    });
-                }
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-                progressBar.setVisibility(View.GONE);
-                if (swipeRefreshLayout != null && swipeRefreshLayout.isRefreshing()) {
-                    swipeRefreshLayout.setRefreshing(false);
-                }
-                if (swipeTriggered) {
-                    Snackbar.make(findViewById(android.R.id.content), "Failed to refresh: " + error.getMessage(), Snackbar.LENGTH_LONG).show();
-                }
-                Toast.makeText(LeaderboardActivity.this,
-                        "Failed to load leaderboard: " + error.getMessage(),
-                        Toast.LENGTH_SHORT).show();
-            }
-        });
+            });
     }
+
+    private void updateCurrentUserInList(DataSnapshot userSnapshot) {
+        String uid = userSnapshot.getKey();
+        if (uid == null) return;
+
+        for (LeaderboardEntry entry : leaderboardList) {
+            if (uid.equals(entry.getUserId())) {
+                String displayName = userSnapshot.child("displayName").getValue(String.class);
+                if (displayName != null && !displayName.isEmpty()) {
+                    entry.setUserName(displayName);
+                }
+                
+                if (userSnapshot.child("avatar").exists()) {
+                    entry.setAvatarData((java.util.Map<String, Object>) userSnapshot.child("avatar").getValue());
+                } else if (userSnapshot.child("avatarData").exists()) {
+                    entry.setAvatarData((java.util.Map<String, Object>) userSnapshot.child("avatarData").getValue());
+                }
+                
+                // Refresh UI
+                adapter.notifyDataSetChanged();
+                updateUserRank(); // Refresh Hero section
+                break;
+            }
+        }
+    }
+
 
     private void finishLoadingLeaderboard(boolean swipeTriggered) {
         // Sort by score descending

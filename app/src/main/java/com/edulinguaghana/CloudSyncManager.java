@@ -307,6 +307,12 @@ public class CloudSyncManager {
                 updates.put("score", ServerValue.increment(score));
                 updates.put("timestamp", System.currentTimeMillis());
 
+                // Include avatar data so leaderboard doesn't have to fetch it separately
+                AvatarBuilder.AvatarConfig avatarConfig = AvatarBuilder.loadConfig(context);
+                if (avatarConfig != null) {
+                    updates.put("avatarData", avatarConfig.toMap());
+                }
+
 
                 // Upload to leaderboard (cumulative score)
                 databaseRef.child("leaderboard").child(userId)

@@ -142,11 +142,28 @@ public class ProfileActivity extends AppCompatActivity {
         tvLevel = findViewById(R.id.tv_level);
         pbXp = findViewById(R.id.pb_xp);
         tvXpText = findViewById(R.id.tv_xp_text);
-        ivBadgesPreview = findViewById(R.id.iv_badges_preview);
         achievementsCard = findViewById(R.id.achievementsCard);
         lessonsSection = findViewById(R.id.lessonsSection);
         learnerDetailsCard = findViewById(R.id.learnerDetailsCard);
+
+        // Entrance animation for signedInLayout children
+        if (signedInLayout != null && signedInLayout instanceof android.view.ViewGroup) {
+            android.view.ViewGroup group = (android.view.ViewGroup) signedInLayout;
+            for (int i = 0; i < group.getChildCount(); i++) {
+                android.view.View child = group.getChildAt(i);
+                child.setAlpha(0f);
+                child.setTranslationY(100f);
+                child.animate()
+                    .alpha(1f)
+                    .translationY(0f)
+                    .setDuration(600)
+                    .setStartDelay(200 + i * 100L)
+                    .setInterpolator(new android.view.animation.DecelerateInterpolator())
+                    .start();
+            }
+        }
     }
+
 
     /**
      * Ensure the current user's data exists in Firebase Realtime Database
