@@ -275,7 +275,7 @@
                         android:orientation="vertical"
                         android:padding="12dp">
                         <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Best Score" android:textSize="11sp" android:textColor="@color/textColorSecondary" />
-                        <TextView android:id="@+id/tvHighScore" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="10/10" android:textSize="20sp" android:textStyle="bold" android:textColor="@color/colorAccent" />
+                        <TextView android:id="@+id/tvHighScore" android:layout_width="wrap_content" android:layout_height="wrap_content" tools:text="10" android:textSize="20sp" android:textStyle="bold" android:textColor="@color/colorAccent" />
                     </LinearLayout>
 
                     <LinearLayout

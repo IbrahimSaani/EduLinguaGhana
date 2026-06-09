@@ -217,8 +217,9 @@ public class LoginActivity extends AppCompatActivity {
                                         // The email exists in our system, so the password must be the incorrect part
                                         Toast.makeText(LoginActivity.this, R.string.error_auth_wrong_password, Toast.LENGTH_LONG).show();
                                     } else {
-                                        // The email is not found or other error, show the generic invalid email message
-                                        Toast.makeText(LoginActivity.this, R.string.error_auth_invalid_email, Toast.LENGTH_LONG).show();
+                                        // The email is not found, enumeration protection is on, or other error.
+                                        // Use a more balanced message that includes both possibilities.
+                                        Toast.makeText(LoginActivity.this, R.string.error_auth_invalid_credentials, Toast.LENGTH_LONG).show();
                                     }
                                 });
                                 return;
@@ -251,7 +252,7 @@ public class LoginActivity extends AppCompatActivity {
                 case "ERROR_TOO_MANY_REQUESTS":
                     return getString(R.string.error_auth_too_many_requests);
                 case "ERROR_INVALID_CREDENTIAL":
-                    return getString(R.string.error_auth_invalid_email);
+                    return getString(R.string.error_auth_invalid_credentials);
             }
         }
         

@@ -81,9 +81,7 @@ public class ProgressActivity extends AppCompatActivity {
         final int percentage    = ProgressManager.getAccuracy(this);
 
         // Basic stats
-        // Cap the high score display at 10 (quiz can have scores > 10 in time-limited mode)
-        int displayHighScore = Math.min(highScore, 10);
-        tvStatHighScore.setText(getString(R.string.stat_high_score, displayHighScore));
+        tvStatHighScore.setText(getString(R.string.stat_high_score, highScore));
         tvStatTotalQuizzes.setText(getString(R.string.stat_total_quizzes, totalQuizzes));
         tvStatTotalCorrect.setText(getString(R.string.stat_total_correct, totalCorrect));
         if (tvStatPerfectScores != null) {
@@ -246,10 +244,8 @@ public class ProgressActivity extends AppCompatActivity {
     }
 
     private void shareProgress(int highScore, int totalQuizzes, int totalCorrect, int percentage, String achievementText) {
-        // Cap the high score at 10 for sharing (same as display)
-        int displayHighScore = Math.min(highScore, 10);
         String shareText = "My EduLingua Ghana Progress:\n\n"
-                + "Best quiz score: " + displayHighScore + " / 10\n"
+                + "Best quiz score: " + highScore + "\n"
                 + "Total quizzes taken: " + totalQuizzes + "\n"
                 + "Total correct answers: " + totalCorrect + "\n"
                 + "Overall accuracy: " + percentage + "%\n\n"

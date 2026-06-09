@@ -367,9 +367,9 @@ public class StudentDetailActivity extends AppCompatActivity {
         if (tvTotalQuizzes != null) tvTotalQuizzes.setText(String.valueOf(aggregate.getTotalQuizzes()));
         if (tvAccuracy != null) tvAccuracy.setText(String.format(Locale.getDefault(), "%.1f%%", aggregate.getAccuracy()));
         
-        // Best score capped at 10 for display as requested
-        int cappedBestScore = Math.min(aggregate.getHighestScore(), 10);
-        if (tvHighScore != null) tvHighScore.setText(cappedBestScore + "/10");
+        // Show raw best score
+        int bestScoreValue = aggregate.getHighestScore();
+        if (tvHighScore != null) tvHighScore.setText(String.valueOf(bestScoreValue));
         
         if (tvAverageScore != null) tvAverageScore.setText(String.format(Locale.getDefault(), "%.1f", aggregate.getAverageScore()));
         if (tvTotalQuestions != null) tvTotalQuestions.setText(String.valueOf(aggregate.getTotalQuestions()));
@@ -467,7 +467,7 @@ public class StudentDetailActivity extends AppCompatActivity {
         if (p == null) return;
 
         String name = studentName != null ? studentName : "Student";
-        int cappedBestScore = Math.min(p.getHighestScore(), 10);
+        int bestScoreValue = p.getHighestScore();
         
         StringBuilder report = new StringBuilder();
         report.append("EDU LINGUA GHANA - PROGRESS REPORT\n");
@@ -480,7 +480,7 @@ public class StudentDetailActivity extends AppCompatActivity {
         report.append("--------------------\n");
         report.append("• Current Level: ").append(p.getCurrentLevel()).append("\n");
         report.append("• Total XP: ").append(p.getTotalXP()).append("\n");
-        report.append("• Best Quiz Score: ").append(cappedBestScore).append("/10\n");
+        report.append("• Best Quiz Score: ").append(bestScoreValue).append("\n");
         report.append("• Overall Accuracy: ").append(String.format(Locale.getDefault(), "%.1f%%", p.getAccuracy())).append("\n");
         report.append("• Total Quizzes: ").append(p.getTotalQuizzes()).append("\n\n");
         

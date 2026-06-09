@@ -242,7 +242,7 @@
                                     android:id="@+id/tvStatHighScore"
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
-                                    tools:text="8 / 10"
+                                    tools:text="8"
                                     android:textSize="20sp"
                                     android:textStyle="bold"
                                     android:textColor="@color/textPrimary"

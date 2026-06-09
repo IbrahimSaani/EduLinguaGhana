@@ -170,9 +170,8 @@ public class QuizActivity extends AppCompatActivity {
         SharedPreferences prefs = getSharedPreferences(PREF_NAME, MODE_PRIVATE);
         bestScore = prefs.getInt(getHighScoreKey(), 0);
         isSfxOn = prefs.getBoolean(KEY_SFX_ENABLED, true);
-        // Cap best score display at 10 (quiz can have scores > 10 in time-limited mode)
-        int displayBestScore = Math.min(bestScore, 10);
-        tvGameBest.setText(String.format(Locale.getDefault(), getString(R.string.quiz_best_score), displayBestScore));
+        
+        tvGameBest.setText(String.format(Locale.getDefault(), getString(R.string.quiz_best_score), bestScore));
 
         // Initialize language-specific alphabet
         alphabet = LanguageConversionUtils.getAlphabetForLanguage(languageCode);
@@ -1173,10 +1172,9 @@ public class QuizActivity extends AppCompatActivity {
                 bestScore = score;
                 saveHighScore();
                 
-                // Update best score display (cap at 10 for display)
-                int displayBestScore = Math.min(bestScore, 10);
+                // Update best score display
                 if (tvGameBest != null) {
-                    tvGameBest.setText(String.format(Locale.getDefault(), getString(R.string.quiz_best_score), displayBestScore));
+                    tvGameBest.setText(String.format(Locale.getDefault(), getString(R.string.quiz_best_score), bestScore));
                 }
                 
                 animateHighScore();
@@ -1412,10 +1410,8 @@ public class QuizActivity extends AppCompatActivity {
                 tvEndXP.setText("+" + xpEarned);
             }
             
-            // Cap best score display at 10 (quiz can have scores > 10 in time-limited mode)
-            int displayBestScore = Math.min(bestScore, 10);
             if (tvEndBestScore != null) {
-                tvEndBestScore.setText(String.valueOf(displayBestScore));
+                tvEndBestScore.setText(String.valueOf(bestScore));
             }
 
             if (newHighScore) {
