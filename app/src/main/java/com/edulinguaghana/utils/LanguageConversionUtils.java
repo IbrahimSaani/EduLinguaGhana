@@ -180,16 +180,16 @@ public class LanguageConversionUtils {
      */
     public static String convertNumberToWordEwe(int num) {
         if (num < 1 || num > 100) return "";
-        String[] units = {"", "ɖeka", "eve", "etɔ̃", "ene", "atɔ̃", "adẽ", "adrẽ", "enyi", "asieke"};
+        String[] units = {"", "ɖeka", "eve", "etɔ̃", "ene", "atɔ̃", "ade", "adre", "enyi", "asieke"};
 
         // Handle 1-9
         if (num < 10) return units[num];
 
         // Handle 10
-        if (num == 10) return "ewó";
+        if (num == 10) return "ewo";
 
         // Handle 11-19
-        if (num < 20) return "ewóí" + units[num - 10];
+        if (num < 20) return "wui" + units[num - 10];
 
         // Handle 20-99
         if (num % 10 == 0) {
@@ -197,16 +197,17 @@ public class LanguageConversionUtils {
             if (num == 30) return "blaetɔ̃";
             if (num == 40) return "blaene";
             if (num == 50) return "blaatɔ̃";
-            if (num == 60) return "blaadẽ";
-            if (num == 70) return "blaadrẽ";
+            if (num == 60) return "blaade";
+            if (num == 70) return "blaadre";
             if (num == 80) return "blaenyi";
             if (num == 90) return "blaasieke";
         }
 
         // Handle 21-99 with remainder
-        if (num == 100) return "alakpa ɖeka";
-        return convertNumberToWordEwe(num - (num % 10)) + " kple " + units[num % 10];
+        if (num == 100) return "alafa ɖeka";
+        return convertNumberToWordEwe(num - (num % 10)) + " vɔ " + units[num % 10];
     }
+
 
     /**
      * Converts number to Ga words (1-100)
@@ -361,16 +362,17 @@ public class LanguageConversionUtils {
      */
     public static String getMatchingWordForLetter(String letter, String languageCode) {
         String code = normalizeLanguageCode(languageCode);
-        letter = letter.toUpperCase(Locale.ROOT);
+        String upperLetter = letter.toUpperCase(Locale.ROOT);
         
         switch (code) {
-            case LANG_TWI: return getTwiWord(letter);
-            case LANG_EWE: return getEweWord(letter);
-            case LANG_GA: return getGaWord(letter);
-            case LANG_FRENCH: return getFrenchWord(letter);
-            default: return getEnglishWord(letter);
+            case LANG_TWI: return getTwiWord(upperLetter);
+            case LANG_EWE: return getEweWord(upperLetter);
+            case LANG_GA: return getGaWord(upperLetter);
+            case LANG_FRENCH: return getFrenchWord(upperLetter);
+            default: return getEnglishWord(upperLetter);
         }
     }
+
 
     private static String getEnglishWord(String letter) {
         switch (letter) {
