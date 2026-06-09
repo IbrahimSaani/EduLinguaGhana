@@ -62,6 +62,13 @@
 -keep class com.google.gson.** { *; }
 -keep class com.edulinguaghana.** { *; }
 
+# --- Strip debug logs in production ---
+-assumenosideeffects class android.util.Log {
+    public static int v(...);
+    public static int d(...);
+    public static int i(...);
+}
+
 # --- Glide rules ---
 -keep public class * extends com.bumptech.glide.module.AppGlideModule
 -keep public class * extends com.bumptech.glide.module.LibraryGlideModule

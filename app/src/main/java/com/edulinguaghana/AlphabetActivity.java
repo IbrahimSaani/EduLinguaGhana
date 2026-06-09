@@ -11,8 +11,6 @@ import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.VibrationEffect;
-import android.os.Vibrator;
 import android.speech.tts.TextToSpeech;
 import android.view.HapticFeedbackConstants;
 import android.view.View;
@@ -68,9 +66,23 @@ public class AlphabetActivity extends AppCompatActivity {
     private AudioManager audioManager;
     private AudioFocusRequest focusRequest;
     private final AudioManager.OnAudioFocusChangeListener focusChangeListener = focusChange -> {
-        if (focusChange == AudioManager.AUDIOFOCUS_LOSS) {
-            if (mediaPlayer != null && mediaPlayer.isPlaying()) mediaPlayer.pause();
-            if (tts != null) tts.stop();
+        switch (focusChange) {
+            case AudioManager.AUDIOFOCUS_LOSS:
+            case AudioManager.AUDIOFOCUS_LOSS_TRANSIENT:
+                if (mediaPlayer != null && mediaPlayer.isPlaying()) mediaPlayer.pause();
+                if (tts != null) tts.stop();
+                break;
+            case AudioManager.AUDIOFOCUS_LOSS_TRANSIENT_CAN_DUCK:
+                if (mediaPlayer != null && mediaPlayer.isPlaying()) {
+                    mediaPlayer.setVolume(0.2f, 0.2f);
+                }
+                break;
+            case AudioManager.AUDIOFOCUS_GAIN:
+                if (mediaPlayer != null) {
+                    mediaPlayer.setVolume(1.0f, 1.0f);
+                    // Optionally resume if it was paused by transient loss
+                }
+                break;
         }
     };
 
@@ -137,12 +149,13 @@ public class AlphabetActivity extends AppCompatActivity {
         progressTracker = new ProgressTracker(this);
         startTime = System.currentTimeMillis();
 
-        // Record practice for streak immediately when starting a learning session
-        try {
-            new StreakManager(this).recordPractice();
-            PracticeTracker.recordPractice(this);
-        } catch (Exception ignored) {}
-
+        // Record practice for streak in background to avoid blocking main thread
+        new Thread(() -> {
+            try {
+                new StreakManager(getApplicationContext()).recordPractice();
+                PracticeTracker.recordPractice(getApplicationContext());
+            } catch (Exception ignored) {}
+        }).start();
 
         languageCode = getIntent().getStringExtra("LANG_CODE");
         languageName = getIntent().getStringExtra("LANG_NAME");
@@ -715,23 +728,34 @@ public class AlphabetActivity extends AppCompatActivity {
 
     private void playAudioResource(int resId) {
         if (!requestAudioFocus()) return;
-        if (mediaPlayer != null) {
+        
+        // Use a background thread for MediaPlayer creation to keep UI responsive
+        new Thread(() -> {
             try {
-                mediaPlayer.release();
-            } catch (Exception ignored) {}
-        }
-        mediaPlayer = MediaPlayer.create(this, resId);
-        if (mediaPlayer != null) {
-            mediaPlayer.setOnCompletionListener(mp -> {
-                try {
-                    mp.release();
-                } catch (Exception ignored) {}
-                if (mediaPlayer == mp) {
-                    mediaPlayer = null;
+                if (mediaPlayer != null) {
+                    try {
+                        mediaPlayer.stop();
+                        mediaPlayer.release();
+                    } catch (Exception ignored) {}
                 }
-            });
-            mediaPlayer.start();
-        }
+                
+                MediaPlayer mp = MediaPlayer.create(AlphabetActivity.this, resId);
+                if (mp != null) {
+                    mediaPlayer = mp;
+                    mp.setOnCompletionListener(player -> {
+                        try {
+                            player.release();
+                        } catch (Exception ignored) {}
+                        if (mediaPlayer == player) {
+                            mediaPlayer = null;
+                        }
+                    });
+                    mp.start();
+                }
+            } catch (Exception e) {
+                android.util.Log.e("AlphabetActivity", "Error playing audio resource", e);
+            }
+        }).start();
     }
 
     private void showMascotMessage(String message) {

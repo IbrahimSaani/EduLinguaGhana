@@ -70,13 +70,15 @@ public class App extends Application {
         } catch (Exception ignored) {
         }
 
-        // Enable App Distribution Tester Feedback notification
-        try {
-            FirebaseAppDistribution.getInstance().showFeedbackNotification(
-                    "Submit feedback to the developers",
-                    InterruptionLevel.DEFAULT
-            );
-        } catch (Exception ignored) {
+        // Enable App Distribution Tester Feedback notification only in debug builds
+        if (BuildConfig.DEBUG) {
+            try {
+                FirebaseAppDistribution.getInstance().showFeedbackNotification(
+                        "Submit feedback to the developers",
+                        InterruptionLevel.DEFAULT
+                );
+            } catch (Exception ignored) {
+            }
         }
 
         // Apply global hotfix for Firebase App Distribution FeedbackActivity crash

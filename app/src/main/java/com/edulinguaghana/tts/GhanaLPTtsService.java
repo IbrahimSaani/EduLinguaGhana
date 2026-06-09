@@ -7,6 +7,7 @@ import android.util.Log;
 import androidx.annotation.NonNull;
 
 import com.edulinguaghana.R;
+import com.edulinguaghana.BuildConfig;
 
 import org.json.JSONObject;
 
@@ -32,7 +33,7 @@ import okhttp3.ResponseBody;
 public class GhanaLPTtsService {
     private static final String TAG = "GhanaLPTtsService";
     private static final String API_URL = "https://translation-api.ghananlp.org/tts/v2/synthesize";
-    private static final String API_KEY = "2541515ab0984aeb8604153ad10b0d71";
+    private static final String API_KEY = BuildConfig.GHANA_LP_TTS_API_KEY;
 
     private final Context context;
     private final OkHttpClient client;

@@ -13,18 +13,36 @@ android {
     namespace = "com.edulinguaghana"
     compileSdk = 35
 
+    val secretsPropertiesFile = rootProject.file("secrets.properties")
+    val secretsProperties = Properties()
+    if (secretsPropertiesFile.exists()) {
+        secretsProperties.load(FileInputStream(secretsPropertiesFile))
+    }
+
     defaultConfig {
         applicationId = "com.edulinguaghana"
         minSdk = 23
         targetSdk = 35
-        versionCode = 7
-        versionName = "1.0.6"
+        versionCode = 8
+        versionName = "1.0.7"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
         ndk {
             abiFilters.addAll(setOf("armeabi-v7a", "arm64-v8a", "x86", "x86_64"))
         }
+
+        // Inject secrets from secrets.properties
+        resValue("string", "facebook_app_id", secretsProperties.getProperty("FACEBOOK_APP_ID", ""))
+        resValue("string", "facebook_client_token", secretsProperties.getProperty("FACEBOOK_CLIENT_TOKEN", ""))
+        resValue("string", "fb_login_protocol_scheme", secretsProperties.getProperty("FB_LOGIN_PROTOCOL_SCHEME", ""))
+
+        buildConfigField("String", "GHANA_LP_TTS_API_KEY", "\"${secretsProperties.getProperty("GHANA_LP_TTS_API_KEY", "")}\"")
+    }
+
+    buildFeatures {
+        buildConfig = true
+        resValues = true
     }
 
     signingConfigs {
@@ -48,14 +66,15 @@ android {
         release {
             signingConfig = signingConfigs.getByName("release")
             isMinifyEnabled = true
+            isShrinkResources = true
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
             firebaseAppDistribution {
                 appId = "1:340016497126:android:36b6e04f90691927389627"
-                testers = "ibrahimsaani41@gmail.com, quistkelvin32@gmail.com, 41jamesanderson@gmail.com, lovejoycelyn32@gmail.com, rhozaselorm@gmail.com, selormeyphinegad@gmail.com, ucheemmauel539@gmail.com, jnrhoshea@gmail.com, asiedudennis30@gmail.com"
-                releaseNotes = "final patches for deployment."
+                testers = "ibrahimsaani41@gmail.com, quistkelvin32@gmail.com, 41jamesanderson@gmail.com, lovejoycelyn32@gmail.com, rhozaselorm@gmail.com, selormeyphinegad@gmail.com, ucheemmauel539@gmail.com, jnrhoshea@gmail.com, manuelowusu47@gmail.com"
+                releaseNotes = "minor bug fixes and ui improvements."
             }
         }
         create("beta") {
