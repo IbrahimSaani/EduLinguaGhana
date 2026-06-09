@@ -102,13 +102,29 @@
             android:orientation="vertical"
             android:padding="32dp">
 
-            <ImageView
-                android:id="@+id/ivLogo"
-                android:layout_width="140dp"
-                android:layout_height="140dp"
-                android:src="@drawable/ic_logo_professional"
-                android:contentDescription="@string/app_name"
-                android:elevation="8dp" />
+            <FrameLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content">
+
+                <ImageView
+                    android:id="@+id/ivLogo"
+                    android:layout_width="140dp"
+                    android:layout_height="140dp"
+                    android:src="@drawable/ic_logo_professional"
+                    android:contentDescription="@string/app_name"
+                    android:elevation="8dp" />
+
+                <!-- Logo Shine Overlay -->
+                <View
+                    android:id="@+id/logoShine"
+                    android:layout_width="140dp"
+                    android:layout_height="140dp"
+                    android:alpha="0"
+                    android:background="@drawable/bg_splash_shine"
+                    android:elevation="9dp"
+                    android:rotation="45"
+                    android:translationX="-140dp" />
+            </FrameLayout>
 
             <TextView
                 android:id="@+id/tvAppNameSplash"
@@ -121,10 +137,11 @@
                 android:textColor="#FFFFFF"
                 android:textSize="32sp"
                 android:textStyle="bold"
+                android:letterSpacing="0.02"
                 android:shadowColor="#80000000"
-                android:shadowDx="2"
-                android:shadowDy="4"
-                android:shadowRadius="8" />
+                android:shadowDx="0"
+                android:shadowDy="6"
+                android:shadowRadius="12" />
 
             <TextView
                 android:id="@+id/tvTaglineSplash"

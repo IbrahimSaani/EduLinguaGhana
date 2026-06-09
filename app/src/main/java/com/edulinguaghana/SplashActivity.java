@@ -25,6 +25,7 @@ public class SplashActivity extends AppCompatActivity {
     private boolean hasNavigated = false;
 
     private ImageView ivLogo;
+    private View logoShine;
     private TextView tvAppNameSplash;
     private TextView tvTaglineSplash;
     private TextView tvProgressPercentage;
@@ -60,6 +61,7 @@ public class SplashActivity extends AppCompatActivity {
 
         // Bind views
         ivLogo = findViewById(R.id.ivLogo);
+        logoShine = findViewById(R.id.logoShine);
         tvAppNameSplash = findViewById(R.id.tvAppNameSplash);
         tvTaglineSplash = findViewById(R.id.tvTaglineSplash);
         tvProgressPercentage = findViewById(R.id.tvProgressPercentage);
@@ -128,6 +130,8 @@ public class SplashActivity extends AppCompatActivity {
                 .withEndAction(() -> {
                     // Start morph dot animation after logo completes
                     startMorphDotAnimation();
+                    startLogoShineAnimation();
+                    startBreathingAnimation();
                 })
                 .start();
 
@@ -213,7 +217,53 @@ public class SplashActivity extends AppCompatActivity {
                 .scaleY(1f)
                 .setDuration(450)
                 .setInterpolator(new OvershootInterpolator(1.5f))
+                .withEndAction(this::startTitleGlowAnimation)
                 .start();
+    }
+
+    private void startLogoShineAnimation() {
+        if (logoShine == null || ivLogo == null) return;
+        
+        ivLogo.post(() -> {
+            float width = ivLogo.getWidth() > 0 ? ivLogo.getWidth() : 140 * getResources().getDisplayMetrics().density;
+            logoShine.setAlpha(0.4f);
+            ObjectAnimator animator = ObjectAnimator.ofFloat(logoShine, "translationX", -width * 1.5f, width * 1.5f);
+            animator.setDuration(2000);
+            animator.setInterpolator(new AccelerateDecelerateInterpolator());
+            animator.setRepeatCount(ValueAnimator.INFINITE);
+            animator.start();
+        });
+    }
+
+    private void startBreathingAnimation() {
+        if (centerCard == null) return;
+        
+        ObjectAnimator scaleX = ObjectAnimator.ofFloat(centerCard, "scaleX", 1f, 1.03f);
+        ObjectAnimator scaleY = ObjectAnimator.ofFloat(centerCard, "scaleY", 1f, 1.03f);
+        
+        scaleX.setDuration(3000);
+        scaleX.setRepeatCount(ValueAnimator.INFINITE);
+        scaleX.setRepeatMode(ValueAnimator.REVERSE);
+        scaleX.setInterpolator(new AccelerateDecelerateInterpolator());
+        
+        scaleY.setDuration(3000);
+        scaleY.setRepeatCount(ValueAnimator.INFINITE);
+        scaleY.setRepeatMode(ValueAnimator.REVERSE);
+        scaleY.setInterpolator(new AccelerateDecelerateInterpolator());
+        
+        scaleX.start();
+        scaleY.start();
+    }
+
+    private void startTitleGlowAnimation() {
+        if (tvAppNameSplash == null) return;
+        
+        ObjectAnimator glow = ObjectAnimator.ofFloat(tvAppNameSplash, "alpha", 0.85f, 1f);
+        glow.setDuration(1500);
+        glow.setRepeatCount(ValueAnimator.INFINITE);
+        glow.setRepeatMode(ValueAnimator.REVERSE);
+        glow.setInterpolator(new AccelerateDecelerateInterpolator());
+        glow.start();
     }
 
     private void startDecorativeAnimations() {
