@@ -35,6 +35,7 @@ signing.properties
 **/credentials/**
 
 # Build outputs
+/app/release/
 *.apk
 *.ap_
 *.aab
