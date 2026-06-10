@@ -254,6 +254,115 @@
             </com.google.android.material.card.MaterialCardView>
 
 
+            <!-- Accessibility Section -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:layout_marginBottom="12dp">
+
+                <View
+                    android:layout_width="4dp"
+                    android:layout_height="24dp"
+                    android:background="@color/colorAccent" />
+
+                <TextView
+                    android:id="@+id/tvAccessibilityHeader"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="12dp"
+                    android:text="@string/settings_accessibility_title"
+                    android:textColor="@color/colorPrimary"
+                    android:textSize="18sp"
+                    android:textStyle="bold"
+                    android:fontFamily="@font/agbalumo" />
+            </LinearLayout>
+
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="24dp"
+                app:cardCornerRadius="24dp"
+                app:cardElevation="2dp"
+                app:strokeWidth="1dp"
+                app:strokeColor="#0D000000"
+                app:cardBackgroundColor="@color/cardBackground">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="8dp">
+
+                    <com.google.android.material.switchmaterial.SwitchMaterial
+                        android:id="@+id/switchHighContrast"
+                        style="@style/Widget.Material3.CompoundButton.Switch"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="@string/settings_high_contrast"
+                        android:padding="16dp"
+                        android:thumbTint="@color/colorPrimary"
+                        app:trackTint="@color/colorPrimaryLight" />
+
+                    <com.google.android.material.switchmaterial.SwitchMaterial
+                        android:id="@+id/switchStandardFont"
+                        style="@style/Widget.Material3.CompoundButton.Switch"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="@string/settings_standard_font"
+                        android:padding="16dp"
+                        android:thumbTint="@color/colorPrimary"
+                        app:trackTint="@color/colorPrimaryLight" />
+
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="1dp"
+                        android:layout_marginHorizontal="16dp"
+                        android:background="@color/dividerColor"
+                        android:alpha="0.3" />
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:padding="16dp">
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal">
+                            <TextView
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:text="@string/settings_text_size"
+                                android:textColor="@color/textColorPrimary" />
+                            <TextView
+                                android:id="@+id/tvTextSizeValue"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="@string/settings_text_size_normal"
+                                android:textStyle="bold"
+                                android:textColor="@color/colorPrimary" />
+                        </LinearLayout>
+
+                        <SeekBar
+                            android:id="@+id/seekBarTextSize"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="16dp"
+                            android:max="3"
+                            android:progress="1"
+                            android:progressTint="@color/colorPrimary"
+                            android:thumbTint="@color/colorPrimary" />
+                    </LinearLayout>
+
+                </LinearLayout>
+
+            </com.google.android.material.card.MaterialCardView>
+
+
             <!-- Notifications Section -->
             <LinearLayout
                 android:layout_width="match_parent"

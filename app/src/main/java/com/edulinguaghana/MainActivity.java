@@ -1072,6 +1072,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void applyToolbarFont(Toolbar toolbar) {
+        if (AppPreferences.isStandardFontEnabled(this)) return;
         // Apply custom Agbalumo font to toolbar title
         try {
             android.graphics.Typeface typeface = androidx.core.content.res.ResourcesCompat.getFont(this, R.font.agbalumo);

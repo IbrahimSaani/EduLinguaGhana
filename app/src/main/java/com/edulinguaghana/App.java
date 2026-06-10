@@ -87,6 +87,32 @@ public class App extends Application {
     }
 
     /**
+     * Applies accessibility settings to the given activity.
+     */
+    private void applyAccessibilitySettings(Activity activity) {
+        try {
+            // 1. Apply Font Scale
+            int size = AppPreferences.getTextSize(activity);
+            float scale = 1.0f;
+            switch (size) {
+                case 0: scale = 0.85f; break;
+                case 1: scale = 1.0f; break;
+                case 2: scale = 1.15f; break;
+                case 3: scale = 1.30f; break;
+            }
+
+            android.content.res.Configuration config = new android.content.res.Configuration(activity.getResources().getConfiguration());
+            config.fontScale = scale;
+            activity.applyOverrideConfiguration(config);
+
+            // 2. High Contrast (Optional: could set a high contrast theme if defined)
+            if (AppPreferences.isHighContrastEnabled(activity)) {
+                // activity.setTheme(R.style.Theme_HighContrast);
+            }
+        } catch (Exception ignored) {}
+    }
+
+    /**
      * Hotfix for a known crash in Firebase App Distribution SDK (16.0.0-beta19)
      * The FeedbackActivity crashes in onSaveInstanceState when screenshotUri is null.
      */
@@ -94,6 +120,7 @@ public class App extends Application {
         registerActivityLifecycleCallbacks(new ActivityLifecycleCallbacks() {
             @Override
             public void onActivityCreated(@androidx.annotation.NonNull Activity activity, @androidx.annotation.Nullable Bundle savedInstanceState) {
+                applyAccessibilitySettings(activity);
                 if (activity.getClass().getName().endsWith(".FeedbackActivity")) {
                     try {
                         // Use reflection to ensure screenshotUri is never null before onSaveInstanceState is called

@@ -21,6 +21,7 @@ import com.google.firebase.auth.AuthCredential;
 import com.google.firebase.auth.EmailAuthProvider;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.auth.UserInfo;
 import com.google.firebase.auth.UserProfileChangeRequest;
 
 public class AccountManagementActivity extends AppCompatActivity {
@@ -472,7 +473,22 @@ public class AccountManagementActivity extends AppCompatActivity {
     }
 
     private void deleteAccount() {
-        showReAuthenticationDialog();
+        if (currentUser == null) return;
+
+        boolean hasEmailProvider = false;
+        for (UserInfo profile : currentUser.getProviderData()) {
+            if (EmailAuthProvider.PROVIDER_ID.equals(profile.getProviderId())) {
+                hasEmailProvider = true;
+                break;
+            }
+        }
+
+        if (hasEmailProvider) {
+            showReAuthenticationDialog();
+        } else {
+            // Social provider users (Google/Facebook)
+            deleteUserDataFromDatabase(currentUser.getUid());
+        }
     }
 
     private void showReAuthenticationDialog() {
@@ -505,6 +521,12 @@ public class AccountManagementActivity extends AppCompatActivity {
         showProgress(true);
 
         String email = currentUser.getEmail();
+        if (TextUtils.isEmpty(email)) {
+            showProgress(false);
+            Toast.makeText(this, "Email required for re-authentication", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
         AuthCredential credential = EmailAuthProvider.getCredential(email, password);
 
         currentUser.reauthenticate(credential)

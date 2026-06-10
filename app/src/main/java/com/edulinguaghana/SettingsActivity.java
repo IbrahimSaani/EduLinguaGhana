@@ -30,8 +30,9 @@ public class SettingsActivity extends AppCompatActivity {
     private SwitchMaterial switchAnimations;
     private SwitchMaterial switchLowPowerAnimations;
     private SwitchMaterial switchDailyReminders, switchStreakAlerts;
-    private SeekBar seekBarQuizMusicVolume;
-    private TextView tvQuizMusicVolumeValue;
+    private SwitchMaterial switchHighContrast, switchStandardFont;
+    private SeekBar seekBarQuizMusicVolume, seekBarTextSize;
+    private TextView tvQuizMusicVolumeValue, tvTextSizeValue;
     private Button btnResetProgress;
     private Button btnSyncToCloud;
     private Button btnSyncFromCloud;
@@ -90,6 +91,12 @@ public class SettingsActivity extends AppCompatActivity {
         switchDailyReminders = findViewById(R.id.switchDailyReminders);
         switchStreakAlerts = findViewById(R.id.switchStreakAlerts);
 
+        // Accessibility Views
+        switchHighContrast = findViewById(R.id.switchHighContrast);
+        switchStandardFont = findViewById(R.id.switchStandardFont);
+        seekBarTextSize = findViewById(R.id.seekBarTextSize);
+        tvTextSizeValue = findViewById(R.id.tvTextSizeValue);
+
         // Apply custom font to section headers
         applySectionHeaderFonts();
 
@@ -99,6 +106,7 @@ public class SettingsActivity extends AppCompatActivity {
         // Update Sync and Role status
         updateLastSyncTime();
         displayCurrentRole();
+        setupAccessibilityListeners();
 
         // Load preferences
         SharedPreferences prefs = getSharedPreferences(PREF_NAME, MODE_PRIVATE);
@@ -243,6 +251,55 @@ public class SettingsActivity extends AppCompatActivity {
     }
 
 
+    private void setupAccessibilityListeners() {
+        // High Contrast
+        switchHighContrast.setChecked(AppPreferences.isHighContrastEnabled(this));
+        switchHighContrast.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            AppPreferences.setHighContrastEnabled(this, isChecked);
+            // In a real app, we might need to recreate the activity or apply theme
+            Toast.makeText(this, "High Contrast " + (isChecked ? "Enabled" : "Disabled") + ". Restart app to apply fully.", Toast.LENGTH_SHORT).show();
+        });
+
+        // Standard Font
+        switchStandardFont.setChecked(AppPreferences.isStandardFontEnabled(this));
+        switchStandardFont.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            AppPreferences.setStandardFontEnabled(this, isChecked);
+            Toast.makeText(this, "Standard Font " + (isChecked ? "Enabled" : "Disabled") + ". Restart app to apply fully.", Toast.LENGTH_SHORT).show();
+        });
+
+        // Text Size
+        int currentSize = AppPreferences.getTextSize(this);
+        seekBarTextSize.setProgress(currentSize);
+        updateTextSizeDisplay(currentSize);
+
+        seekBarTextSize.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                updateTextSizeDisplay(progress);
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {}
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+                AppPreferences.setTextSize(SettingsActivity.this, seekBar.getProgress());
+                Toast.makeText(SettingsActivity.this, "Text Size updated. Restart app to apply fully.", Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    private void updateTextSizeDisplay(int progress) {
+        String sizeLabel;
+        switch (progress) {
+            case 0: sizeLabel = getString(R.string.settings_text_size_small); break;
+            case 2: sizeLabel = getString(R.string.settings_text_size_large); break;
+            case 3: sizeLabel = getString(R.string.settings_text_size_extra_large); break;
+            default: sizeLabel = getString(R.string.settings_text_size_normal); break;
+        }
+        tvTextSizeValue.setText(sizeLabel);
+    }
+
     private void updateAppVersionText() {
         if (tvAppVersion == null) return;
         try {
@@ -255,6 +312,7 @@ public class SettingsActivity extends AppCompatActivity {
 
 
     private void applyToolbarFont(Toolbar toolbar) {
+        if (AppPreferences.isStandardFontEnabled(this)) return;
         try {
             Typeface typeface = ResourcesCompat.getFont(this, R.font.agbalumo);
             // Find and apply font to toolbar title
@@ -274,27 +332,32 @@ public class SettingsActivity extends AppCompatActivity {
     }
 
     private void applySectionHeaderFonts() {
-        try {
-            Typeface typeface = ResourcesCompat.getFont(this, R.font.agbalumo);
-
-            // Apply font to all section headers
-            TextView tvAudioHeader = findViewById(R.id.tvAudioHeader);
-            TextView tvVisualHeader = findViewById(R.id.tvVisualHeader);
-            TextView tvNotificationsHeader = findViewById(R.id.tvNotificationsHeader);
-            TextView tvProgressHeader = findViewById(R.id.tvProgressHeader);
-            TextView tvAccountHeader = findViewById(R.id.tvAccountHeader);
-            TextView tvCloudHeader = findViewById(R.id.tvCloudHeader);
-            TextView tvAboutHeader = findViewById(R.id.tvAboutHeader);
-
-            if (tvAudioHeader != null) tvAudioHeader.setTypeface(typeface, android.graphics.Typeface.BOLD);
-            if (tvVisualHeader != null) tvVisualHeader.setTypeface(typeface, android.graphics.Typeface.BOLD);
-            if (tvNotificationsHeader != null) tvNotificationsHeader.setTypeface(typeface, android.graphics.Typeface.BOLD);
-            if (tvProgressHeader != null) tvProgressHeader.setTypeface(typeface, android.graphics.Typeface.BOLD);
-            if (tvAccountHeader != null) tvAccountHeader.setTypeface(typeface, android.graphics.Typeface.BOLD);
-            if (tvCloudHeader != null) tvCloudHeader.setTypeface(typeface, android.graphics.Typeface.BOLD);
-            if (tvAboutHeader != null) tvAboutHeader.setTypeface(typeface, android.graphics.Typeface.BOLD);
-        } catch (Exception ignored) {
+        Typeface typeface = null;
+        if (!AppPreferences.isStandardFontEnabled(this)) {
+            try {
+                typeface = ResourcesCompat.getFont(this, R.font.agbalumo);
+            } catch (Exception ignored) {
+            }
         }
+
+        // Apply font to all section headers
+        TextView tvAudioHeader = findViewById(R.id.tvAudioHeader);
+        TextView tvVisualHeader = findViewById(R.id.tvVisualHeader);
+        TextView tvNotificationsHeader = findViewById(R.id.tvNotificationsHeader);
+        TextView tvProgressHeader = findViewById(R.id.tvProgressHeader);
+        TextView tvAccountHeader = findViewById(R.id.tvAccountHeader);
+        TextView tvCloudHeader = findViewById(R.id.tvCloudHeader);
+        TextView tvAboutHeader = findViewById(R.id.tvAboutHeader);
+        TextView tvAccessibilityHeader = findViewById(R.id.tvAccessibilityHeader);
+
+        if (tvAudioHeader != null) tvAudioHeader.setTypeface(typeface, android.graphics.Typeface.BOLD);
+        if (tvVisualHeader != null) tvVisualHeader.setTypeface(typeface, android.graphics.Typeface.BOLD);
+        if (tvNotificationsHeader != null) tvNotificationsHeader.setTypeface(typeface, android.graphics.Typeface.BOLD);
+        if (tvProgressHeader != null) tvProgressHeader.setTypeface(typeface, android.graphics.Typeface.BOLD);
+        if (tvAccountHeader != null) tvAccountHeader.setTypeface(typeface, android.graphics.Typeface.BOLD);
+        if (tvCloudHeader != null) tvCloudHeader.setTypeface(typeface, android.graphics.Typeface.BOLD);
+        if (tvAboutHeader != null) tvAboutHeader.setTypeface(typeface, android.graphics.Typeface.BOLD);
+        if (tvAccessibilityHeader != null) tvAccessibilityHeader.setTypeface(typeface, android.graphics.Typeface.BOLD);
     }
 
     private void showPrivacyPolicy() {

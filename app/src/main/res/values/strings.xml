@@ -48,6 +48,16 @@
     <string name="content_description_next">Next</string>
     <string name="content_description_back">Back</string>
 
+    <!-- Accessibility -->
+    <string name="settings_accessibility_title">♿ Accessibility</string>
+    <string name="settings_high_contrast">High Contrast Mode</string>
+    <string name="settings_text_size">Text Size</string>
+    <string name="settings_text_size_small">Small</string>
+    <string name="settings_text_size_normal">Normal</string>
+    <string name="settings_text_size_large">Large</string>
+    <string name="settings_text_size_extra_large">Extra Large</string>
+    <string name="settings_standard_font">Use Standard Font</string>
+
     <!-- Quiz -->
     <string name="quiz_prompt_letter">Which letter did you hear?</string>
     <string name="quiz_prompt_number">Which number did you hear?</string>
