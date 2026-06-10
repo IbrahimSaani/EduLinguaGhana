@@ -3,6 +3,7 @@ package com.edulinguaghana;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.os.Handler;
@@ -32,6 +33,7 @@ public class ProgressActivity extends AppCompatActivity {
     private MaterialCardView cardStats, cardAccuracy, cardAchievements;
     private MediaPlayer sfxPlayer;
     private TextView tvAccuracyPercentage;
+    private SwipeRefreshLayout swipeRefreshLayout;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -55,6 +57,14 @@ public class ProgressActivity extends AppCompatActivity {
         btnShareProgress   = findViewById(R.id.btnShareProgress);
         progressAccuracy   = findViewById(R.id.progressAccuracy);
         tvAccuracyPercentage = findViewById(R.id.tvAccuracyPercentage);
+        swipeRefreshLayout = findViewById(R.id.swipeRefreshLayout);
+
+        if (swipeRefreshLayout != null) {
+            swipeRefreshLayout.setOnRefreshListener(() -> {
+                recreate(); // Simple way to refresh local stats for now
+            });
+            swipeRefreshLayout.setColorSchemeResources(R.color.colorAccent, R.color.colorPrimary);
+        }
         cardStats          = findViewById(R.id.cardStats);
         cardAccuracy       = findViewById(R.id.cardAccuracy);
         cardAchievements   = findViewById(R.id.cardAchievements);

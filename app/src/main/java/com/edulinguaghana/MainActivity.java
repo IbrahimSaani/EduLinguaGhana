@@ -34,6 +34,7 @@ import androidx.coordinatorlayout.widget.CoordinatorLayout;
 import androidx.core.content.ContextCompat;
 import androidx.core.widget.ImageViewCompat;
 import androidx.core.widget.NestedScrollView;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.card.MaterialCardView;
@@ -84,6 +85,7 @@ public class MainActivity extends AppCompatActivity {
     private android.widget.TextView tvTotalGames;
     private android.widget.TextView tvAchievements;
     private View offlineBanner;
+    private SwipeRefreshLayout swipeRefreshLayout;
     private BottomNavigationView bottomNavigation;
     private com.edulinguaghana.social.NotificationPermissionHelper permissionHelper;
     private FloatingActionButton fabRoleDashboard;
@@ -155,6 +157,13 @@ public class MainActivity extends AppCompatActivity {
         tvTotalQuizzes = findViewById(R.id.tvTotalQuizzes);
         tvTotalGames = findViewById(R.id.tvTotalGames);
         tvAchievements = findViewById(R.id.tvAchievements);
+        swipeRefreshLayout = findViewById(R.id.swipeRefresh);
+
+        // Setup Swipe Refresh
+        if (swipeRefreshLayout != null) {
+            swipeRefreshLayout.setOnRefreshListener(this::refreshData);
+            swipeRefreshLayout.setColorSchemeResources(R.color.colorAccent, R.color.colorPrimary);
+        }
         offlineBanner = findViewById(R.id.offlineBanner);
         languageChipGroup = findViewById(R.id.languageChipGroup);
         btnRecitalMode = findViewById(R.id.btnRecitalMode);
@@ -339,6 +348,26 @@ public class MainActivity extends AppCompatActivity {
     protected void onStop() {
         super.onStop();
         unregisterNetworkCallback();
+    }
+
+    private void refreshData() {
+        // Refresh all dynamic content
+        setupQuickStats();
+        setupDailyMotivation();
+        setupLearningStreak();
+        setupFunFacts();
+        setupEnhancedFeatures(); // Includes Role Dashboard refresh
+        
+        // Also refresh announcements if logged in
+        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+        if (user != null) {
+            setupAnnouncementsListener();
+        }
+
+        // Stop the refreshing animation after a short delay
+        if (swipeRefreshLayout != null) {
+            swipeRefreshLayout.postDelayed(() -> swipeRefreshLayout.setRefreshing(false), 1500);
+        }
     }
 
     private void requestNotificationPermission() {

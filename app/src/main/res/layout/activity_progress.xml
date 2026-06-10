@@ -30,602 +30,609 @@
 
     </com.google.android.material.appbar.AppBarLayout>
 
-    <androidx.core.widget.NestedScrollView
+    <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+        android:id="@+id/swipeRefreshLayout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
-        <LinearLayout
+        <androidx.core.widget.NestedScrollView
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:padding="16dp">
+            android:layout_height="match_parent">
 
-            <!-- Level Progress Card -->
-            <com.google.android.material.card.MaterialCardView
-                android:id="@+id/cardLevelProgress"
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="16dp"
-                app:cardCornerRadius="24dp"
-                app:cardElevation="8dp"
-                app:strokeWidth="0dp">
+                android:orientation="vertical"
+                android:padding="16dp">
 
-                <LinearLayout
+                <!-- Level Progress Card -->
+                <com.google.android.material.card.MaterialCardView
+                    android:id="@+id/cardLevelProgress"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:background="@drawable/bg_hero_glow"
-                    android:orientation="vertical"
-                    android:padding="24dp">
+                    android:layout_marginBottom="16dp"
+                    app:cardCornerRadius="24dp"
+                    app:cardElevation="8dp"
+                    app:strokeWidth="0dp">
 
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:orientation="horizontal"
-                        android:gravity="center_vertical">
-
-                        <com.google.android.material.card.MaterialCardView
-                            android:layout_width="@dimen/avatar_size_medium"
-                            android:layout_height="@dimen/avatar_size_medium"
-                            app:cardCornerRadius="32dp"
-                            app:cardElevation="4dp"
-                            app:cardBackgroundColor="@color/white">
-                            <TextView
-                                android:id="@+id/tvCurrentLevelBadge"
-                                android:layout_width="match_parent"
-                                android:layout_height="match_parent"
-                                android:gravity="center"
-                                android:text="1"
-                                android:textSize="28sp"
-                                android:textStyle="bold"
-                                android:textColor="@color/colorPrimary"
-                                android:fontFamily="@font/agbalumo" />
-                        </com.google.android.material.card.MaterialCardView>
+                        android:background="@drawable/bg_hero_glow"
+                        android:orientation="vertical"
+                        android:padding="24dp">
 
                         <LinearLayout
-                            android:layout_width="0dp"
+                            android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:layout_marginStart="16dp"
-                            android:orientation="vertical">
+                            android:orientation="horizontal"
+                            android:gravity="center_vertical">
+
+                            <com.google.android.material.card.MaterialCardView
+                                android:layout_width="@dimen/avatar_size_medium"
+                                android:layout_height="@dimen/avatar_size_medium"
+                                app:cardCornerRadius="32dp"
+                                app:cardElevation="4dp"
+                                app:cardBackgroundColor="@color/white">
+                                <TextView
+                                    android:id="@+id/tvCurrentLevelBadge"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="match_parent"
+                                    android:gravity="center"
+                                    android:text="1"
+                                    android:textSize="28sp"
+                                    android:textStyle="bold"
+                                    android:textColor="@color/colorPrimary"
+                                    android:fontFamily="@font/agbalumo" />
+                            </com.google.android.material.card.MaterialCardView>
+
+                            <LinearLayout
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:layout_marginStart="16dp"
+                                android:orientation="vertical">
+
+                                <TextView
+                                    android:id="@+id/tvLevelName"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="Beginner Explorer"
+                                    android:textSize="@dimen/text_headline_small"
+                                    android:textStyle="bold"
+                                    android:textColor="@color/colorPrimary"
+                                    android:fontFamily="@font/agbalumo"
+                                    app:autoSizeTextType="uniform"
+                                    app:autoSizeMinTextSize="14sp"
+                                    app:autoSizeMaxTextSize="20sp" />
+
+                                <TextView
+                                    android:id="@+id/tvXpToNextLevel"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="250 XP to Level 2"
+                                    android:textSize="13sp"
+                                    android:textColor="@color/textColorSecondary"
+                                    android:alpha="0.8" />
+                            </LinearLayout>
+
+                        </LinearLayout>
+
+                        <com.google.android.material.progressindicator.LinearProgressIndicator
+                            android:id="@+id/progressLevel"
+                            android:layout_width="match_parent"
+                            android:layout_height="12dp"
+                            android:layout_marginTop="20dp"
+                            app:trackThickness="12dp"
+                            app:trackCornerRadius="6dp"
+                            app:trackColor="#E0E0E0"
+                            app:indicatorColor="@color/colorPrimary"
+                            android:progress="40" />
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="8dp"
+                            android:orientation="horizontal">
 
                             <TextView
-                                android:id="@+id/tvLevelName"
+                                android:id="@+id/tvCurrentXP"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="Beginner Explorer"
-                                android:textSize="@dimen/text_headline_small"
+                                android:text="150 XP"
+                                android:textSize="12sp"
                                 android:textStyle="bold"
-                                android:textColor="@color/colorPrimary"
-                                android:fontFamily="@font/agbalumo"
-                                app:autoSizeTextType="uniform"
-                                app:autoSizeMinTextSize="14sp"
-                                app:autoSizeMaxTextSize="20sp" />
+                                android:textColor="@color/colorPrimary" />
+
+                            <View
+                                android:layout_width="0dp"
+                                android:layout_height="0dp"
+                                android:layout_weight="1" />
 
                             <TextView
-                                android:id="@+id/tvXpToNextLevel"
+                                android:id="@+id/tvTargetXP"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="250 XP to Level 2"
-                                android:textSize="13sp"
-                                android:textColor="@color/textColorSecondary"
-                                android:alpha="0.8" />
+                                android:text="400 XP"
+                                android:textSize="12sp"
+                                android:textColor="@color/textColorSecondary" />
                         </LinearLayout>
 
                     </LinearLayout>
+                </com.google.android.material.card.MaterialCardView>
 
-                    <com.google.android.material.progressindicator.LinearProgressIndicator
-                        android:id="@+id/progressLevel"
-                        android:layout_width="match_parent"
-                        android:layout_height="12dp"
-                        android:layout_marginTop="20dp"
-                        app:trackThickness="12dp"
-                        app:trackCornerRadius="6dp"
-                        app:trackColor="#E0E0E0"
-                        app:indicatorColor="@color/colorPrimary"
-                        android:progress="40" />
-
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="8dp"
-                        android:orientation="horizontal">
-
-                        <TextView
-                            android:id="@+id/tvCurrentXP"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="150 XP"
-                            android:textSize="12sp"
-                            android:textStyle="bold"
-                            android:textColor="@color/colorPrimary" />
-
-                        <View
-                            android:layout_width="0dp"
-                            android:layout_height="0dp"
-                            android:layout_weight="1" />
-
-                        <TextView
-                            android:id="@+id/tvTargetXP"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="400 XP"
-                            android:textSize="12sp"
-                            android:textColor="@color/textColorSecondary" />
-                    </LinearLayout>
-
-                </LinearLayout>
-            </com.google.android.material.card.MaterialCardView>
-
-            <!-- Statistics Card -->
-            <com.google.android.material.card.MaterialCardView
-                android:id="@+id/cardStats"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="16dp"
-                app:cardCornerRadius="20dp"
-                app:cardElevation="6dp"
-                app:cardBackgroundColor="@color/cardBackground"
-                app:strokeWidth="0dp">
-
-                <LinearLayout
+                <!-- Statistics Card -->
+                <com.google.android.material.card.MaterialCardView
+                    android:id="@+id/cardStats"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:padding="20dp">
+                    android:layout_marginBottom="16dp"
+                    app:cardCornerRadius="20dp"
+                    app:cardElevation="6dp"
+                    app:cardBackgroundColor="@color/cardBackground"
+                    app:strokeWidth="0dp">
 
-                    <!-- Card Header -->
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:orientation="horizontal"
-                        android:gravity="center_vertical"
-                        android:layout_marginBottom="20dp">
-
-                        <TextView
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:text="📈 Your Statistics"
-                            android:textSize="@dimen/text_headline_small"
-                            android:textStyle="bold"
-                            android:fontFamily="@font/agbalumo"
-                            android:textColor="@color/colorPrimary"
-                            android:letterSpacing="0.02"
-                            app:autoSizeTextType="uniform"
-                            app:autoSizeMinTextSize="16sp"
-                            app:autoSizeMaxTextSize="20sp" />
-
-                    </LinearLayout>
-
-                    <!-- Stats Grid -->
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:orientation="vertical"
-                        android:divider="@drawable/divider_horizontal"
-                        android:showDividers="middle">
+                        android:padding="20dp">
 
-                        <!-- High Score Stat -->
+                        <!-- Card Header -->
                         <LinearLayout
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:orientation="horizontal"
                             android:gravity="center_vertical"
-                            android:padding="12dp"
-                            android:background="?attr/selectableItemBackground">
+                            android:layout_marginBottom="20dp">
 
                             <TextView
-                                android:layout_width="40dp"
-                                android:layout_height="40dp"
-                                android:text="🏆"
-                                android:textSize="28sp"
-                                android:gravity="center"
-                                android:layout_marginEnd="16dp" />
-
-                            <LinearLayout
                                 android:layout_width="0dp"
                                 android:layout_height="wrap_content"
                                 android:layout_weight="1"
-                                android:orientation="vertical">
-
-                                <TextView
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:text="Best Quiz Score"
-                                    android:textSize="12sp"
-                                    android:textColor="@color/textSecondary"
-                                    android:textStyle="bold"
-                                    android:textAllCaps="true" />
-
-                                <TextView
-                                    android:id="@+id/tvStatHighScore"
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    tools:text="8"
-                                    android:textSize="20sp"
-                                    android:textStyle="bold"
-                                    android:textColor="@color/textPrimary"
-                                    android:layout_marginTop="2dp" />
-
-                            </LinearLayout>
+                                android:text="📈 Your Statistics"
+                                android:textSize="@dimen/text_headline_small"
+                                android:textStyle="bold"
+                                android:fontFamily="@font/agbalumo"
+                                android:textColor="@color/colorPrimary"
+                                android:letterSpacing="0.02"
+                                app:autoSizeTextType="uniform"
+                                app:autoSizeMinTextSize="16sp"
+                                app:autoSizeMaxTextSize="20sp" />
 
                         </LinearLayout>
 
-                        <!-- Total Quizzes Stat -->
+                        <!-- Stats Grid -->
                         <LinearLayout
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:orientation="horizontal"
-                            android:gravity="center_vertical"
-                            android:padding="12dp"
-                            android:background="?attr/selectableItemBackground">
+                            android:orientation="vertical"
+                            android:divider="@drawable/divider_horizontal"
+                            android:showDividers="middle">
 
-                            <TextView
-                                android:layout_width="40dp"
-                                android:layout_height="40dp"
-                                android:text="📝"
-                                android:textSize="28sp"
-                                android:gravity="center"
-                                android:layout_marginEnd="16dp" />
-
+                            <!-- High Score Stat -->
                             <LinearLayout
-                                android:layout_width="0dp"
+                                android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
-                                android:layout_weight="1"
-                                android:orientation="vertical">
+                                android:orientation="horizontal"
+                                android:gravity="center_vertical"
+                                android:padding="12dp"
+                                android:background="?attr/selectableItemBackground">
 
                                 <TextView
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:text="Total Quizzes Taken"
-                                    android:textSize="12sp"
-                                    android:textColor="@color/textSecondary"
-                                    android:textStyle="bold"
-                                    android:textAllCaps="true" />
+                                    android:layout_width="40dp"
+                                    android:layout_height="40dp"
+                                    android:text="🏆"
+                                    android:textSize="28sp"
+                                    android:gravity="center"
+                                    android:layout_marginEnd="16dp" />
 
-                                <TextView
-                                    android:id="@+id/tvStatTotalQuizzes"
-                                    android:layout_width="wrap_content"
+                                <LinearLayout
+                                    android:layout_width="0dp"
                                     android:layout_height="wrap_content"
-                                    tools:text="15 quizzes"
-                                    android:textSize="20sp"
-                                    android:textStyle="bold"
-                                    android:textColor="@color/textPrimary"
-                                    android:layout_marginTop="2dp" />
+                                    android:layout_weight="1"
+                                    android:orientation="vertical">
+
+                                    <TextView
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:text="Best Quiz Score"
+                                        android:textSize="12sp"
+                                        android:textColor="@color/textSecondary"
+                                        android:textStyle="bold"
+                                        android:textAllCaps="true" />
+
+                                    <TextView
+                                        android:id="@+id/tvStatHighScore"
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        tools:text="8"
+                                        android:textSize="20sp"
+                                        android:textStyle="bold"
+                                        android:textColor="@color/textPrimary"
+                                        android:layout_marginTop="2dp" />
+
+                                </LinearLayout>
 
                             </LinearLayout>
 
-                        </LinearLayout>
-
-                        <!-- Total Correct Stat -->
-                        <LinearLayout
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:orientation="horizontal"
-                            android:gravity="center_vertical"
-                            android:padding="12dp"
-                            android:background="?attr/selectableItemBackground">
-
-                            <TextView
-                                android:layout_width="40dp"
-                                android:layout_height="40dp"
-                                android:text="✅"
-                                android:textSize="28sp"
-                                android:gravity="center"
-                                android:layout_marginEnd="16dp" />
-
+                            <!-- Total Quizzes Stat -->
                             <LinearLayout
-                                android:layout_width="0dp"
+                                android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
-                                android:layout_weight="1"
-                                android:orientation="vertical">
+                                android:orientation="horizontal"
+                                android:gravity="center_vertical"
+                                android:padding="12dp"
+                                android:background="?attr/selectableItemBackground">
 
                                 <TextView
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:text="Total Correct Answers"
-                                    android:textSize="12sp"
-                                    android:textColor="@color/textSecondary"
-                                    android:textStyle="bold"
-                                    android:textAllCaps="true" />
+                                    android:layout_width="40dp"
+                                    android:layout_height="40dp"
+                                    android:text="📝"
+                                    android:textSize="28sp"
+                                    android:gravity="center"
+                                    android:layout_marginEnd="16dp" />
 
-                                <TextView
-                                    android:id="@+id/tvStatTotalCorrect"
-                                    android:layout_width="wrap_content"
+                                <LinearLayout
+                                    android:layout_width="0dp"
                                     android:layout_height="wrap_content"
-                                    tools:text="120 answers"
-                                    android:textSize="20sp"
-                                    android:textStyle="bold"
-                                    android:textColor="@color/textPrimary"
-                                    android:layout_marginTop="2dp" />
+                                    android:layout_weight="1"
+                                    android:orientation="vertical">
+
+                                    <TextView
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:text="Total Quizzes Taken"
+                                        android:textSize="12sp"
+                                        android:textColor="@color/textSecondary"
+                                        android:textStyle="bold"
+                                        android:textAllCaps="true" />
+
+                                    <TextView
+                                        android:id="@+id/tvStatTotalQuizzes"
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        tools:text="15 quizzes"
+                                        android:textSize="20sp"
+                                        android:textStyle="bold"
+                                        android:textColor="@color/textPrimary"
+                                        android:layout_marginTop="2dp" />
+
+                                </LinearLayout>
 
                             </LinearLayout>
 
-                        </LinearLayout>
-
-                        <!-- Perfect Scores Stat -->
-                        <LinearLayout
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:orientation="horizontal"
-                            android:gravity="center_vertical"
-                            android:padding="12dp"
-                            android:background="?attr/selectableItemBackground">
-
-                            <TextView
-                                android:layout_width="40dp"
-                                android:layout_height="40dp"
-                                android:text="✨"
-                                android:textSize="28sp"
-                                android:gravity="center"
-                                android:layout_marginEnd="16dp" />
-
+                            <!-- Total Correct Stat -->
                             <LinearLayout
-                                android:layout_width="0dp"
+                                android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
-                                android:layout_weight="1"
-                                android:orientation="vertical">
+                                android:orientation="horizontal"
+                                android:gravity="center_vertical"
+                                android:padding="12dp"
+                                android:background="?attr/selectableItemBackground">
 
                                 <TextView
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:text="Perfect Scores"
-                                    android:textSize="12sp"
-                                    android:textColor="@color/textSecondary"
-                                    android:textStyle="bold"
-                                    android:textAllCaps="true" />
+                                    android:layout_width="40dp"
+                                    android:layout_height="40dp"
+                                    android:text="✅"
+                                    android:textSize="28sp"
+                                    android:gravity="center"
+                                    android:layout_marginEnd="16dp" />
 
-                                <TextView
-                                    android:id="@+id/tvStatPerfectScores"
-                                    android:layout_width="wrap_content"
+                                <LinearLayout
+                                    android:layout_width="0dp"
                                     android:layout_height="wrap_content"
-                                    tools:text="3 perfects"
-                                    android:textSize="20sp"
-                                    android:textStyle="bold"
-                                    android:textColor="@color/textPrimary"
-                                    android:layout_marginTop="2dp" />
+                                    android:layout_weight="1"
+                                    android:orientation="vertical">
+
+                                    <TextView
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:text="Total Correct Answers"
+                                        android:textSize="12sp"
+                                        android:textColor="@color/textSecondary"
+                                        android:textStyle="bold"
+                                        android:textAllCaps="true" />
+
+                                    <TextView
+                                        android:id="@+id/tvStatTotalCorrect"
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        tools:text="120 answers"
+                                        android:textSize="20sp"
+                                        android:textStyle="bold"
+                                        android:textColor="@color/textPrimary"
+                                        android:layout_marginTop="2dp" />
+
+                                </LinearLayout>
 
                             </LinearLayout>
 
-                        </LinearLayout>
-
-                        <!-- Total Games Stat -->
-                        <LinearLayout
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:orientation="horizontal"
-                            android:gravity="center_vertical"
-                            android:padding="12dp"
-                            android:background="?attr/selectableItemBackground">
-
-                            <TextView
-                                android:layout_width="40dp"
-                                android:layout_height="40dp"
-                                android:text="🎮"
-                                android:textSize="28sp"
-                                android:gravity="center"
-                                android:layout_marginEnd="16dp" />
-
+                            <!-- Perfect Scores Stat -->
                             <LinearLayout
-                                android:layout_width="0dp"
+                                android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
-                                android:layout_weight="1"
-                                android:orientation="vertical">
+                                android:orientation="horizontal"
+                                android:gravity="center_vertical"
+                                android:padding="12dp"
+                                android:background="?attr/selectableItemBackground">
 
                                 <TextView
-                                    android:layout_width="wrap_content"
+                                    android:layout_width="40dp"
+                                    android:layout_height="40dp"
+                                    android:text="✨"
+                                    android:textSize="28sp"
+                                    android:gravity="center"
+                                    android:layout_marginEnd="16dp" />
+
+                                <LinearLayout
+                                    android:layout_width="0dp"
                                     android:layout_height="wrap_content"
-                                    android:text="Total Games Played"
-                                    android:textSize="12sp"
-                                    android:textColor="@color/textSecondary"
-                                    android:textStyle="bold"
-                                    android:textAllCaps="true" />
+                                    android:layout_weight="1"
+                                    android:orientation="vertical">
+
+                                    <TextView
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:text="Perfect Scores"
+                                        android:textSize="12sp"
+                                        android:textColor="@color/textSecondary"
+                                        android:textStyle="bold"
+                                        android:textAllCaps="true" />
+
+                                    <TextView
+                                        android:id="@+id/tvStatPerfectScores"
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        tools:text="3 perfects"
+                                        android:textSize="20sp"
+                                        android:textStyle="bold"
+                                        android:textColor="@color/textPrimary"
+                                        android:layout_marginTop="2dp" />
+
+                                </LinearLayout>
+
+                            </LinearLayout>
+
+                            <!-- Total Games Stat -->
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:orientation="horizontal"
+                                android:gravity="center_vertical"
+                                android:padding="12dp"
+                                android:background="?attr/selectableItemBackground">
 
                                 <TextView
-                                    android:id="@+id/tvStatTotalGames"
-                                    android:layout_width="wrap_content"
+                                    android:layout_width="40dp"
+                                    android:layout_height="40dp"
+                                    android:text="🎮"
+                                    android:textSize="28sp"
+                                    android:gravity="center"
+                                    android:layout_marginEnd="16dp" />
+
+                                <LinearLayout
+                                    android:layout_width="0dp"
                                     android:layout_height="wrap_content"
-                                    tools:text="5 games"
-                                    android:textSize="20sp"
-                                    android:textStyle="bold"
-                                    android:textColor="@color/textPrimary"
-                                    android:layout_marginTop="2dp" />
+                                    android:layout_weight="1"
+                                    android:orientation="vertical">
+
+                                    <TextView
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:text="Total Games Played"
+                                        android:textSize="12sp"
+                                        android:textColor="@color/textSecondary"
+                                        android:textStyle="bold"
+                                        android:textAllCaps="true" />
+
+                                    <TextView
+                                        android:id="@+id/tvStatTotalGames"
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        tools:text="5 games"
+                                        android:textSize="20sp"
+                                        android:textStyle="bold"
+                                        android:textColor="@color/textPrimary"
+                                        android:layout_marginTop="2dp" />
+
+                                </LinearLayout>
 
                             </LinearLayout>
 
                         </LinearLayout>
 
                     </LinearLayout>
+                </com.google.android.material.card.MaterialCardView>
 
-                </LinearLayout>
-            </com.google.android.material.card.MaterialCardView>
-
-            <!-- Accuracy Card -->
-            <com.google.android.material.card.MaterialCardView
-                android:id="@+id/cardAccuracy"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="16dp"
-                app:cardCornerRadius="20dp"
-                app:cardElevation="6dp"
-                app:cardBackgroundColor="@color/cardBackground"
-                app:strokeWidth="0dp">
-
-                <LinearLayout
+                <!-- Accuracy Card -->
+                <com.google.android.material.card.MaterialCardView
+                    android:id="@+id/cardAccuracy"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:padding="20dp">
+                    android:layout_marginBottom="16dp"
+                    app:cardCornerRadius="20dp"
+                    app:cardElevation="6dp"
+                    app:cardBackgroundColor="@color/cardBackground"
+                    app:strokeWidth="0dp">
 
-                    <!-- Card Header -->
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="🎯 Overall Accuracy"
-                        android:textSize="20sp"
-                        android:textStyle="bold"
-                        android:fontFamily="@font/agbalumo"
-                        android:textColor="@color/colorPrimary"
-                        android:letterSpacing="0.02"
-                        android:layout_marginBottom="20dp" />
-
-                    <!-- Circular Progress with Percentage -->
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:orientation="horizontal"
-                        android:gravity="center_vertical"
-                        android:baselineAligned="false">
+                        android:orientation="vertical"
+                        android:padding="20dp">
 
-                        <FrameLayout
+                        <!-- Card Header -->
+                        <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_marginEnd="24dp">
+                            android:text="🎯 Overall Accuracy"
+                            android:textSize="20sp"
+                            android:textStyle="bold"
+                            android:fontFamily="@font/agbalumo"
+                            android:textColor="@color/colorPrimary"
+                            android:letterSpacing="0.02"
+                            android:layout_marginBottom="20dp" />
 
-                            <com.google.android.material.progressindicator.CircularProgressIndicator
-                                android:id="@+id/progressAccuracy"
-                                android:layout_width="100dp"
-                                android:layout_height="100dp"
-                                app:indicatorSize="100dp"
-                                app:trackThickness="10dp"
-                                app:indicatorColor="@color/colorPrimary"
-                                app:trackColor="@color/progressTrackColor"
-                                app:trackCornerRadius="5dp" />
-
-                            <TextView
-                                android:id="@+id/tvAccuracyPercentage"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_gravity="center"
-                                tools:text="80%"
-                                android:textSize="24sp"
-                                android:textStyle="bold"
-                                android:textColor="@color/colorPrimary" />
-
-                        </FrameLayout>
-
+                        <!-- Circular Progress with Percentage -->
                         <LinearLayout
-                            android:layout_width="0dp"
+                            android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:orientation="vertical">
+                            android:orientation="horizontal"
+                            android:gravity="center_vertical"
+                            android:baselineAligned="false">
 
-                            <TextView
-                                android:id="@+id/tvStatAccuracy"
+                            <FrameLayout
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                tools:text="You're doing great!"
-                                android:textSize="18sp"
-                                android:textStyle="bold"
-                                android:textColor="@color/textPrimary"
-                                android:layout_marginBottom="8dp" />
+                                android:layout_marginEnd="24dp">
 
-                            <TextView
-                                android:id="@+id/tvAccuracyDescription"
-                                android:layout_width="wrap_content"
+                                <com.google.android.material.progressindicator.CircularProgressIndicator
+                                    android:id="@+id/progressAccuracy"
+                                    android:layout_width="100dp"
+                                    android:layout_height="100dp"
+                                    app:indicatorSize="100dp"
+                                    app:trackThickness="10dp"
+                                    app:indicatorColor="@color/colorPrimary"
+                                    app:trackColor="@color/progressTrackColor"
+                                    app:trackCornerRadius="5dp" />
+
+                                <TextView
+                                    android:id="@+id/tvAccuracyPercentage"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_gravity="center"
+                                    tools:text="80%"
+                                    android:textSize="24sp"
+                                    android:textStyle="bold"
+                                    android:textColor="@color/colorPrimary" />
+
+                            </FrameLayout>
+
+                            <LinearLayout
+                                android:layout_width="0dp"
                                 android:layout_height="wrap_content"
-                                tools:text="Keep up the excellent work to maintain your high accuracy rate."
-                                android:textSize="14sp"
-                                android:textColor="@color/textSecondary"
-                                android:lineSpacingExtra="2dp" />
+                                android:layout_weight="1"
+                                android:orientation="vertical">
+
+                                <TextView
+                                    android:id="@+id/tvStatAccuracy"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    tools:text="You're doing great!"
+                                    android:textSize="18sp"
+                                    android:textStyle="bold"
+                                    android:textColor="@color/textPrimary"
+                                    android:layout_marginBottom="8dp" />
+
+                                <TextView
+                                    android:id="@+id/tvAccuracyDescription"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    tools:text="Keep up the excellent work to maintain your high accuracy rate."
+                                    android:textSize="14sp"
+                                    android:textColor="@color/textSecondary"
+                                    android:lineSpacingExtra="2dp" />
+
+                            </LinearLayout>
 
                         </LinearLayout>
 
                     </LinearLayout>
 
-                </LinearLayout>
+                </com.google.android.material.card.MaterialCardView>
 
-            </com.google.android.material.card.MaterialCardView>
+                <!-- Achievements & Level Card -->
+                <com.google.android.material.card.MaterialCardView
+                    android:id="@+id/cardAchievements"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="16dp"
+                    app:cardCornerRadius="20dp"
+                    app:cardElevation="6dp"
+                    app:cardBackgroundColor="@color/cardBackground"
+                    app:strokeWidth="0dp">
 
-            <!-- Achievements & Level Card -->
-            <com.google.android.material.card.MaterialCardView
-                android:id="@+id/cardAchievements"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="16dp"
-                app:cardCornerRadius="20dp"
-                app:cardElevation="6dp"
-                app:cardBackgroundColor="@color/cardBackground"
-                app:strokeWidth="0dp">
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:padding="20dp">
 
+                        <!-- Card Header -->
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="🏅 Achievements &amp; Level"
+                            android:textSize="20sp"
+                            android:textStyle="bold"
+                            android:fontFamily="@font/agbalumo"
+                            android:textColor="@color/colorPrimary"
+                            android:letterSpacing="0.02"
+                            android:layout_marginBottom="16dp" />
+
+                        <!-- Achievement Content -->
+                        <TextView
+                            android:id="@+id/tvAchievements"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:lineSpacingExtra="4dp"
+                            tools:text="Level 4 – Fluent Explorer\n\n🏅 Excellent accuracy (80%+). Great job!\n\nTotal correct answers so far: 120\n\nNext level at 100 correct answers.\nOnly 20 more to go!"
+                            android:textSize="15sp"
+                            android:textColor="@color/textPrimary" />
+
+                    </LinearLayout>
+
+                </com.google.android.material.card.MaterialCardView>
+
+                <!-- Action Buttons -->
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:padding="20dp">
+                    android:orientation="horizontal"
+                    android:gravity="center"
+                    android:layout_marginTop="8dp">
 
-                    <!-- Card Header -->
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="🏅 Achievements &amp; Level"
-                        android:textSize="20sp"
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btnShareProgress"
+                        style="@style/Widget.MaterialComponents.Button"
+                        android:layout_width="0dp"
+                        android:layout_height="@dimen/button_height_normal"
+                        android:layout_weight="1"
+                        android:layout_marginEnd="8dp"
+                        android:text="📤 Share Progress"
+                        android:textSize="@dimen/text_body_small"
                         android:textStyle="bold"
-                        android:fontFamily="@font/agbalumo"
-                        android:textColor="@color/colorPrimary"
-                        android:letterSpacing="0.02"
-                        android:layout_marginBottom="16dp" />
+                        android:textColor="@color/white"
+                        android:backgroundTint="@color/colorPrimary"
+                        app:cornerRadius="28dp"
+                        app:icon="@drawable/ic_share"
+                        app:iconTint="@color/white"
+                        app:iconGravity="textStart"
+                        android:elevation="4dp" />
 
-                    <!-- Achievement Content -->
-                    <TextView
-                        android:id="@+id/tvAchievements"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:lineSpacingExtra="4dp"
-                        tools:text="Level 4 – Fluent Explorer\n\n🏅 Excellent accuracy (80%+). Great job!\n\nTotal correct answers so far: 120\n\nNext level at 100 correct answers.\nOnly 20 more to go!"
-                        android:textSize="15sp"
-                        android:textColor="@color/textPrimary" />
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btnCloseProgress"
+                        style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                        android:layout_width="0dp"
+                        android:layout_height="@dimen/button_height_normal"
+                        android:layout_weight="1"
+                        android:layout_marginStart="8dp"
+                        android:text="← Back"
+                        android:textSize="@dimen/text_body_small"
+                        android:textStyle="bold"
+                        android:textColor="@color/colorPrimary"
+                        app:strokeColor="@color/colorPrimary"
+                        app:strokeWidth="2dp"
+                        app:cornerRadius="28dp" />
 
                 </LinearLayout>
 
-            </com.google.android.material.card.MaterialCardView>
-
-            <!-- Action Buttons -->
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:gravity="center"
-                android:layout_marginTop="8dp">
-
-                <com.google.android.material.button.MaterialButton
-                    android:id="@+id/btnShareProgress"
-                    style="@style/Widget.MaterialComponents.Button"
-                    android:layout_width="0dp"
-                    android:layout_height="@dimen/button_height_normal"
-                    android:layout_weight="1"
-                    android:layout_marginEnd="8dp"
-                    android:text="📤 Share Progress"
-                    android:textSize="@dimen/text_body_small"
-                    android:textStyle="bold"
-                    android:textColor="@color/white"
-                    android:backgroundTint="@color/colorPrimary"
-                    app:cornerRadius="28dp"
-                    app:icon="@drawable/ic_share"
-                    app:iconTint="@color/white"
-                    app:iconGravity="textStart"
-                    android:elevation="4dp" />
-
-                <com.google.android.material.button.MaterialButton
-                    android:id="@+id/btnCloseProgress"
-                    style="@style/Widget.MaterialComponents.Button.OutlinedButton"
-                    android:layout_width="0dp"
-                    android:layout_height="@dimen/button_height_normal"
-                    android:layout_weight="1"
-                    android:layout_marginStart="8dp"
-                    android:text="← Back"
-                    android:textSize="@dimen/text_body_small"
-                    android:textStyle="bold"
-                    android:textColor="@color/colorPrimary"
-                    app:strokeColor="@color/colorPrimary"
-                    app:strokeWidth="2dp"
-                    app:cornerRadius="28dp" />
-
             </LinearLayout>
 
-        </LinearLayout>
+        </androidx.core.widget.NestedScrollView>
 
-    </androidx.core.widget.NestedScrollView>
+    </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>
