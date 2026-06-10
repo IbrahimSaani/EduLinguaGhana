@@ -45,6 +45,9 @@ public class ProgressAggregate {
     private int quizzesThisMonth;
     private int xpThisMonth;
 
+    // Per-mode high scores
+    private Map<String, Integer> quizHighScores;
+
     public ProgressAggregate() {
         // Required for Firebase
     }
@@ -121,5 +124,8 @@ public class ProgressAggregate {
 
     public int getXpThisMonth() { return xpThisMonth; }
     public void setXpThisMonth(int xpThisMonth) { this.xpThisMonth = xpThisMonth; }
+
+    public Map<String, Integer> getQuizHighScores() { return quizHighScores; }
+    public void setQuizHighScores(Map<String, Integer> quizHighScores) { this.quizHighScores = quizHighScores; }
 }
 

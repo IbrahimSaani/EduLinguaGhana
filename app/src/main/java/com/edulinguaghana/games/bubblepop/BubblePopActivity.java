@@ -138,6 +138,11 @@ public class BubblePopActivity extends AppCompatActivity {
         overlayLayout = findViewById(R.id.overlayLayout);
         konfettiView = findViewById(R.id.konfettiView);
 
+        findViewById(R.id.btnPause).setOnClickListener(v -> {
+            v.performHapticFeedback(HapticFeedbackConstants.VIRTUAL_KEY);
+            togglePause();
+        });
+
         findViewById(R.id.btnResume).setOnClickListener(v -> {
             v.performHapticFeedback(HapticFeedbackConstants.VIRTUAL_KEY);
             togglePause();

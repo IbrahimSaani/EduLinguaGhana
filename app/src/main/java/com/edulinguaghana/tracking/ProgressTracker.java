@@ -16,6 +16,8 @@ import com.google.firebase.database.ValueEventListener;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.UUID;
 
 /**
@@ -300,6 +302,7 @@ public class ProgressTracker {
                 int totalFunGamesCount = 0;
                 int bestFunGameScore = 0;
                 int funGamesThisWeek = 0;
+                Map<String, Integer> quizHighScores = new HashMap<>();
                 
                 long now = System.currentTimeMillis();
                 long oneWeekAgo = now - (7L * 24 * 60 * 60 * 1000);
@@ -314,6 +317,16 @@ public class ProgressTracker {
                             totalCorrectCount += activity.getCorrectAnswers();
                             totalQuestionsCount += activity.getTotalQuestions();
                             
+                            // Track high scores per mode
+                            String mode = activity.getMode();
+                            int currentScore = activity.getScore();
+                            if (mode != null) {
+                                int existingHigh = quizHighScores.getOrDefault(mode, 0);
+                                if (currentScore > existingHigh) {
+                                    quizHighScores.put(mode, currentScore);
+                                }
+                            }
+
                             if (activity.getTimestamp() >= oneWeekAgo) {
                                 quizzesThisWeek++;
                                 xpThisWeek += activity.getXpEarned();
@@ -323,12 +336,23 @@ public class ProgressTracker {
                             if (activity.getScore() > bestFunGameScore) {
                                 bestFunGameScore = activity.getScore();
                             }
+
+                            // Also track individual fun game high scores in the same map
+                            String mode = activity.getMode();
+                            int currentScore = activity.getScore();
+                            if (mode != null) {
+                                int existingHigh = quizHighScores.getOrDefault(mode, 0);
+                                if (currentScore > existingHigh) {
+                                    quizHighScores.put(mode, currentScore);
+                                }
+                            }
                             
                             if (activity.getTimestamp() >= oneWeekAgo) {
                                 funGamesThisWeek++;
                                 xpThisWeek += activity.getXpEarned();
                             }
-                        } else if (activity.getActivityType() == ProgressActivity.ActivityType.XP_EARNED) {
+                        }
+else if (activity.getActivityType() == ProgressActivity.ActivityType.XP_EARNED) {
                             if (activity.getTimestamp() >= oneWeekAgo) {
                                 xpThisWeek += activity.getXpEarned();
                             }
@@ -345,6 +369,7 @@ public class ProgressTracker {
                 final int finalFunGamesCount = totalFunGamesCount;
                 final int finalBestFunGameScore = bestFunGameScore;
                 final int finalFunGamesWeek = funGamesThisWeek;
+                final Map<String, Integer> finalQuizHighScores = quizHighScores;
 
                 aggregatesRef.child(userId).addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
@@ -382,6 +407,7 @@ public class ProgressTracker {
                             aggregate.setTotalFunGames(finalFunGamesCount);
                             aggregate.setBestFunGameScore(finalBestFunGameScore);
                             aggregate.setFunGamesThisWeek(finalFunGamesWeek);
+                            aggregate.setQuizHighScores(finalQuizHighScores);
 
                             // Calculate accuracy
                             if (finalQuestionsCount > 0) {

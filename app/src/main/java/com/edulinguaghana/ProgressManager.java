@@ -218,6 +218,17 @@ public class ProgressManager {
                 .apply();
     }
 
+    // Save multiple quiz-specific high scores
+    public static void saveQuizHighScores(Context context, java.util.Map<java.lang.String, java.lang.Integer> highScores) {
+        if (highScores == null || highScores.isEmpty()) return;
+        SharedPreferences prefs = context.getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = prefs.edit();
+        for (java.util.Map.Entry<java.lang.String, java.lang.Integer> entry : highScores.entrySet()) {
+            editor.putInt("high_score_" + entry.getKey(), entry.getValue());
+        }
+        editor.apply();
+    }
+
     // Clear progress (optional)
     public static void resetProgress(Context context) {
         context.getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE)

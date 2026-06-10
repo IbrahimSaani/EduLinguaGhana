@@ -587,6 +587,12 @@ public class LoginActivity extends AppCompatActivity {
                             aggregate.getTotalCorrectAnswers(),
                             aggregate.getTotalQuestions());
 
+                    // Restore Per-Quiz High Scores
+                    if (aggregate.getQuizHighScores() != null) {
+                        com.edulinguaghana.ProgressManager.saveQuizHighScores(LoginActivity.this,
+                                aggregate.getQuizHighScores());
+                    }
+
                     // Restore Streak
                     com.edulinguaghana.StreakManager streakManager = new com.edulinguaghana.StreakManager(LoginActivity.this);
                     streakManager.saveAllStreakData(aggregate.getCurrentStreak(),

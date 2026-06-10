@@ -25,6 +25,8 @@ import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
+import androidx.activity.OnBackPressedCallback;
+import com.google.android.material.appbar.MaterialToolbar;
 
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
@@ -51,6 +53,8 @@ public class SpeedGameActivity extends AppCompatActivity {
     private ProgressBar speedProgressBar;
     private ShadowView shadowView;
     private nl.dionsegijn.konfetti.xml.KonfettiView konfettiView;
+    private View overlayLayout;
+    private TextView tvOverlayTitle;
 
     // Game variables
     private int score = 0;
@@ -60,6 +64,8 @@ public class SpeedGameActivity extends AppCompatActivity {
     private long timeLeftMs;
     private long gameStartTime;
     private boolean isChallengeMode = false;
+    private boolean isPaused = false;
+    private boolean isGameOver = false;
     private String challengeId;
     private String quizType = "letters";  // NEW: Support different quiz modes
     private String[] alphabet;  // NEW: Language-specific alphabet
@@ -141,6 +147,20 @@ public class SpeedGameActivity extends AppCompatActivity {
         btnPlayAudio = findViewById(R.id.btnPlayAudio);
         shadowView = findViewById(R.id.shadowView);
         konfettiView = findViewById(R.id.konfettiView);
+        overlayLayout = findViewById(R.id.overlayLayout);
+        tvOverlayTitle = findViewById(R.id.tvOverlayTitle);
+
+        MaterialToolbar toolbar = findViewById(R.id.toolbar);
+        if (toolbar != null) {
+            toolbar.setNavigationOnClickListener(v -> {
+                v.performHapticFeedback(HapticFeedbackConstants.VIRTUAL_KEY);
+                if (!isGameOver) {
+                    togglePause();
+                } else {
+                    finish();
+                }
+            });
+        }
 
         // OPTIONAL: if you added a Play Audio button in XML, otherwise comment out
         btnPlayAudio = findViewById(R.id.btnPlayAudio);
@@ -167,9 +187,20 @@ public class SpeedGameActivity extends AppCompatActivity {
 
         btnBack.setOnClickListener(v -> {
             v.performHapticFeedback(HapticFeedbackConstants.VIRTUAL_KEY);
-            cancelTimer();
-            finish();
+            if (!isGameOver) {
+                togglePause();
+            } else {
+                finish();
+            }
         });
+
+        findViewById(R.id.btnPause).setOnClickListener(v -> togglePause());
+        findViewById(R.id.btnResume).setOnClickListener(v -> togglePause());
+        findViewById(R.id.btnRestart).setOnClickListener(v -> {
+            if (overlayLayout != null) overlayLayout.setVisibility(View.GONE);
+            startNewRound();
+        });
+        findViewById(R.id.btnQuit).setOnClickListener(v -> finish());
 
         if (btnPlayAudio != null) {
             btnPlayAudio.setOnClickListener(v -> {
@@ -179,6 +210,16 @@ public class SpeedGameActivity extends AppCompatActivity {
         }
 
         // --- Start game ---
+        getOnBackPressedDispatcher().addCallback(this, new androidx.activity.OnBackPressedCallback(true) {
+            @Override
+            public void handleOnBackPressed() {
+                if (!isGameOver) {
+                    togglePause();
+                } else {
+                    finish();
+                }
+            }
+        });
         startNewRound();
     }
 
@@ -266,7 +307,12 @@ public class SpeedGameActivity extends AppCompatActivity {
 
     private void startNewRound() {
         score = 0;
+        isGameOver = false;
+        isPaused = false;
         gameStartTime = System.currentTimeMillis();
+        
+        if (overlayLayout != null) overlayLayout.setVisibility(View.GONE);
+        setOptionsEnabled(true);
         
         // Support challenge duration
         if (isChallengeMode) {
@@ -277,8 +323,7 @@ public class SpeedGameActivity extends AppCompatActivity {
         
         tvGameScore.setText(getString(R.string.quiz_score, score));
         tvGameFeedback.setText("");
-        timeLeftMs = TOTAL_TIME_MS;
-        tvGameTimer.setText(getString(R.string.quiz_timer, (timeLeftMs / 1000)));
+        tvGameTimer.setText(getString(R.string.quiz_timer, (int)(timeLeftMs / 1000)));
         tvGameTimer.setTextColor(Color.parseColor("#0D47A1")); // Dark blue for visibility
 
         generateNewQuestion();
@@ -286,6 +331,7 @@ public class SpeedGameActivity extends AppCompatActivity {
     }
 
     private void generateNewQuestion() {
+        isGameOver = false;
         // Reset button backgrounds for gaming UI
         MaterialButton[] buttons = {btnOption1, btnOption2, btnOption3, btnOption4, btnOption5, btnOption6};
         for (MaterialButton button : buttons) {
@@ -293,6 +339,10 @@ public class SpeedGameActivity extends AppCompatActivity {
                 button.setBackgroundResource(R.drawable.bg_quiz_option);
                 button.setScaleX(1.0f);
                 button.setScaleY(1.0f);
+                button.setTextColor(ContextCompat.getColor(this, R.color.colorPrimary));
+                button.setAlpha(1.0f);
+                button.setStrokeColor(ColorStateList.valueOf(Color.TRANSPARENT));
+                button.setVisibility(View.VISIBLE);
             }
         }
 
@@ -612,6 +662,25 @@ public class SpeedGameActivity extends AppCompatActivity {
         }
     }
 
+    private void togglePause() {
+        if (isGameOver) return;
+        isPaused = !isPaused;
+        if (isPaused) {
+            cancelTimer();
+            if (overlayLayout != null) {
+                overlayLayout.setVisibility(View.VISIBLE);
+                if (tvOverlayTitle != null) tvOverlayTitle.setText("Mission Paused");
+                TextView tvScore = findViewById(R.id.tvOverlayScore);
+                if (tvScore != null) tvScore.setText("Current Score: " + score);
+                MaterialButton btnResume = findViewById(R.id.btnResume);
+                if (btnResume != null) btnResume.setVisibility(View.VISIBLE);
+            }
+        } else {
+            if (overlayLayout != null) overlayLayout.setVisibility(View.GONE);
+            startTimer();
+        }
+    }
+
     private void handleAnswerClick(MaterialButton clickedButton) {
         if ("shadow_match".equals(quizType) && !"drag_success".equals(clickedButton.getTag(R.id.shadowView))) {
             // Speed game version: Only drag and drop allowed
@@ -708,9 +777,20 @@ public class SpeedGameActivity extends AppCompatActivity {
 
             @Override
             public void onFinish() {
+                isGameOver = true;
                 timeLeftMs = 0;
                 tvGameTimer.setText(getString(R.string.quiz_timer_done));
                 tvGameFeedback.setText(getString(R.string.quiz_final_score, score));
+
+                // Show end game overlay
+                if (overlayLayout != null) {
+                    overlayLayout.setVisibility(View.VISIBLE);
+                    if (tvOverlayTitle != null) tvOverlayTitle.setText("Mission Complete!");
+                    TextView tvScore = findViewById(R.id.tvOverlayScore);
+                    if (tvScore != null) tvScore.setText("Final Score: " + score);
+                    MaterialButton btnResume = findViewById(R.id.btnResume);
+                    if (btnResume != null) btnResume.setVisibility(View.GONE);
+                }
 
                 // Disable buttons
                 setOptionsEnabled(false);
