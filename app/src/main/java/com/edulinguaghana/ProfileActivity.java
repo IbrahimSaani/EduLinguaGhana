@@ -1728,7 +1728,7 @@ public class ProfileActivity extends AppCompatActivity {
                         runOnUiThread(() -> {
                             profileInfo.append("📊 Stats:\n");
                             profileInfo.append("• Total Quizzes: ").append(totalQuizzes).append("\n");
-                            profileInfo.append("• High Score: ").append(highScore).append("/10\n");
+                            profileInfo.append("• High Score: ").append(highScore).append("\n");
                             profileInfo.append("• ⚔️ Challenges Won: ").append(stats.challengesWon).append("\n");
                             profileInfo.append("• ⚔️ Challenges Lost: ").append(stats.challengesLost).append("\n");
 
@@ -1756,7 +1756,7 @@ public class ProfileActivity extends AppCompatActivity {
                             // Fallback if challenge stats fail
                             profileInfo.append("📊 Stats:\n");
                             profileInfo.append("• Total Quizzes: ").append(totalQuizzes).append("\n");
-                            profileInfo.append("• High Score: ").append(highScore).append("/10");
+                            profileInfo.append("• High Score: ").append(highScore).append("\n");
 
                             StyledMenuHelper.showStyledConfirmationDialog(
                                 ProfileActivity.this,

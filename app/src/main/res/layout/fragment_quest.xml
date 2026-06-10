@@ -4,226 +4,200 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@android:color/transparent">
+    android:background="@color/appBackground">
 
     <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="@android:color/transparent"
         android:fillViewport="true">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:padding="16dp">
+            android:paddingBottom="32dp">
 
-            <!-- Header Card -->
+            <!-- Hero Header with Premium Gradient -->
             <com.google.android.material.card.MaterialCardView
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="16dp"
-                app:cardCornerRadius="16dp"
-                app:cardElevation="4dp"
-                app:cardBackgroundColor="@color/cardBackground"
+                android:layout_height="240dp"
+                android:layout_marginBottom="-30dp"
+                app:cardElevation="0dp"
+                app:cardCornerRadius="0dp"
                 app:strokeWidth="0dp">
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:background="@drawable/gradient_background_premium" />
+
+                <!-- Decorative Elements -->
+                <ImageView
+                    android:layout_width="120dp"
+                    android:layout_height="120dp"
+                    android:layout_gravity="top|end"
+                    android:layout_marginTop="-20dp"
+                    android:layout_marginEnd="-30dp"
+                    android:src="@drawable/ic_progress_sparkle"
+                    android:alpha="0.2"
+                    app:tint="@color/white" />
 
                 <LinearLayout
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
+                    android:layout_height="match_parent"
                     android:orientation="vertical"
-                    android:padding="20dp">
+                    android:gravity="center"
+                    android:paddingHorizontal="24dp">
 
-                    <!-- Title with Icon -->
-                    <LinearLayout
-                        android:layout_width="match_parent"
+                    <TextView
+                        android:layout_width="80dp"
+                        android:layout_height="80dp"
+                        android:text="📜"
+                        android:textSize="60sp"
+                        android:gravity="center"
+                        android:layout_marginBottom="12dp" />
+
+                    <TextView
+                        android:id="@+id/tv_daily_quest_title"
+                        android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:orientation="horizontal"
-                        android:gravity="center_vertical"
-                        android:layout_marginBottom="8dp">
+                        android:text="@string/daily_quest_title"
+                        android:textSize="28sp"
+                        android:textStyle="bold"
+                        android:fontFamily="@font/agbalumo"
+                        android:textColor="@color/white"
+                        android:letterSpacing="0.02" />
 
-                        <TextView
-                            android:layout_width="40dp"
-                            android:layout_height="40dp"
-                            android:text="🎯"
-                            android:textSize="32sp"
-                            android:gravity="center"
-                            android:layout_marginEnd="12dp" />
-
-                        <TextView
-                            android:id="@+id/tv_daily_quest_title"
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:text="@string/daily_quest_title"
-                            android:textSize="22sp"
-                            android:textStyle="bold"
-                            android:fontFamily="@font/agbalumo"
-                            android:textColor="@color/colorPrimary"
-                            android:letterSpacing="0.02" />
-
-                    </LinearLayout>
-
-                    <!-- Description -->
                     <TextView
                         android:id="@+id/tv_daily_quest_desc"
-                        android:layout_width="match_parent"
+                        android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="@string/daily_quest_description"
                         android:textSize="14sp"
-                        android:textColor="@color/textSecondary"
-                        android:lineSpacingExtra="2dp" />
+                        android:textColor="#E0E0E0"
+                        android:layout_marginTop="8dp"
+                        android:gravity="center" />
 
                 </LinearLayout>
 
             </com.google.android.material.card.MaterialCardView>
 
-            <!-- Stats Card -->
+            <!-- Stats Overlay Card -->
             <com.google.android.material.card.MaterialCardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="16dp"
-                app:cardCornerRadius="18dp"
-                app:cardElevation="5dp"
-                app:cardBackgroundColor="@color/colorPrimaryLight"
-                app:strokeWidth="0dp">
+                android:layout_marginHorizontal="20dp"
+                app:cardCornerRadius="24dp"
+                app:cardElevation="12dp"
+                app:cardBackgroundColor="@color/cardBackground"
+                app:strokeWidth="1dp"
+                app:strokeColor="#1A000000">
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:padding="16dp">
+                    android:orientation="horizontal"
+                    android:padding="20dp"
+                    android:baselineAligned="false">
 
-                    <!-- Stats Header -->
+                    <!-- Completed Quests -->
                     <LinearLayout
-                        android:layout_width="match_parent"
+                        android:layout_width="0dp"
                         android:layout_height="wrap_content"
-                        android:orientation="horizontal"
-                        android:gravity="center_vertical"
-                        android:layout_marginBottom="12dp">
+                        android:layout_weight="1"
+                        android:orientation="vertical"
+                        android:gravity="center">
 
                         <TextView
-                            android:layout_width="0dp"
+                            android:id="@+id/tv_completed_count"
+                            android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:text="Daily Progress"
-                            android:textSize="16sp"
+                            tools:text="5"
+                            android:textSize="24sp"
                             android:textStyle="bold"
-                            android:textColor="@color/colorPrimary" />
+                            android:textColor="@color/correctAnswer" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Done"
+                            android:textSize="10sp"
+                            android:textColor="@color/textSecondary"
+                            android:textAllCaps="true"
+                            android:layout_marginTop="4dp"
+                            android:letterSpacing="0.05" />
 
                     </LinearLayout>
 
-                    <!-- Stats Grid -->
+                    <View
+                        android:layout_width="1dp"
+                        android:layout_height="40dp"
+                        android:layout_gravity="center"
+                        android:background="@color/dividerColor"
+                        android:alpha="0.2" />
+
+                    <!-- Active Quests -->
                     <LinearLayout
-                        android:layout_width="match_parent"
+                        android:layout_width="0dp"
                         android:layout_height="wrap_content"
-                        android:orientation="horizontal"
-                        android:gravity="center"
-                        android:baselineAligned="false">
+                        android:layout_weight="1"
+                        android:orientation="vertical"
+                        android:gravity="center">
 
-                        <!-- Completed Quests -->
-                        <LinearLayout
-                            android:layout_width="0dp"
+                        <TextView
+                            android:id="@+id/tv_active_count"
+                            android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:orientation="vertical"
-                            android:gravity="center"
-                            android:padding="12dp">
+                            tools:text="3"
+                            android:textSize="24sp"
+                            android:textStyle="bold"
+                            android:textColor="@color/colorAccent" />
 
-                            <TextView
-                                android:id="@+id/tv_completed_count"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                tools:text="5"
-                                android:textSize="32sp"
-                                android:textStyle="bold"
-                                android:textColor="@color/correctAnswer" />
-
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="Completed"
-                                android:textSize="11sp"
-                                android:textColor="@color/textSecondary"
-                                android:textAllCaps="true"
-                                android:layout_marginTop="6dp"
-                                android:letterSpacing="0.05" />
-
-                        </LinearLayout>
-
-                        <!-- Divider -->
-                        <View
-                            android:layout_width="1dp"
-                            android:layout_height="60dp"
-                            android:background="@color/textSecondary"
-                            android:alpha="0.2" />
-
-                        <!-- Active Quests -->
-                        <LinearLayout
-                            android:layout_width="0dp"
+                        <TextView
+                            android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:orientation="vertical"
-                            android:gravity="center"
-                            android:padding="12dp">
+                            android:text="Active"
+                            android:textSize="10sp"
+                            android:textColor="@color/textSecondary"
+                            android:textAllCaps="true"
+                            android:layout_marginTop="4dp"
+                            android:letterSpacing="0.05" />
 
-                            <TextView
-                                android:id="@+id/tv_active_count"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                tools:text="3"
-                                android:textSize="32sp"
-                                android:textStyle="bold"
-                                android:textColor="@color/colorAccent" />
+                    </LinearLayout>
 
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="Active"
-                                android:textSize="11sp"
-                                android:textColor="@color/textSecondary"
-                                android:textAllCaps="true"
-                                android:layout_marginTop="6dp"
-                                android:letterSpacing="0.05" />
+                    <View
+                        android:layout_width="1dp"
+                        android:layout_height="40dp"
+                        android:layout_gravity="center"
+                        android:background="@color/dividerColor"
+                        android:alpha="0.2" />
 
-                        </LinearLayout>
+                    <!-- Total XP Earned -->
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:orientation="vertical"
+                        android:gravity="center">
 
-                        <!-- Divider -->
-                        <View
-                            android:layout_width="1dp"
-                            android:layout_height="60dp"
-                            android:background="@color/textSecondary"
-                            android:alpha="0.2" />
-
-                        <!-- Total Points -->
-                        <LinearLayout
-                            android:layout_width="0dp"
+                        <TextView
+                            android:id="@+id/tv_total_points"
+                            android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:orientation="vertical"
-                            android:gravity="center"
-                            android:padding="12dp">
+                            tools:text="250"
+                            android:textSize="24sp"
+                            android:textStyle="bold"
+                            android:textColor="@color/colorPrimary" />
 
-                            <TextView
-                                android:id="@+id/tv_total_points"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                tools:text="250"
-                                android:textSize="32sp"
-                                android:textStyle="bold"
-                                android:textColor="@color/colorPrimary" />
-
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="XP Earned"
-                                android:textSize="11sp"
-                                android:textColor="@color/textSecondary"
-                                android:textAllCaps="true"
-                                android:layout_marginTop="6dp"
-                                android:letterSpacing="0.05" />
-
-                        </LinearLayout>
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Total XP"
+                            android:textSize="10sp"
+                            android:textColor="@color/textSecondary"
+                            android:textAllCaps="true"
+                            android:layout_marginTop="4dp"
+                            android:letterSpacing="0.05" />
 
                     </LinearLayout>
 
@@ -232,15 +206,30 @@
             </com.google.android.material.card.MaterialCardView>
 
             <!-- Section Title -->
-            <TextView
-                android:layout_width="wrap_content"
+            <LinearLayout
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Your Quests"
-                android:textSize="18sp"
-                android:textStyle="bold"
-                android:textColor="@color/textPrimary"
-                android:layout_marginBottom="12dp"
-                android:layout_marginStart="4dp" />
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:layout_marginTop="32dp"
+                android:layout_marginBottom="16dp"
+                android:paddingHorizontal="24dp">
+
+                <View
+                    android:layout_width="4dp"
+                    android:layout_height="20dp"
+                    android:background="@color/colorAccent" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="12dp"
+                    android:text="Available Quests"
+                    android:textSize="20sp"
+                    android:textStyle="bold"
+                    android:fontFamily="@font/agbalumo"
+                    android:textColor="@color/textPrimary" />
+            </LinearLayout>
 
             <!-- RecyclerView for Quests -->
             <androidx.recyclerview.widget.RecyclerView
@@ -248,6 +237,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:nestedScrollingEnabled="false"
+                android:paddingHorizontal="16dp"
                 android:clipToPadding="false"
                 tools:listitem="@layout/item_quest"
                 tools:itemCount="3" />
@@ -259,19 +249,20 @@
     <!-- Empty State -->
     <LinearLayout
         android:id="@+id/empty_state"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_gravity="center"
+        android:layout_gravity="bottom"
+        android:layout_marginBottom="100dp"
         android:orientation="vertical"
         android:gravity="center"
         android:padding="32dp"
         android:visibility="gone"
-        tools:visibility="visible">
+        tools:visibility="gone">
 
         <TextView
             android:layout_width="80dp"
             android:layout_height="80dp"
-            android:text="📋"
+            android:text="✨"
             android:textSize="64sp"
             android:gravity="center"
             android:layout_marginBottom="16dp" />
@@ -279,7 +270,7 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="No Quests Available"
+            android:text="You're all caught up!"
             android:textSize="20sp"
             android:textStyle="bold"
             android:textColor="@color/textPrimary"
@@ -288,7 +279,7 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Check back later for new challenges"
+            android:text="Check back tomorrow for new daily quests."
             android:textSize="14sp"
             android:textColor="@color/textSecondary"
             android:gravity="center" />
@@ -296,4 +287,3 @@
     </LinearLayout>
 
 </FrameLayout>
-

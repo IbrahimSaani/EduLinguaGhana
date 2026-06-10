@@ -5,14 +5,13 @@
     android:id="@+id/questCard"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_marginBottom="12dp"
-    android:layout_marginStart="8dp"
-    android:layout_marginEnd="8dp"
-    app:cardCornerRadius="18dp"
-    app:cardElevation="5dp"
+    android:layout_marginBottom="16dp"
+    android:layout_marginHorizontal="8dp"
+    app:cardCornerRadius="24dp"
+    app:cardElevation="2dp"
     app:cardBackgroundColor="@color/cardBackground"
     app:strokeWidth="1dp"
-    app:strokeColor="@color/dividerColor"
+    app:strokeColor="#0D000000"
     android:clickable="true"
     android:focusable="true"
     android:foreground="?attr/selectableItemBackground">
@@ -20,196 +19,156 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:padding="12dp"
-        android:gravity="center_vertical">
+        android:orientation="vertical"
+        android:padding="20dp">
 
-        <!-- Quest Icon with Status Indicator -->
-        <FrameLayout
-            android:layout_width="64dp"
-            android:layout_height="64dp"
-            android:layout_marginEnd="16dp">
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:layout_marginBottom="16dp">
 
-            <!-- Icon Background -->
+            <!-- Premium Icon Container -->
             <com.google.android.material.card.MaterialCardView
-                android:id="@+id/iconBackground"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                app:cardCornerRadius="32dp"
-                app:cardElevation="0dp"
-                app:cardBackgroundColor="@color/buttonSecondary">
+                android:layout_width="56dp"
+                android:layout_height="56dp"
+                app:cardCornerRadius="28dp"
+                app:cardElevation="4dp"
+                app:strokeWidth="0dp"
+                app:cardBackgroundColor="@color/cardBackground">
 
                 <View
-                    android:id="@+id/overlayColor"
+                    android:id="@+id/iconBackgroundOverlay"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:background="@color/colorPrimaryLight"
-                    android:alpha="0.15" />
-            </com.google.android.material.card.MaterialCardView>
-
-            <!-- Quest Icon / Emoji -->
-            <TextView
-                android:id="@+id/tv_quest_icon"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:text="⚡"
-                android:textSize="32sp"
-                android:gravity="center"
-                android:elevation="2dp"
-                tools:text="⚡" />
-
-            <!-- Completion Checkmark (for completed quests) -->
-            <com.google.android.material.card.MaterialCardView
-                android:id="@+id/completionIndicator"
-                android:layout_width="24dp"
-                android:layout_height="24dp"
-                android:layout_gravity="bottom|end"
-                android:layout_marginEnd="0dp"
-                android:layout_marginBottom="0dp"
-                app:cardCornerRadius="12dp"
-                app:cardElevation="3dp"
-                app:cardBackgroundColor="@color/correctAnswer"
-                android:visibility="gone">
+                    android:background="@color/colorPrimary"
+                    android:alpha="0.1" />
 
                 <TextView
+                    android:id="@+id/tv_quest_icon"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:text="✓"
-                    android:textSize="14sp"
-                    android:textColor="@android:color/white"
+                    android:text="⚡"
+                    android:textSize="28sp"
                     android:gravity="center"
-                    android:textStyle="bold" />
+                    tools:text="⚡" />
             </com.google.android.material.card.MaterialCardView>
 
-        </FrameLayout>
-
-        <!-- Quest Info -->
-        <LinearLayout
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:orientation="vertical">
-
-            <!-- Quest Title -->
-            <TextView
-                android:id="@+id/tv_quest_title"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                tools:text="Complete 5 Quizzes"
-                android:textSize="16sp"
-                android:textStyle="bold"
-                android:textColor="@color/textPrimary"
-                android:maxLines="2"
-                android:ellipsize="end"
-                android:layout_marginBottom="4dp" />
-
-            <!-- Quest Description (optional) -->
-            <TextView
-                android:id="@+id/tv_quest_description"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                tools:text="Test your knowledge"
-                android:textSize="12sp"
-                android:textColor="@color/textSecondary"
-                android:maxLines="1"
-                android:ellipsize="end"
-                android:visibility="gone"
-                android:layout_marginBottom="6dp" />
-
-            <!-- Quest Progress Bar -->
             <LinearLayout
-                android:layout_width="match_parent"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:gravity="center_vertical"
-                android:layout_marginBottom="6dp">
-
-                <com.google.android.material.progressindicator.LinearProgressIndicator
-                    android:id="@+id/progress_quest"
-                    android:layout_width="0dp"
-                    android:layout_height="6dp"
-                    android:layout_weight="1"
-                    android:layout_marginEnd="8dp"
-                    app:indicatorColor="@color/colorPrimary"
-                    app:trackColor="@color/progressTrackColor"
-                    app:trackCornerRadius="3dp"
-                    app:trackThickness="6dp"
-                    tools:progress="60" />
+                android:layout_weight="1"
+                android:orientation="vertical"
+                android:layout_marginStart="16dp">
 
                 <TextView
-                    android:id="@+id/tv_quest_progress"
-                    android:layout_width="wrap_content"
+                    android:id="@+id/tv_quest_title"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    tools:text="3/5"
-                    android:textSize="13sp"
+                    tools:text="Complete 5 Quizzes"
+                    android:textSize="17sp"
                     android:textStyle="bold"
-                    android:textColor="@color/colorPrimary" />
-
-            </LinearLayout>
-
-            <!-- Ready to Claim Indicator -->
-            <com.google.android.material.card.MaterialCardView
-                android:id="@+id/claimIndicator"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:visibility="gone"
-                app:cardCornerRadius="12dp"
-                app:cardElevation="0dp"
-                app:cardBackgroundColor="@color/correctAnswer">
-
-                <LinearLayout
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:padding="6dp"
-                    android:gravity="center_vertical">
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="✨ Tap to Claim"
-                        android:textSize="12sp"
-                        android:textColor="@android:color/white"
-                        android:textStyle="bold" />
-
-                </LinearLayout>
-
-            </com.google.android.material.card.MaterialCardView>
-
-            <!-- Quest Points Badge -->
-            <com.google.android.material.card.MaterialCardView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="start"
-                android:layout_marginTop="4dp"
-                app:cardCornerRadius="10dp"
-                app:cardElevation="0dp"
-                app:cardBackgroundColor="@color/notification_achievement_bg">
+                    android:textColor="@color/textPrimary" />
 
                 <TextView
                     android:id="@+id/tv_quest_points"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:paddingHorizontal="8dp"
-                    android:paddingVertical="4dp"
-                    tools:text="+50 XP"
-                    android:textSize="12sp"
+                    tools:text="+50 XP REWARD"
+                    android:textSize="11sp"
                     android:textStyle="bold"
-                    android:textColor="#F57C00" />
+                    android:textColor="@color/colorAccent"
+                    android:textAllCaps="true"
+                    android:letterSpacing="0.05"
+                    android:layout_marginTop="4dp" />
+            </LinearLayout>
 
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/completionIndicator"
+                android:layout_width="32dp"
+                android:layout_height="32dp"
+                app:cardCornerRadius="16dp"
+                app:cardElevation="0dp"
+                app:cardBackgroundColor="@color/correctAnswer"
+                android:visibility="gone"
+                tools:visibility="visible">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:text="✓"
+                    android:textColor="@color/white"
+                    android:textStyle="bold"
+                    android:textSize="18sp" />
             </com.google.android.material.card.MaterialCardView>
-
         </LinearLayout>
 
-        <!-- Right Arrow (Indicator for progress) -->
-        <ImageView
-            android:layout_width="20dp"
-            android:layout_height="20dp"
-            android:layout_marginStart="8dp"
-            android:src="@drawable/ic_arrow_forward"
-            android:contentDescription="Quest Progress Indicator"
-            app:tint="@color/dividerColor"
-            android:alpha="0.5" />
+        <TextView
+            android:id="@+id/tv_quest_description"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            tools:text="Test your knowledge by completing quizzes in any language."
+            android:textSize="13sp"
+            android:textColor="@color/textSecondary"
+            android:layout_marginBottom="16dp"
+            android:visibility="visible" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <com.google.android.material.progressindicator.LinearProgressIndicator
+                android:id="@+id/progress_quest"
+                android:layout_width="match_parent"
+                android:layout_height="10dp"
+                app:indicatorColor="@color/colorPrimary"
+                app:trackColor="#F5F5F5"
+                app:trackCornerRadius="5dp"
+                app:trackThickness="10dp"
+                tools:progress="60" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginTop="8dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Progress"
+                    android:textSize="12sp"
+                    android:textColor="@color/textSecondary" />
+
+                <View
+                    android:layout_width="0dp"
+                    android:layout_height="0dp"
+                    android:layout_weight="1" />
+
+                <TextView
+                    android:id="@+id/tv_quest_progress"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    tools:text="3 / 5"
+                    android:textSize="12sp"
+                    android:textStyle="bold"
+                    android:textColor="@color/colorPrimary" />
+            </LinearLayout>
+        </LinearLayout>
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnClaimReward"
+            style="@style/Widget.Material3.Button.TonalButton"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:layout_marginTop="16dp"
+            android:text="Claim XP Reward ✨"
+            android:visibility="gone"
+            tools:visibility="visible"
+            app:cornerRadius="24dp" />
 
     </LinearLayout>
 
