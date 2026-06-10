@@ -643,9 +643,19 @@ public class TeacherDashboardActivity extends AppCompatActivity {
                             b.getProgress().getCurrentLevel(),
                             a.getProgress().getCurrentLevel());
                 case 2:
-                    return Integer.compare(
+                    int scoreComp = Integer.compare(
                             b.getProgress().getTotalCumulativeScore(),
                             a.getProgress().getTotalCumulativeScore());
+                    if (scoreComp != 0) return scoreComp;
+
+                    int xpComp = Integer.compare(
+                            b.getProgress().getTotalXP(),
+                            a.getProgress().getTotalXP());
+                    if (xpComp != 0) return xpComp;
+
+                    return Integer.compare(
+                            b.getProgress().getCurrentLevel(),
+                            a.getProgress().getCurrentLevel());
                 case 3:
                     return Long.compare(
                             b.getProgress().getLastUpdated(),
@@ -836,10 +846,13 @@ public class TeacherDashboardActivity extends AppCompatActivity {
         ProgressAggregate pa = a.getProgress();
         ProgressAggregate pb = b.getProgress();
         
-        if (pa.getCurrentLevel() != pb.getCurrentLevel()) {
-            return Integer.compare(pa.getCurrentLevel(), pb.getCurrentLevel());
+        if (pa.getTotalCumulativeScore() != pb.getTotalCumulativeScore()) {
+            return Integer.compare(pa.getTotalCumulativeScore(), pb.getTotalCumulativeScore());
         }
-        return Double.compare(pa.getAccuracy(), pb.getAccuracy());
+        if (pa.getTotalXP() != pb.getTotalXP()) {
+            return Integer.compare(pa.getTotalXP(), pb.getTotalXP());
+        }
+        return Integer.compare(pa.getCurrentLevel(), pb.getCurrentLevel());
     }
 
     private boolean isStrugglingMore(StudentProgressItem student, StudentProgressItem currentStruggling, long threeDaysAgo) {

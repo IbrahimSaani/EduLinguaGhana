@@ -669,9 +669,9 @@
 
     <!-- Friendly Auth Errors -->
     <string name="error_auth_invalid_email">We couldn\'t find an account with that email. Please check the spelling or sign up!</string>
-    <string name="error_auth_wrong_password">Oops! The password you entered is incorrect. Please try again.</string>
-    <string name="error_auth_invalid_credentials">Oops! We couldn\'t find your account. Check your spelling and try again!</string>
-    <string name="error_auth_user_not_found">No account exists for this email. Would you like to create one?</string>
+    <string name="error_auth_wrong_password">invalid email or password please try again.</string>
+    <string name="error_auth_invalid_credentials">invalid email or password please try again.</string>
+    <string name="error_auth_user_not_found">invalid email or password please try again.</string>
     <string name="error_auth_user_disabled">This account has been disabled. Please contact our support team.</string>
     <string name="error_auth_too_many_requests">Too many attempts! Please take a short break and try again in a few minutes.</string>
     <string name="error_auth_network_error">Connection trouble. Please check your internet and try again.</string>
