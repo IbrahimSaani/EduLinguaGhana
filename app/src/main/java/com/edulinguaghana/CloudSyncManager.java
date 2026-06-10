@@ -114,7 +114,8 @@ public class CloudSyncManager {
             userData.put("funGameBestScore", eduPrefs.getInt("FUN_GAME_BEST_SCORE", 0));
             Set<String> playedGames = eduPrefs.getStringSet("FUN_GAMES_PLAYED_SET", null);
             if (playedGames != null) {
-                userData.put("funGamesPlayedSet", playedGames);
+                // Firebase Realtime Database does not support Set, convert to List
+                userData.put("funGamesPlayedSet", new java.util.ArrayList<>(playedGames));
             }
 
             // Timestamp
