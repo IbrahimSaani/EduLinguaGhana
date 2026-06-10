@@ -1,6 +1,5 @@
 package com.edulinguaghana;
 
-import android.graphics.Color;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -58,21 +57,18 @@ public class AvatarSelectionAdapter extends RecyclerView.Adapter<AvatarSelection
         }
 
         if (position == selectedPosition) {
-            holder.cardItem.setStrokeWidth(4);
-            holder.cardItem.setStrokeColor(ContextCompat.getColor(holder.itemView.getContext(), R.color.colorPrimary));
-            holder.cardItem.setCardBackgroundColor(Color.parseColor("#15" + 
-                Integer.toHexString(ContextCompat.getColor(holder.itemView.getContext(), R.color.colorPrimary)).substring(2)));
+            holder.cardItem.setStrokeWidth(6);
+            holder.cardItem.setStrokeColor(ContextCompat.getColor(holder.itemView.getContext(), R.color.colorAccent));
+            holder.cardItem.setCardBackgroundColor(ContextCompat.getColor(holder.itemView.getContext(), R.color.cardBackground));
             holder.tvLabel.setTextColor(ContextCompat.getColor(holder.itemView.getContext(), R.color.colorPrimary));
-            holder.cardItem.setCardElevation(6);
-            holder.cardItem.setScaleX(1.05f);
-            holder.cardItem.setScaleY(1.05f);
+            holder.cardItem.setCardElevation(12);
+            holder.cardItem.animate().scaleX(1.08f).scaleY(1.08f).setDuration(200).start();
         } else {
             holder.cardItem.setStrokeWidth(0);
-            holder.cardItem.setCardBackgroundColor(Color.WHITE);
+            holder.cardItem.setCardBackgroundColor(ContextCompat.getColor(holder.itemView.getContext(), R.color.cardBackground));
             holder.tvLabel.setTextColor(ContextCompat.getColor(holder.itemView.getContext(), R.color.textColorSecondary));
             holder.cardItem.setCardElevation(2);
-            holder.cardItem.setScaleX(1.0f);
-            holder.cardItem.setScaleY(1.0f);
+            holder.cardItem.animate().scaleX(1.0f).scaleY(1.0f).setDuration(200).start();
         }
 
         holder.itemView.setOnClickListener(v -> {

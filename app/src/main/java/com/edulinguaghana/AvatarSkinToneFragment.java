@@ -2,24 +2,20 @@ package com.edulinguaghana;
 
 import android.os.Bundle;
 import android.view.LayoutInflater;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.HorizontalScrollView;
-import android.widget.RadioGroup;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.RecyclerView;
 
-import com.google.android.material.card.MaterialCardView;
+import java.util.Arrays;
 
 public class AvatarSkinToneFragment extends Fragment {
 
-    private RadioGroup rgSkinTone;
-    private HorizontalScrollView hsvSkinTone;
-    private MaterialCardView cardSkinLight, cardSkinMedium, cardSkinTan, cardSkinBrown, cardSkinDark;
+    private RecyclerView rvSkinTone;
+    private AvatarSelectionAdapter skinToneAdapter;
     private AvatarEditorActivity activity;
 
     @Nullable
@@ -28,100 +24,31 @@ public class AvatarSkinToneFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_avatar_skin_tone, container, false);
 
         activity = (AvatarEditorActivity) getActivity();
-        rgSkinTone = view.findViewById(R.id.rgSkinTone);
-        hsvSkinTone = view.findViewById(R.id.hsvSkinTone);
-        cardSkinLight = view.findViewById(R.id.cardSkinLight);
-        cardSkinMedium = view.findViewById(R.id.cardSkinMedium);
-        cardSkinTan = view.findViewById(R.id.cardSkinTan);
-        cardSkinBrown = view.findViewById(R.id.cardSkinBrown);
-        cardSkinDark = view.findViewById(R.id.cardSkinDark);
+        rvSkinTone = view.findViewById(R.id.rvSkinTone);
 
-        setupSkinToneCardClicks();
-        setupListeners();
-        setupHorizontalScroll();
+        setupRecyclerView();
         updateUIFromConfig();
 
         return view;
     }
 
-    private void setupHorizontalScroll() {
-        if (hsvSkinTone != null) {
-            hsvSkinTone.setOnTouchListener((v, event) -> {
-                if (event.getAction() == MotionEvent.ACTION_DOWN || event.getAction() == MotionEvent.ACTION_MOVE) {
-                    v.getParent().requestDisallowInterceptTouchEvent(true);
-                }
-                return false;
+    private void setupRecyclerView() {
+        String[] skinTones = {"Light", "Medium", "Tan", "Brown", "Dark"};
+        String[] skinIcons = {"🏻", "🏼", "🏽", "🏾", "🏿"};
+        
+        skinToneAdapter = new AvatarSelectionAdapter(
+            Arrays.asList(skinTones), 
+            Arrays.asList(skinIcons),
+            activity.getAvatarConfig().skinTone.ordinal(), 
+            position -> {
+                activity.getAvatarConfig().skinTone = AvatarBuilder.SkinTone.values()[position];
+                activity.updateAvatar();
             });
-        }
-    }
-
-    private void setupSkinToneCardClicks() {
-        cardSkinLight.setOnClickListener(v -> rgSkinTone.check(R.id.rbSkinLight));
-        cardSkinMedium.setOnClickListener(v -> rgSkinTone.check(R.id.rbSkinMedium));
-        cardSkinTan.setOnClickListener(v -> rgSkinTone.check(R.id.rbSkinTan));
-        cardSkinBrown.setOnClickListener(v -> rgSkinTone.check(R.id.rbSkinBrown));
-        cardSkinDark.setOnClickListener(v -> rgSkinTone.check(R.id.rbSkinDark));
-    }
-
-    private void setupListeners() {
-        rgSkinTone.setOnCheckedChangeListener((group, checkedId) -> {
-            if (checkedId == R.id.rbSkinLight) {
-                activity.getAvatarConfig().skinTone = AvatarBuilder.SkinTone.LIGHT;
-                updateSkinToneCardSelection(cardSkinLight);
-            } else if (checkedId == R.id.rbSkinMedium) {
-                activity.getAvatarConfig().skinTone = AvatarBuilder.SkinTone.MEDIUM;
-                updateSkinToneCardSelection(cardSkinMedium);
-            } else if (checkedId == R.id.rbSkinTan) {
-                activity.getAvatarConfig().skinTone = AvatarBuilder.SkinTone.TAN;
-                updateSkinToneCardSelection(cardSkinTan);
-            } else if (checkedId == R.id.rbSkinBrown) {
-                activity.getAvatarConfig().skinTone = AvatarBuilder.SkinTone.BROWN;
-                updateSkinToneCardSelection(cardSkinBrown);
-            } else if (checkedId == R.id.rbSkinDark) {
-                activity.getAvatarConfig().skinTone = AvatarBuilder.SkinTone.DARK;
-                updateSkinToneCardSelection(cardSkinDark);
-            }
-            activity.updateAvatar();
-        });
-    }
-
-    private void updateSkinToneCardSelection(MaterialCardView selectedCard) {
-        // Reset all cards
-        cardSkinLight.setStrokeWidth(0);
-        cardSkinMedium.setStrokeWidth(0);
-        cardSkinTan.setStrokeWidth(0);
-        cardSkinBrown.setStrokeWidth(0);
-        cardSkinDark.setStrokeWidth(0);
-
-        // Highlight selected card
-        selectedCard.setStrokeWidth(8);
-        selectedCard.setStrokeColor(ContextCompat.getColor(getContext(), R.color.colorAccent));
+        rvSkinTone.setAdapter(skinToneAdapter);
     }
 
     public void updateUIFromConfig() {
-        if (rgSkinTone == null) return;
-        // Update skin tone radio buttons
-        switch (activity.getAvatarConfig().skinTone) {
-            case LIGHT:
-                rgSkinTone.check(R.id.rbSkinLight);
-                updateSkinToneCardSelection(cardSkinLight);
-                break;
-            case MEDIUM:
-                rgSkinTone.check(R.id.rbSkinMedium);
-                updateSkinToneCardSelection(cardSkinMedium);
-                break;
-            case TAN:
-                rgSkinTone.check(R.id.rbSkinTan);
-                updateSkinToneCardSelection(cardSkinTan);
-                break;
-            case BROWN:
-                rgSkinTone.check(R.id.rbSkinBrown);
-                updateSkinToneCardSelection(cardSkinBrown);
-                break;
-            case DARK:
-                rgSkinTone.check(R.id.rbSkinDark);
-                updateSkinToneCardSelection(cardSkinDark);
-                break;
-        }
+        if (skinToneAdapter == null) return;
+        skinToneAdapter.setSelectedPosition(activity.getAvatarConfig().skinTone.ordinal());
     }
 }

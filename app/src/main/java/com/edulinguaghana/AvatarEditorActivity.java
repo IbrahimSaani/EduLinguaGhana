@@ -95,22 +95,25 @@ public class AvatarEditorActivity extends AppCompatActivity {
         builder = new AvatarBuilder(this, config);
         updateAvatarPreview();
 
-        // Add pulse animation on load
-        avatarPreview.postDelayed(() -> {
-            avatarPreview.setScaleX(0.95f);
-            avatarPreview.setScaleY(0.95f);
-            avatarPreview.animate()
-                .scaleX(1.05f)
-                .scaleY(1.05f)
-                .setDuration(300)
-                .withEndAction(() -> {
+        startFloatingAnimation();
+    }
+
+    private void startFloatingAnimation() {
+        avatarPreview.animate()
+            .translationY(-15f)
+            .setDuration(2000)
+            .setInterpolator(new android.view.animation.AccelerateDecelerateInterpolator())
+            .withEndAction(new Runnable() {
+                @Override
+                public void run() {
                     avatarPreview.animate()
-                        .scaleX(1f)
-                        .scaleY(1f)
-                        .setDuration(300)
+                        .translationY(15f)
+                        .setDuration(2000)
+                        .setInterpolator(new android.view.animation.AccelerateDecelerateInterpolator())
+                        .withEndAction(this)
                         .start();
-                }).start();
-        }, 200);
+                }
+            }).start();
     }
 
     private void setupViewPager() {
@@ -120,28 +123,22 @@ public class AvatarEditorActivity extends AppCompatActivity {
         new TabLayoutMediator(tabLayout, viewPager, (tab, position) -> {
             switch (position) {
                 case 0:
-                    tab.setText("Skin");
-                    tab.setContentDescription("Skin tone tab");
+                    tab.setText("🎨 Skin");
                     break;
                 case 1:
-                    tab.setText("Hair");
-                    tab.setContentDescription("Hair style and color tab");
+                    tab.setText("💇 Hair");
                     break;
                 case 2:
-                    tab.setText("Eyes/Mouth");
-                    tab.setContentDescription("Eye and mouth style tab");
+                    tab.setText("👀 Face");
                     break;
                 case 3:
-                    tab.setText("Accessory");
-                    tab.setContentDescription("Accessory tab");
+                    tab.setText("👑 Accs");
                     break;
                 case 4:
-                    tab.setText("Clothing");
-                    tab.setContentDescription("Clothing tab");
+                    tab.setText("👔 Style");
                     break;
                 case 5:
-                    tab.setText("Expression");
-                    tab.setContentDescription("Expression tab");
+                    tab.setText("😊 Mood");
                     break;
             }
         }).attach();

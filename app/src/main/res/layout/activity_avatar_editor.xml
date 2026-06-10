@@ -3,6 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@drawable/gradient_background_premium"
     android:fitsSystemWindows="true">
 
     <View
@@ -16,7 +17,7 @@
         android:layout_height="wrap_content"
         android:background="@android:color/transparent"
         app:elevation="0dp"
-        android:theme="@style/ThemeOverlay.AppCompat.DayNight.ActionBar">
+        android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar">
 
         <androidx.appcompat.widget.Toolbar
             android:id="@+id/toolbar"
@@ -25,7 +26,8 @@
             android:background="@android:color/transparent"
             app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
             app:titleTextAppearance="@style/ToolbarTitleStyle"
-            app:titleTextColor="@color/colorPrimary" />
+            app:titleTextColor="@color/white"
+            app:navigationIconTint="@color/white" />
 
     </com.google.android.material.appbar.AppBarLayout>
 
@@ -44,10 +46,10 @@
             android:layout_marginEnd="20dp"
             android:layout_marginBottom="16dp"
             app:cardCornerRadius="28dp"
-            app:cardElevation="2dp"
+            app:cardElevation="8dp"
             app:strokeWidth="1dp"
-            app:strokeColor="#1A000000"
-            app:cardBackgroundColor="#CCFFFFFF">
+            app:strokeColor="#33FFFFFF"
+            app:cardBackgroundColor="#26FFFFFF">
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -63,7 +65,11 @@
                     android:textSize="@dimen/text_headline_small"
                     android:textStyle="bold"
                     android:fontFamily="@font/agbalumo"
-                    android:textColor="@color/colorPrimary"
+                    android:textColor="@color/white"
+                    android:shadowColor="#40000000"
+                    android:shadowDx="2"
+                    android:shadowDy="2"
+                    android:shadowRadius="4"
                     android:letterSpacing="0.02"
                     app:autoSizeTextType="uniform"
                     app:autoSizeMinTextSize="14sp"
@@ -101,31 +107,37 @@
                         android:id="@+id/btnChangeBackground"
                         style="@style/Widget.Material3.Button.TonalButton"
                         android:layout_width="wrap_content"
-                        android:layout_height="40dp"
+                        android:layout_height="44dp"
                         android:layout_marginEnd="8dp"
-                        android:text="Background"
-                        app:icon="@android:drawable/ic_menu_gallery"
-                        app:iconSize="16dp"
-                        android:textSize="11sp"
-                        android:textColor="@color/colorAccent"
-                        app:iconTint="@color/colorAccent"
-                        android:paddingLeft="12dp"
-                        android:paddingRight="12dp" />
+                        android:text="BG Color"
+                        app:icon="@drawable/ic_theme"
+                        app:iconSize="18dp"
+                        android:textSize="12sp"
+                        android:textStyle="bold"
+                        android:textColor="@color/white"
+                        app:iconTint="@color/white"
+                        android:backgroundTint="#40FFFFFF"
+                        app:cornerRadius="12dp"
+                        android:paddingLeft="16dp"
+                        android:paddingRight="16dp" />
 
                     <com.google.android.material.button.MaterialButton
                         android:id="@+id/btnRandomAvatar"
                         style="@style/Widget.Material3.Button.TonalButton"
                         android:layout_width="wrap_content"
-                        android:layout_height="40dp"
+                        android:layout_height="44dp"
                         android:layout_marginStart="8dp"
-                        android:text="Randomize"
-                        app:icon="@android:drawable/ic_menu_rotate"
-                        app:iconSize="16dp"
-                        android:textSize="11sp"
-                        android:textColor="@color/colorPrimary"
-                        app:iconTint="@color/colorPrimary"
-                        android:paddingLeft="12dp"
-                        android:paddingRight="12dp" />
+                        android:text="Random"
+                        app:icon="@drawable/ic_progress_sparkle"
+                        app:iconSize="18dp"
+                        android:textSize="12sp"
+                        android:textStyle="bold"
+                        android:textColor="@color/white"
+                        app:iconTint="@color/white"
+                        android:backgroundTint="#40FFFFFF"
+                        app:cornerRadius="12dp"
+                        android:paddingLeft="16dp"
+                        android:paddingRight="16dp" />
 
                 </LinearLayout>
 
@@ -141,9 +153,9 @@
             android:layout_marginEnd="16dp"
             android:layout_marginTop="4dp"
             app:cardCornerRadius="28dp"
-            app:cardElevation="4dp"
+            app:cardElevation="12dp"
             app:cardUseCompatPadding="true"
-            app:cardBackgroundColor="#EEFFFFFF">
+            app:cardBackgroundColor="@color/cardBackground">
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -155,7 +167,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:background="@android:color/transparent"
-                    android:minHeight="60dp"
+                    android:minHeight="64dp"
                     app:tabPaddingStart="16dp"
                     app:tabPaddingEnd="16dp"
                     app:tabMinWidth="100dp"
@@ -163,11 +175,14 @@
                     app:tabGravity="fill"
                     app:tabIndicatorFullWidth="false"
                     app:tabIndicatorHeight="4dp"
-                    app:tabIndicatorColor="@color/colorPrimary"
+                    app:tabIndicatorColor="@color/colorAccent"
                     app:tabSelectedTextColor="@color/colorPrimary"
                     app:tabTextColor="@color/textColorSecondary"
                     app:tabRippleColor="@color/colorAccent"
-                    app:tabIndicatorAnimationMode="elastic" />
+                    app:tabIndicatorAnimationMode="elastic"
+                    android:clipToPadding="false"
+                    android:paddingTop="4dp"
+                    android:paddingBottom="4dp" />
 
                 <View
                     android:layout_width="match_parent"
@@ -192,12 +207,12 @@
             android:layout_marginTop="12dp"
             android:layout_marginBottom="20dp"
             android:text="Save My Avatar!"
-            android:textSize="@dimen/text_headline_small"
+            android:textSize="20sp"
             android:textStyle="bold"
             android:fontFamily="@font/agbalumo"
             android:textAllCaps="false"
             android:textColor="@color/white"
-            android:backgroundTint="@color/colorPrimary"
+            android:backgroundTint="@color/colorAccent"
             app:cornerRadius="36dp"
             app:elevation="12dp"
             app:icon="@android:drawable/ic_menu_save"
@@ -205,7 +220,8 @@
             app:iconPadding="16dp"
             app:iconSize="28dp"
             app:iconTint="@color/white"
-            app:rippleColor="@color/colorAccent" />
+            app:rippleColor="@color/white"
+            android:stateListAnimator="@null" />
 
     </LinearLayout>
 

@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_margin="6dp"
-    app:cardCornerRadius="16dp"
+    app:cardCornerRadius="20dp"
     app:cardElevation="2dp"
     app:strokeWidth="0dp"
     app:strokeColor="@color/colorAccent">
@@ -15,27 +15,35 @@
         android:layout_height="wrap_content"
         android:gravity="center"
         android:orientation="vertical"
-        android:paddingTop="16dp"
-        android:paddingBottom="16dp"
+        android:paddingTop="18dp"
+        android:paddingBottom="18dp"
         android:paddingStart="8dp"
         android:paddingEnd="8dp">
 
-        <ImageView
-            android:id="@+id/ivIcon"
-            android:layout_width="48dp"
-            android:layout_height="48dp"
-            android:layout_marginBottom="6dp"
-            android:src="@android:drawable/ic_menu_help"
-            android:visibility="gone" />
+        <FrameLayout
+            android:layout_width="60dp"
+            android:layout_height="60dp"
+            android:layout_marginBottom="8dp"
+            android:background="@drawable/avatar_item_icon_bg">
 
-        <TextView
-            android:id="@+id/tvEmoji"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textSize="32sp"
-            android:layout_marginBottom="6dp"
-            android:visibility="gone"
-            android:text="😊" />
+            <ImageView
+                android:id="@+id/ivIcon"
+                android:layout_width="32dp"
+                android:layout_height="32dp"
+                android:layout_gravity="center"
+                android:src="@android:drawable/ic_menu_help"
+                android:visibility="gone" />
+
+            <TextView
+                android:id="@+id/tvEmoji"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:textSize="32sp"
+                android:visibility="gone"
+                android:text="😊" />
+
+        </FrameLayout>
 
         <TextView
             android:id="@+id/tvLabel"
@@ -43,7 +51,7 @@
             android:layout_height="wrap_content"
             android:gravity="center"
             android:text="Label"
-            android:textSize="14sp"
+            android:textSize="12sp"
             android:textStyle="bold"
             android:fontFamily="@font/agbalumo"
             android:textColor="@color/textColorPrimary" />
