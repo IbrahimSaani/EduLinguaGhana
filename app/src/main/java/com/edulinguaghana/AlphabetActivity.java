@@ -332,11 +332,20 @@ public class AlphabetActivity extends AppCompatActivity {
             // Update progress bar and counter
             progressBar.setProgress(currentIndex + 1);
             updateProgressCounter();
+
+            // Auto-voice accessibility feature
+            if (com.edulinguaghana.AppPreferences.isAutoVoiceEnabled(this)) {
+                speakCurrentLetter();
+            }
         } catch (Exception ignored) {
         }
     }
 
     private void updateLetterWithAnimation() {
+        if (com.edulinguaghana.AppPreferences.isReducedMotionEnabled(this)) {
+            updateLetter();
+            return;
+        }
         // Animate letter change with smooth fade and scale
         try {
             animateLetterChange();
@@ -351,6 +360,11 @@ public class AlphabetActivity extends AppCompatActivity {
         // Update progress bar and counter
         progressBar.setProgress(currentIndex + 1);
         updateProgressCounter();
+
+        // Auto-voice accessibility feature
+        if (com.edulinguaghana.AppPreferences.isAutoVoiceEnabled(this)) {
+            speakCurrentLetter();
+        }
 
         try {
             animateProgressIcon();
@@ -392,6 +406,8 @@ public class AlphabetActivity extends AppCompatActivity {
     }
 
     private void startBackgroundAnimations() {
+        if (com.edulinguaghana.AppPreferences.isReducedMotionEnabled(this) || 
+            com.edulinguaghana.AppPreferences.isFocusModeEnabled(this)) return;
         try {
             // Floating animations for decorative shapes
             if (decorativeShape1 != null && decorativeShape2 != null &&

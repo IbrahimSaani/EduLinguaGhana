@@ -315,6 +315,36 @@
                         android:thumbTint="@color/colorPrimary"
                         app:trackTint="@color/colorPrimaryLight" />
 
+                    <com.google.android.material.switchmaterial.SwitchMaterial
+                        android:id="@+id/switchHapticFeedback"
+                        style="@style/Widget.Material3.CompoundButton.Switch"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="@string/settings_haptic_feedback"
+                        android:padding="16dp"
+                        android:thumbTint="@color/colorPrimary"
+                        app:trackTint="@color/colorPrimaryLight" />
+
+                    <com.google.android.material.switchmaterial.SwitchMaterial
+                        android:id="@+id/switchAutoVoice"
+                        style="@style/Widget.Material3.CompoundButton.Switch"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="@string/settings_auto_voice"
+                        android:padding="16dp"
+                        android:thumbTint="@color/colorPrimary"
+                        app:trackTint="@color/colorPrimaryLight" />
+
+                    <com.google.android.material.switchmaterial.SwitchMaterial
+                        android:id="@+id/switchFocusMode"
+                        style="@style/Widget.Material3.CompoundButton.Switch"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="@string/settings_focus_mode"
+                        android:padding="16dp"
+                        android:thumbTint="@color/colorPrimary"
+                        app:trackTint="@color/colorPrimaryLight" />
+
                     <View
                         android:layout_width="match_parent"
                         android:layout_height="1dp"

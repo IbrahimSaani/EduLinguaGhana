@@ -57,6 +57,9 @@
     <string name="settings_text_size_large">Large</string>
     <string name="settings_text_size_extra_large">Extra Large</string>
     <string name="settings_standard_font">Use Standard Font</string>
+    <string name="settings_haptic_feedback">Haptic Feedback (Vibration)</string>
+    <string name="settings_auto_voice">Auto-Voice (Speak on Page Change)</string>
+    <string name="settings_focus_mode">Focus Mode (Reduce Distractions)</string>
 
     <!-- Quiz -->
     <string name="quiz_prompt_letter">Which letter did you hear?</string>

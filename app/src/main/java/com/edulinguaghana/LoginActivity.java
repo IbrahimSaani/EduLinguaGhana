@@ -85,6 +85,8 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     private void animateViews() {
+        if (com.edulinguaghana.AppPreferences.isReducedMotionEnabled(this)) return;
+
         // Animate logo
         android.view.View logo = findViewById(R.id.ivLogo);
         if (logo != null) {

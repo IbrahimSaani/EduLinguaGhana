@@ -516,6 +516,10 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void setupMascot() {
+        if (com.edulinguaghana.AppPreferences.isFocusModeEnabled(this)) {
+            mascotView.setVisibility(View.GONE);
+            return;
+        }
         if (mascotView == null) return;
 
         // Entrance animation: Peek from bottom
@@ -1215,13 +1219,11 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private boolean animationsEnabled() {
-        SharedPreferences prefs = getSharedPreferences(PREF_NAME, MODE_PRIVATE);
-        return prefs.getBoolean(KEY_ANIMATIONS_ENABLED, true);
+        return com.edulinguaghana.AppPreferences.isAnimationsEnabled(this);
     }
 
     private boolean animationsReduced() {
-        SharedPreferences prefs = getSharedPreferences(PREF_NAME, MODE_PRIVATE);
-        return prefs.getBoolean(KEY_LOW_POWER_ANIMATIONS, false);
+        return com.edulinguaghana.AppPreferences.isReducedMotionEnabled(this);
     }
 
     // ---------------- BACK HANDLER ----------------
@@ -1606,13 +1608,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void vibrate() {
-        Vibrator v = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            v.vibrate(VibrationEffect.createOneShot(50, VibrationEffect.DEFAULT_AMPLITUDE));
-        } else {
-            //deprecated in API 26 
-            v.vibrate(50);
-        }
+        com.edulinguaghana.utils.HapticUtil.vibrateSuccess(this);
     }
 
     private void setupScrollAnimations() {

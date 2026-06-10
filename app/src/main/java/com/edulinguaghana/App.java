@@ -91,6 +91,9 @@ public class App extends Application {
      */
     private void applyAccessibilitySettings(Activity activity) {
         try {
+            // Apply Focus Mode (hide distracting elements)
+            com.edulinguaghana.utils.DecorationUtils.applyFocusMode(activity.getWindow().getDecorView());
+
             // 1. Apply Font Scale
             int size = AppPreferences.getTextSize(activity);
             float scale = 1.0f;

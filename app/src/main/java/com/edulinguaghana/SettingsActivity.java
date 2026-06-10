@@ -31,6 +31,7 @@ public class SettingsActivity extends AppCompatActivity {
     private SwitchMaterial switchLowPowerAnimations;
     private SwitchMaterial switchDailyReminders, switchStreakAlerts;
     private SwitchMaterial switchHighContrast, switchStandardFont;
+    private SwitchMaterial switchHapticFeedback, switchAutoVoice, switchFocusMode;
     private SeekBar seekBarQuizMusicVolume, seekBarTextSize;
     private TextView tvQuizMusicVolumeValue, tvTextSizeValue;
     private Button btnResetProgress;
@@ -94,6 +95,9 @@ public class SettingsActivity extends AppCompatActivity {
         // Accessibility Views
         switchHighContrast = findViewById(R.id.switchHighContrast);
         switchStandardFont = findViewById(R.id.switchStandardFont);
+        switchHapticFeedback = findViewById(R.id.switchHapticFeedback);
+        switchAutoVoice = findViewById(R.id.switchAutoVoice);
+        switchFocusMode = findViewById(R.id.switchFocusMode);
         seekBarTextSize = findViewById(R.id.seekBarTextSize);
         tvTextSizeValue = findViewById(R.id.tvTextSizeValue);
 
@@ -109,14 +113,13 @@ public class SettingsActivity extends AppCompatActivity {
         setupAccessibilityListeners();
 
         // Load preferences
-        SharedPreferences prefs = getSharedPreferences(PREF_NAME, MODE_PRIVATE);
-        boolean musicEnabled = prefs.getBoolean(KEY_MUSIC_ENABLED, true);
-        boolean sfxEnabled = prefs.getBoolean(KEY_SFX_ENABLED, true);
-        boolean animationsEnabled = prefs.getBoolean(KEY_ANIMATIONS_ENABLED, true);
-        boolean lowPowerEnabled = prefs.getBoolean(KEY_LOW_POWER_ANIMATIONS, false);
+        boolean musicEnabled = getSharedPreferences(PREF_NAME, MODE_PRIVATE).getBoolean(KEY_MUSIC_ENABLED, true);
+        boolean sfxEnabled = getSharedPreferences(PREF_NAME, MODE_PRIVATE).getBoolean(KEY_SFX_ENABLED, true);
+        boolean animationsEnabled = AppPreferences.isAnimationsEnabled(this);
+        boolean lowPowerEnabled = AppPreferences.isReducedMotionEnabled(this);
         boolean dailyReminders = AppPreferences.isDailyRemindersEnabled(this);
         boolean streakAlerts = AppPreferences.isStreakAlertsEnabled(this);
-        int quizMusicVolume = prefs.getInt(KEY_QUIZ_MUSIC_VOLUME, 50);
+        int quizMusicVolume = getSharedPreferences(PREF_NAME, MODE_PRIVATE).getInt(KEY_QUIZ_MUSIC_VOLUME, 50);
 
         // Set UI states
         switchMusic.setChecked(musicEnabled);
@@ -133,6 +136,7 @@ public class SettingsActivity extends AppCompatActivity {
         }
 
         // Save preferences when toggles change
+        SharedPreferences prefs = getSharedPreferences(PREF_NAME, MODE_PRIVATE);
         switchMusic.setOnCheckedChangeListener((buttonView, isChecked) -> {
             prefs.edit().putBoolean(KEY_MUSIC_ENABLED, isChecked).apply();
         });
@@ -142,11 +146,11 @@ public class SettingsActivity extends AppCompatActivity {
         });
 
         switchAnimations.setOnCheckedChangeListener((buttonView, isChecked) -> {
-            prefs.edit().putBoolean(KEY_ANIMATIONS_ENABLED, isChecked).apply();
+            AppPreferences.setAnimationsEnabled(this, isChecked);
         });
 
         switchLowPowerAnimations.setOnCheckedChangeListener((buttonView, isChecked) -> {
-            prefs.edit().putBoolean(KEY_LOW_POWER_ANIMATIONS, isChecked).apply();
+            AppPreferences.setReducedMotionEnabled(this, isChecked);
         });
 
         switchDailyReminders.setOnCheckedChangeListener((buttonView, isChecked) -> {
@@ -265,6 +269,25 @@ public class SettingsActivity extends AppCompatActivity {
         switchStandardFont.setOnCheckedChangeListener((buttonView, isChecked) -> {
             AppPreferences.setStandardFontEnabled(this, isChecked);
             Toast.makeText(this, "Standard Font " + (isChecked ? "Enabled" : "Disabled") + ". Restart app to apply fully.", Toast.LENGTH_SHORT).show();
+        });
+
+        // Haptic Feedback
+        switchHapticFeedback.setChecked(AppPreferences.isHapticFeedbackEnabled(this));
+        switchHapticFeedback.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            AppPreferences.setHapticFeedbackEnabled(this, isChecked);
+        });
+
+        // Auto Voice
+        switchAutoVoice.setChecked(AppPreferences.isAutoVoiceEnabled(this));
+        switchAutoVoice.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            AppPreferences.setAutoVoiceEnabled(this, isChecked);
+        });
+
+        // Focus Mode
+        switchFocusMode.setChecked(AppPreferences.isFocusModeEnabled(this));
+        switchFocusMode.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            AppPreferences.setFocusModeEnabled(this, isChecked);
+            Toast.makeText(this, "Focus Mode " + (isChecked ? "Enabled" : "Disabled") + ". UI will adjust on next screen load.", Toast.LENGTH_SHORT).show();
         });
 
         // Text Size

@@ -1147,6 +1147,7 @@ public class QuizActivity extends AppCompatActivity {
         Animation wrongAnim = AnimationUtils.loadAnimation(this, R.anim.wrong_answer);
 
         if (isCorrect) {
+            com.edulinguaghana.utils.HapticUtil.vibrateSuccess(this);
             score++;
             totalQuestionsAttempted++;
             tvGameFeedback.setText(R.string.quiz_feedback_correct);
@@ -1186,6 +1187,7 @@ public class QuizActivity extends AppCompatActivity {
                 celebrate();
             }
         } else {
+            com.edulinguaghana.utils.HapticUtil.vibrateFailure(this);
             totalQuestionsAttempted++;
             tvGameFeedback.setText(getString(R.string.quiz_feedback_wrong, currentCorrectAnswer));
             tvGameFeedback.setTextColor(ContextCompat.getColor(this, R.color.wrongAnswer));

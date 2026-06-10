@@ -243,6 +243,11 @@ public class NumbersActivity extends AppCompatActivity {
             tvNumberSpelling.setText(numberWord != null ? numberWord : "");
             progressBar.setProgress(currentNumber);
             updateProgressCounter();
+            
+            // Auto-voice accessibility feature
+            if (com.edulinguaghana.AppPreferences.isAutoVoiceEnabled(this)) {
+                speakCurrentNumber();
+            }
         } catch (Exception ignored) {
         }
     }
