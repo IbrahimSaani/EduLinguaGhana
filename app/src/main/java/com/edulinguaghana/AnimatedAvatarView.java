@@ -62,6 +62,15 @@ public class AnimatedAvatarView extends androidx.appcompat.widget.AppCompatImage
         builder = new AvatarBuilder(context, config);
         animationStartTime = System.currentTimeMillis();
 
+        // Set background color of the view itself to fill any padding area
+        if (config != null && config.backgroundColor != null) {
+            try {
+                setBackgroundColor(Color.parseColor(config.backgroundColor));
+            } catch (Exception e) {
+                // Ignore
+            }
+        }
+
         // Start animation loop
         if (animationsEnabled) {
             startAnimations();
@@ -73,6 +82,18 @@ public class AnimatedAvatarView extends androidx.appcompat.widget.AppCompatImage
     public void setAvatarConfig(AvatarBuilder.AvatarConfig config) {
         this.config = config;
         this.builder = new AvatarBuilder(getContext(), config);
+
+        // Set background color of the view itself to fill any padding area
+        if (config != null && config.backgroundColor != null) {
+            try {
+                setBackgroundColor(Color.parseColor(config.backgroundColor));
+            } catch (Exception e) {
+                // Ignore invalid color strings
+            }
+        } else if (config == null) {
+            setBackgroundColor(Color.TRANSPARENT);
+        }
+
         if (animationsEnabled) {
             invalidate();
         } else {
@@ -228,6 +249,17 @@ public class AnimatedAvatarView extends androidx.appcompat.widget.AppCompatImage
 
     private void updateAvatar() {
         post(() -> {
+            if (config == null) return;
+
+            // Set background color of the view itself to fill any padding area
+            if (config.backgroundColor != null) {
+                try {
+                    setBackgroundColor(Color.parseColor(config.backgroundColor));
+                } catch (Exception e) {
+                    // Ignore invalid color strings
+                }
+            }
+
             int size = Math.max(getWidth(), getHeight());
             if (size == 0) size = 200;
 

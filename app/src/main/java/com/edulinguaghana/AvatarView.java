@@ -3,6 +3,7 @@ package com.edulinguaghana;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
+import android.graphics.Color;
 import android.util.AttributeSet;
 import android.view.View;
 
@@ -42,6 +43,7 @@ public class AvatarView extends androidx.appcompat.widget.AppCompatImageView {
         } else {
             this.builder = null;
             setImageDrawable(null);
+            setBackgroundColor(Color.TRANSPARENT);
         }
     }
 
@@ -53,6 +55,16 @@ public class AvatarView extends androidx.appcompat.widget.AppCompatImageView {
         if (config == null) return;
         post(() -> {
             if (config == null) return;
+
+            // Set background color of the view itself to fill any padding area
+            if (config.backgroundColor != null) {
+                try {
+                    setBackgroundColor(Color.parseColor(config.backgroundColor));
+                } catch (Exception e) {
+                    // Ignore invalid color strings
+                }
+            }
+
             int size = Math.max(getWidth(), getHeight());
             if (size == 0) size = 200; // Default size
 

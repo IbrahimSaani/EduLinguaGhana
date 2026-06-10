@@ -28,6 +28,7 @@ import androidx.core.content.ContextCompat;
 import androidx.activity.OnBackPressedCallback;
 import com.google.android.material.appbar.MaterialToolbar;
 
+import android.widget.Button;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
@@ -48,7 +49,7 @@ public class SpeedGameActivity extends AppCompatActivity {
     // Views
     private TextView tvGameTitle, tvGameTimer, tvGameScore, tvGameBest, tvGameFeedback, tvGamePrompt, tvChallengeResult;
     private FloatingActionButton btnPlayAudio;
-    private MaterialButton btnOption1, btnOption2, btnOption3, btnOption4, btnOption5, btnOption6;
+    private Button btnOption1, btnOption2, btnOption3, btnOption4, btnOption5, btnOption6;
     private MaterialButton btnBack;
     private ProgressBar speedProgressBar;
     private ShadowView shadowView;
@@ -178,12 +179,12 @@ public class SpeedGameActivity extends AppCompatActivity {
         initTts();
 
         // --- Button listeners ---
-        btnOption1.setOnClickListener(v -> { v.performHapticFeedback(HapticFeedbackConstants.KEYBOARD_TAP); handleAnswerClick((MaterialButton) v); });
-        btnOption2.setOnClickListener(v -> { v.performHapticFeedback(HapticFeedbackConstants.KEYBOARD_TAP); handleAnswerClick((MaterialButton) v); });
-        btnOption3.setOnClickListener(v -> { v.performHapticFeedback(HapticFeedbackConstants.KEYBOARD_TAP); handleAnswerClick((MaterialButton) v); });
-        btnOption4.setOnClickListener(v -> { v.performHapticFeedback(HapticFeedbackConstants.KEYBOARD_TAP); handleAnswerClick((MaterialButton) v); });
-        btnOption5.setOnClickListener(v -> { v.performHapticFeedback(HapticFeedbackConstants.KEYBOARD_TAP); handleAnswerClick((MaterialButton) v); });
-        btnOption6.setOnClickListener(v -> { v.performHapticFeedback(HapticFeedbackConstants.KEYBOARD_TAP); handleAnswerClick((MaterialButton) v); });
+        btnOption1.setOnClickListener(v -> { v.performHapticFeedback(HapticFeedbackConstants.KEYBOARD_TAP); handleAnswerClick((Button) v); });
+        btnOption2.setOnClickListener(v -> { v.performHapticFeedback(HapticFeedbackConstants.KEYBOARD_TAP); handleAnswerClick((Button) v); });
+        btnOption3.setOnClickListener(v -> { v.performHapticFeedback(HapticFeedbackConstants.KEYBOARD_TAP); handleAnswerClick((Button) v); });
+        btnOption4.setOnClickListener(v -> { v.performHapticFeedback(HapticFeedbackConstants.KEYBOARD_TAP); handleAnswerClick((Button) v); });
+        btnOption5.setOnClickListener(v -> { v.performHapticFeedback(HapticFeedbackConstants.KEYBOARD_TAP); handleAnswerClick((Button) v); });
+        btnOption6.setOnClickListener(v -> { v.performHapticFeedback(HapticFeedbackConstants.KEYBOARD_TAP); handleAnswerClick((Button) v); });
 
         btnBack.setOnClickListener(v -> {
             v.performHapticFeedback(HapticFeedbackConstants.VIRTUAL_KEY);
@@ -333,15 +334,17 @@ public class SpeedGameActivity extends AppCompatActivity {
     private void generateNewQuestion() {
         isGameOver = false;
         // Reset button backgrounds for gaming UI
-        MaterialButton[] buttons = {btnOption1, btnOption2, btnOption3, btnOption4, btnOption5, btnOption6};
-        for (MaterialButton button : buttons) {
+        Button[] buttons = {btnOption1, btnOption2, btnOption3, btnOption4, btnOption5, btnOption6};
+        for (Button button : buttons) {
             if (button != null) {
                 button.setBackgroundResource(R.drawable.bg_quiz_option);
                 button.setScaleX(1.0f);
                 button.setScaleY(1.0f);
-                button.setTextColor(ContextCompat.getColor(this, R.color.colorPrimary));
+                button.setTextColor(Color.BLACK);
                 button.setAlpha(1.0f);
-                button.setStrokeColor(ColorStateList.valueOf(Color.TRANSPARENT));
+                if (button instanceof MaterialButton) {
+                    ((MaterialButton) button).setStrokeColor(ColorStateList.valueOf(Color.TRANSPARENT));
+                }
                 button.setVisibility(View.VISIBLE);
             }
         }
@@ -577,8 +580,8 @@ public class SpeedGameActivity extends AppCompatActivity {
                         ClipData.Item item = event.getClipData().getItemAt(0);
                         String dragData = item.getText().toString();
                         if (dragData.equals(currentCorrectAnswer)) {
-                            MaterialButton[] buttons = {btnOption1, btnOption2, btnOption3, btnOption4, btnOption5, btnOption6};
-                            for (MaterialButton btn : buttons) {
+                            Button[] buttons = {btnOption1, btnOption2, btnOption3, btnOption4, btnOption5, btnOption6};
+                            for (Button btn : buttons) {
                                 if (btn != null && btn.getText().equals(dragData)) {
                                     btn.setTag(R.id.shadowView, "drag_success");
                                     shadowView.reveal(ContextCompat.getColor(this, R.color.correctAnswer));
@@ -616,13 +619,11 @@ public class SpeedGameActivity extends AppCompatActivity {
         }
 
         Collections.shuffle(options);
-        MaterialButton[] buttons = {btnOption1, btnOption2, btnOption3, btnOption4, btnOption5, btnOption6};
+        Button[] buttons = {btnOption1, btnOption2, btnOption3, btnOption4, btnOption5, btnOption6};
         for (int i = 0; i < buttons.length; i++) {
             if (buttons[i] != null) {
                 buttons[i].setText(options.get(i));
-                buttons[i].setStrokeColor(ColorStateList.valueOf(Color.TRANSPARENT));
-
-                final MaterialButton currentBtn = buttons[i];
+                final Button currentBtn = buttons[i];
                 currentBtn.setOnLongClickListener(v -> {
                     ClipData.Item item = new ClipData.Item(currentBtn.getText());
                     ClipData dragData = new ClipData(currentBtn.getText(), new String[]{ClipDescription.MIMETYPE_TEXT_PLAIN}, item);
@@ -681,7 +682,7 @@ public class SpeedGameActivity extends AppCompatActivity {
         }
     }
 
-    private void handleAnswerClick(MaterialButton clickedButton) {
+    private void handleAnswerClick(Button clickedButton) {
         if ("shadow_match".equals(quizType) && !"drag_success".equals(clickedButton.getTag(R.id.shadowView))) {
             // Speed game version: Only drag and drop allowed
             tvGameFeedback.setText(R.string.quiz_hint_drag_to_match);
@@ -823,8 +824,8 @@ public class SpeedGameActivity extends AppCompatActivity {
     }
 
     private void setOptionsEnabled(boolean enabled) {
-        MaterialButton[] options = {btnOption1, btnOption2, btnOption3, btnOption4, btnOption5, btnOption6};
-        for (MaterialButton btn : options) {
+        Button[] options = {btnOption1, btnOption2, btnOption3, btnOption4, btnOption5, btnOption6};
+        for (Button btn : options) {
             if (btn != null) btn.setEnabled(enabled);
         }
     }
@@ -854,8 +855,8 @@ public class SpeedGameActivity extends AppCompatActivity {
     }
 
     private void highlightCorrectButton() {
-        MaterialButton[] buttons = {btnOption1, btnOption2, btnOption3, btnOption4, btnOption5, btnOption6};
-        for (MaterialButton button : buttons) {
+        Button[] buttons = {btnOption1, btnOption2, btnOption3, btnOption4, btnOption5, btnOption6};
+        for (Button button : buttons) {
             if (button != null && button.getText().toString().equals(currentCorrectAnswer)) {
                 button.setBackgroundResource(R.drawable.bg_quiz_option_correct);
                 button.animate()
