@@ -23,8 +23,8 @@ android {
         applicationId = "com.edulinguaghana"
         minSdk = 23
         targetSdk = 35
-        versionCode = 8
-        versionName = "1.0.7"
+        versionCode = 9
+        versionName = "1.0.8"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
@@ -74,7 +74,7 @@ android {
             firebaseAppDistribution {
                 appId = "1:340016497126:android:36b6e04f90691927389627"
                 testers = "ibrahimsaani41@gmail.com, quistkelvin32@gmail.com, 41jamesanderson@gmail.com, lovejoycelyn32@gmail.com, rhozaselorm@gmail.com, selormeyphinegad@gmail.com, ucheemmauel539@gmail.com, jnrhoshea@gmail.com, manuelowusu47@gmail.com"
-                releaseNotes = "minor bug fixes and ui improvements."
+                releaseNotes = "ui improvements for final testing to be deployed."
             }
         }
         create("beta") {
@@ -82,8 +82,8 @@ android {
             matchingFallbacks += listOf("release")
             firebaseAppDistribution {
                 appId = "1:340016497126:android:36b6e04f90691927389627"
-                testers = "ibrahimsaani41@gmail.com, quistkelvin32@gmail.com, 41jamesanderson@gmail.com, lovejoycelyn32@gmail.com, rhozaselorm@gmail.com, selormeyphinegad@gmail.com, ucheemmauel539@gmail.com, jnrhoshea@gmail.com, asiedudennis30@gmail.com"
-                releaseNotes = "final patches for deployment."
+                testers = "ibrahimsaani41@gmail.com, quistkelvin32@gmail.com, 41jamesanderson@gmail.com, lovejoycelyn32@gmail.com, rhozaselorm@gmail.com, selormeyphinegad@gmail.com, ucheemmauel539@gmail.com, jnrhoshea@gmail.com, manuelowusu47@gmail.com"
+                releaseNotes = "ui improvements for final testing to be deployed."
             }
         }
     }

@@ -116,4 +116,8 @@
     <color name="motivationCardEnd">#FFE082</color>
     <color name="motivationCardStroke">#FFD54F</color>
     <color name="quickStatsStroke">#CFD8DC</color>
+
+    <!-- Danger Zone Colors -->
+    <color name="dangerCardBackground">#FFF5F5</color>
+    <color name="dangerCardStroke">#1A880000</color>
 </resources>

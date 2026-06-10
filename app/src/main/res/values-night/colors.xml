@@ -100,4 +100,8 @@
     <color name="insightWarningBackground">#4A3200</color>
     <color name="insightWarningStroke">#5D4037</color>
     <color name="insightWarningText">#FFCC80</color>
+
+    <!-- Danger Zone Colors - Dark Mode -->
+    <color name="dangerCardBackground">#2C1A1A</color>
+    <color name="dangerCardStroke">#4A1A1A</color>
 </resources>

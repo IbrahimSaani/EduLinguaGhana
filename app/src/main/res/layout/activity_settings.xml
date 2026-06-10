@@ -112,7 +112,7 @@
                 app:cardCornerRadius="24dp"
                 app:cardElevation="2dp"
                 app:strokeWidth="1dp"
-                app:strokeColor="#0D000000"
+                app:strokeColor="@color/card_stroke"
                 app:cardBackgroundColor="@color/cardBackground">
 
                 <LinearLayout
@@ -220,7 +220,7 @@
                 app:cardCornerRadius="24dp"
                 app:cardElevation="2dp"
                 app:strokeWidth="1dp"
-                app:strokeColor="#0D000000"
+                app:strokeColor="@color/card_stroke"
                 app:cardBackgroundColor="@color/cardBackground">
 
                 <LinearLayout
@@ -286,7 +286,7 @@
                 app:cardCornerRadius="24dp"
                 app:cardElevation="2dp"
                 app:strokeWidth="1dp"
-                app:strokeColor="#0D000000"
+                app:strokeColor="@color/card_stroke"
                 app:cardBackgroundColor="@color/cardBackground">
 
                 <LinearLayout
@@ -425,7 +425,7 @@
                 app:cardCornerRadius="24dp"
                 app:cardElevation="2dp"
                 app:strokeWidth="1dp"
-                app:strokeColor="#0D000000"
+                app:strokeColor="@color/card_stroke"
                 app:cardBackgroundColor="@color/cardBackground">
 
                 <LinearLayout
@@ -491,7 +491,7 @@
                 app:cardCornerRadius="24dp"
                 app:cardElevation="2dp"
                 app:strokeWidth="1dp"
-                app:strokeColor="#0D000000"
+                app:strokeColor="@color/card_stroke"
                 app:cardBackgroundColor="@color/cardBackground">
 
                 <LinearLayout
@@ -585,7 +585,7 @@
                 app:cardCornerRadius="24dp"
                 app:cardElevation="2dp"
                 app:strokeWidth="1dp"
-                app:strokeColor="#0D000000"
+                app:strokeColor="@color/card_stroke"
                 app:cardBackgroundColor="@color/cardBackground">
 
                 <LinearLayout
@@ -681,7 +681,7 @@
                 app:cardCornerRadius="24dp"
                 app:cardElevation="2dp"
                 app:strokeWidth="1dp"
-                app:strokeColor="#0D000000"
+                app:strokeColor="@color/card_stroke"
                 app:cardBackgroundColor="@color/cardBackground">
 
                 <LinearLayout
@@ -790,7 +790,7 @@
                 <View
                     android:layout_width="4dp"
                     android:layout_height="24dp"
-                    android:background="@android:color/holo_red_dark" />
+                    android:background="@color/wrongAnswer" />
 
                 <TextView
                     android:id="@+id/tvProgressHeader"
@@ -798,7 +798,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginStart="12dp"
                     android:text="Danger Zone"
-                    android:textColor="@android:color/holo_red_dark"
+                    android:textColor="@color/wrongAnswer"
                     android:textSize="18sp"
                     android:textStyle="bold"
                     android:fontFamily="@font/agbalumo" />
@@ -811,8 +811,8 @@
                 app:cardCornerRadius="24dp"
                 app:cardElevation="0dp"
                 app:strokeWidth="1dp"
-                app:strokeColor="#1A880000"
-                app:cardBackgroundColor="#FFF5F5">
+                app:strokeColor="@color/dangerCardStroke"
+                app:cardBackgroundColor="@color/dangerCardBackground">
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -824,7 +824,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:text="This will permanently delete all your local progress and achievements. This action cannot be undone."
-                        android:textColor="#C62828"
+                        android:textColor="@color/wrongAnswer"
                         android:textSize="13sp" />
 
                     <com.google.android.material.button.MaterialButton
@@ -834,10 +834,10 @@
                         android:layout_height="56dp"
                         android:layout_marginTop="20dp"
                         android:text="Reset All Progress"
-                        android:textColor="@android:color/holo_red_dark"
+                        android:textColor="@color/wrongAnswer"
                         app:cornerRadius="28dp"
                         app:icon="@android:drawable/ic_menu_delete"
-                        app:iconTint="@android:color/holo_red_dark" />
+                        app:iconTint="@color/wrongAnswer" />
 
                 </LinearLayout>
 
