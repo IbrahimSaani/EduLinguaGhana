@@ -53,9 +53,10 @@ public class QuestAdapter extends RecyclerView.Adapter<QuestAdapter.QuestViewHol
         notifyDataSetChanged();
     }
 
-    static class QuestViewHolder extends RecyclerView.ViewHolder {
+    public static class QuestViewHolder extends RecyclerView.ViewHolder {
         TextView tvQuestIcon;
         TextView tvQuestTitle;
+        TextView tvQuestDescription;
         TextView tvQuestProgress;
         TextView tvQuestPoints;
         LinearProgressIndicator progressQuest;
@@ -68,6 +69,7 @@ public class QuestAdapter extends RecyclerView.Adapter<QuestAdapter.QuestViewHol
             super(itemView);
             tvQuestIcon = itemView.findViewById(R.id.tv_quest_icon);
             tvQuestTitle = itemView.findViewById(R.id.tv_quest_title);
+            tvQuestDescription = itemView.findViewById(R.id.tv_quest_description);
             tvQuestProgress = itemView.findViewById(R.id.tv_quest_progress);
             tvQuestPoints = itemView.findViewById(R.id.tv_quest_points);
             progressQuest = itemView.findViewById(R.id.progress_quest);
@@ -84,6 +86,11 @@ public class QuestAdapter extends RecyclerView.Adapter<QuestAdapter.QuestViewHol
 
             // Set quest title
             tvQuestTitle.setText(quest.title);
+
+            // Set quest description
+            if (tvQuestDescription != null) {
+                tvQuestDescription.setText(quest.description);
+            }
 
             // Calculate progress percentage
             int progressPercentage = quest.target > 0 ?

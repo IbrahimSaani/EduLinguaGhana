@@ -31,6 +31,7 @@
 
             <!-- Premium Icon Container -->
             <com.google.android.material.card.MaterialCardView
+                android:id="@+id/iconBackground"
                 android:layout_width="56dp"
                 android:layout_height="56dp"
                 app:cardCornerRadius="28dp"
@@ -39,7 +40,7 @@
                 app:cardBackgroundColor="@color/cardBackground">
 
                 <View
-                    android:id="@+id/iconBackgroundOverlay"
+                    android:id="@+id/overlayColor"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:background="@color/colorPrimary"
@@ -160,7 +161,7 @@
         </LinearLayout>
 
         <com.google.android.material.button.MaterialButton
-            android:id="@+id/btnClaimReward"
+            android:id="@+id/claimIndicator"
             style="@style/Widget.Material3.Button.TonalButton"
             android:layout_width="match_parent"
             android:layout_height="48dp"
