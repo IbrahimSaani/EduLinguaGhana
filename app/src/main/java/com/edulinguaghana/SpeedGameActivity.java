@@ -153,6 +153,10 @@ public class SpeedGameActivity extends AppCompatActivity {
 
         MaterialToolbar toolbar = findViewById(R.id.toolbar);
         if (toolbar != null) {
+            String langName = getIntent().getStringExtra("LANG_NAME");
+            if (langName != null) {
+                toolbar.setTitle(getString(R.string.game_speed_challenge_title) + " – " + langName);
+            }
             toolbar.setNavigationOnClickListener(v -> {
                 v.performHapticFeedback(HapticFeedbackConstants.VIRTUAL_KEY);
                 if (!isGameOver) {
@@ -325,7 +329,7 @@ public class SpeedGameActivity extends AppCompatActivity {
         tvGameScore.setText(getString(R.string.quiz_score, score));
         tvGameFeedback.setText("");
         tvGameTimer.setText(getString(R.string.quiz_timer, (int)(timeLeftMs / 1000)));
-        tvGameTimer.setTextColor(Color.parseColor("#0D47A1")); // Dark blue for visibility
+        tvGameTimer.setTextColor(Color.WHITE); // White for visibility on dark HUD
 
         generateNewQuestion();
         startTimer();
@@ -769,7 +773,7 @@ public class SpeedGameActivity extends AppCompatActivity {
                         speedProgressBar.setProgressTintList(ColorStateList.valueOf(ContextCompat.getColor(SpeedGameActivity.this, R.color.wrongAnswer)));
                     }
                 } else {
-                    tvGameTimer.setTextColor(ContextCompat.getColor(SpeedGameActivity.this, R.color.colorPrimary));
+                    tvGameTimer.setTextColor(Color.WHITE);
                     if (speedProgressBar != null) {
                         speedProgressBar.setProgressTintList(ColorStateList.valueOf(ContextCompat.getColor(SpeedGameActivity.this, R.color.colorAccent)));
                     }
