@@ -164,7 +164,7 @@
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="PAUSE"
+                            android:text="@string/quiz_pause_button"
                             android:textColor="#88FFFFFF"
                             android:textSize="10sp"
                             android:textStyle="bold" />
@@ -399,7 +399,7 @@
                     android:id="@+id/tvOverlayTitle"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Mission Paused"
+                    android:text="@string/game_status_mission_paused"
                     android:textColor="#FFAB40"
                     android:textSize="32sp"
                     android:fontFamily="@font/agbalumo"
@@ -410,7 +410,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="12dp"
-                    android:text="Final Score: 0"
+                    android:text="@string/game_overlay_score_final"
                     android:textColor="@color/textColorPrimary"
                     android:textSize="22sp" />
 
@@ -421,7 +421,7 @@
                     android:layout_marginTop="32dp"
                     android:backgroundTint="@null"
                     android:background="@drawable/bg_quiz_primary_button"
-                    android:text="Resume Mission"
+                    android:text="@string/game_overlay_resume"
                     android:textColor="@color/white"
                     android:textSize="18sp"
                     android:textStyle="bold"
@@ -436,7 +436,7 @@
                     android:layout_marginTop="16dp"
                     android:backgroundTint="@null"
                     android:background="@drawable/bg_quiz_success_button"
-                    android:text="Restart Mission"
+                    android:text="@string/game_overlay_restart"
                     android:textColor="@color/white"
                     android:textSize="18sp"
                     android:textStyle="bold"
@@ -451,7 +451,7 @@
                     android:layout_marginTop="16dp"
                     android:backgroundTint="@null"
                     android:background="@drawable/bg_quiz_error_button"
-                    android:text="Quit to Menu"
+                    android:text="@string/game_overlay_quit"
                     android:textColor="@color/white"
                     android:textSize="18sp"
                     android:textStyle="bold"

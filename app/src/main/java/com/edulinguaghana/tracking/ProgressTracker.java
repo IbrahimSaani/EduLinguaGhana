@@ -301,6 +301,9 @@ public class ProgressTracker {
                 int totalQuestionsCount = 0;
                 int totalFunGamesCount = 0;
                 int bestFunGameScore = 0;
+                int totalFunGameScore = 0;
+                int totalCumulativeScore = 0;
+                int maxQuizScore = 0;
                 int funGamesThisWeek = 0;
                 Map<String, Integer> quizHighScores = new HashMap<>();
                 
@@ -311,12 +314,17 @@ public class ProgressTracker {
                     ProgressActivity activity = snapshot.getValue(ProgressActivity.class);
                     if (activity != null) {
                         totalTimeSeconds += activity.getDurationSeconds();
+                        totalCumulativeScore += activity.getScore();
                         
                         if (activity.getActivityType() == ProgressActivity.ActivityType.QUIZ_COMPLETED) {
                             totalQuizzesCount++;
                             totalCorrectCount += activity.getCorrectAnswers();
                             totalQuestionsCount += activity.getTotalQuestions();
                             
+                            if (activity.getScore() > maxQuizScore) {
+                                maxQuizScore = activity.getScore();
+                            }
+
                             // Track high scores per mode
                             String mode = activity.getMode();
                             int currentScore = activity.getScore();
@@ -333,6 +341,7 @@ public class ProgressTracker {
                             }
                         } else if (activity.getActivityType() == ProgressActivity.ActivityType.FUN_GAME_COMPLETED) {
                             totalFunGamesCount++;
+                            totalFunGameScore += activity.getScore();
                             if (activity.getScore() > bestFunGameScore) {
                                 bestFunGameScore = activity.getScore();
                             }
@@ -368,6 +377,9 @@ else if (activity.getActivityType() == ProgressActivity.ActivityType.XP_EARNED) 
                 final int finalQuestionsCount = totalQuestionsCount;
                 final int finalFunGamesCount = totalFunGamesCount;
                 final int finalBestFunGameScore = bestFunGameScore;
+                final int finalTotalFunGameScore = totalFunGameScore;
+                final int finalTotalCumulativeScore = totalCumulativeScore;
+                final int finalMaxQuizScore = maxQuizScore;
                 final int finalFunGamesWeek = funGamesThisWeek;
                 final Map<String, Integer> finalQuizHighScores = quizHighScores;
 
@@ -402,10 +414,13 @@ else if (activity.getActivityType() == ProgressActivity.ActivityType.XP_EARNED) 
                             aggregate.setTotalTimeSpentSeconds(finalTotalTime);
                             aggregate.setQuizzesThisWeek(finalQuizzesWeek);
                             aggregate.setXpThisWeek(finalXpWeek);
+                            aggregate.setHighestScore(Math.max(finalMaxQuizScore, aggregate.getHighestScore()));
                             
                             // Fun Games
                             aggregate.setTotalFunGames(finalFunGamesCount);
                             aggregate.setBestFunGameScore(finalBestFunGameScore);
+                            aggregate.setTotalFunGameScore(finalTotalFunGameScore);
+                            aggregate.setTotalCumulativeScore(finalTotalCumulativeScore);
                             aggregate.setFunGamesThisWeek(finalFunGamesWeek);
                             aggregate.setQuizHighScores(finalQuizHighScores);
 

@@ -251,6 +251,7 @@ public class TeacherDashboardActivity extends AppCompatActivity {
         String[] options = {
                 getString(R.string.sort_by_name),
                 getString(R.string.sort_by_level),
+                getString(R.string.sort_by_score),
                 getString(R.string.sort_by_activity)
         };
 
@@ -258,7 +259,7 @@ public class TeacherDashboardActivity extends AppCompatActivity {
         java.util.List<com.edulinguaghana.StyledMenuHelper.MenuItem> menuItems = new java.util.ArrayList<>();
         for (int i = 0; i < options.length; i++) {
             final int index = i;
-            String icon = index == 0 ? "🔤" : (index == 1 ? "📊" : "🕐");
+            String icon = index == 0 ? "🔤" : (index == 1 ? "📊" : (index == 2 ? "🏆" : "🕐"));
             menuItems.add(new com.edulinguaghana.StyledMenuHelper.MenuItem(
                 icon,
                 options[i],
@@ -642,6 +643,10 @@ public class TeacherDashboardActivity extends AppCompatActivity {
                             b.getProgress().getCurrentLevel(),
                             a.getProgress().getCurrentLevel());
                 case 2:
+                    return Integer.compare(
+                            b.getProgress().getTotalCumulativeScore(),
+                            a.getProgress().getTotalCumulativeScore());
+                case 3:
                     return Long.compare(
                             b.getProgress().getLastUpdated(),
                             a.getProgress().getLastUpdated());
@@ -798,11 +803,15 @@ public class TeacherDashboardActivity extends AppCompatActivity {
             return;
         }
 
-        // Sort by XP or Level
+        // Sort by Total Cumulative Score (Matches global leaderboard), then XP
         List<StudentProgressItem> sorted = new ArrayList<>(students);
         Collections.sort(sorted, (a, b) -> {
+            int scoreCompare = Integer.compare(b.getProgress().getTotalCumulativeScore(), a.getProgress().getTotalCumulativeScore());
+            if (scoreCompare != 0) return scoreCompare;
+
             int xpCompare = Integer.compare(b.getProgress().getTotalXP(), a.getProgress().getTotalXP());
             if (xpCompare != 0) return xpCompare;
+
             return Integer.compare(b.getProgress().getCurrentLevel(), a.getProgress().getCurrentLevel());
         });
 

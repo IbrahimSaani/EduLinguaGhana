@@ -669,9 +669,9 @@ public class SpeedGameActivity extends AppCompatActivity {
             cancelTimer();
             if (overlayLayout != null) {
                 overlayLayout.setVisibility(View.VISIBLE);
-                if (tvOverlayTitle != null) tvOverlayTitle.setText("Mission Paused");
+                if (tvOverlayTitle != null) tvOverlayTitle.setText(getString(R.string.game_status_mission_paused));
                 TextView tvScore = findViewById(R.id.tvOverlayScore);
-                if (tvScore != null) tvScore.setText("Current Score: " + score);
+                if (tvScore != null) tvScore.setText(getString(R.string.quiz_score, score));
                 MaterialButton btnResume = findViewById(R.id.btnResume);
                 if (btnResume != null) btnResume.setVisibility(View.VISIBLE);
             }
@@ -785,9 +785,9 @@ public class SpeedGameActivity extends AppCompatActivity {
                 // Show end game overlay
                 if (overlayLayout != null) {
                     overlayLayout.setVisibility(View.VISIBLE);
-                    if (tvOverlayTitle != null) tvOverlayTitle.setText("Mission Complete!");
+                    if (tvOverlayTitle != null) tvOverlayTitle.setText(getString(R.string.game_over_mission_complete));
                     TextView tvScore = findViewById(R.id.tvOverlayScore);
-                    if (tvScore != null) tvScore.setText("Final Score: " + score);
+                    if (tvScore != null) tvScore.setText(getString(R.string.quiz_final_score, score));
                     MaterialButton btnResume = findViewById(R.id.btnResume);
                     if (btnResume != null) btnResume.setVisibility(View.GONE);
                 }
