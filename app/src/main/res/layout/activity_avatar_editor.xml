@@ -3,7 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/gradient_background_premium"
+    android:background="@color/appBackground"
     android:fitsSystemWindows="true">
 
     <View
@@ -16,18 +16,16 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@android:color/transparent"
-        app:elevation="0dp"
-        android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar">
+        app:elevation="0dp">
 
         <androidx.appcompat.widget.Toolbar
             android:id="@+id/toolbar"
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
             android:background="@android:color/transparent"
-            app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
             app:titleTextAppearance="@style/ToolbarTitleStyle"
-            app:titleTextColor="@color/white"
-            app:navigationIconTint="@color/white" />
+            app:titleTextColor="@color/colorPrimary"
+            app:navigationIconTint="@color/colorPrimary" />
 
     </com.google.android.material.appbar.AppBarLayout>
 
@@ -45,44 +43,40 @@
             android:layout_marginStart="20dp"
             android:layout_marginEnd="20dp"
             android:layout_marginBottom="16dp"
-            app:cardCornerRadius="28dp"
-            app:cardElevation="8dp"
-            app:strokeWidth="1dp"
-            app:strokeColor="#33FFFFFF"
-            app:cardBackgroundColor="#26FFFFFF">
+            app:cardCornerRadius="32dp"
+            app:cardElevation="4dp"
+            app:strokeWidth="1.5dp"
+            app:strokeColor="@color/colorPrimaryLight"
+            app:cardBackgroundColor="@color/cardBackground">
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
-                android:padding="16dp"
+                android:padding="20dp"
                 android:gravity="center">
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Customize Your Look"
-                    android:textSize="@dimen/text_headline_small"
+                    android:textSize="22sp"
                     android:textStyle="bold"
                     android:fontFamily="@font/agbalumo"
-                    android:textColor="@color/white"
-                    android:shadowColor="#40000000"
-                    android:shadowDx="2"
-                    android:shadowDy="2"
-                    android:shadowRadius="4"
+                    android:textColor="@color/colorPrimary"
                     android:letterSpacing="0.02"
                     app:autoSizeTextType="uniform"
-                    app:autoSizeMinTextSize="14sp"
-                    app:autoSizeMaxTextSize="18sp" />
+                    app:autoSizeMinTextSize="16sp"
+                    app:autoSizeMaxTextSize="22sp" />
 
                 <com.google.android.material.card.MaterialCardView
                     android:layout_width="@dimen/hero_animation_size"
                     android:layout_height="@dimen/hero_animation_size"
-                    android:layout_marginTop="12dp"
+                    android:layout_marginTop="16dp"
                     app:cardCornerRadius="110dp"
-                    app:cardElevation="4dp"
-                    app:strokeWidth="4dp"
-                    app:strokeColor="@color/white"
+                    app:cardElevation="6dp"
+                    app:strokeWidth="5dp"
+                    app:strokeColor="@color/colorAccent"
                     app:cardBackgroundColor="@color/cardBackground">
 
                     <com.edulinguaghana.AvatarView
@@ -107,37 +101,31 @@
                         android:id="@+id/btnChangeBackground"
                         style="@style/Widget.Material3.Button.TonalButton"
                         android:layout_width="wrap_content"
-                        android:layout_height="44dp"
+                        android:layout_height="48dp"
                         android:layout_marginEnd="8dp"
                         android:text="BG Color"
                         app:icon="@drawable/ic_theme"
-                        app:iconSize="18dp"
-                        android:textSize="12sp"
+                        app:iconSize="20dp"
+                        android:textSize="13sp"
                         android:textStyle="bold"
-                        android:textColor="@color/white"
-                        app:iconTint="@color/white"
-                        android:backgroundTint="#40FFFFFF"
-                        app:cornerRadius="12dp"
-                        android:paddingLeft="16dp"
-                        android:paddingRight="16dp" />
+                        app:cornerRadius="16dp"
+                        android:paddingLeft="20dp"
+                        android:paddingRight="20dp" />
 
                     <com.google.android.material.button.MaterialButton
                         android:id="@+id/btnRandomAvatar"
                         style="@style/Widget.Material3.Button.TonalButton"
                         android:layout_width="wrap_content"
-                        android:layout_height="44dp"
+                        android:layout_height="48dp"
                         android:layout_marginStart="8dp"
                         android:text="Random"
                         app:icon="@drawable/ic_progress_sparkle"
-                        app:iconSize="18dp"
-                        android:textSize="12sp"
+                        app:iconSize="20dp"
+                        android:textSize="13sp"
                         android:textStyle="bold"
-                        android:textColor="@color/white"
-                        app:iconTint="@color/white"
-                        android:backgroundTint="#40FFFFFF"
-                        app:cornerRadius="12dp"
-                        android:paddingLeft="16dp"
-                        android:paddingRight="16dp" />
+                        app:cornerRadius="16dp"
+                        android:paddingLeft="20dp"
+                        android:paddingRight="20dp" />
 
                 </LinearLayout>
 

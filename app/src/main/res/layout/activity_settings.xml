@@ -128,8 +128,9 @@
                         android:layout_height="wrap_content"
                         android:text="Background Music"
                         android:padding="16dp"
-                        android:thumbTint="@color/colorPrimary"
-                        app:trackTint="@color/colorPrimaryLight" />
+                        app:thumbTint="@color/switch_thumb_selector"
+                        app:trackTint="@color/switch_track_selector"
+                        app:useMaterialThemeColors="false" />
 
                     <com.google.android.material.switchmaterial.SwitchMaterial
                         android:id="@+id/switchSfx"
@@ -138,8 +139,9 @@
                         android:layout_height="wrap_content"
                         android:text="Sound Effects"
                         android:padding="16dp"
-                        android:thumbTint="@color/colorPrimary"
-                        app:trackTint="@color/colorPrimaryLight" />
+                        app:thumbTint="@color/switch_thumb_selector"
+                        app:trackTint="@color/switch_track_selector"
+                        app:useMaterialThemeColors="false" />
 
                     <View
                         android:layout_width="match_parent"
@@ -236,8 +238,9 @@
                         android:layout_height="wrap_content"
                         android:text="@string/settings_background_animations"
                         android:padding="16dp"
-                        android:thumbTint="@color/colorPrimary"
-                        app:trackTint="@color/colorPrimaryLight" />
+                        app:thumbTint="@color/switch_thumb_selector"
+                        app:trackTint="@color/switch_track_selector"
+                        app:useMaterialThemeColors="false" />
 
                     <com.google.android.material.switchmaterial.SwitchMaterial
                         android:id="@+id/switchLowPowerAnimations"
@@ -246,8 +249,9 @@
                         android:layout_height="wrap_content"
                         android:text="@string/settings_low_power_animations"
                         android:padding="16dp"
-                        android:thumbTint="@color/colorPrimary"
-                        app:trackTint="@color/colorPrimaryLight" />
+                        app:thumbTint="@color/switch_thumb_selector"
+                        app:trackTint="@color/switch_track_selector"
+                        app:useMaterialThemeColors="false" />
 
                 </LinearLayout>
 
@@ -302,8 +306,9 @@
                         android:layout_height="wrap_content"
                         android:text="@string/settings_high_contrast"
                         android:padding="16dp"
-                        android:thumbTint="@color/colorPrimary"
-                        app:trackTint="@color/colorPrimaryLight" />
+                        app:thumbTint="@color/switch_thumb_selector"
+                        app:trackTint="@color/switch_track_selector"
+                        app:useMaterialThemeColors="false" />
 
                     <com.google.android.material.switchmaterial.SwitchMaterial
                         android:id="@+id/switchStandardFont"
@@ -312,8 +317,9 @@
                         android:layout_height="wrap_content"
                         android:text="@string/settings_standard_font"
                         android:padding="16dp"
-                        android:thumbTint="@color/colorPrimary"
-                        app:trackTint="@color/colorPrimaryLight" />
+                        app:thumbTint="@color/switch_thumb_selector"
+                        app:trackTint="@color/switch_track_selector"
+                        app:useMaterialThemeColors="false" />
 
                     <com.google.android.material.switchmaterial.SwitchMaterial
                         android:id="@+id/switchHapticFeedback"
@@ -322,8 +328,9 @@
                         android:layout_height="wrap_content"
                         android:text="@string/settings_haptic_feedback"
                         android:padding="16dp"
-                        android:thumbTint="@color/colorPrimary"
-                        app:trackTint="@color/colorPrimaryLight" />
+                        app:thumbTint="@color/switch_thumb_selector"
+                        app:trackTint="@color/switch_track_selector"
+                        app:useMaterialThemeColors="false" />
 
                     <com.google.android.material.switchmaterial.SwitchMaterial
                         android:id="@+id/switchAutoVoice"
@@ -332,8 +339,9 @@
                         android:layout_height="wrap_content"
                         android:text="@string/settings_auto_voice"
                         android:padding="16dp"
-                        android:thumbTint="@color/colorPrimary"
-                        app:trackTint="@color/colorPrimaryLight" />
+                        app:thumbTint="@color/switch_thumb_selector"
+                        app:trackTint="@color/switch_track_selector"
+                        app:useMaterialThemeColors="false" />
 
                     <com.google.android.material.switchmaterial.SwitchMaterial
                         android:id="@+id/switchFocusMode"
@@ -342,8 +350,9 @@
                         android:layout_height="wrap_content"
                         android:text="@string/settings_focus_mode"
                         android:padding="16dp"
-                        android:thumbTint="@color/colorPrimary"
-                        app:trackTint="@color/colorPrimaryLight" />
+                        app:thumbTint="@color/switch_thumb_selector"
+                        app:trackTint="@color/switch_track_selector"
+                        app:useMaterialThemeColors="false" />
 
                     <View
                         android:layout_width="match_parent"
@@ -441,8 +450,9 @@
                         android:layout_height="wrap_content"
                         android:text="@string/settings_daily_reminder"
                         android:padding="16dp"
-                        android:thumbTint="@color/colorPrimary"
-                        app:trackTint="@color/colorPrimaryLight" />
+                        app:thumbTint="@color/switch_thumb_selector"
+                        app:trackTint="@color/switch_track_selector"
+                        app:useMaterialThemeColors="false" />
 
                     <com.google.android.material.switchmaterial.SwitchMaterial
                         android:id="@+id/switchStreakAlerts"
@@ -451,8 +461,9 @@
                         android:layout_height="wrap_content"
                         android:text="@string/settings_streak_alerts"
                         android:padding="16dp"
-                        android:thumbTint="@color/colorPrimary"
-                        app:trackTint="@color/colorPrimaryLight" />
+                        app:thumbTint="@color/switch_thumb_selector"
+                        app:trackTint="@color/switch_track_selector"
+                        app:useMaterialThemeColors="false" />
 
                 </LinearLayout>
 

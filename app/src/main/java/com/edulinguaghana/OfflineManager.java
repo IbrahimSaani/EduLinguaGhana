@@ -18,6 +18,7 @@ public class OfflineManager {
     /**
      * Check if device is connected to internet
      */
+    @SuppressWarnings("deprecation")
     public boolean isOnline() {
         ConnectivityManager connectivityManager =
             (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);

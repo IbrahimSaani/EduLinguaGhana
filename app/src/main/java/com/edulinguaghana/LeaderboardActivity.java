@@ -191,6 +191,7 @@ public class LeaderboardActivity extends AppCompatActivity {
         leaderboardRef.orderByChild("score").limitToLast(100)
             .addListenerForSingleValueEvent(new ValueEventListener() {
                 @Override
+                @SuppressWarnings("unchecked")
                 public void onDataChange(@NonNull DataSnapshot snapshot) {
                     leaderboardList.clear();
 
@@ -253,6 +254,7 @@ public class LeaderboardActivity extends AppCompatActivity {
             });
     }
 
+    @SuppressWarnings("unchecked")
     private void updateCurrentUserInList(DataSnapshot userSnapshot) {
         String uid = userSnapshot.getKey();
         if (uid == null) return;
