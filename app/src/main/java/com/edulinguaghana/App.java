@@ -14,6 +14,7 @@ import com.facebook.FacebookSdk;
 import com.facebook.appevents.AppEventsLogger;
 import com.google.firebase.FirebaseApp;
 import com.google.firebase.crashlytics.FirebaseCrashlytics;
+import com.google.firebase.database.FirebaseDatabase;
 import com.edulinguaghana.social.impl.FirebaseSocialRepository;
 import com.edulinguaghana.social.SocialRepository;
 import com.edulinguaghana.social.SocialProvider;
@@ -32,6 +33,7 @@ public class App extends Application {
         // Initialize Firebase (no-op if already initialized by google-services)
         try {
             FirebaseApp.initializeApp(this);
+            FirebaseDatabase.getInstance().setPersistenceEnabled(true);
             FirebaseCrashlytics.getInstance().setCrashlyticsCollectionEnabled(true);
         } catch (Exception ignored) {
         }

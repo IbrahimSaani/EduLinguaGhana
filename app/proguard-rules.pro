@@ -60,7 +60,11 @@
 -keepattributes *Annotation*
 -dontwarn sun.misc.**
 -keep class com.google.gson.** { *; }
--keep class com.edulinguaghana.** { *; }
+# Keep model classes used for Gson serialization
+-keep class com.edulinguaghana.gamification.XPState { *; }
+-keep class com.edulinguaghana.LeaderboardEntry { *; }
+-keep class com.edulinguaghana.social.ChallengeStats { *; }
+-keep class com.edulinguaghana.social.Challenge$State { *; }
 
 # --- Strip debug logs in production ---
 -assumenosideeffects class android.util.Log {
