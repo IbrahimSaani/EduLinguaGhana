@@ -179,11 +179,8 @@ public class MainActivity extends AppCompatActivity {
         btnOpenRoleDashboard = findViewById(R.id.btnOpenRoleDashboard);
 
         setupMascot();
-        setupHeroGlow();
-        setupStarAnimations();
-        setupBubbleAnimations();
-        setupFloatingElements();
-        setupAnimatedShapes();
+        // Animation setup moved to onResume/refreshAnimations
+        
         setupEnhancedFeatures();
         setupQuickStats();
         setupOfflineIndicator();
@@ -1187,35 +1184,60 @@ public class MainActivity extends AppCompatActivity {
         // Setup role-based navigation (refresh in case role changed)
         setupRoleBasedNavigation();
 
-        // previously read high score to show in removed UI; keep prefs access in case other features rely on it
+        // Refresh Animations
+        refreshAnimations();
+    }
 
-        // Only start the dynamic overlay pulse when animations are enabled, dynamic
-        // backgrounds are allowed by user preference and the system is not in dark mode.
+    private void refreshAnimations() {
+        stopAllAnimations();
+
         boolean isDark = ThemeUtils.isDarkMode(this);
+        boolean enabled = animationsEnabled() && !isDark;
 
-        if (animationsEnabled() && !isDark) {
-            if (heroGlowAnimator != null && !heroGlowAnimator.isStarted()) {
-                heroGlowAnimator.start();
-            }
-            if (starLeftAnimator != null && !starLeftAnimator.isStarted()) starLeftAnimator.start();
-            if (starRightAnimator != null && !starRightAnimator.isStarted()) starRightAnimator.start();
-            if (bubbleTopAnimator != null && !bubbleTopAnimator.isStarted()) bubbleTopAnimator.start();
-            if (bubbleMidAnimator != null && !bubbleMidAnimator.isStarted()) bubbleMidAnimator.start();
-            if (bubbleBottomAnimator != null && !bubbleBottomAnimator.isStarted()) bubbleBottomAnimator.start();
+        if (enabled) {
+            // Re-initialize animators (they might change based on Reduced Motion setting)
+            setupHeroGlow();
+            setupStarAnimations();
+            setupBubbleAnimations();
+            
+            // Start Property Animators
+            if (heroGlowAnimator != null) heroGlowAnimator.start();
+            if (starLeftAnimator != null) starLeftAnimator.start();
+            if (starRightAnimator != null) starRightAnimator.start();
+            if (bubbleTopAnimator != null) bubbleTopAnimator.start();
+            if (bubbleMidAnimator != null) bubbleMidAnimator.start();
+            if (bubbleBottomAnimator != null) bubbleBottomAnimator.start();
+
+            // Start View Animations
+            setupFloatingElements();
+            setupAnimatedShapes();
         }
     }
 
     @Override
     protected void onPause() {
-        if (heroGlowAnimator != null && heroGlowAnimator.isRunning()) {
-            heroGlowAnimator.end();
-        }
+        stopAllAnimations();
+        super.onPause();
+    }
+
+    private void stopAllAnimations() {
+        if (heroGlowAnimator != null && heroGlowAnimator.isRunning()) heroGlowAnimator.end();
         if (starLeftAnimator != null && starLeftAnimator.isRunning()) starLeftAnimator.end();
         if (starRightAnimator != null && starRightAnimator.isRunning()) starRightAnimator.end();
         if (bubbleTopAnimator != null && bubbleTopAnimator.isRunning()) bubbleTopAnimator.end();
         if (bubbleMidAnimator != null && bubbleMidAnimator.isRunning()) bubbleMidAnimator.end();
         if (bubbleBottomAnimator != null && bubbleBottomAnimator.isRunning()) bubbleBottomAnimator.end();
-        super.onPause();
+        
+        if (floatingElementsContainer != null) {
+            for (int i = 0; i < floatingElementsContainer.getChildCount(); i++) {
+                floatingElementsContainer.getChildAt(i).clearAnimation();
+            }
+        }
+        if (animatedShapesContainer != null) {
+            for (int i = 0; i < animatedShapesContainer.getChildCount(); i++) {
+                animatedShapesContainer.getChildAt(i).clearAnimation();
+            }
+        }
     }
 
     private boolean animationsEnabled() {

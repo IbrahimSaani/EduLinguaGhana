@@ -322,6 +322,28 @@ public class AlphabetActivity extends AppCompatActivity {
         });
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+        // Refresh animations state
+        if (com.edulinguaghana.AppPreferences.isAnimationsEnabled(this)) {
+            startBackgroundAnimations();
+        } else {
+            stopBackgroundAnimations();
+        }
+    }
+
+    private void stopBackgroundAnimations() {
+        try {
+            if (decorativeShape1 != null) decorativeShape1.clearAnimation();
+            if (decorativeShape2 != null) decorativeShape2.clearAnimation();
+            if (decorativeShape3 != null) decorativeShape3.clearAnimation();
+            if (decorativeShape4 != null) decorativeShape4.clearAnimation();
+            if (modeIcon != null) modeIcon.clearAnimation();
+            if (progressIcon != null) progressIcon.clearAnimation();
+        } catch (Exception ignored) {}
+    }
+
     private void updateLetter() {
         try {
             // Update text with letter
@@ -394,6 +416,7 @@ public class AlphabetActivity extends AppCompatActivity {
     }
 
     private void animateLetter() {
+        if (!com.edulinguaghana.AppPreferences.isAnimationsEnabled(this)) return;
         try {
             Animation letterAnim = AnimationUtils.loadAnimation(this, R.anim.letter_bounce);
             tvLetter.startAnimation(letterAnim);
@@ -406,8 +429,12 @@ public class AlphabetActivity extends AppCompatActivity {
     }
 
     private void startBackgroundAnimations() {
-        if (com.edulinguaghana.AppPreferences.isReducedMotionEnabled(this) || 
-            com.edulinguaghana.AppPreferences.isFocusModeEnabled(this)) return;
+        if (!com.edulinguaghana.AppPreferences.isAnimationsEnabled(this) ||
+            com.edulinguaghana.AppPreferences.isReducedMotionEnabled(this) || 
+            com.edulinguaghana.AppPreferences.isFocusModeEnabled(this)) {
+            stopBackgroundAnimations();
+            return;
+        }
         try {
             // Floating animations for decorative shapes
             if (decorativeShape1 != null && decorativeShape2 != null &&

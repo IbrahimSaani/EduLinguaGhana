@@ -260,15 +260,16 @@ public class SettingsActivity extends AppCompatActivity {
         switchHighContrast.setChecked(AppPreferences.isHighContrastEnabled(this));
         switchHighContrast.setOnCheckedChangeListener((buttonView, isChecked) -> {
             AppPreferences.setHighContrastEnabled(this, isChecked);
-            // In a real app, we might need to recreate the activity or apply theme
-            Toast.makeText(this, "High Contrast " + (isChecked ? "Enabled" : "Disabled") + ". Restart app to apply fully.", Toast.LENGTH_SHORT).show();
+            // Recreate to apply theme immediately
+            recreate();
         });
 
         // Standard Font
         switchStandardFont.setChecked(AppPreferences.isStandardFontEnabled(this));
         switchStandardFont.setOnCheckedChangeListener((buttonView, isChecked) -> {
             AppPreferences.setStandardFontEnabled(this, isChecked);
-            Toast.makeText(this, "Standard Font " + (isChecked ? "Enabled" : "Disabled") + ". Restart app to apply fully.", Toast.LENGTH_SHORT).show();
+            // Recreate to apply font settings
+            recreate();
         });
 
         // Haptic Feedback
@@ -287,7 +288,8 @@ public class SettingsActivity extends AppCompatActivity {
         switchFocusMode.setChecked(AppPreferences.isFocusModeEnabled(this));
         switchFocusMode.setOnCheckedChangeListener((buttonView, isChecked) -> {
             AppPreferences.setFocusModeEnabled(this, isChecked);
-            Toast.makeText(this, "Focus Mode " + (isChecked ? "Enabled" : "Disabled") + ". UI will adjust on next screen load.", Toast.LENGTH_SHORT).show();
+            // Recreate to apply focus mode immediately
+            recreate();
         });
 
         // Text Size
@@ -307,7 +309,7 @@ public class SettingsActivity extends AppCompatActivity {
             @Override
             public void onStopTrackingTouch(SeekBar seekBar) {
                 AppPreferences.setTextSize(SettingsActivity.this, seekBar.getProgress());
-                Toast.makeText(SettingsActivity.this, "Text Size updated. Restart app to apply fully.", Toast.LENGTH_SHORT).show();
+                recreate();
             }
         });
     }

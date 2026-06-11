@@ -89,14 +89,11 @@ public class App extends Application {
     }
 
     /**
-     * Applies accessibility settings to the given activity.
+     * Applies settings that must be set BEFORE setContentView (Themes, Config)
      */
-    private void applyAccessibilitySettings(Activity activity) {
+    private void applyPreInflationSettings(Activity activity) {
         try {
-            // Apply Focus Mode (hide distracting elements)
-            com.edulinguaghana.utils.DecorationUtils.applyFocusMode(activity.getWindow().getDecorView());
-
-            // 1. Apply Font Scale
+            // 1. Apply Font Scale (config override)
             int size = AppPreferences.getTextSize(activity);
             float scale = 1.0f;
             switch (size) {
@@ -110,10 +107,23 @@ public class App extends Application {
             config.fontScale = scale;
             activity.applyOverrideConfiguration(config);
 
-            // 2. High Contrast (Optional: could set a high contrast theme if defined)
+            // 2. High Contrast Theme
             if (AppPreferences.isHighContrastEnabled(activity)) {
-                // activity.setTheme(R.style.Theme_HighContrast);
+                activity.setTheme(R.style.Theme_EduLinguaGhana_HighContrast);
             }
+        } catch (Exception ignored) {}
+    }
+
+    /**
+     * Applies settings that must be set AFTER views are inflated (Fonts, Focus Mode)
+     */
+    private void applyPostInflationSettings(Activity activity) {
+        try {
+            // 1. Apply Focus Mode (hide distracting elements)
+            com.edulinguaghana.utils.DecorationUtils.applyFocusMode(activity.getWindow().getDecorView());
+            
+            // 2. Apply App Font (Standard vs Custom)
+            com.edulinguaghana.utils.FontUtils.applyAppFont(activity.getWindow().getDecorView());
         } catch (Exception ignored) {}
     }
 
@@ -125,7 +135,7 @@ public class App extends Application {
         registerActivityLifecycleCallbacks(new ActivityLifecycleCallbacks() {
             @Override
             public void onActivityCreated(@androidx.annotation.NonNull Activity activity, @androidx.annotation.Nullable Bundle savedInstanceState) {
-                applyAccessibilitySettings(activity);
+                applyPreInflationSettings(activity);
                 if (activity.getClass().getName().endsWith(".FeedbackActivity")) {
                     try {
                         // Use reflection to ensure screenshotUri is never null before onSaveInstanceState is called
@@ -139,7 +149,9 @@ public class App extends Application {
                 }
             }
 
-            @Override public void onActivityStarted(@androidx.annotation.NonNull Activity activity) {}
+            @Override public void onActivityStarted(@androidx.annotation.NonNull Activity activity) {
+                applyPostInflationSettings(activity);
+            }
             @Override public void onActivityResumed(@androidx.annotation.NonNull Activity activity) {}
             @Override public void onActivityPaused(@androidx.annotation.NonNull Activity activity) {}
             @Override public void onActivityStopped(@androidx.annotation.NonNull Activity activity) {}

@@ -274,6 +274,7 @@ public class NumbersActivity extends AppCompatActivity {
     }
 
     private void animateNumber() {
+        if (!com.edulinguaghana.AppPreferences.isAnimationsEnabled(this)) return;
         Animation anim = AnimationUtils.loadAnimation(this, R.anim.number_bounce);
         tvNumber.startAnimation(anim);
     }

@@ -11,12 +11,17 @@ public class DecorationUtils {
      * Or hides specific views by ID if they are common decorative elements.
      */
     public static void applyFocusMode(View root) {
-        if (root == null || !AppPreferences.isFocusModeEnabled(root.getContext())) return;
-
-        hideDecorations(root);
+        if (root == null) return;
+        
+        boolean focusMode = AppPreferences.isFocusModeEnabled(root.getContext());
+        boolean highContrast = AppPreferences.isHighContrastEnabled(root.getContext());
+        
+        if (focusMode || highContrast) {
+            simplifyUI(root, focusMode, highContrast);
+        }
     }
 
-    private static void hideDecorations(View view) {
+    private static void simplifyUI(View view, boolean focusMode, boolean highContrast) {
         if (view == null) return;
 
         // Check common decorative IDs
@@ -26,15 +31,18 @@ public class DecorationUtils {
             name = view.getContext().getResources().getResourceEntryName(id);
         } catch (Exception ignored) {}
 
+        // Hide decorations in Focus Mode OR High Contrast
         if (name.contains("decor") || name.contains("decoration") || name.contains("decorative") || 
-            name.contains("sparkle") || name.contains("dynamicBackground")) {
+            name.contains("sparkle") || name.contains("dynamicBackground") || name.contains("bubble") ||
+            name.contains("star") || name.contains("circle") || name.contains("triangle") || 
+            name.contains("square") || name.contains("floatingElements")) {
             view.setVisibility(View.GONE);
         }
 
         if (view instanceof ViewGroup) {
             ViewGroup group = (ViewGroup) view;
             for (int i = 0; i < group.getChildCount(); i++) {
-                hideDecorations(group.getChildAt(i));
+                simplifyUI(group.getChildAt(i), focusMode, highContrast);
             }
         }
     }
