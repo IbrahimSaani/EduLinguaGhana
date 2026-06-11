@@ -1,6 +1,6 @@
 # 🦉 EduLingua Ghana
 
-**EduLingua Ghana** is a premium, interactive language learning application for children, designed to make mastering Ghanaian languages fun, engaging, and effective. Meet **Owlbert**, the friendly learning buddy who guides young learners through the vibrant world of **Akan (Twi)**, **Ewe**, and **Ga**.
+**EduLingua Ghana** is a premium, interactive educational application for children, designed to make mastering **Alphabets and Numbers** fun and effective. Meet **Owlbert**, the friendly learning buddy who guides young learners through **English, French, Akan (Twi), Ewe, and Ga**.
 
 [![Stable Version](https://img.shields.io/badge/Version-1.0.9-blueviolet?style=for-the-badge)](https://github.com/IbrahimSaani/EduLinguaGhana/releases)
 [![Platform](https://img.shields.io/badge/Platform-Android-green?style=for-the-badge)](https://github.com/IbrahimSaani/EduLinguaGhana/releases)
@@ -10,24 +10,25 @@
 
 ## 🌟 Features
 
+### 🔢 Foundation Learning
+*   **Alphabet Recital:** Interactive exploration of alphabets in 5 languages.
+*   **Number Mastery:** Learn numbers from 1 to 100 with professional audio support.
+*   **Multilingual Support:** Switch seamlessly between English, French, Twi, Ewe, and Ga.
+
 ### 🎮 Educational Games
 *   **Rocket Sort:** Categorize letters and numbers while dodging space debris.
 *   **Bubble Pop:** Test your reflexes by popping the correct character bubbles.
 *   **Hidden Shapes:** Rub away the digital "sand" to reveal hidden letters and words.
 *   **Shape Match:** A premium puzzle experience for matching characters to their slots.
 
-### 🔊 Native Audio & TTS
-*   **Offline Native Audio:** High-quality, studio-recorded pronunciations for the entire alphabet and number sets.
-*   **GhanaLP Integration:** Advanced Text-to-Speech support for complex word synthesis in Twi, Ewe, and Ga.
+### 🔊 Native Audio
+*   **Offline Native Audio:** High-quality, studio-recorded pronunciations for letters and numbers across all supported languages.
+*   **Clear Articulation:** Designed specifically for early learners to catch the correct accent.
 
 ### 🧠 Smart Progress Tracking
 *   **XP & Leveling System:** Earn experience points for every lesson and game completed.
 *   **Streaks:** Stay motivated with daily learning streaks.
-*   **Teacher & Parent Dashboards:** Specialized roles to monitor student progress, view detailed reports, and provide support.
-
-### 🎨 Customizable Experience
-*   **Avatar Editor:** Create a unique learner profile with a fully customizable avatar.
-*   **Personalized Quests:** Daily tasks and milestones to keep the adventure fresh.
+*   **Teacher & Parent Dashboards:** Specialized roles to monitor progress and view detailed reports.
 
 ---
 
@@ -52,13 +53,12 @@ The official app is available as a signed APK. You can download it directly from
 *   **Auth:** Firebase Authentication (Email, Google, Facebook)
 *   **Animations:** Lottie, ViewPropertyAnimator
 *   **Background Tasks:** WorkManager
-*   **Analytics:** Firebase Crashlytics & Google Analytics
 
 ---
 
 ## 🤝 Support & Community
 
-We are committed to empowering Ghana's next generation through language. If you have suggestions, bug reports, or want to collaborate, please reach out!
+We are committed to empowering children through foundational education. If you have suggestions, bug reports, or want to collaborate, please reach out!
 
 *   **Email:** [edulinguaghana4@gmail.com](mailto:edulinguaghana4@gmail.com)
 *   **Landing Page:** [https://ibrahimsaani.github.io/EduLinguaGhana/](https://ibrahimsaani.github.io/EduLinguaGhana/)
