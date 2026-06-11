@@ -15,7 +15,7 @@
 # EduLingua Ghana ProGuard Rules
 
 # Preservation of line numbers for crash reporting
--keepattributes SourceFile,LineNumberTable
+-keepattributes SourceFile,LineNumberTable,Signature,EnclosingMethod,InnerClasses
 -renamesourcefileattribute SourceFile
 
 # --- Firebase rules ---
@@ -60,11 +60,24 @@
 -keepattributes *Annotation*
 -dontwarn sun.misc.**
 -keep class com.google.gson.** { *; }
-# Keep model classes used for Gson serialization
--keep class com.edulinguaghana.gamification.XPState { *; }
+-keep class com.google.gson.reflect.TypeToken
+-keep class * extends com.google.gson.reflect.TypeToken
+
+# --- Gson & Firebase Models ---
+-keep class com.edulinguaghana.Notification { *; }
+-keep class com.edulinguaghana.Notification$NotificationType { *; }
+-keep class com.edulinguaghana.Achievement { *; }
+-keep class com.edulinguaghana.Achievement$AchievementType { *; }
 -keep class com.edulinguaghana.LeaderboardEntry { *; }
+-keep class com.edulinguaghana.gamification.XPState { *; }
 -keep class com.edulinguaghana.social.ChallengeStats { *; }
 -keep class com.edulinguaghana.social.Challenge$State { *; }
+
+# Keep all classes in specific packages that are used as models
+-keep class com.edulinguaghana.roles.** { *; }
+-keep class com.edulinguaghana.tracking.models.** { *; }
+-keep class com.edulinguaghana.gamification.** { *; }
+-keep class com.edulinguaghana.social.** { *; }
 
 # --- Strip debug logs in production ---
 -assumenosideeffects class android.util.Log {
