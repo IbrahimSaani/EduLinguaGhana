@@ -105,29 +105,29 @@ public class QuestAdapter extends RecyclerView.Adapter<QuestAdapter.QuestViewHol
             // Set progress text and claim indicator visibility
             if (quest.completed) {
                 tvQuestProgress.setText("Completed!");
-                tvQuestProgress.setTextColor(itemView.getContext().getColor(R.color.correctAnswer));
+                tvQuestProgress.setTextColor(androidx.core.content.ContextCompat.getColor(itemView.getContext(), R.color.correctAnswer));
                 claimIndicator.setVisibility(View.GONE);
                 completionIndicator.setVisibility(View.VISIBLE);
                 itemView.setAlpha(0.7f);
-                iconBackground.setCardBackgroundColor(itemView.getContext().getColor(R.color.notification_achievement_bg));
+                iconBackground.setCardBackgroundColor(androidx.core.content.ContextCompat.getColor(itemView.getContext(), R.color.notification_achievement_bg));
                 overlayColor.setAlpha(0.2f);
             } else if (quest.progress >= quest.target) {
                 // Quest is ready to claim
                 tvQuestProgress.setText(quest.progress + "/" + quest.target);
-                tvQuestProgress.setTextColor(itemView.getContext().getColor(R.color.correctAnswer));
+                tvQuestProgress.setTextColor(androidx.core.content.ContextCompat.getColor(itemView.getContext(), R.color.correctAnswer));
                 claimIndicator.setVisibility(View.VISIBLE);
                 completionIndicator.setVisibility(View.GONE);
                 itemView.setAlpha(1.0f);
-                iconBackground.setCardBackgroundColor(itemView.getContext().getColor(R.color.white));
+                iconBackground.setCardBackgroundColor(androidx.core.content.ContextCompat.getColor(itemView.getContext(), R.color.white));
                 overlayColor.setAlpha(0.15f);
             } else {
                 // Quest in progress
                 tvQuestProgress.setText(quest.progress + "/" + quest.target);
-                tvQuestProgress.setTextColor(itemView.getContext().getColor(R.color.colorPrimary));
+                tvQuestProgress.setTextColor(androidx.core.content.ContextCompat.getColor(itemView.getContext(), R.color.colorPrimary));
                 claimIndicator.setVisibility(View.GONE);
                 completionIndicator.setVisibility(View.GONE);
                 itemView.setAlpha(1.0f);
-                iconBackground.setCardBackgroundColor(itemView.getContext().getColor(R.color.dividerColor));
+                iconBackground.setCardBackgroundColor(androidx.core.content.ContextCompat.getColor(itemView.getContext(), R.color.dividerColor));
                 overlayColor.setAlpha(0.1f);
             }
 

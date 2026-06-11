@@ -777,8 +777,8 @@ public class AlphabetActivity extends AppCompatActivity {
     private void showMascotMessage(String message) {
         Snackbar snackbar = Snackbar.make(findViewById(android.R.id.content), message, Snackbar.LENGTH_LONG);
         if (letterCard != null) snackbar.setAnchorView(letterCard);
-        snackbar.setBackgroundTint(getColor(R.color.colorPrimary));
-        snackbar.setTextColor(getColor(android.R.color.white));
+        snackbar.setBackgroundTint(androidx.core.content.ContextCompat.getColor(this, R.color.colorPrimary));
+        snackbar.setTextColor(androidx.core.content.ContextCompat.getColor(this, android.R.color.white));
         
         // Add a "Help" emoji to make it feel like Owlbert is talking
         message = "🦉 " + message;
@@ -849,11 +849,11 @@ public class AlphabetActivity extends AppCompatActivity {
                 
                 if (currentIndex == position) {
                     card.setStrokeWidth(4);
-                    card.setStrokeColor(ColorStateList.valueOf(getColor(R.color.colorAccent)));
-                    textView.setTextColor(getColor(R.color.colorAccent));
+                    card.setStrokeColor(ColorStateList.valueOf(androidx.core.content.ContextCompat.getColor(AlphabetActivity.this, R.color.colorAccent)));
+                    textView.setTextColor(androidx.core.content.ContextCompat.getColor(AlphabetActivity.this, R.color.colorAccent));
                 } else {
                     card.setStrokeWidth(0);
-                    textView.setTextColor(getColor(R.color.textColorPrimary));
+                    textView.setTextColor(androidx.core.content.ContextCompat.getColor(AlphabetActivity.this, R.color.textColorPrimary));
                 }
                 
                 card.setOnClickListener(v -> {

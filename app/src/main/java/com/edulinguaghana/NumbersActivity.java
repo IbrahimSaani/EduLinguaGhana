@@ -444,11 +444,11 @@ public class NumbersActivity extends AppCompatActivity {
                 
                 if (currentNumber == (position + 1)) {
                     card.setStrokeWidth(4);
-                    card.setStrokeColor(ColorStateList.valueOf(getColor(R.color.colorAccent)));
-                    textView.setTextColor(getColor(R.color.colorAccent));
+                    card.setStrokeColor(ColorStateList.valueOf(androidx.core.content.ContextCompat.getColor(NumbersActivity.this, R.color.colorAccent)));
+                    textView.setTextColor(androidx.core.content.ContextCompat.getColor(NumbersActivity.this, R.color.colorAccent));
                 } else {
                     card.setStrokeWidth(0);
-                    textView.setTextColor(getColor(R.color.textColorPrimary));
+                    textView.setTextColor(androidx.core.content.ContextCompat.getColor(NumbersActivity.this, R.color.textColorPrimary));
                 }
                 
                 card.setOnClickListener(v -> {
@@ -497,8 +497,8 @@ public class NumbersActivity extends AppCompatActivity {
     private void showMascotMessage(String message) {
         Snackbar snackbar = Snackbar.make(findViewById(android.R.id.content), message, Snackbar.LENGTH_LONG);
         if (mainNumberCard != null) snackbar.setAnchorView(mainNumberCard);
-        snackbar.setBackgroundTint(getColor(R.color.colorPrimary));
-        snackbar.setTextColor(getColor(android.R.color.white));
+        snackbar.setBackgroundTint(androidx.core.content.ContextCompat.getColor(this, R.color.colorPrimary));
+        snackbar.setTextColor(androidx.core.content.ContextCompat.getColor(this, android.R.color.white));
         
         String fullMessage = "🦉 " + message;
         

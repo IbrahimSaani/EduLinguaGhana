@@ -23,8 +23,8 @@ android {
         applicationId = "com.edulinguaghana"
         minSdk = 23
         targetSdk = 35
-        versionCode = 10
-        versionName = "1.0.9"
+        versionCode = 11
+        versionName = "1.1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
@@ -117,8 +117,8 @@ dependencies {
     implementation(libs.glide)
     implementation("androidx.viewpager2:viewpager2:1.0.0")
     implementation("androidx.cardview:cardview:1.0.0")
-    implementation("androidx.annotation:annotation:1.7.0")
-    implementation("com.google.code.gson:gson:2.10.1")
+    implementation("androidx.annotation:annotation:1.9.1")
+    implementation("com.google.code.gson:gson:2.11.0")
 
     // HTTP client for GhanaLP TTS API
     implementation("com.squareup.okhttp3:okhttp:4.12.0")
@@ -128,22 +128,22 @@ dependencies {
     implementation("com.journeyapps:zxing-android-embedded:4.3.0")
 
     // Firebase Authentication
-    implementation(platform("com.google.firebase:firebase-bom:34.13.0"))
+    implementation(platform("com.google.firebase:firebase-bom:34.14.1"))
     implementation("com.google.firebase:firebase-auth")
     implementation("com.google.firebase:firebase-database")
     implementation("com.google.firebase:firebase-crashlytics")
     implementation("com.google.firebase:firebase-messaging")
     implementation("com.google.firebase:firebase-installations")
-    implementation("com.google.android.gms:play-services-auth:20.7.0")
+    implementation("com.google.android.gms:play-services-auth:21.3.0")
 
     // Facebook Login
-    implementation("com.facebook.android:facebook-login:16.3.0")
+    implementation("com.facebook.android:facebook-login:18.0.0")
 
     // Celebratory effects
     implementation("nl.dionsegijn:konfetti-xml:2.0.4")
 
     // WorkManager for background tasks and notifications
-    implementation("androidx.work:work-runtime:2.9.0")
+    implementation("androidx.work:work-runtime:2.11.2")
 
     // Firebase App Distribution Feedback
     implementation(libs.firebase.appdistribution.api)

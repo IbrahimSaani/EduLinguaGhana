@@ -702,12 +702,16 @@ public class AvatarBuilder {
         DatabaseReference ref = FirebaseDatabase.getInstance().getReference("users").child(userId).child("avatar");
         ref.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
+            @SuppressWarnings("unchecked")
             public void onDataChange(DataSnapshot snapshot) {
                 if (snapshot.exists()) {
-                    Map<String, Object> map = (Map<String, Object>) snapshot.getValue();
-                    AvatarConfig config = AvatarConfig.fromMap(map);
-                    AvatarBuilder builder = new AvatarBuilder(context, config);
-                    builder.saveLocalOnly(context);
+                    Object value = snapshot.getValue();
+                    if (value instanceof Map) {
+                        Map<String, Object> map = (Map<String, Object>) value;
+                        AvatarConfig config = AvatarConfig.fromMap(map);
+                        AvatarBuilder builder = new AvatarBuilder(context, config);
+                        builder.saveLocalOnly(context);
+                    }
                 }
                 if (callback != null) callback.run();
             }
