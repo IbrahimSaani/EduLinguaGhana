@@ -61,7 +61,7 @@ The official app is available as a signed APK. You can download it directly from
 We are committed to empowering children through foundational education. If you have suggestions, bug reports, or want to collaborate, please reach out!
 
 *   **Email:** [edulinguaghana4@gmail.com](mailto:edulinguaghana4@gmail.com)
-*   **Landing Page:** [https://ibrahimsaani.github.io/EduLinguaGhana/](https://ibrahimsaani.github.io/EduLinguaGhana/)
+*   **Landing Page:** [https://edulinguaghana.online/](https://edulinguaghana.online/)
 
 ---
 
