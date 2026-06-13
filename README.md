@@ -2,7 +2,7 @@
 
 **EduLingua Ghana** is a premium, interactive educational application for children, designed to make mastering **Alphabets and Numbers** fun and effective. Meet **Owlbert**, the friendly learning buddy who guides young learners through **English, French, Akan (Twi), Ewe, and Ga**.
 
-[![Stable Version](https://img.shields.io/badge/Version-1.1.1-blueviolet?style=for-the-badge)](https://github.com/IbrahimSaani/EduLinguaGhana/releases)
+[![Stable Version](https://img.shields.io/badge/Version-1.1.2-blueviolet?style=for-the-badge)](https://github.com/IbrahimSaani/EduLinguaGhana/releases)
 [![Platform](https://img.shields.io/badge/Platform-Android-green?style=for-the-badge)](https://github.com/IbrahimSaani/EduLinguaGhana/releases)
 [![License](https://img.shields.io/badge/License-MIT-orange?style=for-the-badge)](LICENSE)
 
